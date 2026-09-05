@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface ApartmentPlan {
   rooms: 1 | 2 | 3 | number;
@@ -25,36 +25,47 @@ export default function FloorPlansSection({
   whatsappNumber = '996709115115',
   theme = 'dark',
 }: FloorPlansSectionProps) {
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
-  
-  // Выбранная планировка для детального просмотра
+
+  // Активная планировка для 3D-шоурума
   const [selectedPlan, setSelectedPlan] = useState<ApartmentPlan | null>(null);
-  // Полноэкранный зум (Lightbox как на 3-м скриншоте)
-  const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
+  
+  // Управление масштабом (Zoom)
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const filteredPlans =
     activeTab === 'all' ? plans : plans.filter((p) => p.rooms === activeTab);
 
-  const isDark = theme === 'dark';
+  // Сброс зума при смене квартиры
+  const openPlanModal = (plan: ApartmentPlan) => {
+    setSelectedPlan(plan);
+    setZoomLevel(1);
+    setIsFullscreen(false);
+  };
 
-  // Закрытие по клавише Esc
-  const handleCloseModal = useCallback(() => {
-    if (isLightboxOpen) {
-      setIsLightboxOpen(false);
-    } else {
-      setSelectedPlan(null);
-    }
-  }, [isLightboxOpen]);
+  const closeModal = useCallback(() => {
+    setSelectedPlan(null);
+    setZoomLevel(1);
+    setIsFullscreen(false);
+  }, []);
 
+  // Управление зумом
+  const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.35, 2.5));
+  const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.35, 0.75));
+  const handleResetZoom = () => setZoomLevel(1);
+
+  // Навигация клавишами
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleCloseModal();
+      if (e.key === 'Escape') closeModal();
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleCloseModal]);
+  }, [closeModal]);
 
-  // Блокировка прокрутки фона при открытом окне
+  // Блокировка прокрутки фона
   useEffect(() => {
     if (selectedPlan) {
       document.body.style.overflow = 'hidden';
@@ -66,102 +77,122 @@ export default function FloorPlansSection({
     };
   }, [selectedPlan]);
 
-  // Список «Другие планировки» (исключаем текущую открытую)
+  // Другие планировки для нижней ленты
   const otherPlans = selectedPlan
-    ? plans.filter((p) => p.title !== selectedPlan.title || p.area !== selectedPlan.area).slice(0, 4)
+    ? plans.filter((p) => p.title !== selectedPlan.title || p.area !== selectedPlan.area)
     : [];
 
   const getWhatsAppLink = (plan: ApartmentPlan) => {
-    const message = `Здравствуйте! Интересует подробная информация о планировке: ${plan.title} (${plan.area}) в ${projectName}. Сообщите, пожалуйста, актуальную цену, этажи и условия рассрочки.`;
+    const message = `Здравствуйте! Меня интересует 3D-планировка: ${plan.title} (${plan.area}) в ${projectName}. Отправьте, пожалуйста, свободные этажи и расчет рассрочки.`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
 
   return (
-    <section className={`py-16 px-4 sm:px-6 relative ${isDark ? 'bg-[#181818] text-white' : 'bg-[#f4f7f5] text-gray-900'}`}>
-      <div className="max-w-6xl mx-auto">
-        
-        {/* Заголовок */}
-        <h2 className={`text-2xl sm:text-3xl font-black text-center uppercase tracking-wider mb-8 ${isDark ? 'text-[#d4b26f]' : 'text-[#064734]'}`}>
-          Планировки
-        </h2>
+    <section className={`py-24 px-4 sm:px-6 relative overflow-hidden ${isDark ? 'bg-[#0e1110] text-white' : 'bg-[#f4f7f5] text-gray-900'}`}>
+      
+      {/* Декоративное фоновое свечение */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#064734]/20 rounded-full blur-[140px] pointer-events-none" />
 
-        {/* Табы комнатности */}
-        <div className="flex justify-center items-center gap-6 sm:gap-10 mb-12 border-b border-white/10 pb-4">
-          {[
-            { id: 'all', label: 'Все' },
-            { id: 1, label: '1 ком' },
-            { id: 2, label: '2 ком' },
-            { id: 3, label: '3 ком' },
-          ].map((tab) => {
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`text-sm sm:text-base font-bold transition-all relative pb-2 ${
-                  isActive
-                    ? isDark
-                      ? 'text-[#d4b26f]'
-                      : 'text-[#064734]'
-                    : isDark
-                    ? 'text-gray-400 hover:text-white'
-                    : 'text-gray-500 hover:text-gray-900'
-                }`}
-              >
-                {tab.label}
-                {isActive && (
-                  <span
-                    className={`absolute bottom-[-17px] left-0 w-full h-[3px] rounded-full ${
-                      isDark ? 'bg-[#d4b26f]' : 'bg-[#064734]'
-                    }`}
-                  />
-                )}
-              </button>
-            );
-          })}
+      <div className="max-w-7xl mx-auto relative z-10">
+        
+        {/* Шапка секции */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#064734]/30 border border-[#d4b26f]/30 text-[#d4b26f] text-xs font-bold uppercase tracking-widest mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#d4b26f] animate-pulse" />
+              Интерактивный каталог
+            </div>
+            <h2 className={`text-3xl sm:text-5xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+              3D Планировки
+            </h2>
+          </div>
+
+          {/* Фильтр по комнатам */}
+          <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10">
+            {[
+              { id: 'all', label: 'Все планировки' },
+              { id: 1, label: '1-комнатные' },
+              { id: 2, label: '2-комнатные' },
+              { id: 3, label: '3-комнатные' },
+            ].map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                  className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-300 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#064734] to-[#0a5740] text-white shadow-lg shadow-[#064734]/40 scale-105'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Сетка карточек */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Сетка карточек с 3D-эффектом */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
           {filteredPlans.map((plan, idx) => (
             <div
               key={idx}
-              onClick={() => setSelectedPlan(plan)}
-              className="bg-[#ebebeb] text-gray-900 rounded-2xl p-5 flex flex-col justify-between hover:shadow-xl transition-all duration-300 group cursor-pointer border border-transparent hover:border-[#064734]/30"
+              onClick={() => openPlanModal(plan)}
+              className="group cursor-pointer rounded-3xl p-5 bg-gradient-to-b from-white/[0.07] to-white/[0.02] hover:from-[#064734]/30 hover:to-black/40 border border-white/10 hover:border-[#d4b26f]/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(0,0,0,0.5)] flex flex-col justify-between"
             >
               <div>
-                {/* Изображение с индикатором лупы */}
-                <div className="relative h-44 w-full bg-white rounded-xl overflow-hidden mb-4 flex items-center justify-center p-3 border border-gray-200">
+                {/* 3D-подиум карточки */}
+                <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-gradient-to-b from-neutral-900/90 to-black p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:border-[#d4b26f]/20 transition-colors">
+                  
+                  {/* Фоновая координатная сетка */}
+                  <div
+                    className="absolute inset-0 opacity-20 pointer-events-none"
+                    style={{
+                      backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
+                      backgroundSize: '16px 16px',
+                    }}
+                  />
+
+                  {/* Бедж комнатности */}
+                  <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#064734] text-white shadow border border-white/10">
+                    {plan.rooms}-КОМНАТНАЯ
+                  </span>
+
+                  {/* Иконка 3D / Лупы */}
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-[#d4b26f] flex items-center justify-center border border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                  </div>
+
+                  {/* Само 3D-изображение с мягким левитирующим зумом */}
                   <img
                     src={plan.image || '/projects/Abu-Dhabi.png'}
                     alt={plan.title}
-                    className="max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="max-h-full max-w-full object-contain filter drop-shadow-[0_12px_18px_rgba(0,0,0,0.7)] group-hover:scale-110 transition-transform duration-500 ease-out"
                   />
-                  
-                  {/* Иконка лупы в углу */}
-                  <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
                 </div>
 
-                {/* Название и площадь */}
-                <p className="text-xs text-gray-600 font-medium leading-snug line-clamp-2 mb-2">
+                <p className="text-xs text-gray-400 font-medium line-clamp-2 mb-2">
                   {plan.title}
                 </p>
-                <p className="text-2xl font-black text-gray-950 tracking-tight">
-                  {plan.area}
-                </p>
+
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl sm:text-3xl font-black text-[#d4b26f] tracking-tight">
+                    {plan.area}
+                  </span>
+                </div>
               </div>
 
-              {/* Кнопка подробнее */}
+              {/* Кнопка интерактивного входа */}
               <button
                 type="button"
-                className="mt-5 w-full text-center bg-[#064734] hover:bg-[#032b20] text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm"
+                className="mt-5 w-full py-3 rounded-xl bg-white/5 group-hover:bg-[#064734] text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border border-white/10 group-hover:border-transparent shadow-sm"
               >
-                Узнать подробнее
+                <span>3D Осмотр</span>
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
               </button>
             </div>
           ))}
@@ -169,123 +200,228 @@ export default function FloorPlansSection({
 
       </div>
 
-      {/* ======================================================== */}
-      {/* 🔍 МОДАЛЬНОЕ ОКНО ДЕТАЛЬНОГО ПРОСМОТРА С ПЛАНИРОВКОЙ    */}
-      {/* ======================================================== */}
+      {/* ========================================================================= */}
+      {/* 🏛️ ПРЕМИАЛЬНЫЙ 3D-ШОУРУМ (MODAL SHOWCASE)                                 */}
+      {/* ========================================================================= */}
       {selectedPlan && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md animate-fadeIn"
-          onClick={() => setSelectedPlan(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/90 backdrop-blur-2xl animate-fadeIn"
+          onClick={closeModal}
         >
+          {/* Контейнер шоурума */}
           <div
-            className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto bg-white text-gray-900 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col"
+            className={`relative w-full ${
+              isFullscreen ? 'max-w-none h-screen rounded-none' : 'max-w-6xl max-h-[94vh] rounded-[32px]'
+            } bg-gradient-to-b from-[#161a18] to-[#0c0f0d] text-white border border-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.9)] flex flex-col overflow-hidden transition-all duration-300`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Крестик закрытия */}
-            <button
-              type="button"
-              onClick={() => setSelectedPlan(null)}
-              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center transition-all"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+            
+            {/* Верхняя статус-панель */}
+            <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md">
+              <div className="flex items-center gap-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs uppercase font-extrabold tracking-wider text-[#d4b26f]">
+                  {projectName} • 3D Модель
+                </span>
+              </div>
 
-            {/* Верхний блок: Чертеж слева, Характеристики справа */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-10">
-              
-              {/* Большой чертеж с кнопкой лупы */}
-              <div
-                className="relative bg-[#f8f9f8] border border-gray-200 rounded-2xl p-4 sm:p-6 flex items-center justify-center h-72 sm:h-80 cursor-zoom-in group"
-                onClick={() => setIsLightboxOpen(true)}
-              >
-                <img
-                  src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
-                  alt={selectedPlan.title}
-                  className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
-                />
-
-                {/* Лупа в кружке (как на скриншоте) */}
+              {/* Кнопки управления */}
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsLightboxOpen(true);
-                  }}
-                  className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white shadow-md border border-gray-200 text-gray-700 flex items-center justify-center hover:scale-110 transition-transform"
-                  title="Увеличить планировку"
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  className="hidden sm:flex px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-xs font-semibold text-gray-300 hover:text-white transition-colors items-center gap-1.5"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                  <span>{isFullscreen ? 'Обычный вид' : 'Во весь экран'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  aria-label="Закрыть"
+                  className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/25 active:scale-95 text-white flex items-center justify-center transition-all border border-white/10"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
+            </div>
 
-              {/* Параметры квартиры */}
-              <div className="flex flex-col justify-between">
+            {/* Основное тело шоурума */}
+            <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12">
+              
+              {/* Левая интерактивная 3D-сцена (7 колонок) */}
+              <div className="lg:col-span-7 relative bg-gradient-to-b from-black/80 to-neutral-950 p-6 sm:p-10 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[500px] border-b lg:border-b-0 lg:border-r border-white/10 overflow-hidden">
+                
+                {/* Архитектурная подложка-сетка */}
+                <div
+                  className="absolute inset-0 opacity-25 pointer-events-none"
+                  style={{
+                    backgroundImage: 'radial-gradient(circle, rgba(212,178,111,0.4) 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                  }}
+                />
+
+                {/* Плавающая панель инструментов масштабирования (Floating 3D Bar) */}
+                <div className="absolute top-4 left-4 z-30 flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/15 shadow-2xl">
+                  <button
+                    type="button"
+                    onClick={handleZoomOut}
+                    disabled={zoomLevel <= 0.75}
+                    className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white flex items-center justify-center text-sm font-bold transition-all"
+                    title="Уменьшить"
+                  >
+                    −
+                  </button>
+                  <span className="text-[11px] font-mono px-2 font-bold text-[#d4b26f]">
+                    {Math.round(zoomLevel * 100)}%
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleZoomIn}
+                    disabled={zoomLevel >= 2.5}
+                    className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/15 disabled:opacity-30 text-white flex items-center justify-center text-sm font-bold transition-all"
+                    title="Приблизить"
+                  >
+                    +
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetZoom}
+                    className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg bg-white/5 hover:bg-white/15 text-gray-300 transition-colors ml-1"
+                  >
+                    Сброс
+                  </button>
+                </div>
+
+                {/* 3D-планировка с трансформацией масштаба */}
+                <div
+                  className="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 ease-out cursor-grab active:cursor-grabbing"
+                  style={{ transform: `scale(${zoomLevel})` }}
+                  onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.75 : 1))}
+                >
+                  <img
+                    src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
+                    alt={selectedPlan.title}
+                    className="max-h-[340px] sm:max-h-[440px] max-w-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.9)] select-none"
+                    draggable={false}
+                  />
+                </div>
+
+                <div className="relative z-20 mt-4 text-center">
+                  <span className="text-[11px] text-gray-400 bg-black/60 px-3 py-1 rounded-full border border-white/5">
+                    💡 Кликните по планировке для быстрого увеличения деталей
+                  </span>
+                </div>
+              </div>
+
+              {/* Правая колонка с характеристиками и бронированием (5 колонок) */}
+              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-b from-[#141816] to-[#0c0f0e]">
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight mb-4">
+                  <div className="inline-block text-[11px] uppercase font-black tracking-widest text-[#d4b26f] mb-1">
+                    {selectedPlan.rooms}-КОМНАТНАЯ КВАРТИРА
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-black text-white leading-tight mb-2">
                     {selectedPlan.title}
                   </h3>
 
-                  <div className="space-y-2.5 text-sm text-gray-700 mb-8">
-                    <p className="flex items-center gap-2">
-                      <span className="text-gray-400">Площадь:</span>
-                      <strong className="text-gray-950 font-extrabold">{selectedPlan.area}</strong>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="text-gray-400">Высота потолков:</span>
-                      <strong className="text-gray-950">{selectedPlan.ceiling || '3.45 метра'}</strong>
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="text-gray-400">Тип отделки:</span>
-                      <strong className="text-gray-950">{selectedPlan.finish || 'ПСО'}</strong>
+                  <div className="text-3xl sm:text-4xl font-black text-[#d4b26f] tracking-tight mb-6">
+                    {selectedPlan.area}
+                  </div>
+
+                  {/* Сетка параметров 2x2 */}
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                      <span className="text-[11px] text-gray-400 block mb-1">Потолки</span>
+                      <strong className="text-sm font-bold text-white">
+                        {selectedPlan.ceiling || '3.45 метра'}
+                      </strong>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                      <span className="text-[11px] text-gray-400 block mb-1">Отделка</span>
+                      <strong className="text-sm font-bold text-white">
+                        {selectedPlan.finish || 'ПСО (самоотделка)'}
+                      </strong>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                      <span className="text-[11px] text-gray-400 block mb-1">Сейсмостойкость</span>
+                      <strong className="text-sm font-bold text-white">9 баллов (СНиП)</strong>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
+                      <span className="text-[11px] text-gray-400 block mb-1">Рассрочка</span>
+                      <strong className="text-sm font-bold text-[#d4b26f]">до 40 месяцев 0%</strong>
+                    </div>
+                  </div>
+
+                  {/* Выгода и статус */}
+                  <div className="p-4 rounded-2xl bg-[#064734]/25 border border-[#064734]/60 flex items-start gap-3 mb-6">
+                    <span className="text-xl">🛡️</span>
+                    <p className="text-xs text-emerald-100/90 leading-relaxed">
+                      Прямой договор с застройщиком. Возможность оформления по программе Trade-in (обмен авто или недвижимости).
                     </p>
                   </div>
                 </div>
 
-                {/* Кнопка WhatsApp */}
-                <a
-                  href={getWhatsAppLink(selectedPlan)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-center bg-[#064734] hover:bg-[#032b20] text-white font-extrabold py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md"
-                >
-                  Узнать подробнее
-                </a>
+                {/* Кнопка мгновенной связи */}
+                <div>
+                  <a
+                    href={getWhatsAppLink(selectedPlan)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#064734] to-[#0a5c44] hover:from-[#032b20] hover:to-[#064734] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-300 shadow-xl shadow-[#064734]/30 flex items-center justify-center gap-2.5 active:scale-[0.98] border border-emerald-500/30"
+                  >
+                    <span className="text-base">💬</span>
+                    <span>Получить расчет и цены в WhatsApp</span>
+                  </a>
+                  <span className="text-[11px] text-gray-500 text-center block mt-2">
+                    Ответим в течение 2 минут со всеми деталями
+                  </span>
+                </div>
               </div>
 
             </div>
 
-            {/* Нижний блок: «Другие планировки:» (как на скриншоте) */}
+            {/* Нижняя лента: «Другие 3D-планировки» */}
             {otherPlans.length > 0 && (
-              <div className="border-t border-gray-100 pt-6">
-                <h4 className="text-sm font-bold text-gray-800 mb-4">
-                  Другие планировки:
-                </h4>
+              <div className="px-6 py-4 bg-black/60 border-t border-white/10">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+                    Другие доступные планировки:
+                  </span>
+                  <span className="text-[11px] text-[#d4b26f]">
+                    Всего вариантов: {plans.length}
+                  </span>
+                </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {otherPlans.map((item, oIdx) => (
+                <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
+                  {otherPlans.slice(0, 6).map((item, idx) => (
                     <div
-                      key={oIdx}
-                      onClick={() => setSelectedPlan(item)}
-                      className="p-3 bg-[#f8f9f8] hover:bg-[#eef2ef] rounded-xl border border-gray-200 cursor-pointer transition-all group flex flex-col justify-between"
+                      key={idx}
+                      onClick={() => openPlanModal(item)}
+                      className="flex-shrink-0 w-44 p-2.5 rounded-xl bg-white/5 hover:bg-[#064734]/30 border border-white/10 hover:border-[#d4b26f]/50 cursor-pointer transition-all flex items-center gap-2.5 group"
                     >
-                      <div className="h-24 w-full flex items-center justify-center bg-white rounded-lg mb-2 p-1 border border-gray-100">
+                      <div className="w-12 h-12 rounded-lg bg-black/50 p-1 flex items-center justify-center flex-shrink-0">
                         <img
                           src={item.image || '/projects/Abu-Dhabi.png'}
                           alt={item.title}
-                          className="max-h-full object-contain group-hover:scale-105 transition-transform"
+                          className="max-h-full object-contain group-hover:scale-110 transition-transform"
                         />
                       </div>
-                      <div>
-                        <p className="text-[11px] text-gray-600 line-clamp-2 leading-tight mb-1">
+                      <div className="overflow-hidden">
+                        <span className="text-[10px] text-gray-400 block truncate">
                           {item.title}
-                        </p>
-                        <p className="text-xs font-black text-gray-900">
+                        </span>
+                        <strong className="text-xs text-[#d4b26f] font-bold">
                           {item.area}
-                        </p>
+                        </strong>
                       </div>
                     </div>
                   ))}
@@ -294,34 +430,6 @@ export default function FloorPlansSection({
             )}
 
           </div>
-        </div>
-      )}
-
-      {/* ======================================================== */}
-      {/* 🖼️ ПОЛНОЭКРАННЫЙ ЗУМ (LIGHTBOX КАК НА 3-М СКРИНШОТЕ)   */}
-      {/* ======================================================== */}
-      {isLightboxOpen && selectedPlan && (
-        <div
-          className="fixed inset-0 z-[60] bg-black/95 flex items-center justify-center p-4 sm:p-8 cursor-zoom-out animate-fadeIn"
-          onClick={() => setIsLightboxOpen(false)}
-        >
-          {/* Кнопка закрытия зума */}
-          <button
-            type="button"
-            onClick={() => setIsLightboxOpen(false)}
-            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all border border-white/20"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-
-          <img
-            src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
-            alt={selectedPlan.title}
-            className="max-h-[90vh] max-w-[90vw] object-contain drop-shadow-2xl scale-105 sm:scale-125 transition-transform duration-300"
-            onClick={(e) => e.stopPropagation()}
-          />
         </div>
       )}
 
