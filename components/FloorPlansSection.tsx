@@ -28,35 +28,92 @@ export default function FloorPlansSection({
   const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
 
-  // Активная планировка для 3D-шоурума
+  // Активная планировка
   const [selectedPlan, setSelectedPlan] = useState<ApartmentPlan | null>(null);
   
-  // Управление масштабом (Zoom)
+  // Управление масштабом и полноэкранным режимом
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  // 3D Tilt переменные наклона
+  const [rotateX, setRotateX] = useState<number>(0);
+  const [rotateY, setRotateY] = useState<number>(0);
+  const [isInteracting, setIsInteracting] = useState<boolean>(false);
+  const [isAutoRotate, setIsAutoRotate] = useState<boolean>(false);
+
+  const stageRef = useRef<HTMLDivElement>(null);
 
   const filteredPlans =
     activeTab === 'all' ? plans : plans.filter((p) => p.rooms === activeTab);
 
-  // Сброс зума при смене квартиры
+  // Открытие модалки
   const openPlanModal = (plan: ApartmentPlan) => {
     setSelectedPlan(plan);
     setZoomLevel(1);
+    setRotateX(0);
+    setRotateY(0);
     setIsFullscreen(false);
+    setIsAutoRotate(false);
   };
 
   const closeModal = useCallback(() => {
     setSelectedPlan(null);
     setZoomLevel(1);
+    setRotateX(0);
+    setRotateY(0);
     setIsFullscreen(false);
+    setIsAutoRotate(false);
   }, []);
 
   // Управление зумом
   const handleZoomIn = () => setZoomLevel((prev) => Math.min(prev + 0.35, 2.5));
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.35, 0.75));
-  const handleResetZoom = () => setZoomLevel(1);
+  const handleResetZoom = () => {
+    setZoomLevel(1);
+    setRotateX(0);
+    setRotateY(0);
+  };
 
-  // Навигация клавишами
+  // Расчет 3D-наклона от центра подиума
+  const handlePointerMove = (clientX: number, clientY: number) => {
+    if (!stageRef.current || isAutoRotate) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = (clientX - rect.left) / rect.width - 0.5;
+    const y = (clientY - rect.top) / rect.height - 0.5;
+    
+    // Плавный угол наклона: до ±28° по горизонтали и ±20° по вертикали
+    setRotateY(Number((x * 32).toFixed(2)));
+    setRotateX(Number((-y * 24).toFixed(2)));
+    setIsInteracting(true);
+  };
+
+  const handlePointerLeave = () => {
+    setIsInteracting(false);
+    if (!isAutoRotate) {
+      setRotateX(0);
+      setRotateY(0);
+    }
+  };
+
+  // Авто-парение (Wobble анимация через requestAnimationFrame)
+  useEffect(() => {
+    if (!isAutoRotate || !selectedPlan) return;
+
+    let frameId: number;
+    let startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = (Date.now() - startTime) / 1000;
+      setRotateY(Math.sin(elapsed * 1.5) * 18);
+      setRotateX(Math.cos(elapsed * 1.2) * 10);
+      frameId = requestAnimationFrame(animate);
+    };
+
+    frameId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frameId);
+  }, [isAutoRotate, selectedPlan]);
+
+  // Закрытие по Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeModal();
@@ -65,7 +122,7 @@ export default function FloorPlansSection({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [closeModal]);
 
-  // Блокировка прокрутки фона
+  // Блокировка прокрутки фона страницы
   useEffect(() => {
     if (selectedPlan) {
       document.body.style.overflow = 'hidden';
@@ -77,7 +134,6 @@ export default function FloorPlansSection({
     };
   }, [selectedPlan]);
 
-  // Другие планировки для нижней ленты
   const otherPlans = selectedPlan
     ? plans.filter((p) => p.title !== selectedPlan.title || p.area !== selectedPlan.area)
     : [];
@@ -90,20 +146,20 @@ export default function FloorPlansSection({
   return (
     <section className={`py-24 px-4 sm:px-6 relative overflow-hidden ${isDark ? 'bg-[#0e1110] text-white' : 'bg-[#f4f7f5] text-gray-900'}`}>
       
-      {/* Декоративное фоновое свечение */}
+      {/* Декоративное изумрудное свечение */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#064734]/20 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto relative z-10">
         
-        {/* Шапка секции */}
+        {/* Шапка каталога */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#064734]/30 border border-[#d4b26f]/30 text-[#d4b26f] text-xs font-bold uppercase tracking-widest mb-3">
               <span className="w-1.5 h-1.5 rounded-full bg-[#d4b26f] animate-pulse" />
-              Интерактивный каталог
+              Интерактивный 3D Каталог
             </div>
             <h2 className={`text-3xl sm:text-5xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-[#064734]'}`}>
-              3D Планировки
+              Планировки квартир
             </h2>
           </div>
 
@@ -134,7 +190,7 @@ export default function FloorPlansSection({
           </div>
         </div>
 
-        {/* Сетка карточек с 3D-эффектом */}
+        {/* Сетка планировок */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-7">
           {filteredPlans.map((plan, idx) => (
             <div
@@ -143,10 +199,10 @@ export default function FloorPlansSection({
               className="group cursor-pointer rounded-3xl p-5 bg-gradient-to-b from-white/[0.07] to-white/[0.02] hover:from-[#064734]/30 hover:to-black/40 border border-white/10 hover:border-[#d4b26f]/50 transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_45px_rgba(0,0,0,0.5)] flex flex-col justify-between"
             >
               <div>
-                {/* 3D-подиум карточки */}
+                {/* Карточка-подиум */}
                 <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-gradient-to-b from-neutral-900/90 to-black p-4 mb-5 flex items-center justify-center border border-white/5 group-hover:border-[#d4b26f]/20 transition-colors">
                   
-                  {/* Фоновая координатная сетка */}
+                  {/* Фоновая архитектурная сетка */}
                   <div
                     className="absolute inset-0 opacity-20 pointer-events-none"
                     style={{
@@ -155,19 +211,14 @@ export default function FloorPlansSection({
                     }}
                   />
 
-                  {/* Бедж комнатности */}
                   <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-[#064734] text-white shadow border border-white/10">
                     {plan.rooms}-КОМНАТНАЯ
                   </span>
 
-                  {/* Иконка 3D / Лупы */}
                   <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/60 backdrop-blur-md text-[#d4b26f] flex items-center justify-center border border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
-                    </svg>
+                    <span className="text-xs">3D</span>
                   </div>
 
-                  {/* Само 3D-изображение с мягким левитирующим зумом */}
                   <img
                     src={plan.image || '/projects/Abu-Dhabi.png'}
                     alt={plan.title}
@@ -186,7 +237,6 @@ export default function FloorPlansSection({
                 </div>
               </div>
 
-              {/* Кнопка интерактивного входа */}
               <button
                 type="button"
                 className="mt-5 w-full py-3 rounded-xl bg-white/5 group-hover:bg-[#064734] text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 border border-white/10 group-hover:border-transparent shadow-sm"
@@ -201,14 +251,13 @@ export default function FloorPlansSection({
       </div>
 
       {/* ========================================================================= */}
-      {/* 🏛️ ПРЕМИАЛЬНЫЙ 3D-ШОУРУМ (MODAL SHOWCASE)                                 */}
+      {/* 🏛️ 3D-ШОУРУМ С ИНТЕРАКТИВНЫМ TILT НАКЛОНОМ                               */}
       {/* ========================================================================= */}
       {selectedPlan && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-black/90 backdrop-blur-2xl animate-fadeIn"
           onClick={closeModal}
         >
-          {/* Контейнер шоурума */}
           <div
             className={`relative w-full ${
               isFullscreen ? 'max-w-none h-screen rounded-none' : 'max-w-6xl max-h-[94vh] rounded-[32px]'
@@ -221,11 +270,11 @@ export default function FloorPlansSection({
               <div className="flex items-center gap-3">
                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-xs uppercase font-extrabold tracking-wider text-[#d4b26f]">
-                  {projectName} • 3D Модель
+                  {projectName} • Интерактивный 3D Осмотр
                 </span>
               </div>
 
-              {/* Кнопки управления */}
+              {/* Управление окном */}
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -251,23 +300,35 @@ export default function FloorPlansSection({
               </div>
             </div>
 
-            {/* Основное тело шоурума */}
+            {/* Основное тело */}
             <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12">
               
-              {/* Левая интерактивная 3D-сцена (7 колонок) */}
-              <div className="lg:col-span-7 relative bg-gradient-to-b from-black/80 to-neutral-950 p-6 sm:p-10 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[500px] border-b lg:border-b-0 lg:border-r border-white/10 overflow-hidden">
+              {/* Левая 3D-сцена с реакцией на движение (7 колонок) */}
+              <div
+                ref={stageRef}
+                onMouseMove={(e) => handlePointerMove(e.clientX, e.clientY)}
+                onMouseLeave={handlePointerLeave}
+                onTouchMove={(e) => {
+                  if (e.touches[0]) {
+                    handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+                  }
+                }}
+                onTouchEnd={handlePointerLeave}
+                style={{ touchAction: 'none' }}
+                className="lg:col-span-7 relative bg-gradient-to-b from-black/85 to-neutral-950 p-6 sm:p-10 flex flex-col items-center justify-center min-h-[400px] sm:min-h-[520px] border-b lg:border-b-0 lg:border-r border-white/10 overflow-hidden select-none cursor-crosshair"
+              >
                 
-                {/* Архитектурная подложка-сетка */}
+                {/* Архитектурная координатная сетка */}
                 <div
                   className="absolute inset-0 opacity-25 pointer-events-none"
                   style={{
-                    backgroundImage: 'radial-gradient(circle, rgba(212,178,111,0.4) 1px, transparent 1px)',
+                    backgroundImage: 'radial-gradient(circle, rgba(212,178,111,0.45) 1px, transparent 1px)',
                     backgroundSize: '24px 24px',
                   }}
                 />
 
-                {/* Плавающая панель инструментов масштабирования (Floating 3D Bar) */}
-                <div className="absolute top-4 left-4 z-30 flex items-center gap-1.5 p-1.5 rounded-2xl bg-black/70 backdrop-blur-xl border border-white/15 shadow-2xl">
+                {/* Панель инструментов: масштаб и режим Авто-вращения */}
+                <div className="absolute top-4 left-4 z-30 flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-black/75 backdrop-blur-xl border border-white/15 shadow-2xl">
                   <button
                     type="button"
                     onClick={handleZoomOut}
@@ -289,37 +350,72 @@ export default function FloorPlansSection({
                   >
                     +
                   </button>
+
+                  <div className="h-4 w-px bg-white/20 mx-1" />
+
+                  {/* Кнопка Авто-парения 3D */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAutoRotate(!isAutoRotate);
+                      if (isAutoRotate) {
+                        setRotateX(0);
+                        setRotateY(0);
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-[11px] font-extrabold uppercase transition-all flex items-center gap-1.5 ${
+                      isAutoRotate
+                        ? 'bg-[#d4b26f] text-[#064734] shadow-md shadow-[#d4b26f]/30'
+                        : 'bg-white/10 hover:bg-white/20 text-gray-300'
+                    }`}
+                  >
+                    <span>{isAutoRotate ? '⏹ Стоп 3D' : '🔄 Авто 3D'}</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleResetZoom}
-                    className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg bg-white/5 hover:bg-white/15 text-gray-300 transition-colors ml-1"
+                    className="px-2.5 py-1 text-[10px] font-bold uppercase rounded-lg bg-white/5 hover:bg-white/15 text-gray-400 hover:text-white transition-colors"
                   >
                     Сброс
                   </button>
                 </div>
 
-                {/* 3D-планировка с трансформацией масштаба */}
+                {/* 3D Контейнер с перспективой */}
                 <div
-                  className="relative z-10 w-full h-full flex items-center justify-center transition-transform duration-300 ease-out cursor-grab active:cursor-grabbing"
-                  style={{ transform: `scale(${zoomLevel})` }}
-                  onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.75 : 1))}
+                  className="relative z-10 w-full h-full flex items-center justify-center pointer-events-none"
+                  style={{ perspective: '1200px' }}
                 >
-                  <img
-                    src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
-                    alt={selectedPlan.title}
-                    className="max-h-[340px] sm:max-h-[440px] max-w-full object-contain filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.9)] select-none"
-                    draggable={false}
-                  />
+                  <div
+                    className="relative transition-transform ease-out"
+                    style={{
+                      transform: `scale(${zoomLevel}) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+                      transformStyle: 'preserve-3d',
+                      transitionDuration: isInteracting ? '70ms' : '500ms',
+                    }}
+                  >
+                    {/* Динамическая падающая тень */}
+                    <img
+                      src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
+                      alt={selectedPlan.title}
+                      className="max-h-[340px] sm:max-h-[440px] max-w-full object-contain select-none"
+                      style={{
+                        filter: `drop-shadow(${-rotateY * 1.3}px ${rotateX * 1.3 + 28}px 32px rgba(0,0,0,0.85))`,
+                      }}
+                      draggable={false}
+                    />
+                  </div>
                 </div>
 
-                <div className="relative z-20 mt-4 text-center">
-                  <span className="text-[11px] text-gray-400 bg-black/60 px-3 py-1 rounded-full border border-white/5">
-                    💡 Кликните по планировке для быстрого увеличения деталей
+                {/* Интерактивная подсказка внизу сцены */}
+                <div className="relative z-20 mt-3 text-center pointer-events-none">
+                  <span className="text-[11px] font-medium text-gray-400 bg-black/60 px-3.5 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                    🕹️ Водите курсором или пальцем для наклона в 3D пространстве
                   </span>
                 </div>
               </div>
 
-              {/* Правая колонка с характеристиками и бронированием (5 колонок) */}
+              {/* Правая колонка характеристик (5 колонок) */}
               <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-gradient-to-b from-[#141816] to-[#0c0f0e]">
                 <div>
                   <div className="inline-block text-[11px] uppercase font-black tracking-widest text-[#d4b26f] mb-1">
@@ -334,17 +430,17 @@ export default function FloorPlansSection({
                     {selectedPlan.area}
                   </div>
 
-                  {/* Сетка параметров 2x2 */}
+                  {/* Сетка параметров */}
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
-                      <span className="text-[11px] text-gray-400 block mb-1">Потолки</span>
+                      <span className="text-[11px] text-gray-400 block mb-1">Высота потолков</span>
                       <strong className="text-sm font-bold text-white">
                         {selectedPlan.ceiling || '3.45 метра'}
                       </strong>
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
-                      <span className="text-[11px] text-gray-400 block mb-1">Отделка</span>
+                      <span className="text-[11px] text-gray-400 block mb-1">Тип отделки</span>
                       <strong className="text-sm font-bold text-white">
                         {selectedPlan.finish || 'ПСО (самоотделка)'}
                       </strong>
@@ -352,25 +448,24 @@ export default function FloorPlansSection({
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
                       <span className="text-[11px] text-gray-400 block mb-1">Сейсмостойкость</span>
-                      <strong className="text-sm font-bold text-white">9 баллов (СНиП)</strong>
+                      <strong className="text-sm font-bold text-white">9 баллов</strong>
                     </div>
 
                     <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10">
                       <span className="text-[11px] text-gray-400 block mb-1">Рассрочка</span>
-                      <strong className="text-sm font-bold text-[#d4b26f]">до 40 месяцев 0%</strong>
+                      <strong className="text-sm font-bold text-[#d4b26f]">до 40 мес. 0%</strong>
                     </div>
                   </div>
 
-                  {/* Выгода и статус */}
                   <div className="p-4 rounded-2xl bg-[#064734]/25 border border-[#064734]/60 flex items-start gap-3 mb-6">
                     <span className="text-xl">🛡️</span>
                     <p className="text-xs text-emerald-100/90 leading-relaxed">
-                      Прямой договор с застройщиком. Возможность оформления по программе Trade-in (обмен авто или недвижимости).
+                      Прямое оформление от застройщика EL ORDO GROUP. Доступна программа Trade-in (обмен на авто или вторичную недвижимость).
                     </p>
                   </div>
                 </div>
 
-                {/* Кнопка мгновенной связи */}
+                {/* WhatsApp конверсия */}
                 <div>
                   <a
                     href={getWhatsAppLink(selectedPlan)}
@@ -382,19 +477,19 @@ export default function FloorPlansSection({
                     <span>Получить расчет и цены в WhatsApp</span>
                   </a>
                   <span className="text-[11px] text-gray-500 text-center block mt-2">
-                    Ответим в течение 2 минут со всеми деталями
+                    Менеджер вышлет этажи и актуальный прайс в течение 2 минут
                   </span>
                 </div>
               </div>
 
             </div>
 
-            {/* Нижняя лента: «Другие 3D-планировки» */}
+            {/* Нижняя лента: выбор других 3D-планировок */}
             {otherPlans.length > 0 && (
               <div className="px-6 py-4 bg-black/60 border-t border-white/10">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
-                    Другие доступные планировки:
+                    Другие доступные варианты:
                   </span>
                   <span className="text-[11px] text-[#d4b26f]">
                     Всего вариантов: {plans.length}
