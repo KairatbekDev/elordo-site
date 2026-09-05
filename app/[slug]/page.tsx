@@ -239,27 +239,27 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
         {
           name: 'Eco Play',
           desc: 'Современные детские площадки из натуральных материалов.',
-          image: '/projects/Aikolplus.png',
+          image: '/layouts/ajkol-plus/ecoplay.jpg',
         },
         {
           name: 'Green Zone',
           desc: 'Зоны для прогулок и отдыха на свежем воздухе.',
-          image: '/projects/Aikolplus.png',
+          image: '/layouts/ajkol-plus/greenzone.jpg',
         },
         {
           name: 'Parking',
           desc: 'Удобная парковочная зона для жителей и гостей.',
-          image: '/projects/Aikolplus.png',
+          image: '/layouts/ajkol-plus/parking.jpg',
         },
       ],
     },
     legalText:
       'Мы ценим ваше доверие и работаем строго по закону. Ознакомьтесь с документацией дома, посетив наш офис продаж.',
     typicalFloors: [
-      { id: '2', label: '2 этаж', image: '/projects/Aikolplus.png' },
-      { id: '3-8', label: '3-8 этаж', image: '/projects/Aikolplus.png' },
-      { id: '9', label: '9 этаж', image: '/projects/Aikolplus.png' },
-      { id: '10', label: '10 этаж', image: '/projects/Aikolplus.png' },
+      { id: '2', label: '2 этаж', image: '/layouts/ajkol-plus/2floor.jpg' },
+      { id: '3-8', label: '3-8 этаж', image: '/layouts/ajkol-plus/3-8floor.jpg' },
+      { id: '9', label: '9 этаж', image: '/layouts/ajkol-plus/9floor.jpg' },
+      { id: '10', label: '10 этаж', image: '/layouts/ajkol-plus/10floor.jpg' },
     ],
   },
   'ajkol': {
