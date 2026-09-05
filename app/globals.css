@@ -2,15 +2,165 @@
 
 @layer base {
   :root {
+    /* Фирменная палитра EL ORDO GROUP */
     --brand-primary: #064734;
-    --brand-dark: #032b20;
-    --brand-accent: #c5a880;
-    --brand-surface: #f9fbf9;
+    --brand-primary-hover: #032b20;
+    --brand-dark: #021c15;
+    --brand-gold: #d4b26f;
+    --brand-gold-hover: #c49f57;
+    --brand-surface: #fafbfa;
+
+    /* Сглаживание и типографика */
+    --font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    background-color: #fdfdfd;
+    background-color: #fafbfa;
     color: #1a202c;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: var(--font-feature-settings);
+    overflow-x: hidden;
   }
+
+  /* Фирменное премиальное выделение текста */
+  ::selection {
+    background-color: #d4b26f;
+    color: #064734;
+  }
+
+  ::-moz-selection {
+    background-color: #d4b26f;
+    color: #064734;
+  }
+
+  /* Защита чертежей и рендеров от случайного перетаскивания */
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+}
+
+/* ==========================================================================
+   1. КАСТОМНЫЙ СКРОЛЛБАР В СТИЛЕ EL ORDO
+   ========================================================================== */
+
+/* Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f3;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #064734;
+  border-radius: 9999px;
+  border: 2px solid #f1f5f3;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #032b20;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #064734 #f1f5f3;
+}
+
+/* Скрытие скроллбара для горизонтальных табов на мобилках */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #d4b26f;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   2. АППАРАТНЫЕ АНИМАЦИИ (60 FPS)
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out forwards;
+}
+
+/* ==========================================================================
+   3. ПОЛИРОВКА КАРТ LEAFLET
+   ========================================================================== */
+
+.leaflet-container {
+  font-family: inherit !important;
+  background-color: #eef2ef !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 18px !important;
+  padding: 4px !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+.leaflet-popup-tip {
+  background: #ffffff !important;
+}
+
+/* Плавный эффект левитации для карточек объектов */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
 }
