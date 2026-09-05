@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --brand-primary: #064734;
+    --brand-dark: #032b20;
+    --brand-accent: #c5a880;
+    --brand-surface: #f9fbf9;
+  }
+
+  body {
+    background-color: #fdfdfd;
+    color: #1a202c;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
