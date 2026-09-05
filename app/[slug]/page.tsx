@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import FloorPlansSection, { ApartmentPlan } from '@/components/FloorPlansSection';
 import TypicalFloorsSection, { TypicalFloorItem } from '@/components/TypicalFloorsSection';
 
@@ -183,7 +184,7 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок А', area: '53.88 м²', image: '/layouts/madina-residence/2 1room-madina.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок Б', area: '57.87 м²', image: '/layouts/madina-residence/3 1room-madina.png' },
 
-      // 2-комнатные (все 11 вариантов)
+      // 2-комнатные
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок А', area: '71.00 м²', image: '/layouts/madina-residence/1 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок В', area: '71.07 м²', image: '/layouts/madina-residence/2 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок Б', area: '74.30 м²', image: '/layouts/madina-residence/3 2room-madina.png' },
@@ -274,7 +275,7 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
       image: '/projects/ajkol.jpg',
       deadline: '2026 г. 2 квартал',
       price: 'от 950 $',
-      address: 'ул. Арашан 10',
+      address: 'ул. Арашан, 10',
     },
     advantages: [
       {
@@ -316,10 +317,6 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
     },
     legalText:
       'Строительство ведется в строгом соответствии с нормами СНиП КР. Все разрешительные документы доступны в офисе.',
-    plans: [
-      { rooms: 1, title: '1-ком квартира в ЖД Айкол', area: 'от 42 м²' },
-      { rooms: 2, title: '2-ком квартира в ЖД Айкол', area: 'от 65 м²' },
-    ],
   },
   'kelechek': {
     name: 'ЖК Келечек',
@@ -453,6 +450,37 @@ export async function generateStaticParams() {
   return Object.keys(COMPLEXES_DATA).map((slug) => ({ slug }));
 }
 
+// 🌐 1. Dynamic SEO & OpenGraph превью для соцсетей и мессенджеров
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const project = COMPLEXES_DATA[slug];
+
+  if (!project) {
+    return { title: 'Объект не найден | EL ORDO GROUP' };
+  }
+
+  return {
+    title: `${project.name} (${project.hero.price}) — Строительная компания EL ORDO GROUP`,
+    description: `${project.hero.subtitle} Адрес: ${project.hero.address}. Срок сдачи: ${project.hero.deadline}.`,
+    openGraph: {
+      title: `${project.name} | Официальные цены и планировки`,
+      description: `${project.hero.subtitle} Рассрочка 0% до 40 месяцев без банка.`,
+      images: [
+        {
+          url: project.hero.image,
+          width: 1200,
+          height: 630,
+          alt: project.name,
+        },
+      ],
+    },
+  };
+}
+
 export default async function ComplexPage({
   params,
 }: {
@@ -471,7 +499,7 @@ export default async function ComplexPage({
   );
 
   return (
-    <main className={`min-h-screen ${isDark ? 'bg-[#181818] text-white' : 'bg-[#fafbfa] text-gray-900'}`}>
+    <main className={`min-h-screen pb-16 md:pb-0 ${isDark ? 'bg-[#181818] text-white' : 'bg-[#fafbfa] text-gray-900'}`}>
       
       {/* 1. Хлебные крошки */}
       <div className={`border-b ${isDark ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-100'}`}>
@@ -490,22 +518,25 @@ export default async function ComplexPage({
         </div>
       </div>
 
-      {/* 2. Hero-секция */}
-      <section className="relative min-h-[520px] flex items-center justify-center bg-[#064734] text-white py-20 px-6 overflow-hidden">
+      {/* 2. Улучшенная Hero-секция с выводом всех ключевых данных */}
+      <section className="relative min-h-[580px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src={project.hero.image}
             alt={project.name}
             className="w-full h-full object-cover object-center opacity-30 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/65" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <span className="text-xs uppercase font-bold tracking-widest text-[#d4b26f] block mb-2">
-            {project.hero.tag}
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-black uppercase tracking-wide leading-tight mb-5 drop-shadow-lg">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-bold uppercase tracking-widest mb-4">
+            <span>{project.hero.tag}</span>
+            <span>•</span>
+            <span className="text-white">{project.classType}</span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black uppercase tracking-wide leading-tight mb-5 drop-shadow-lg">
             {project.hero.title}
           </h1>
 
@@ -513,20 +544,36 @@ export default async function ComplexPage({
             {project.hero.subtitle}
           </p>
 
+          {/* 🌟 Новая статус-панель характеристик (Цена, Срок, Адрес) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto mb-8 p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-left">
+            <div className="p-2.5 rounded-xl bg-black/25">
+              <span className="text-[11px] text-gray-300 block">Стоимость:</span>
+              <strong className="text-base font-black text-[#d4b26f]">{project.hero.price} / м²</strong>
+            </div>
+            <div className="p-2.5 rounded-xl bg-black/25">
+              <span className="text-[11px] text-gray-300 block">Срок сдачи:</span>
+              <strong className="text-sm font-bold text-white">{project.hero.deadline}</strong>
+            </div>
+            <div className="p-2.5 rounded-xl bg-black/25">
+              <span className="text-[11px] text-gray-300 block">Локация:</span>
+              <strong className="text-xs font-bold text-white block truncate">{project.hero.address}</strong>
+            </div>
+          </div>
+
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#d4b26f] hover:bg-[#c29f5a] text-[#064734] font-black px-8 py-3.5 rounded-full uppercase tracking-wider text-xs sm:text-sm transition-all shadow-md"
+              className="bg-[#d4b26f] hover:bg-[#c29f5a] text-[#064734] font-black px-8 py-4 rounded-full uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl hover:scale-105 active:scale-95"
             >
-              Получить консультацию в WhatsApp
+              Получить расчет в WhatsApp
             </a>
             <Link
               href="/projects"
-              className="bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-3.5 rounded-full text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm"
+              className="bg-white/10 hover:bg-white/20 text-white font-semibold px-8 py-4 rounded-full text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm"
             >
-              Смотреть все объекты
+              Все объекты компании
             </Link>
           </div>
         </div>
@@ -609,7 +656,7 @@ export default async function ComplexPage({
         </p>
       </section>
 
-      {/* 6. Способы оплаты (ссылки на раздел условий) */}
+      {/* 6. Способы оплаты */}
       <section className="max-w-6xl mx-auto px-6 pb-16">
         <h2 className={`text-xl sm:text-2xl font-black text-center uppercase tracking-wider mb-8 ${isDark ? 'text-[#d4b26f]' : 'text-[#064734]'}`}>
           СПОСОБЫ ОПЛАТЫ
@@ -650,7 +697,7 @@ export default async function ComplexPage({
         </div>
       </section>
 
-      {/* 7. Планировки ИЛИ Типовые этажи ИЛИ Блок сданного объекта */}
+      {/* 7. Планировки ИЛИ Типовые этажи ИЛИ Умный блок сданного/строящегося объекта */}
       {project.typicalFloors && project.typicalFloors.length > 0 ? (
         <TypicalFloorsSection
           projectName={project.name}
@@ -662,13 +709,35 @@ export default async function ComplexPage({
           plans={project.plans}
           theme={project.theme}
         />
-      ) : (
+      ) : project.hero.tag === 'СДАН В ЭКСПЛУАТАЦИЮ' ? (
         <section className="py-16 px-6 max-w-4xl mx-auto text-center">
           <div className="p-8 rounded-3xl bg-white/5 border border-white/10 shadow-sm">
             <h3 className="text-xl font-bold mb-2">Объект сдан в эксплуатацию</h3>
             <p className="text-sm text-gray-400 max-w-xl mx-auto">
               Все квартиры от застройщика в данном жилом комплексе распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке, свяжитесь с нашим отделом продаж.
             </p>
+          </div>
+        </section>
+      ) : (
+        <section className="py-16 px-6 max-w-4xl mx-auto text-center">
+          <div className={`p-8 rounded-3xl border shadow-sm ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#eef2ef] border-gray-200'}`}>
+            <span className="text-xs uppercase font-bold tracking-widest text-[#d4b26f] block mb-2">
+              Планировочные решения
+            </span>
+            <h3 className="text-xl sm:text-2xl font-black uppercase mb-3 tracking-tight">
+              Шахматка и планировки по запросу
+            </h3>
+            <p className={`text-xs sm:text-sm max-w-xl mx-auto mb-6 leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              Актуальный список свободных квартир, этажей и расчет рассрочки в {project.name} менеджер отправит вам напрямую в мессенджер.
+            </p>
+            <a
+              href={`https://wa.me/996709115115?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md"
+            >
+              <span>💬</span> Запросить планировки в WhatsApp
+            </a>
           </div>
         </section>
       )}
@@ -712,7 +781,7 @@ export default async function ComplexPage({
         </div>
       </section>
 
-      {/* 9. Свяжитесь с нами */}
+      {/* 9. Свяжитесь с нами + кнопка 2GIS */}
       <section className={`py-16 border-t ${isDark ? 'bg-[#181818] border-white/10' : 'bg-white border-gray-100'}`}>
         <div className="max-w-6xl mx-auto px-6">
           <h2 className={`text-2xl sm:text-3xl font-black tracking-tight text-center uppercase mb-10 ${isDark ? 'text-white' : 'text-[#064734]'}`}>
@@ -723,10 +792,18 @@ export default async function ComplexPage({
             <div>
               <p className="text-xs text-gray-400 mb-1">Адрес объекта:</p>
               <p className="text-base font-bold mb-3">{project.hero.address}</p>
-              <div className="space-y-1 text-sm font-semibold">
+              <div className="space-y-1 text-sm font-semibold mb-4">
                 <p>+996 709 115 115</p>
                 <p>+996 990 115 115</p>
               </div>
+              <a
+                href={`https://2gis.kg/bishkek/search/${encodeURIComponent(project.hero.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#d4b26f] hover:underline"
+              >
+                <span>📍</span> Открыть адрес в 2GIS →
+              </a>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -734,7 +811,7 @@ export default async function ComplexPage({
                 href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow"
               >
                 <span>💬</span> Написать в WhatsApp
               </a>
@@ -742,7 +819,7 @@ export default async function ComplexPage({
                 href="https://instagram.com/elordo.group"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-[#d4b26f] px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
+                className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-[#d4b26f] px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
               >
                 <span>📸</span> Перейти в Instagram
               </a>
@@ -750,6 +827,24 @@ export default async function ComplexPage({
           </div>
         </div>
       </section>
+
+      {/* 📱 10. Мобильный Sticky Action Bar (всегда под рукой при скролле) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden p-3 bg-neutral-950/90 backdrop-blur-xl border-t border-white/10 flex items-center gap-2 shadow-2xl">
+        <a
+          href="tel:+996709115115"
+          className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider text-center border border-white/15 transition-all"
+        >
+          📞 Позвонить
+        </a>
+        <a
+          href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-[2] py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-black text-xs uppercase tracking-wider text-center shadow-lg flex items-center justify-center gap-1.5 transition-all"
+        >
+          <span>💬</span> Написать в WhatsApp
+        </a>
+      </div>
 
     </main>
   );
