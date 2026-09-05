@@ -4,119 +4,50 @@ import { useState } from 'react';
 import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import ConsultationForm from '@/components/ConsultationForm';
+import { PROJECTS_LIST, COMPANY_INFO } from '@/lib/data';
 
-interface ProjectItem {
-  slug: string;
-  name: string;
-  category: 'active' | 'finished';
-  classType: string;
-  image: string;
-  address: string;
-  deadline: string;
-  price: string | null;
-  floors: string;
-  desc: string;
-}
-
-const PROJECTS: ProjectItem[] = [
+const PAYMENT_CARDS = [
   {
-    slug: 'abu-dhabi',
-    name: 'ЖК Abu Dhabi',
-    category: 'active',
-    classType: 'Премиум-класс',
-    image: '/projects/Abu-Dhabi.png',
-    address: 'ул. Сухомлинова, 29',
-    deadline: '2029 г. 3 квартал',
-    price: 'от 1 650 $/м²',
-    floors: '25 этажей (2 башни)',
-    desc: 'Флагманский проект столицы с панорамным остеклением, рестораном и фитнес-центром внутри.',
+    slug: 'rassrochka',
+    title: 'Рассрочка 0%',
+    badge: 'Без банка',
+    desc: 'Беспроцентная внутренняя рассрочка от застройщика до 40 месяцев без справок о доходах и кредитных проверок.',
+    icon: '🗓️',
+    actionText: 'Условия и расчет платежа',
   },
   {
-    slug: 'madina-residence',
-    name: 'ЖК Madina Residence',
-    category: 'active',
-    classType: 'Бизнес-класс',
-    image: '/projects/Madina-Residense.png',
-    address: 'ул. Огонбаева, 12',
-    deadline: '2027 г. 3 квартал',
-    price: 'от 1 400 $/м²',
-    floors: '14 этажей',
-    desc: 'Статусный дом в административном центре Бишкека с закрытой охраняемой территорией.',
+    slug: 'trade-in',
+    title: 'Trade-in (Бартер)',
+    badge: 'Оценка за 24 ч',
+    desc: 'Быстрый обмен вашего автомобиля или вторичной недвижимости в счет первого взноса за новую квартиру.',
+    icon: '🚗',
+    actionText: 'Оценить авто или жилье',
   },
   {
-    slug: 'ajkol-plus',
-    name: 'ЖД Айкол +',
-    category: 'active',
-    classType: 'Комфорт+',
-    image: '/projects/Aikolplus.png',
-    address: 'с. Кок-Жар, ул. Баялинова, 6',
-    deadline: '2028 г. 3 квартал',
-    price: 'от 1 100 $/м²',
-    floors: '10 этажей',
-    desc: 'Клубный формат жизни в экологически чистом южном предгорье с кристальным горным воздухом.',
-  },
-  {
-    slug: 'ajkol',
-    name: 'ЖД Айкол',
-    category: 'active',
-    classType: 'Комфорт-класс',
-    image: '/projects/ajkol.jpg',
-    address: 'ул. Арашан, 10',
-    deadline: '2026 г. 2 квартал',
-    price: 'от 950 $/м²',
-    floors: '9 этажей',
-    desc: 'Надежный монолитно-кирпичный дом высокой готовности. Скорый ввод в эксплуатацию.',
-  },
-  {
-    slug: 'kelechek',
-    name: 'ЖК Келечек',
-    category: 'finished',
-    classType: 'Комфорт-класс',
-    image: '/projects/Kelechek.jpg',
-    address: 'ул. Космическая, 153',
-    deadline: 'Сдан в эксплуатацию',
-    price: 'Все квартиры проданы',
-    floors: '9 этажей',
-    desc: 'Успешно завершенный, введенный в эксплуатацию и заселенный жилой комплекс.',
-  },
-  {
-    slug: 'ordo',
-    name: 'КД Ордо',
-    category: 'finished',
-    classType: 'Клубный дом',
-    image: '/projects/Ordo.jpg',
-    address: 'ул. Тверская, 20',
-    deadline: 'Сдан в эксплуатацию',
-    price: 'Все квартиры проданы',
-    floors: '7 этажей',
-    desc: 'Первый сданный клубный дом компании с авторской отделкой фасада и террасой.',
+    slug: 'polniy-raschet',
+    title: '100% Расчет',
+    badge: 'Макс. выгода',
+    desc: 'Индивидуальная специальная скидка при единовременной оплате и приоритетный выбор лучших видовых этажей.',
+    icon: '💎',
+    actionText: 'Узнать размер скидки',
   },
 ];
 
-const PAYMENT_METHODS = [
+const ADVANTAGES = [
   {
-    slug: 'usloviya#calculator',
-    title: 'Рассрочка 0%',
-    badge: 'Без банка',
-    desc: 'Беспроцентная внутренняя рассрочка от застройщика до 40 месяцев без справок о доходах.',
-    icon: '🗓️',
-    actionText: 'Рассчитать платеж',
+    icon: '🏛️',
+    title: 'Монолит + жженый кирпич',
+    desc: 'Каркас из прочного железобетона марки М350 с заполнением экологичным жженым кирпичом. Высокая звукоизоляция и сейсмостойкость 9 баллов.',
   },
   {
-    slug: 'usloviya#trade-in',
-    title: 'Trade-in (Бартер)',
-    badge: 'Популярно',
-    desc: 'Быстрый обмен вашего автомобиля или вторичного жилья в счет первого взноса за новую квартиру.',
-    icon: '🚗',
-    actionText: 'Оценить авто / жилье',
+    icon: '📋',
+    title: 'Прямой ДДУ и Красная книга',
+    desc: 'Все объекты возводятся на собственных участках с Красными книгами. Оформление официального Договора долевого участия с госрегистрацией в КР.',
   },
   {
-    slug: 'usloviya',
-    title: '100% Расчет',
-    badge: 'Выгода',
-    desc: 'Индивидуальная специальная скидка при единовременной оплате и приоритетный выбор видовых этажей.',
-    icon: '💎',
-    actionText: 'Узнать скидку',
+    icon: '🌲',
+    title: 'Экология и панорамные виды',
+    desc: 'Локации в престижном центре столицы и экологически чистом южном предгорье с постоянным притоком горного воздуха и видом на хребет Ала-Тоо.',
   },
 ];
 
@@ -125,37 +56,34 @@ export default function Home() {
 
   const filteredProjects =
     activeTab === 'all'
-      ? PROJECTS
-      : PROJECTS.filter((p) => p.category === activeTab);
+      ? PROJECTS_LIST
+      : PROJECTS_LIST.filter((p) => p.category === activeTab);
+
+  const activeCount = PROJECTS_LIST.filter((p) => p.category === 'active').length;
+  const finishedCount = PROJECTS_LIST.filter((p) => p.category === 'finished').length;
 
   return (
     <main className="min-h-screen bg-[#fafbfa] text-gray-900 selection:bg-[#d4b26f] selection:text-[#064734]">
       
-      {/* ========================================================================= */}
-      {/* 1. ГЛАВНЫЙ ЭКРАН (HERO) — ПРЕМИАЛЬНЫЙ СТИЛЬ С ПЛАВНЫМ ФОНОМ               */}
-      {/* ========================================================================= */}
+      {/* 1. ГЛАВНЫЙ ЭКРАН (HERO) */}
       <section className="relative min-h-[92dvh] sm:min-h-[640px] md:min-h-[720px] flex items-center justify-center bg-[#064734] text-white pt-24 pb-20 px-4 sm:px-6 overflow-hidden">
         
-        {/* Фоновое архитектурное изображение */}
         <div className="absolute inset-0 z-0">
           <img
             src="/projects/Abu-Dhabi.png"
             alt="Архитектура EL ORDO GROUP"
             className="w-full h-full object-cover object-center opacity-35 scale-105 transition-transform duration-1000 ease-out"
           />
-          {/* Глубокий градиент для кристальной читаемости текста */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#021c15] via-[#064734]/85 to-black/70" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
           
-          {/* Статусный бейдж */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-lg animate-fadeIn">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Строительная компания EL ORDO GROUP • Бишкек</span>
           </div>
 
-          {/* Главный заголовок */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-tight sm:leading-none mb-6 drop-shadow-xl">
             АРХИТЕКТУРА ВАШЕГО СТАТУСА <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4b26f] via-[#eddab2] to-[#d4b26f]">
@@ -163,12 +91,10 @@ export default function Home() {
             </span>
           </h1>
 
-          {/* Описание */}
           <p className="text-sm sm:text-lg md:text-xl text-white/90 font-light leading-relaxed max-w-2xl mb-10 px-2 drop-shadow">
-            Создаем современные жилые комплексы премиум и бизнес-класса в Бишкеке. Монолитно-кирпичная надежность, сейсмостойкость 9 баллов и честная рассрочка 0% до 40 месяцев.
+            С 2021 года возводим современные жилые комплексы в Бишкеке. Монолитно-кирпичная надежность, сейсмостойкость 9 баллов и честная рассрочка 0% до 40 месяцев без участия банков.
           </p>
 
-          {/* Кнопки действий */}
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <a
               href="#projects"
@@ -177,14 +103,14 @@ export default function Home() {
               Выбрать жилой комплекс
             </a>
             <Link
-              href="/usloviya"
+              href="/rassrochka"
               className="w-full sm:w-auto bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-xs sm:text-sm border border-white/25 transition-all backdrop-blur-md text-center"
             >
-              Калькулятор рассрочки 0%
+              Условия рассрочки 0%
             </Link>
           </div>
 
-          {/* 🌟 Полоса доверия (Trust Bar) прямо в Hero */}
+          {/* Полоса доверия (Trust Bar) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl mt-14 pt-8 border-t border-white/15 text-left">
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
               <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">0%</span>
@@ -201,13 +127,13 @@ export default function Home() {
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
               <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">Trade-in</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Обмен вашего авто или жилья
+                Обмен авто или жилья за 24 ч
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
               <span className="text-xl sm:text-2xl font-black text-white block">100%</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Юридическая чистота и ДДУ
+                Госрегистрация ДДУ и чистота
               </span>
             </div>
           </div>
@@ -215,9 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 2. ПОЧЕМУ ВЫБИРАЮТ EL ORDO — СТАНДАРТЫ КАЧЕСТВА                          */}
-      {/* ========================================================================= */}
+      {/* 2. ПОЧЕМУ ВЫБИРАЮТ EL ORDO */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
@@ -229,48 +153,29 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all">
-            <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl mb-6">
-              🏛️
+          {ADVANTAGES.map((adv, idx) => (
+            <div
+              key={idx}
+              className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all flex flex-col justify-between"
+            >
+              <div>
+                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl mb-6">
+                  {adv.icon}
+                </div>
+                <h3 className="text-lg font-black text-gray-900 mb-3">
+                  {adv.title}
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                  {adv.desc}
+                </p>
+              </div>
             </div>
-            <h3 className="text-lg font-black text-gray-900 mb-3">
-              Монолит + жженый кирпич
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Каркас из прочного железобетона с заполнением экологичным жженым кирпичом. Отличная шумоизоляция и сейсмостойкость конструкции 9 баллов.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all">
-            <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl mb-6">
-              📋
-            </div>
-            <h3 className="text-lg font-black text-gray-900 mb-3">
-              Прямой ДДУ и Красная книга
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Все строительные площадки имеют полный пакет разрешительных документов. Оформление по закону КР с регистрацией в государственных органах.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all">
-            <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl mb-6">
-              🌲
-            </div>
-            <h3 className="text-lg font-black text-gray-900 mb-3">
-              Экология и премиальные виды
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
-              Продуманные локации: от респектабельного центра столицы до южного предгорья с постоянным притоком чистого горного воздуха без смога.
-            </p>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 3. КАТАЛОГ ОБЪЕКТОВ С БЫСТРЫМИ ТАБАМИ                                    */}
-      {/* ========================================================================= */}
-      <section id="projects" className="bg-[#f0f4f1] py-16 sm:py-24 px-4 sm:px-6">
+      {/* 3. КАТАЛОГ ОБЪЕКТОВ С БЫСТРЫМИ ТАБАМИ */}
+      <section id="projects" className="bg-[#f0f4f1] py-16 sm:py-24 px-4 sm:px-6 scroll-mt-20">
         <div className="max-w-6xl mx-auto">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
@@ -283,12 +188,12 @@ export default function Home() {
               </h2>
             </div>
 
-            {/* Быстрые фильтры */}
-            <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white border border-gray-200 shadow-sm">
+            {/* Фильтры объектов */}
+            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200 shadow-sm">
               {[
-                { id: 'all', label: 'Все' },
-                { id: 'active', label: '🏗️ В продаже' },
-                { id: 'finished', label: '✓ Сданные' },
+                { id: 'all', label: `Все (${PROJECTS_LIST.length})` },
+                { id: 'active', label: `🏗️ В продаже (${activeCount})` },
+                { id: 'finished', label: `✓ Сданные (${finishedCount})` },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -309,14 +214,13 @@ export default function Home() {
           {/* Сетка карточек проектов */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredProjects.map((project) => {
-              const isFinished = project.category === 'finished';
+              const isFinished = project.isFinished;
               return (
                 <div
                   key={project.slug}
                   className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Фото проекта */}
                     <div className="relative h-60 w-full overflow-hidden bg-neutral-900">
                       <img
                         src={project.image}
@@ -324,7 +228,6 @@ export default function Home() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
 
-                      {/* Бейдж статуса */}
                       <div className="absolute top-3.5 left-3.5">
                         <span
                           className={`text-[11px] font-black uppercase px-3 py-1.5 rounded-xl shadow-md ${
@@ -333,11 +236,10 @@ export default function Home() {
                               : 'bg-[#064734] text-white'
                           }`}
                         >
-                          {isFinished ? 'Сдан' : project.classType}
+                          {isFinished ? 'Сдан ✓' : project.classType}
                         </span>
                       </div>
 
-                      {/* Цена */}
                       {project.price && (
                         <div className="absolute bottom-3.5 right-3.5 bg-black/75 backdrop-blur-md text-[#d4b26f] text-xs font-black px-3 py-1.5 rounded-xl border border-white/10 shadow">
                           {project.price}
@@ -345,7 +247,6 @@ export default function Home() {
                       )}
                     </div>
 
-                    {/* Описание */}
                     <div className="p-6">
                       <h3 className="text-xl font-black text-gray-950 mb-2 group-hover:text-[#064734] transition-colors">
                         {project.name}
@@ -371,7 +272,6 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Кнопка перехода */}
                   <div className="p-6 pt-0">
                     <Link
                       href={`/${project.slug}`}
@@ -390,7 +290,7 @@ export default function Home() {
               href="/projects"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-300 text-xs font-black uppercase tracking-wider text-[#064734] shadow-sm hover:shadow transition-all"
             >
-              <span>Посмотреть полный каталог всех объектов</span>
+              <span>Посмотреть полный каталог всех 6 объектов</span>
               <span>→</span>
             </Link>
           </div>
@@ -398,10 +298,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 4. СПОСОБЫ ОПЛАТЫ — ПРЕМИАЛЬНЫЙ ИНФОРМАТИВНЫЙ БЛОК                        */}
-      {/* ========================================================================= */}
-      <section id="payments" className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+      {/* 4. СПОСОБЫ ОПЛАТЫ */}
+      <section id="payments" className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 scroll-mt-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             Прозрачные расчеты
@@ -412,7 +310,7 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {PAYMENT_METHODS.map((method, idx) => (
+          {PAYMENT_CARDS.map((method, idx) => (
             <div
               key={idx}
               className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between"
@@ -444,14 +342,58 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 5. ФОРМА ЗАЯВКИ НА КОНСУЛЬТАЦИЮ                                           */}
-      {/* ========================================================================= */}
+      {/* 5. ОТЗЫВЫ РЕЗИДЕНТОВ И ИНВЕСТОРОВ */}
+      <section className="bg-[#f2f6f4] py-16 sm:py-20 px-4 sm:px-6 border-y border-gray-200">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
+              Реальные истории
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+              Отзывы наших покупателей
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {COMPANY_INFO.reviews.map((rev, idx) => (
+              <div
+                key={idx}
+                className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center gap-1 text-[#d4b26f] text-sm mb-4">
+                    {'★'.repeat(5)}
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic mb-6">
+                    «{rev.text}»
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#064734] text-[#d4b26f] font-black text-sm flex items-center justify-center shrink-0">
+                    {rev.author[0]}
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-black text-gray-900 leading-tight">
+                      {rev.author}
+                    </h4>
+                    {rev.role && (
+                      <span className="text-[11px] text-gray-400 block mt-0.5">
+                        {rev.role}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. ФОРМА ЗАЯВКИ НА КОНСУЛЬТАЦИЮ */}
       <ConsultationForm />
 
-      {/* ========================================================================= */}
-      {/* 6. ОФИС ПРОДАЖ И ИНТЕРАКТИВНАЯ КАРТА БИШКЕКА                             */}
-      {/* ========================================================================= */}
+      {/* 7. ОФИС ПРОДАЖ И ИНТЕРАКТИВНАЯ КАРТА БИШКЕКА */}
       <section className="bg-white border-t border-gray-100 py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -467,22 +409,19 @@ export default function Home() {
             <div>
               <p className="text-xs text-gray-400 mb-1">Адрес офиса:</p>
               <p className="text-lg font-bold text-gray-900 mb-4">
-                г. Бишкек, ул. И. Ахунбаева, 137/1
+                {COMPANY_INFO.address}
               </p>
               <div className="space-y-1.5 text-sm font-semibold text-gray-800 mb-4">
-                <p>
-                  <a href="tel:+996709115115" className="hover:text-[#064734]">
-                    +996 709 115 115
-                  </a>
-                </p>
-                <p>
-                  <a href="tel:+996990115115" className="hover:text-[#064734]">
-                    +996 990 115 115
-                  </a>
-                </p>
+                {COMPANY_INFO.phones.map((phone, idx) => (
+                  <p key={idx}>
+                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-[#064734]">
+                      {phone}
+                    </a>
+                  </p>
+                ))}
               </div>
               <a
-                href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
+                href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:underline"
@@ -493,7 +432,9 @@ export default function Home() {
 
             <div className="flex flex-col gap-3">
               <a
-                href="https://wa.me/996709115115?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D1%80%D0%B8%D0%B5%D1%85%D0%B0%D1%82%D1%8c%20%D0%BA%20%D0%B2%D0%B0%D0%BC%20%D0%B2%20%D0%BE%D1%84%D0%B8%D1%81%20%D0%BD%D0%B0%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E"
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+                  'Здравствуйте! Хочу записаться на консультацию в офис продаж EL ORDO GROUP.'
+                )}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
@@ -501,7 +442,7 @@ export default function Home() {
                 <span>💬</span> Записаться на визит в WhatsApp
               </a>
               <a
-                href="https://instagram.com/elordo.group"
+                href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
@@ -511,7 +452,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Карта */}
           <BishkekMap />
         </div>
       </section>
