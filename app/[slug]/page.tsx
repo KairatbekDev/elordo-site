@@ -81,7 +81,7 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
         {
           name: 'Premium Restaurant',
           desc: 'Гастрономические вечера прямо в вашем доме.',
-          image: '/layouts/abu-dhabi/restoran.jpg',
+          image: '/layouts/abu-dhabi/restaurant.jpg',
         },
         {
           name: 'Private Park',
