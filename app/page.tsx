@@ -5,6 +5,22 @@ import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import ConsultationForm from '@/components/ConsultationForm';
 import { PROJECTS_LIST, COMPANY_INFO } from '@/lib/data';
+import {
+  IconBuilding,
+  IconCrane,
+  IconCheck,
+  IconMapPin,
+  IconCalendar,
+  IconCar,
+  IconDiamond,
+  IconDocument,
+  IconTree,
+  IconPhone,
+  IconWhatsApp,
+  IconInstagram,
+  IconArrowRight,
+  IconStar,
+} from '@/components/Icons';
 
 const PAYMENT_CARDS = [
   {
@@ -12,7 +28,7 @@ const PAYMENT_CARDS = [
     title: 'Рассрочка 0%',
     badge: 'Без банка',
     desc: 'Беспроцентная внутренняя рассрочка от застройщика до 40 месяцев без справок о доходах и кредитных проверок.',
-    icon: '🗓️',
+    icon: <IconCalendar className="w-7 h-7 text-[#064734]" />,
     actionText: 'Условия и расчет платежа',
   },
   {
@@ -20,7 +36,7 @@ const PAYMENT_CARDS = [
     title: 'Trade-in (Бартер)',
     badge: 'Оценка за 24 ч',
     desc: 'Быстрый обмен вашего автомобиля или вторичной недвижимости в счет первого взноса за новую квартиру.',
-    icon: '🚗',
+    icon: <IconCar className="w-7 h-7 text-[#064734]" />,
     actionText: 'Оценить авто или жилье',
   },
   {
@@ -28,24 +44,24 @@ const PAYMENT_CARDS = [
     title: '100% Расчет',
     badge: 'Макс. выгода',
     desc: 'Индивидуальная специальная скидка при единовременной оплате и приоритетный выбор лучших видовых этажей.',
-    icon: '💎',
+    icon: <IconDiamond className="w-7 h-7 text-[#064734]" />,
     actionText: 'Узнать размер скидки',
   },
 ];
 
 const ADVANTAGES = [
   {
-    icon: '🏛️',
+    icon: <IconBuilding className="w-7 h-7 text-[#d4b26f]" />,
     title: 'Монолит + жженый кирпич',
     desc: 'Каркас из прочного железобетона марки М350 с заполнением экологичным жженым кирпичом. Высокая звукоизоляция и сейсмостойкость 9 баллов.',
   },
   {
-    icon: '📋',
+    icon: <IconDocument className="w-7 h-7 text-[#d4b26f]" />,
     title: 'Прямой ДДУ и Красная книга',
     desc: 'Все объекты возводятся на собственных участках с Красными книгами. Оформление официального Договора долевого участия с госрегистрацией в КР.',
   },
   {
-    icon: '🌲',
+    icon: <IconTree className="w-7 h-7 text-[#d4b26f]" />,
     title: 'Экология и панорамные виды',
     desc: 'Локации в престижном центре столицы и экологически чистом южном предгорье с постоянным притоком горного воздуха и видом на хребет Ала-Тоо.',
   },
@@ -159,7 +175,7 @@ export default function Home() {
               className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 flex items-center justify-center mb-6">
                   {adv.icon}
                 </div>
                 <h3 className="text-lg font-black text-gray-900 mb-3">
@@ -188,26 +204,30 @@ export default function Home() {
               </h2>
             </div>
 
-            {/* Фильтры объектов */}
-            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200 shadow-sm">
+            {/* Фильтры объектов с иконками */}
+            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200 shadow-sm overflow-x-auto scrollbar-none">
               {[
-                { id: 'all', label: `Все (${PROJECTS_LIST.length})` },
-                { id: 'active', label: `🏗️ В продаже (${activeCount})` },
-                { id: 'finished', label: `✓ Сданные (${finishedCount})` },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-[#064734] text-white shadow-md'
-                      : 'text-gray-600 hover:text-gray-950 hover:bg-gray-100'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+                { id: 'all', label: `Все (${PROJECTS_LIST.length})`, icon: null },
+                { id: 'active', label: `В продаже (${activeCount})`, icon: <IconCrane className="w-3.5 h-3.5 shrink-0" /> },
+                { id: 'finished', label: `Сданные (${finishedCount})`, icon: <IconCheck className="w-3.5 h-3.5 shrink-0" /> },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                      isActive
+                        ? 'bg-[#064734] text-white shadow-md'
+                        : 'text-gray-600 hover:text-gray-950 hover:bg-gray-100'
+                    }`}
+                  >
+                    {tab.icon && <span className={isActive ? 'text-white' : 'text-[#064734]'}>{tab.icon}</span>}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -230,13 +250,14 @@ export default function Home() {
 
                       <div className="absolute top-3.5 left-3.5">
                         <span
-                          className={`text-[11px] font-black uppercase px-3 py-1.5 rounded-xl shadow-md ${
+                          className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase px-3 py-1.5 rounded-xl shadow-md ${
                             isFinished
                               ? 'bg-[#2b2b2b] text-white'
                               : 'bg-[#064734] text-white'
                           }`}
                         >
-                          {isFinished ? 'Сдан ✓' : project.classType}
+                          {isFinished && <IconCheck className="w-3.5 h-3.5 text-emerald-400" />}
+                          <span>{isFinished ? 'Сдан' : project.classType}</span>
                         </span>
                       </div>
 
@@ -257,15 +278,15 @@ export default function Home() {
 
                       <div className="space-y-2 text-xs text-gray-600 border-t border-gray-100 pt-4 font-medium">
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f]">📍</span>
-                          <span>{project.address}</span>
+                          <IconMapPin className="w-4 h-4 text-[#d4b26f] shrink-0" />
+                          <span className="truncate">{project.address}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f]">🗓️</span>
+                          <IconCalendar className="w-4 h-4 text-[#d4b26f] shrink-0" />
                           <span>{project.deadline}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f]">🏢</span>
+                          <IconBuilding className="w-4 h-4 text-[#d4b26f] shrink-0" />
                           <span>{project.floors}</span>
                         </div>
                       </div>
@@ -275,9 +296,10 @@ export default function Home() {
                   <div className="p-6 pt-0">
                     <Link
                       href={`/${project.slug}`}
-                      className="block w-full text-center bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md"
+                      className="w-full bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-lg"
                     >
-                      Подробнее о проекте →
+                      <span>Подробнее о проекте</span>
+                      <IconArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </div>
@@ -288,10 +310,10 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-300 text-xs font-black uppercase tracking-wider text-[#064734] shadow-sm hover:shadow transition-all"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-300 text-xs font-black uppercase tracking-wider text-[#064734] shadow-sm hover:shadow transition-all"
             >
-              <span>Посмотреть полный каталог всех 6 объектов</span>
-              <span>→</span>
+              <span>Посмотреть полный каталог всех {PROJECTS_LIST.length} объектов</span>
+              <IconArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -317,7 +339,9 @@ export default function Home() {
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <span className="text-3xl">{method.icon}</span>
+                  <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 flex items-center justify-center">
+                    {method.icon}
+                  </div>
                   <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-[#064734]/10 text-[#064734]">
                     {method.badge}
                   </span>
@@ -333,9 +357,10 @@ export default function Home() {
 
               <Link
                 href={`/${method.slug}`}
-                className="w-full text-center bg-[#064734] hover:bg-[#032b20] text-white font-bold py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow"
+                className="w-full bg-[#064734] hover:bg-[#032b20] text-white font-bold py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow flex items-center justify-center gap-2"
               >
-                {method.actionText} →
+                <span>{method.actionText}</span>
+                <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
               </Link>
             </div>
           ))}
@@ -361,8 +386,10 @@ export default function Home() {
                 className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center gap-1 text-[#d4b26f] text-sm mb-4">
-                    {'★'.repeat(5)}
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <IconStar key={i} className="w-4 h-4 text-[#d4b26f]" />
+                    ))}
                   </div>
                   <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic mb-6">
                     «{rev.text}»
@@ -411,22 +438,25 @@ export default function Home() {
               <p className="text-lg font-bold text-gray-900 mb-4">
                 {COMPANY_INFO.address}
               </p>
-              <div className="space-y-1.5 text-sm font-semibold text-gray-800 mb-4">
+              <div className="space-y-2 text-sm font-semibold text-gray-800 mb-5">
                 {COMPANY_INFO.phones.map((phone, idx) => (
-                  <p key={idx}>
-                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-[#064734]">
-                      {phone}
+                  <div key={idx}>
+                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 hover:text-[#064734] transition-colors">
+                      <IconPhone className="w-4 h-4 text-[#064734]" />
+                      <span>{phone}</span>
                     </a>
-                  </p>
+                  </div>
                 ))}
               </div>
               <a
                 href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:text-[#d4b26f] hover:underline transition-all"
               >
-                <span>📍</span> Открыть маршрут в 2GIS →
+                <IconMapPin className="w-4 h-4 text-[#d4b26f]" />
+                <span>Открыть маршрут в 2GIS</span>
+                <IconArrowRight className="w-3 h-3" />
               </a>
             </div>
 
@@ -437,17 +467,19 @@ export default function Home() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
               >
-                <span>💬</span> Записаться на визит в WhatsApp
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                <span>Записаться в WhatsApp</span>
               </a>
               <a
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
               >
-                <span>📸</span> Перейти в Instagram
+                <IconInstagram className="w-4 h-4 text-pink-600" />
+                <span>Перейти в Instagram</span>
               </a>
             </div>
           </div>
