@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 interface MapPoint {
   id: string;
@@ -100,10 +101,12 @@ export default function BishkekMap() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<{ [key: string]: any }>({});
+  const itemsRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [selectedId, setSelectedId] = useState<string>('office');
   const [filter, setFilter] = useState<'all' | 'office' | 'active' | 'finished'>('all');
 
   useEffect(() => {
+    // Подключение CSS Leaflet
     if (!document.getElementById('leaflet-css')) {
       const link = document.createElement('link');
       link.id = 'leaflet-css';
@@ -129,6 +132,11 @@ export default function BishkekMap() {
         maxZoom: 18,
       }).addTo(map);
 
+      // Принудительный пересчет размера для устранения серых тайлов
+      setTimeout(() => {
+        map.invalidateSize();
+      }, 200);
+
       POINTS.forEach((point) => {
         const isOffice = point.category === 'office';
         const isFinished = point.category === 'finished';
@@ -144,11 +152,12 @@ export default function BishkekMap() {
             border: 2px solid #ffffff;
             border-radius: 50% 50% 50% 0;
             transform: rotate(-45deg);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.35);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: transform 0.2s ease;
           ">
             <span style="
               transform: rotate(45deg);
@@ -156,7 +165,7 @@ export default function BishkekMap() {
               line-height: 1;
               display: block;
               color: ${isOffice ? '#064734' : '#ffffff'};
-              font-weight: 800;
+              font-weight: 900;
             ">${innerIcon}</span>
           </div>
         `;
@@ -171,25 +180,41 @@ export default function BishkekMap() {
 
         const marker = L.marker(point.coords, { icon: customIcon }).addTo(map);
 
+        const projectBtn = !isOffice
+          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 10px; font-weight: 800; padding: 6px 8px; border-radius: 6px; text-decoration: none;">О проекте →</a>`
+          : '';
+
         const popupContent = `
-          <div style="font-family: inherit; padding: 2px; max-width: 200px;">
+          <div style="font-family: inherit; padding: 2px; min-width: 190px;">
             <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
               ${point.categoryLabel}
             </div>
-            <div style="font-size: 13px; font-weight: 800; color: #111; margin-bottom: 3px;">
+            <div style="font-size: 13px; font-weight: 900; color: #111; margin-bottom: 3px; line-height: 1.2;">
               ${point.name}
             </div>
-            <div style="font-size: 11px; color: #666; margin-bottom: 6px;">
+            <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
               📍 ${point.address}
             </div>
-            <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; background: #064734; color: #fff; font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 6px; text-decoration: none;">
-              В 2ГИС →
-            </a>
+            <div style="display: flex; gap: 4px;">
+              ${projectBtn}
+              <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 10px; font-weight: 700; padding: 6px 8px; border-radius: 6px; text-decoration: none; border: 1px solid #dbe3df;">
+                В 2ГИС 📍
+              </a>
+            </div>
           </div>
         `;
 
         marker.bindPopup(popupContent);
-        marker.on('click', () => setSelectedId(point.id));
+
+        // Клик по маркеру: синхронизация и плавный скролл в списке
+        marker.on('click', () => {
+          setSelectedId(point.id);
+          const el = itemsRef.current[point.id];
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+
         markersRef.current[point.id] = marker;
       });
     };
@@ -204,7 +229,15 @@ export default function BishkekMap() {
       initMap();
     }
 
+    const handleResize = () => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+
     return () => {
+      window.removeEventListener('resize', handleResize);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -212,7 +245,7 @@ export default function BishkekMap() {
     };
   }, []);
 
-  // Синхронизация маркеров на карте при смене фильтра
+  // Синхронизация маркеров при переключении фильтров
   useEffect(() => {
     if (!mapRef.current) return;
     POINTS.forEach((point) => {
@@ -241,7 +274,7 @@ export default function BishkekMap() {
   return (
     <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
       
-      {/* Шапка с фильтрами: на мобилках скроллится по горизонтали без переносов */}
+      {/* Шапка с фильтрами */}
       <div className="p-3 sm:p-5 border-b border-gray-100 bg-[#f9faf9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs font-bold whitespace-nowrap">
           <button
@@ -302,13 +335,13 @@ export default function BishkekMap() {
 
       {/* Сетка: Карта + Список */}
       <div className="grid grid-cols-1 lg:grid-cols-12">
-        {/* Карта: высота 280px на мобилке, чтобы не блокировать прокрутку пальцем */}
-        <div className="lg:col-span-8 h-[280px] sm:h-[400px] lg:h-[480px] relative bg-[#eef2ef]">
+        {/* Карта */}
+        <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef]">
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
 
-        {/* Список: компактная высота 240px на мобилке */}
-        <div className="lg:col-span-4 h-[240px] sm:h-[360px] lg:h-[480px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-3 sm:p-4 space-y-2 bg-gray-50/50">
+        {/* Список объектов */}
+        <div className="lg:col-span-4 h-[250px] sm:h-[370px] lg:h-[490px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-3 sm:p-4 space-y-2 bg-gray-50/50">
           <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
             Нажмите на объект для перехода:
           </p>
@@ -317,6 +350,9 @@ export default function BishkekMap() {
             return (
               <div
                 key={point.id}
+                ref={(el) => {
+                  itemsRef.current[point.id] = el;
+                }}
                 onClick={() => handleSelectPoint(point)}
                 className={`p-3 rounded-xl cursor-pointer transition-all border text-left ${
                   isSelected
@@ -351,17 +387,25 @@ export default function BishkekMap() {
                 </p>
 
                 {isSelected && (
-                  <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
-                    <p className="text-[10px] text-gray-600 line-clamp-2">
-                      {point.desc}
-                    </p>
+                  <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+                    {point.category !== 'office' ? (
+                      <Link
+                        href={`/${point.id}`}
+                        className="text-[11px] font-extrabold text-[#064734] hover:underline"
+                      >
+                        О проекте →
+                      </Link>
+                    ) : (
+                      <span className="text-[10px] text-gray-500">Главный офис</span>
+                    )}
+
                     <a
                       href={point.gisUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 ml-2 text-[10px] font-bold text-[#064734] underline"
+                      className="text-[10px] font-bold text-gray-600 hover:text-[#064734] underline"
                     >
-                      В 2ГИС
+                      В 2ГИС 📍
                     </a>
                   </div>
                 )}
