@@ -19,6 +19,7 @@ interface PaymentLayoutProps {
   documentsText: string;
   faqList: FaqItem[];
   currentSlug?: 'rassrochka' | 'trade-in' | 'polniy-raschet';
+  children?: React.ReactNode;
 }
 
 const PAYMENT_TABS = [
@@ -38,6 +39,7 @@ export default function PaymentLayout({
   documentsText,
   faqList,
   currentSlug,
+  children,
 }: PaymentLayoutProps) {
   // По умолчанию первый вопрос открыт
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -245,6 +247,13 @@ export default function PaymentLayout({
 
         </div>
       </section>
+
+      {/* 🌟 ДОПОЛНИТЕЛЬНЫЕ ИНТЕРАКТИВНЫЕ БЛОКИ СТРАНИЦЫ (КАЛЬКУЛЯТОРЫ, ТАБЛИЦЫ, ПРИМЕРЫ) */}
+      {children && (
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
+          {children}
+        </section>
+      )}
 
       {/* 6. Контакты и связь с офисом продаж */}
       <section className="bg-white border-t border-gray-100 py-16">
