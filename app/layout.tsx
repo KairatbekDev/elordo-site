@@ -1,11 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import FloatingContact from "../components/FloatingContact";
 
-// Базовый домен для корректного формирования абсолютных ссылок в превью
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elordo.group';
+
+export const viewport: Viewport = {
+  themeColor: '#064734',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -65,14 +71,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="scroll-smooth">
-      <head>
-        <meta name="theme-color" content="#064734" />
-      </head>
-      <body className="antialiased min-h-screen flex flex-col bg-neutral-50 text-neutral-900 selection:bg-[#d4b26f] selection:text-[#064734]">
+      <body className="antialiased min-h-screen flex flex-col bg-neutral-50 text-neutral-900 overflow-x-hidden selection:bg-[#d4b26f] selection:text-[#064734]">
         <Header />
-        <div className="flex-1">
+        <main className="flex-1 w-full overflow-x-hidden">
           {children}
-        </div>
+        </main>
         <Footer />
         <FloatingContact />
       </body>

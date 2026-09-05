@@ -33,7 +33,7 @@ const POINTS: MapPoint[] = [
     categoryLabel: 'Премиум-класс',
     address: 'ул. Сухомлинова, 29',
     coords: [42.84694, 74.58175],
-    deadline: '2029 г. 3 квартал',
+    deadline: '2029 г. 3 кв.',
     price: 'от 1650 $/м²',
     desc: 'Две 25-этажные башни премиум-класса с панорамными видами.',
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%A1%D1%83%D1%85%D0%BE%D0%BC%D0%BB%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%2029',
@@ -45,7 +45,7 @@ const POINTS: MapPoint[] = [
     categoryLabel: 'Бизнес-класс',
     address: 'ул. Огонбаева, 12',
     coords: [42.87785, 74.63916],
-    deadline: '2027 г. 3 квартал',
+    deadline: '2027 г. 3 кв.',
     price: 'от 1400 $/м²',
     desc: 'Символ статуса в центральной части Бишкека.',
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9E%D0%B3%D0%BE%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%2012',
@@ -57,7 +57,7 @@ const POINTS: MapPoint[] = [
     categoryLabel: 'Комфорт+',
     address: 'с. Кок-Жар, ул. Баялинова, 6',
     coords: [42.81725, 74.64607],
-    deadline: '2028 г. 3 квартал',
+    deadline: '2028 г. 3 кв.',
     price: 'от 1100 $/м²',
     desc: 'Экологический клубный дом в предгорье с чистым воздухом.',
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9A%D0%BE%D0%BA-%D0%96%D0%B0%D1%80%20%D0%91%D0%B0%D1%8F%D0%BB%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%206',
@@ -69,7 +69,7 @@ const POINTS: MapPoint[] = [
     categoryLabel: 'Комфорт',
     address: 'ул. Арашан, 10',
     coords: [42.8171, 74.64892],
-    deadline: '2026 г. 2 квартал',
+    deadline: '2026 г. 2 кв.',
     price: 'от 950 $/м²',
     desc: 'Завершение монолитно-кирпичной коробки, скорая сдача.',
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%90%D1%80%D0%B0%D1%88%D0%B0%D0%BD%2010',
@@ -78,17 +78,17 @@ const POINTS: MapPoint[] = [
     id: 'kelechek',
     name: 'ЖК Келечек',
     category: 'finished',
-    categoryLabel: 'Сдан в эксплуатацию',
+    categoryLabel: 'Сдан',
     address: 'ул. Космическая, 153',
     coords: [42.84588, 74.55136],
-    desc: 'Полностью построенный, введенный в эксплуатацию и заселенный дом.',
+    desc: 'Полностью построенный, введенный в эксплуатацию дом.',
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9A%D0%BE%D1%81%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%20153',
   },
   {
     id: 'ordo',
     name: 'КД Ордо',
     category: 'finished',
-    categoryLabel: 'Сдан в эксплуатацию',
+    categoryLabel: 'Сдан',
     address: 'ул. Тверская, 20',
     coords: [42.87974, 74.54623],
     desc: 'Первый клубный дом компании с панорамой на горы.',
@@ -104,7 +104,6 @@ export default function BishkekMap() {
   const [filter, setFilter] = useState<'all' | 'office' | 'active' | 'finished'>('all');
 
   useEffect(() => {
-    // Подключение стилей Leaflet
     if (!document.getElementById('leaflet-css')) {
       const link = document.createElement('link');
       link.id = 'leaflet-css';
@@ -117,7 +116,6 @@ export default function BishkekMap() {
       const L = (window as any).L;
       if (!L || !mapContainerRef.current || mapRef.current) return;
 
-      // Оптимальный центр города с охватом всех объектов от Тверской до Кок-Жара
       const map = L.map(mapContainerRef.current, {
         center: [42.848, 74.598],
         zoom: 12,
@@ -126,29 +124,27 @@ export default function BishkekMap() {
 
       mapRef.current = map;
 
-      // Чистый OSM слой без водяных знаков и ключей
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
+        attribution: '&copy; OpenStreetMap',
         maxZoom: 18,
       }).addTo(map);
 
       POINTS.forEach((point) => {
         const isOffice = point.category === 'office';
         const isFinished = point.category === 'finished';
-
         const pinColor = isOffice ? '#d4b26f' : isFinished ? '#2b2b2b' : '#064734';
         const innerIcon = isOffice ? '🏢' : isFinished ? '✓' : '🏗️';
 
         const iconHtml = `
           <div style="
             position: relative;
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             background: ${pinColor};
-            border: 2.5px solid #ffffff;
+            border: 2px solid #ffffff;
             border-radius: 50% 50% 50% 0;
             transform: rotate(-45deg);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -156,7 +152,7 @@ export default function BishkekMap() {
           ">
             <span style="
               transform: rotate(45deg);
-              font-size: 15px;
+              font-size: 14px;
               line-height: 1;
               display: block;
               color: ${isOffice ? '#064734' : '#ffffff'};
@@ -166,37 +162,34 @@ export default function BishkekMap() {
         `;
 
         const customIcon = L.divIcon({
-          className: 'custom-pin-wrapper',
+          className: 'custom-pin',
           html: iconHtml,
-          iconSize: [36, 36],
-          iconAnchor: [18, 36],
-          popupAnchor: [0, -36],
+          iconSize: [34, 34],
+          iconAnchor: [17, 34],
+          popupAnchor: [0, -34],
         });
 
         const marker = L.marker(point.coords, { icon: customIcon }).addTo(map);
 
         const popupContent = `
-          <div style="font-family: inherit; padding: 2px; max-width: 220px;">
+          <div style="font-family: inherit; padding: 2px; max-width: 200px;">
             <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
               ${point.categoryLabel}
             </div>
-            <div style="font-size: 14px; font-weight: 800; color: #111; margin-bottom: 3px;">
+            <div style="font-size: 13px; font-weight: 800; color: #111; margin-bottom: 3px;">
               ${point.name}
             </div>
             <div style="font-size: 11px; color: #666; margin-bottom: 6px;">
               📍 ${point.address}
             </div>
-            <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; text-decoration: none;">
-              Маршрут в 2ГИС →
+            <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="display: block; text-align: center; background: #064734; color: #fff; font-size: 10px; font-weight: 700; padding: 5px 8px; border-radius: 6px; text-decoration: none;">
+              В 2ГИС →
             </a>
           </div>
         `;
 
         marker.bindPopup(popupContent);
-        marker.on('click', () => {
-          setSelectedId(point.id);
-        });
-
+        marker.on('click', () => setSelectedId(point.id));
         markersRef.current[point.id] = marker;
       });
     };
@@ -219,14 +212,26 @@ export default function BishkekMap() {
     };
   }, []);
 
+  // Синхронизация маркеров на карте при смене фильтра
+  useEffect(() => {
+    if (!mapRef.current) return;
+    POINTS.forEach((point) => {
+      const marker = markersRef.current[point.id];
+      if (!marker) return;
+      if (filter === 'all' || point.category === filter) {
+        if (!mapRef.current.hasLayer(marker)) mapRef.current.addLayer(marker);
+      } else {
+        if (mapRef.current.hasLayer(marker)) mapRef.current.removeLayer(marker);
+      }
+    });
+  }, [filter]);
+
   const handleSelectPoint = (point: MapPoint) => {
     setSelectedId(point.id);
     if (mapRef.current) {
       mapRef.current.flyTo(point.coords, 15, { duration: 0.8 });
       const marker = markersRef.current[point.id];
-      if (marker) {
-        marker.openPopup();
-      }
+      if (marker) marker.openPopup();
     }
   };
 
@@ -234,53 +239,54 @@ export default function BishkekMap() {
     filter === 'all' ? POINTS : POINTS.filter((p) => p.category === filter);
 
   return (
-    <div className="w-full bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
-      {/* Верхние табы фильтрации */}
-      <div className="p-4 sm:p-5 border-b border-gray-100 bg-[#f9faf9] flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-2 text-xs font-bold">
+    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
+      
+      {/* Шапка с фильтрами: на мобилках скроллится по горизонтали без переносов */}
+      <div className="p-3 sm:p-5 border-b border-gray-100 bg-[#f9faf9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs font-bold whitespace-nowrap">
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className={`px-3.5 py-2 rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
               filter === 'all'
                 ? 'bg-[#064734] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            Все локации ({POINTS.length})
+            Все ({POINTS.length})
           </button>
           <button
             type="button"
             onClick={() => setFilter('office')}
-            className={`px-3.5 py-2 rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
               filter === 'office'
                 ? 'bg-[#d4b26f] text-[#064734] shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            🏢 Главный офис
+            🏢 Офис
           </button>
           <button
             type="button"
             onClick={() => setFilter('active')}
-            className={`px-3.5 py-2 rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
               filter === 'active'
                 ? 'bg-[#064734] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            🏗️ Строящиеся объекты
+            🏗️ Строящиеся
           </button>
           <button
             type="button"
             onClick={() => setFilter('finished')}
-            className={`px-3.5 py-2 rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
               filter === 'finished'
                 ? 'bg-[#2b2b2b] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            ✓ Сданные дома
+            ✓ Сданные
           </button>
         </div>
 
@@ -288,23 +294,23 @@ export default function BishkekMap() {
           href="https://2gis.kg/bishkek/search/%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-bold text-[#064734] hover:text-[#032b20] underline underline-offset-4 flex items-center gap-1"
+          className="text-xs font-bold text-[#064734] hover:text-[#032b20] flex items-center gap-1 shrink-0 self-end sm:self-auto"
         >
-          <span>📍</span> Найти офис в 2ГИС
+          <span>📍</span> Офис в 2ГИС →
         </a>
       </div>
 
-      {/* Двухколоночный блок: Карта слева + Интерактивный список справа */}
+      {/* Сетка: Карта + Список */}
       <div className="grid grid-cols-1 lg:grid-cols-12">
-        {/* Карта */}
-        <div className="lg:col-span-8 h-[400px] sm:h-[480px] relative bg-[#eef2ef]">
+        {/* Карта: высота 280px на мобилке, чтобы не блокировать прокрутку пальцем */}
+        <div className="lg:col-span-8 h-[280px] sm:h-[400px] lg:h-[480px] relative bg-[#eef2ef]">
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
 
-        {/* Список локаций для быстрого выбора */}
-        <div className="lg:col-span-4 h-[400px] sm:h-[480px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-4 space-y-2.5 bg-gray-50/50">
-          <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2">
-            Выберите объект для фокуса:
+        {/* Список: компактная высота 240px на мобилке */}
+        <div className="lg:col-span-4 h-[240px] sm:h-[360px] lg:h-[480px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-3 sm:p-4 space-y-2 bg-gray-50/50">
+          <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
+            Нажмите на объект для перехода:
           </p>
           {filteredPoints.map((point) => {
             const isSelected = selectedId === point.id;
@@ -312,15 +318,15 @@ export default function BishkekMap() {
               <div
                 key={point.id}
                 onClick={() => handleSelectPoint(point)}
-                className={`p-3.5 rounded-2xl cursor-pointer transition-all border text-left ${
+                className={`p-3 rounded-xl cursor-pointer transition-all border text-left ${
                   isSelected
-                    ? 'bg-white border-[#064734] shadow-md ring-1 ring-[#064734]/20'
+                    ? 'bg-white border-[#064734] shadow-sm ring-1 ring-[#064734]/20'
                     : 'bg-white border-gray-200 hover:border-gray-300'
                 }`}
               >
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-center justify-between gap-1 mb-1">
                   <span
-                    className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md ${
+                    className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                       point.category === 'office'
                         ? 'bg-[#d4b26f]/20 text-[#8c6b23]'
                         : point.category === 'finished'
@@ -331,31 +337,31 @@ export default function BishkekMap() {
                     {point.categoryLabel}
                   </span>
                   {point.price && (
-                    <span className="text-xs font-bold text-[#064734]">
+                    <span className="text-[11px] font-bold text-[#064734]">
                       {point.price}
                     </span>
                   )}
                 </div>
 
-                <h4 className="text-sm font-bold text-gray-950 mb-0.5">
+                <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
                   {point.name}
                 </h4>
-                <p className="text-xs text-gray-500 line-clamp-1 mb-2">
+                <p className="text-[11px] text-gray-500 line-clamp-1 mt-0.5">
                   📍 {point.address}
                 </p>
 
                 {isSelected && (
                   <div className="mt-2 pt-2 border-t border-gray-100 flex items-center justify-between">
-                    <p className="text-[11px] text-gray-600 line-clamp-2">
+                    <p className="text-[10px] text-gray-600 line-clamp-2">
                       {point.desc}
                     </p>
                     <a
                       href={point.gisUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 ml-2 text-[11px] font-bold text-[#064734] hover:underline"
+                      className="shrink-0 ml-2 text-[10px] font-bold text-[#064734] underline"
                     >
-                      В 2ГИС →
+                      В 2ГИС
                     </a>
                   </div>
                 )}
