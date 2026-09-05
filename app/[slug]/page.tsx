@@ -76,36 +76,41 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
         {
           name: 'Fitness Center',
           desc: 'Ваш личный зал для здоровья и энергии.',
-          image: '/projects/Abu-Dhabi.png',
+          image: '/layouts/abu-dhabi/fitness.jpg',
         },
         {
           name: 'Premium Restaurant',
           desc: 'Гастрономические вечера прямо в вашем доме.',
-          image: '/projects/Abu-Dhabi.png',
+          image: '/layouts/abu-dhabi/restoran.jpg',
         },
         {
           name: 'Private Park',
           desc: 'Пространство без машин для спокойных прогулок и тишины.',
-          image: '/projects/Abu-Dhabi.png',
+          image: '/layouts/abu-dhabi/park.jpg',
         },
       ],
     },
     legalText:
       'Abu Dhabi — это недвижимость, подтвержденная документально. Ознакомьтесь с разрешительными документами, посетив наш офис продаж.',
     plans: [
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.48 м²' },
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.73 м²' },
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок А', area: '50.88 м²' },
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '54.68 м²' },
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '55.62 м²' },
-      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '58.05 м²' },
-      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '78.30 м²' },
-      { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '79.77 м²' },
-      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '80.26 м²' },
-      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '81.59 м²' },
-      { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '83.58 м²' },
-      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '83.99 м²' },
-      { rooms: 3, title: '3х ком квартира в ЖК Abu Dhabi блок Б', area: '119.32 м²' },
+      // 1-комнатные
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.48 м²', image: '/layouts/abu-dhabi/1 1room-abu.png' },
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.73 м²', image: '/layouts/abu-dhabi/2 1room-abu.png' },
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок А', area: '50.88 м²', image: '/layouts/abu-dhabi/3 1room-abu.png' },
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '54.68 м²', image: '/layouts/abu-dhabi/4 1room-abu.png' },
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '55.62 м²', image: '/layouts/abu-dhabi/5 1room-abu.png' },
+      { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '58.05 м²', image: '/layouts/abu-dhabi/6 1room-abu.png' },
+
+      // 2-комнатные
+      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '78.30 м²', image: '/layouts/abu-dhabi/1 2room-abu.png' },
+      { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '79.77 м²', image: '/layouts/abu-dhabi/2 2room-abu.png' },
+      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '80.26 м²', image: '/layouts/abu-dhabi/3 2room-abu.png' },
+      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '81.59 м²', image: '/layouts/abu-dhabi/4 2room-abu.png' },
+      { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '83.58 м²', image: '/layouts/abu-dhabi/5 2room-abu.png' },
+      { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '83.99 м²', image: '/layouts/abu-dhabi/6 2room-abu.png' },
+
+      // 3-комнатная
+      { rooms: 3, title: '3х ком квартира в ЖК Abu Dhabi блок Б', area: '119.32 м²', image: '/layouts/abu-dhabi/1 3room-abu.png' },
     ],
   },
   'madina-residence': {
