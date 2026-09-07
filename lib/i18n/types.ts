@@ -298,6 +298,35 @@ export interface TranslationDictionary {
     waTradeQuestion: string;
     waFullPaymentText: string;
   };
+  footer: {
+    companySubtitle: string;
+    desc: string;
+    salesWeekdays: string;
+    salesSaturday: string;
+    complexesTitle: string;
+    badgePremium: string;
+    badgeBusiness: string;
+    badgeEco: string;
+    badgeComfort: string;
+    badgeFinished: string;
+    buyersTitle: string;
+    linkCatalog: string;
+    linkInstallment: string;
+    linkTradeIn: string;
+    linkFullPayment: string;
+    linkAbout: string;
+    linkContacts: string;
+    contactTitle: string;
+    hotline: string;
+    officeTitle: string;
+    route2Gis: string;
+    btnWhatsApp: string;
+    btnInstagram: string;
+    copyright: string;
+    legalNotice: string;
+    toTop: string;
+    waText: string;
+  };
   common: {
     moreDetails: string;
     learnMore: string;
