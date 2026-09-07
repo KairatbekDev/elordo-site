@@ -61,7 +61,8 @@ export default function Footer() {
             {/* Статус работы офиса */}
             <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-[#d4b26f]">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Отдел продаж: Пн — Сб 09:00 – 18:00</span>
+              <span>Отдел продаж: Пн — Пт 09:00 – 18:00</span>
+              <span>Отдел продаж: Сб 10:00 – 16:00</span>
             </div>
           </div>
 
