@@ -534,7 +534,6 @@ export default async function ComplexPage({
     notFound();
   }
 
-  const isDark = project.theme === 'dark';
   const isSold = project.hero.price.includes('проданы');
 
   const formattedPrice = isSold
@@ -546,11 +545,11 @@ export default async function ComplexPage({
   );
 
   return (
-    <main className={`min-h-screen pb-28 md:pb-0 ${isDark ? 'bg-[#181818] text-white' : 'bg-[#fafbfa] text-gray-900'} selection:bg-[#d4b26f] selection:text-[#064734]`}>
+    <main className="min-h-screen pb-28 md:pb-0 bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. Хлебные крошки */}
-      <div className={`border-b ${isDark ? 'bg-[#141414] border-white/10' : 'bg-white border-gray-100'}`}>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
+      <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#d4b26f] transition-colors">
             Главная
           </Link>
@@ -559,7 +558,7 @@ export default async function ComplexPage({
             Каталог объектов
           </Link>
           <span>/</span>
-          <span className={isDark ? 'text-[#d4b26f] font-bold' : 'text-[#064734] font-bold'}>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">
             {project.name}
           </span>
         </div>
@@ -634,34 +633,34 @@ export default async function ComplexPage({
       </section>
 
       {/* 3. Технические спецификации объекта (СНиП) */}
-      <section className={`border-b py-8 px-4 sm:px-6 ${isDark ? 'bg-[#1e1e1e] border-white/10' : 'bg-white border-gray-200'}`}>
+      <section className="bg-white dark:bg-[#0b1b15] border-b border-gray-200 dark:border-white/10 py-8 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block">Этажность</span>
-            <strong className="text-xs sm:text-sm font-black">{project.specs.floors}</strong>
+            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 block">Этажность</span>
+            <strong className="text-xs sm:text-sm font-black text-gray-900 dark:text-white">{project.specs.floors}</strong>
           </div>
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block">Высота потолков</span>
+            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 block">Высота потолков</span>
             <strong className="text-xs sm:text-sm font-black text-[#d4b26f]">{project.specs.ceiling}</strong>
           </div>
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block">Сейсмостойкость</span>
-            <strong className="text-xs sm:text-sm font-black">{project.specs.seismic}</strong>
+            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 block">Сейсмостойкость</span>
+            <strong className="text-xs sm:text-sm font-black text-gray-900 dark:text-white">{project.specs.seismic}</strong>
           </div>
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block">Конструктив</span>
-            <strong className="text-xs sm:text-sm font-black truncate block">{project.specs.construction}</strong>
+            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 block">Конструктив</span>
+            <strong className="text-xs sm:text-sm font-black truncate block text-gray-900 dark:text-white">{project.specs.construction}</strong>
           </div>
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5 col-span-2 sm:col-span-1">
-            <span className="text-[10px] uppercase font-bold text-gray-400 block">Отопление</span>
-            <strong className="text-xs sm:text-sm font-black truncate block">{project.specs.heating}</strong>
+            <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 block">Отопление</span>
+            <strong className="text-xs sm:text-sm font-black truncate block text-gray-900 dark:text-white">{project.specs.heating}</strong>
           </div>
         </div>
       </section>
 
       {/* 4. Преимущества комплекса */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-        <h2 className={`text-2xl sm:text-4xl font-black text-center uppercase tracking-tight mb-14 ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+        <h2 className="text-2xl sm:text-4xl font-black text-center uppercase tracking-tight mb-14 text-[#064734] dark:text-[#d4b26f]">
           Преимущества проекта
         </h2>
 
@@ -669,22 +668,18 @@ export default async function ComplexPage({
           {project.advantages.map((adv, idx) => (
             <div
               key={idx}
-              className={`rounded-3xl p-8 transition-all flex flex-col items-center text-center ${
-                isDark
-                  ? 'bg-[#222222] border border-white/5 hover:border-[#d4b26f]/40 shadow-lg'
-                  : 'bg-white border border-gray-200 shadow-sm hover:shadow-xl hover:border-[#064734]/30'
-              }`}
+              className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/40 transition-all flex flex-col items-center text-center"
             >
-              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 flex items-center justify-center text-[#d4b26f] mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 dark:bg-[#d4b26f]/15 flex items-center justify-center text-[#d4b26f] mb-6">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
 
-              <h3 className={`text-lg font-black mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <h3 className="text-lg font-black mb-3 text-gray-900 dark:text-white">
                 {adv.title}
               </h3>
-              <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+              <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300">
                 {adv.desc}
               </p>
             </div>
@@ -693,13 +688,13 @@ export default async function ComplexPage({
       </section>
 
       {/* 5. Инфраструктура */}
-      <section className={`py-20 px-4 sm:px-6 ${isDark ? 'bg-[#141414]' : 'bg-[#f0f4f2]'}`}>
+      <section className="py-20 px-4 sm:px-6 bg-[#f0f4f2] dark:bg-[#040c09] transition-colors border-y border-transparent dark:border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <h2 className={`text-2xl sm:text-4xl font-black uppercase tracking-tight mb-4 ${isDark ? 'text-[#d4b26f]' : 'text-[#064734]'}`}>
+            <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tight mb-4 text-[#064734] dark:text-[#d4b26f]">
               {project.infrastructure.title}
             </h2>
-            <p className={`text-xs sm:text-sm font-light leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className="text-xs sm:text-sm font-light leading-relaxed text-gray-600 dark:text-gray-400">
               {project.infrastructure.subtitle}
             </p>
           </div>
@@ -714,10 +709,10 @@ export default async function ComplexPage({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <h3 className={`text-base font-black mb-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className="text-base font-black mb-1 text-gray-900 dark:text-white">
                   {item.name}
                 </h3>
-                <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'} leading-relaxed`}>
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -740,26 +735,26 @@ export default async function ComplexPage({
         />
       ) : isSold ? (
         <section className="py-16 px-4 sm:px-6 max-w-4xl mx-auto text-center">
-          <div className="p-8 rounded-3xl bg-white/5 border border-white/10 shadow-sm">
+          <div className="p-8 rounded-3xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 shadow-sm transition-colors">
             <div className="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-3">
               <IconCheck className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-black mb-2">Объект сдан в эксплуатацию</h3>
-            <p className="text-xs sm:text-sm text-gray-400 max-w-xl mx-auto leading-relaxed">
+            <h3 className="text-xl font-black mb-2 text-gray-900 dark:text-white">Объект сдан в эксплуатацию</h3>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 max-w-xl mx-auto leading-relaxed">
               Все квартиры от застройщика в {project.name} распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке или записаться в лист ожидания, свяжитесь с нашим отделом продаж.
             </p>
           </div>
         </section>
       ) : (
         <section className="py-16 px-4 sm:px-6 max-w-4xl mx-auto text-center">
-          <div className={`p-8 rounded-3xl border shadow-sm ${isDark ? 'bg-white/5 border-white/10' : 'bg-[#eef2ef] border-gray-200'}`}>
+          <div className="p-8 rounded-3xl border shadow-sm bg-[#eef2ef] dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors">
             <span className="text-xs uppercase font-black tracking-widest text-[#d4b26f] block mb-2">
               Планировочные решения
             </span>
-            <h3 className="text-xl sm:text-2xl font-black uppercase mb-3 tracking-tight">
+            <h3 className="text-xl sm:text-2xl font-black uppercase mb-3 tracking-tight text-gray-900 dark:text-white">
               Шахматка и планировки по запросу
             </h3>
-            <p className={`text-xs sm:text-sm max-w-xl mx-auto mb-6 leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className="text-xs sm:text-sm max-w-xl mx-auto mb-6 leading-relaxed text-gray-600 dark:text-gray-400">
               Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в {project.name} менеджер отправит вам напрямую в мессенджер.
             </p>
             <a
@@ -777,7 +772,7 @@ export default async function ComplexPage({
 
       {/* 7. Способы приобретения */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className={`text-xl sm:text-3xl font-black text-center uppercase tracking-tight mb-8 ${isDark ? 'text-[#d4b26f]' : 'text-[#064734]'}`}>
+        <h2 className="text-xl sm:text-3xl font-black text-center uppercase tracking-tight mb-8 text-[#064734] dark:text-[#d4b26f]">
           Программы приобретения в {project.name}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -842,11 +837,11 @@ export default async function ComplexPage({
 
       {/* 8. Юридические гарантии */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center">
-        <div className={`p-6 sm:p-8 rounded-3xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200'}`}>
-          <h2 className={`text-lg sm:text-xl font-black uppercase tracking-tight mb-3 ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+        <div className="p-6 sm:p-8 rounded-3xl border bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors">
+          <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight mb-3 text-[#064734] dark:text-[#d4b26f]">
             Юридическая чистота и гарантии
           </h2>
-          <p className={`text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className="text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
             {project.legalText}
           </p>
         </div>
@@ -906,23 +901,23 @@ export default async function ComplexPage({
       </section>
 
       {/* 10. Офис продаж и адрес на 2GIS */}
-      <section className={`py-16 border-t ${isDark ? 'bg-[#181818] border-white/10' : 'bg-white border-gray-100'}`}>
+      <section className="py-16 border-t bg-white dark:bg-[#07130e] border-gray-100 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
               Отдел продаж
             </span>
-            <h2 className={`text-2xl sm:text-3xl font-black tracking-tight uppercase ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight uppercase text-[#064734] dark:text-[#d4b26f]">
               Консультация по объекту {project.name}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-3xl mx-auto">
             <div>
-              <p className="text-xs text-gray-400 mb-1">Фактический адрес объекта:</p>
-              <p className="text-base font-black mb-3">{project.hero.address}</p>
+              <p className="text-xs text-gray-400 dark:text-neutral-400 mb-1">Фактический адрес объекта:</p>
+              <p className="text-base font-black mb-3 text-gray-900 dark:text-white">{project.hero.address}</p>
               
-              <div className="space-y-1 text-sm font-semibold mb-4">
+              <div className="space-y-1 text-sm font-semibold mb-4 text-gray-800 dark:text-gray-200">
                 <p>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</p>
                 <p>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</p>
               </div>
@@ -953,7 +948,7 @@ export default async function ComplexPage({
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-white/20 hover:border-[#d4b26f] px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/20 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
               >
                 <IconInstagram className="w-4 h-4 text-pink-600" />
                 <span>Перейти в Instagram</span>
@@ -964,12 +959,12 @@ export default async function ComplexPage({
       </section>
 
       {/* 11. Мобильный Sticky Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden p-3 bg-neutral-950/95 backdrop-blur-xl border-t border-white/10 flex items-center gap-2 shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden p-3 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 flex items-center gap-2 shadow-2xl transition-colors">
         <a
           href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-          className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider text-center border border-white/15 transition-all flex items-center justify-center gap-1.5"
+          className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-white/10 dark:hover:bg-white/20 text-gray-900 dark:text-white font-bold text-xs uppercase tracking-wider text-center border border-gray-200 dark:border-white/15 transition-all flex items-center justify-center gap-1.5"
         >
-          <IconPhone className="w-3.5 h-3.5 text-white" />
+          <IconPhone className="w-3.5 h-3.5 text-gray-900 dark:text-white" />
           <span>Позвонить</span>
         </a>
         <a

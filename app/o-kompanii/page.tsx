@@ -80,25 +80,25 @@ const STATS = [
 
 const STANDARDS = [
   {
-    icon: <IconBuilding className="w-6 h-6 text-[#064734]" />,
+    icon: <IconBuilding className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Монолитный железобетон',
     desc: 'Высокомарочный бетон марки М350 и сертифицированная российская арматура класса А500С.',
     badge: 'СНиП КР',
   },
   {
-    icon: <IconDocument className="w-6 h-6 text-[#064734]" />,
+    icon: <IconDocument className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Экологичный жженый кирпич',
     desc: 'Внутренние и межквартирные перегородки возводятся из кирпича, обеспечивая отличную тишину и микроклимат.',
     badge: 'Шумоизоляция',
   },
   {
-    icon: <IconTree className="w-6 h-6 text-[#064734]" />,
+    icon: <IconTree className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Базальтовое утепление 100 мм',
     desc: 'Негорючая теплоизоляция высокой плотности сохраняет прохладу летом и держит тепло в зимние морозы.',
     badge: 'Энергоэффект',
   },
   {
-    icon: <IconShieldCheck className="w-6 h-6 text-[#064734]" />,
+    icon: <IconShieldCheck className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Сейсмостойкость 9 баллов',
     desc: 'Каждый проект проходит строгие расчеты сейсмических нагрузок и экспертизу Госстроя Кыргызской Республики.',
     badge: 'Безопасность',
@@ -134,16 +134,16 @@ export default function AboutPage() {
   );
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 selection:bg-[#d4b26f] selection:text-[#064734]">
+    <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. Хлебные крошки */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
-          <Link href="/" className="hover:text-[#064734] transition-colors">
+      <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
+          <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             Главная
           </Link>
           <span>/</span>
-          <span className="text-[#064734] font-bold">О компании</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">О компании</span>
         </div>
       </div>
 
@@ -198,16 +198,16 @@ export default function AboutPage() {
 
       {/* 3. Ключевые показатели компании */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-12 relative z-20">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-gray-100">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-none border border-gray-100 dark:border-white/10 transition-colors">
           {STATS.map((stat, idx) => (
-            <div key={idx} className="text-center p-2 border-r last:border-r-0 border-gray-100">
-              <div className="text-2xl sm:text-4xl font-black text-[#064734] mb-1">
+            <div key={idx} className="text-center p-2 border-r last:border-r-0 border-gray-100 dark:border-white/10">
+              <div className="text-2xl sm:text-4xl font-black text-[#064734] dark:text-[#d4b26f] mb-1">
                 {stat.value}
               </div>
-              <div className="text-xs sm:text-sm text-gray-900 font-extrabold mb-0.5">
+              <div className="text-xs sm:text-sm text-gray-900 dark:text-white font-extrabold mb-0.5">
                 {stat.label}
               </div>
-              <div className="text-[11px] text-gray-400 hidden sm:block">
+              <div className="text-[11px] text-gray-400 dark:text-neutral-400 hidden sm:block">
                 {stat.sub}
               </div>
             </div>
@@ -224,32 +224,32 @@ export default function AboutPage() {
               <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
                 История и миссия
               </span>
-              <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] leading-snug">
+              <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] leading-snug">
                 Надежность, подтвержденная реальными домами
               </h2>
             </div>
 
-            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
               Строительная компания <strong>EL ORDO GROUP</strong> основана в 2021 году профессионалами с более чем 10-летним стажем в капитальном строительстве Кыргызской Республики. Наша цель — возводить безопасные, эстетичные и энергоэффективные дома, которые растут в цене из года в год.
             </p>
 
-            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
               Мы не экономим на материалах: применяем сейсмостойкий монолитный каркас, стены из жженого кирпича и трехкамерное остекление с шумоизоляцией. Все объекты имеют <strong>Красные книги</strong>, утвержденные АПУ и положительные заключения Государственной экспертизы.
             </p>
 
             {/* Цитата руководства */}
-            <div className="p-6 rounded-2xl bg-[#064734]/5 border-l-4 border-[#064734] shadow-sm">
-              <p className="text-sm font-semibold italic text-gray-800 leading-relaxed mb-3">
+            <div className="p-6 rounded-2xl bg-[#064734]/5 dark:bg-[#064734]/20 border-l-4 border-[#064734] dark:border-[#d4b26f] shadow-sm">
+              <p className="text-sm font-semibold italic text-gray-800 dark:text-gray-200 leading-relaxed mb-3">
                 «Для нас дом — это не просто квадратные метры, а семейная крепость, где каждый житель чувствует абсолютную безопасность, комфорт и уверенность в завтрашнем дне».
               </p>
-              <div className="text-xs font-black uppercase tracking-wider text-[#064734]">
+              <div className="text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f]">
                 — Руководство строительной компании EL ORDO GROUP
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-6">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200 bg-neutral-900 aspect-[4/3] group">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10 bg-neutral-900 aspect-[4/3] group">
               <img
                 src="/projects/Abu-Dhabi.png"
                 alt="Проекты EL ORDO GROUP"
@@ -275,16 +275,16 @@ export default function AboutPage() {
       </section>
 
       {/* 5. Инженерные стандарты строительства */}
-      <section className="bg-white border-y border-gray-100 py-20 px-4 sm:px-6">
+      <section className="bg-white dark:bg-[#07130e] border-y border-gray-100 dark:border-white/10 py-20 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
               Технологии и контроль
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734]">
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
               Стандарты строительства EL ORDO
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-2">
               Каждый этап контролируется сертифицированными инженерами технадзора.
             </p>
           </div>
@@ -293,19 +293,19 @@ export default function AboutPage() {
             {STANDARDS.map((std, idx) => (
               <div
                 key={idx}
-                className="bg-[#fafbfa] p-7 rounded-3xl border border-gray-200/80 hover:border-[#064734]/40 hover:shadow-xl transition-all flex flex-col justify-between"
+                className="bg-[#fafbfa] dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200/80 dark:border-white/10 hover:border-[#064734]/40 dark:hover:border-[#d4b26f]/40 hover:shadow-xl dark:hover:shadow-none transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 flex items-center justify-center mb-4">
                     {std.icon}
                   </div>
-                  <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-[#064734]/10 text-[#064734] mb-3">
+                  <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] mb-3">
                     {std.badge}
                   </span>
-                  <h3 className="text-base font-black text-gray-900 mb-2">
+                  <h3 className="text-base font-black text-gray-900 dark:text-white mb-2">
                     {std.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     {std.desc}
                   </p>
                 </div>
@@ -321,7 +321,7 @@ export default function AboutPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
             Хронология успеха
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734]">
+          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Этапы развития девелопера
           </h2>
         </div>
@@ -330,16 +330,16 @@ export default function AboutPage() {
           {MILESTONES.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-[#d4b26f]/30 transition-all relative flex flex-col justify-between"
             >
               <div>
                 <div className="text-2xl font-black text-[#d4b26f] mb-3">
                   {item.year}
                 </div>
-                <h3 className="text-sm font-black text-gray-950 mb-2">
+                <h3 className="text-sm font-black text-gray-950 dark:text-white mb-2">
                   {item.title}
                 </h3>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -349,16 +349,16 @@ export default function AboutPage() {
       </section>
 
       {/* 7. Руководство и команда компании */}
-      <section className="bg-[#f0f4f1] border-t border-gray-200 py-20 px-4 sm:px-6">
+      <section className="bg-[#f0f4f1] dark:bg-[#040c09] border-t border-gray-200 dark:border-white/10 py-20 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
               Профессиональная команда
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734]">
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
               Руководство EL ORDO GROUP
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 mt-2">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
               Эксперты в сфере девелопмента, архитектурного проектирования, юриспруденции и капитального строительства.
             </p>
           </div>
@@ -367,9 +367,9 @@ export default function AboutPage() {
             {TEAM.map((member, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
+                className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100">
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                   <img
                     src={member.image}
                     alt={member.name}
@@ -378,12 +378,12 @@ export default function AboutPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <div className="p-6 flex-1 flex flex-col justify-between bg-white">
+                <div className="p-6 flex-1 flex flex-col justify-between bg-white dark:bg-[#0b1b15] transition-colors">
                   <div>
-                    <h3 className="text-base sm:text-lg font-black text-gray-900 mb-1 group-hover:text-[#064734] transition-colors">
+                    <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mb-1 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
                       {member.name}
                     </h3>
-                    <p className="text-xs font-bold text-[#8c6b23] uppercase tracking-wider">
+                    <p className="text-xs font-bold text-[#8c6b23] dark:text-[#d4b26f] uppercase tracking-wider">
                       {member.role}
                     </p>
                   </div>
@@ -395,31 +395,31 @@ export default function AboutPage() {
       </section>
 
       {/* 8. Контакты офиса продаж и карта */}
-      <section className="bg-white border-t border-gray-100 py-16 sm:py-20">
+      <section className="bg-white dark:bg-[#07130e] border-t border-gray-100 dark:border-white/10 py-16 sm:py-20 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
               Прямая связь
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
               Офис продаж и консультации
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-3xl mx-auto mb-12">
             <div>
-              <p className="text-xs text-gray-400 mb-1">Головной офис компании:</p>
-              <p className="text-lg font-bold text-gray-900 mb-3">
+              <p className="text-xs text-gray-400 dark:text-neutral-400 mb-1">Головной офис компании:</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                 {COMPANY_INFO.address}
               </p>
-              <div className="space-y-1.5 text-sm font-semibold text-gray-800 mb-4">
+              <div className="space-y-1.5 text-sm font-semibold text-gray-800 dark:text-gray-200 mb-4">
                 {COMPANY_INFO.phones.map((phone, idx) => (
                   <p key={idx}>
                     <a
                       href={`tel:${phone.replace(/\s+/g, '')}`}
-                      className="hover:text-[#064734] transition-colors inline-flex items-center gap-2"
+                      className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors inline-flex items-center gap-2"
                     >
-                      <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
+                      <IconPhone className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f]" />
                       <span>{phone}</span>
                     </a>
                   </p>
@@ -429,7 +429,7 @@ export default function AboutPage() {
                 href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:text-[#d4b26f] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline"
               >
                 <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
                 <span>Открыть маршрут в 2GIS</span>
@@ -442,7 +442,7 @@ export default function AboutPage() {
                 href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center border border-transparent dark:border-white/10"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                 <span>Написать в WhatsApp</span>
@@ -451,7 +451,7 @@ export default function AboutPage() {
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
               >
                 <IconInstagram className="w-4 h-4 text-pink-600" />
                 <span>Перейти в Instagram</span>

@@ -73,13 +73,13 @@ const DISCOUNT_CASES = [
 
 const PRIVILEGES = [
   {
-    icon: <IconDiamond className="w-6 h-6 text-[#064734]" />,
+    icon: <IconDiamond className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Максимальный дисконт от руководства',
     desc: 'Вы получаете минимально возможную цену за квадратный метр. Сэкономленные средства можно направить на дизайнерский ремонт или меблировку.',
   },
   {
     icon: (
-      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
       </svg>
     ),
@@ -88,7 +88,7 @@ const PRIVILEGES = [
   },
   {
     icon: (
-      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
       </svg>
     ),
@@ -97,7 +97,7 @@ const PRIVILEGES = [
   },
   {
     icon: (
-      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
         <polyline points="16 7 22 7 22 13" />
       </svg>
@@ -174,10 +174,10 @@ export default function FullPaymentPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Прямая выгода покупателя
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Реальная экономия при 100% оплате
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Примеры специальной цены на 1-комнатные квартиры при единовременном расчете
           </p>
         </div>
@@ -186,7 +186,7 @@ export default function FullPaymentPage() {
           {DISCOUNT_CASES.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-6 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between relative group"
+              className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 border border-gray-200 dark:border-white/10 shadow-lg dark:shadow-none hover:shadow-2xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between relative group"
             >
               {item.badge && (
                 <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
@@ -195,36 +195,36 @@ export default function FullPaymentPage() {
               )}
 
               <div>
-                <span className="text-xs font-bold text-gray-400 block mb-1">
+                <span className="text-xs font-bold text-gray-400 dark:text-neutral-400 block mb-1">
                   {item.classType}
                 </span>
-                <h4 className="text-xl font-black text-gray-950 mb-1">
+                <h4 className="text-xl font-black text-gray-950 dark:text-white mb-1">
                   {item.complex}
                 </h4>
-                <div className="text-xs font-semibold text-[#064734] mb-4">
+                <div className="text-xs font-semibold text-[#064734] dark:text-[#d4b26f] mb-4">
                   Площадь квартиры: {item.area}
                 </div>
 
-                <div className="space-y-2.5 border-t border-gray-100 pt-3 text-xs">
-                  <div className="flex justify-between text-gray-500">
+                <div className="space-y-2.5 border-t border-gray-100 dark:border-white/10 pt-3 text-xs">
+                  <div className="flex justify-between text-gray-500 dark:text-neutral-400">
                     <span>Базовая стоимость:</span>
                     <span className="line-through">{item.standardPrice}</span>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-[#f2f6f4] border border-[#064734]/15 my-2">
-                    <span className="text-[11px] font-bold text-gray-500 block">
+                  <div className="p-3 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 dark:border-white/10 my-2 transition-colors">
+                    <span className="text-[11px] font-bold text-gray-500 dark:text-neutral-400 block">
                       Спеццена при 100% расчете:
                     </span>
-                    <div className="text-2xl font-black text-[#064734] my-0.5">
+                    <div className="text-2xl font-black text-[#064734] dark:text-[#d4b26f] my-0.5">
                       {item.cashPrice}
                     </div>
-                    <div className="text-xs font-black text-emerald-700 flex items-center gap-1">
+                    <div className="text-xs font-black text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                       <IconCheck className="w-3.5 h-3.5 shrink-0" />
                       <span>{item.saving} ({item.savingKgs})</span>
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-gray-600 leading-relaxed italic pt-1">
+                  <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed italic pt-1">
                     {item.benefit}
                   </p>
                 </div>
@@ -235,15 +235,15 @@ export default function FullPaymentPage() {
                   href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                   <span>Зафиксировать скидку</span>
                   <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
-                  className="block w-full text-center py-1.5 text-[11px] font-bold text-gray-500 hover:text-[#064734] transition-colors"
+                  className="block w-full text-center py-1.5 text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
                 >
                   Смотреть комплекс {item.complex}
                 </Link>
@@ -259,7 +259,7 @@ export default function FullPaymentPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Премиальный сервис
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Привилегии покупателей при 100% оплате
           </h3>
         </div>
@@ -268,16 +268,16 @@ export default function FullPaymentPage() {
           {PRIVILEGES.map((priv, idx) => (
             <div
               key={idx}
-              className="bg-white p-7 rounded-3xl border border-gray-200 shadow-sm hover:shadow-xl transition-all flex items-start gap-4"
+              className="bg-white dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-xl dark:hover:border-[#d4b26f]/30 transition-all flex items-start gap-4"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-2xl shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center text-2xl shrink-0">
                 {priv.icon}
               </div>
               <div>
-                <h4 className="text-base font-black text-gray-900 mb-1.5">
+                <h4 className="text-base font-black text-gray-900 dark:text-white mb-1.5">
                   {priv.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {priv.desc}
                 </p>
               </div>
@@ -287,7 +287,7 @@ export default function FullPaymentPage() {
       </div>
 
       {/* 3. ИНВЕСТИЦИОННЫЙ ПОТЕНЦИАЛ (ИНВЕСТОРАМ) */}
-      <div className="my-16 bg-[#032b20] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+      <div className="my-16 bg-[#032b20] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-white/10">
         <div className="relative z-10 max-w-3xl">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
             Инвестиции в недвижимость Бишкека
@@ -322,7 +322,7 @@ export default function FullPaymentPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Быстро и юридически чисто
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             4 шага к получению квартиры
           </h3>
         </div>
@@ -331,16 +331,16 @@ export default function FullPaymentPage() {
           {STEPS.map((s, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none flex flex-col justify-between transition-colors"
             >
               <div>
                 <span className="text-3xl font-black text-[#d4b26f] block mb-3">
                   {s.num}
                 </span>
-                <h4 className="text-sm font-black text-gray-950 mb-2">
+                <h4 className="text-sm font-black text-gray-950 dark:text-white mb-2">
                   {s.title}
                 </h4>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {s.desc}
                 </p>
               </div>

@@ -75,20 +75,20 @@ const TRADE_IN_CASES = [
 
 const ACCEPTED_CATEGORIES = [
   {
-    icon: <IconCar className="w-7 h-7 text-[#064734]" />,
+    icon: <IconCar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Автомобили и внедорожники',
     desc: 'Ликвидные иномарки (Toyota, Lexus, Hyundai, Kia, BMW, Mercedes и др.) в исправном техническом состоянии с чистой юридической историей.',
     reqs: 'Техпаспорт ТС, паспорт владельца, отсутствие арестов и штрафов.',
   },
   {
-    icon: <IconBuilding className="w-7 h-7 text-[#064734]" />,
+    icon: <IconBuilding className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
     title: 'Вторичные квартиры в Бишкеке',
     desc: '1-, 2-, 3-комнатные квартиры 104, 105, 106 серий, индивидуальных планировок, а также сданные новостройки в черте города.',
     reqs: 'Правоустанавливающие документы, техпаспорт БТИ, справка об отсутствии обременений.',
   },
   {
     icon: (
-      <svg className="w-7 h-7 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
         <line x1="12" y1="9" x2="12" y2="13" />
         <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -171,10 +171,10 @@ export default function TradeInPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Практические примеры
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Реальные сценарии зачета Trade-in
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Как наши резиденты улучшают жилищные условия без свободных наличных средств
           </p>
         </div>
@@ -183,47 +183,47 @@ export default function TradeInPage() {
           {TRADE_IN_CASES.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-6 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between relative group"
+              className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 border border-gray-200 dark:border-white/10 shadow-lg dark:shadow-none hover:shadow-2xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between relative group"
             >
               <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
                 {item.badge}
               </div>
 
               <div>
-                <span className="text-xs font-bold text-gray-400 block mb-1">
+                <span className="text-xs font-bold text-gray-400 dark:text-neutral-400 block mb-1">
                   {item.assetCategory}
                 </span>
-                <h4 className="text-lg font-black text-gray-950 mb-1 leading-snug">
+                <h4 className="text-lg font-black text-gray-950 dark:text-white mb-1 leading-snug">
                   {item.asset}
                 </h4>
 
-                <div className="p-3 rounded-2xl bg-[#f2f6f4] border border-[#064734]/15 my-4">
-                  <span className="text-[11px] text-gray-500 font-semibold block">
+                <div className="p-3 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 dark:border-white/10 my-4 transition-colors">
+                  <span className="text-[11px] text-gray-500 dark:text-neutral-400 font-semibold block">
                     Оценка эксперта EL ORDO:
                   </span>
-                  <div className="text-2xl font-black text-[#064734] my-0.5">
+                  <div className="text-2xl font-black text-[#064734] dark:text-[#d4b26f] my-0.5">
                     {item.valuation}
                   </div>
-                  <span className="text-[11px] font-bold text-[#064734]/80 block">
+                  <span className="text-[11px] font-bold text-[#064734]/80 dark:text-neutral-300 block">
                     {item.valuationKgs}
                   </span>
                 </div>
 
-                <div className="space-y-2.5 text-xs border-t border-gray-100 pt-3">
+                <div className="space-y-2.5 text-xs border-t border-gray-100 dark:border-white/10 pt-3">
                   <div>
-                    <span className="text-gray-400 block text-[11px]">Выбранный объект:</span>
-                    <strong className="text-gray-900 font-extrabold text-sm block">
+                    <span className="text-gray-400 dark:text-neutral-400 block text-[11px]">Выбранный объект:</span>
+                    <strong className="text-gray-900 dark:text-white font-extrabold text-sm block">
                       {item.targetComplex}
                     </strong>
-                    <span className="text-gray-600 text-[11px]">{item.targetApartment}</span>
+                    <span className="text-gray-600 dark:text-gray-300 text-[11px]">{item.targetApartment}</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-semibold text-[11px] leading-relaxed flex items-center gap-1.5">
-                    <IconCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-[11px] leading-relaxed flex items-center gap-1.5 border border-emerald-200/50 dark:border-emerald-900/50">
+                    <IconCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>{item.result}</span>
                   </div>
 
-                  <p className="text-[11px] text-gray-500 leading-relaxed pl-1">
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 leading-relaxed pl-1">
                     {item.surplus}
                   </p>
                 </div>
@@ -234,15 +234,15 @@ export default function TradeInPage() {
                   href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                   <span>Оценить похожее авто</span>
                   <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
-                  className="block w-full text-center py-1.5 text-[11px] font-bold text-gray-500 hover:text-[#064734] transition-colors"
+                  className="block w-full text-center py-1.5 text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
                 >
                   О комплексе {item.targetComplex}
                 </Link>
@@ -253,15 +253,15 @@ export default function TradeInPage() {
       </div>
 
       {/* 2. СРАВНЕНИЕ: TRADE-IN EL ORDO vs САМОСТОЯТЕЛЬНАЯ ПРОДАЖА */}
-      <div className="my-16 bg-white rounded-3xl p-6 sm:p-10 border border-gray-200 shadow-xl">
+      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Экономия времени и денег
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Trade-in EL ORDO или продажа на авторынке?
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Почему обмен напрямую девелоперу выгоднее самостоятельной реализации
           </p>
         </div>
@@ -269,59 +269,59 @@ export default function TradeInPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[550px]">
             <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="py-4 px-3 text-gray-400 font-bold uppercase text-[11px]">Критерий сделки</th>
-                <th className="py-4 px-3 text-[#064734] font-black uppercase text-xs sm:text-sm bg-emerald-50/70 rounded-t-xl">
+              <tr className="border-b-2 border-gray-200 dark:border-white/10">
+                <th className="py-4 px-3 text-gray-400 dark:text-neutral-400 font-bold uppercase text-[11px]">Критерий сделки</th>
+                <th className="py-4 px-3 text-[#064734] dark:text-[#d4b26f] font-black uppercase text-xs sm:text-sm bg-emerald-50/70 dark:bg-emerald-950/40 rounded-t-xl">
                   Trade-in в EL ORDO
                 </th>
-                <th className="py-4 px-3 text-gray-600 font-bold uppercase text-xs">
+                <th className="py-4 px-3 text-gray-600 dark:text-gray-300 font-bold uppercase text-xs">
                   Самостоятельная продажа
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10 text-gray-700 dark:text-gray-300">
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Срок закрытия сделки</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Срок закрытия сделки</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Всего 24 часа
                 </td>
-                <td className="py-3.5 px-3 text-gray-600">
+                <td className="py-3.5 px-3 text-gray-600 dark:text-neutral-400">
                   от 1 до 4 месяцев
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Бронь квартиры и фиксация цены</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Бронь квартиры и фиксация цены</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Квартира бронируется сразу
                 </td>
-                <td className="py-3.5 px-3 text-rose-600 font-medium">
+                <td className="py-3.5 px-3 text-rose-600 dark:text-rose-400 font-medium">
                   Квартира может подорожать или продаться
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Торг и сбивание стоимости</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Торг и сбивание стоимости</td>
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Честная объективная рыночная цена
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Постоянный прессинг перекупщиков
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Комиссии и расходы на рекламу</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Комиссии и расходы на рекламу</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
                   0 сом (Все расходы берет застройщик)
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Оплата объявлений, мойки, авторынка, риелторов
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Юридическое оформление</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40 rounded-b-xl">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Юридическое оформление</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-b-xl">
                   Штатные юристы компании
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Очереди в ГУ «Унаа», риски с расчетами
                 </td>
               </tr>
@@ -336,7 +336,7 @@ export default function TradeInPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Критерии активов
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Какое имущество участвует в программе
           </h3>
         </div>
@@ -345,22 +345,22 @@ export default function TradeInPage() {
           {ACCEPTED_CATEGORIES.map((cat, idx) => (
             <div
               key={idx}
-              className="bg-white p-7 rounded-3xl border border-gray-200 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-xl dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-5">
                   {cat.icon}
                 </div>
-                <h4 className="text-lg font-black text-gray-900 mb-2">
+                <h4 className="text-lg font-black text-gray-900 dark:text-white mb-2">
                   {cat.title}
                 </h4>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                   {cat.desc}
                 </p>
               </div>
 
-              <div className="p-3 rounded-xl bg-gray-50 border border-gray-100 text-[11px] text-gray-500">
-                <strong className="text-gray-900 block mb-0.5">Требования:</strong>
+              <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#040c09] border border-gray-100 dark:border-white/10 text-[11px] text-gray-500 dark:text-neutral-400">
+                <strong className="text-gray-900 dark:text-white block mb-0.5">Требования:</strong>
                 {cat.reqs}
               </div>
             </div>
@@ -374,7 +374,7 @@ export default function TradeInPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Процедура за 24 часа
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Этапы оформления по Trade-in
           </h3>
         </div>
@@ -383,16 +383,16 @@ export default function TradeInPage() {
           {STEPS.map((s, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none flex flex-col justify-between transition-colors"
             >
               <div>
                 <span className="text-3xl font-black text-[#d4b26f] block mb-3">
                   {s.num}
                 </span>
-                <h4 className="text-sm font-black text-gray-950 mb-2">
+                <h4 className="text-sm font-black text-gray-950 dark:text-white mb-2">
                   {s.title}
                 </h4>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {s.desc}
                 </p>
               </div>

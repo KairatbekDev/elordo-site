@@ -81,16 +81,16 @@ export default function PurchaseTermsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-24 selection:bg-[#d4b26f] selection:text-[#064734]">
+    <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 pb-24 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. Хлебные крошки */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
-          <Link href="/" className="hover:text-[#064734] transition-colors">
+      <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
+          <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             Главная
           </Link>
           <span>/</span>
-          <span className="text-[#064734] font-bold">Условия покупки</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">Условия покупки</span>
         </div>
       </div>
 
@@ -114,35 +114,35 @@ export default function PurchaseTermsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Рассрочка 0% */}
-          <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow">
+          <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 flex flex-col justify-between hover:shadow-xl dark:hover:border-[#064734]/50 transition-all">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-lg mb-5 font-black">
+              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center text-lg mb-5 font-black">
                 <IconCalendar className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-black text-gray-950 mb-2">
+              <h3 className="text-xl font-black text-gray-950 dark:text-white mb-2">
                 Рассрочка до 40 мес.
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                 Беспроцентная программа напрямую от застройщика без скрытых банковских страховок и переплат.
               </p>
-              <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
+              <ul className="space-y-2.5 text-xs text-gray-700 dark:text-gray-300 font-medium">
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Взнос от 20% до 50%</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Гибкий график (ежемесячно / ежеквартально)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Оформление только по паспорту</span>
                 </li>
               </ul>
             </div>
             <a
               href="#calculator"
-              className="mt-6 text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm flex items-center justify-center gap-1.5"
+              className="mt-6 text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
             >
               <span>Рассчитать график платежей</span>
               <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -152,38 +152,38 @@ export default function PurchaseTermsPage() {
           </div>
 
           {/* Trade-in / Бартер */}
-          <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-[#d4b26f] flex flex-col justify-between relative hover:shadow-2xl transition-shadow">
+          <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 shadow-xl dark:shadow-none border-2 border-[#d4b26f] flex flex-col justify-between relative hover:shadow-2xl transition-shadow">
             <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow-md">
               Хит продаж
             </div>
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 text-[#064734] flex items-center justify-center mb-5">
+              <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-5">
                 <IconCar className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-black text-gray-950 mb-2">
+              <h3 className="text-xl font-black text-gray-950 dark:text-white mb-2">
                 Бартер / Trade-in
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                 Обменяйте автомобиль или вторичное жилье в счет первого взноса за квартиру в новостройке.
               </p>
-              <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
+              <ul className="space-y-2.5 text-xs text-gray-700 dark:text-gray-300 font-medium">
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Оценка объекта за 24 часа</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Справедливая рыночная цена</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Полное юридическое сопровождение</span>
                 </li>
               </ul>
             </div>
             <a
               href="#trade-in"
-              className="mt-6 text-center bg-[#d4b26f] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#c49f57] transition-colors shadow-md flex items-center justify-center gap-1.5"
+              className="mt-6 text-center bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1.5"
             >
               <span>Оценить объект онлайн</span>
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -193,28 +193,28 @@ export default function PurchaseTermsPage() {
           </div>
 
           {/* 100% расчет */}
-          <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow">
+          <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 shadow-lg dark:shadow-none border border-gray-100 dark:border-white/10 flex flex-col justify-between hover:shadow-xl dark:hover:border-[#064734]/50 transition-all">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center mb-5">
+              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-5">
                 <IconDiamond className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-black text-gray-950 mb-2">
+              <h3 className="text-xl font-black text-gray-950 dark:text-white mb-2">
                 Полный расчет
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
                 Максимальная финансовая выгода и специальные ценовые преференции при единовременной оплате.
               </p>
-              <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
+              <ul className="space-y-2.5 text-xs text-gray-700 dark:text-gray-300 font-medium">
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Индивидуальная скидка на м²</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Приоритетный выбор видовых этажей</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>Быстрая регистрация ДДУ</span>
                 </li>
               </ul>
@@ -225,7 +225,7 @@ export default function PurchaseTermsPage() {
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm flex items-center justify-center gap-1.5"
+              className="mt-6 text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
             >
               <span>Узнать размер скидки</span>
               <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
@@ -237,15 +237,15 @@ export default function PurchaseTermsPage() {
 
       {/* 4. Интерактивный калькулятор рассрочки */}
       <section id="calculator" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
-        <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl">
+        <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
               Финансовый калькулятор 0%
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
               Расчет ежемесячного платежа
             </h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-2">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-2">
               Используйте ползунки или готовые кнопки для расчета комфортного взноса под ваш бюджет.
             </p>
           </div>
@@ -254,14 +254,14 @@ export default function PurchaseTermsPage() {
             {/* Параметр 1: Стоимость квартиры */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600">
+                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
                   Стоимость квартиры:
                 </span>
                 <div className="text-right">
-                  <span className="text-xl font-black text-[#064734]">
+                  <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
                     ${apartmentPrice.toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400 block">
+                  <span className="text-xs text-gray-400 dark:text-neutral-500 block">
                     ≈ {Math.round(apartmentPrice * usdToKgs).toLocaleString()} сом
                   </span>
                 </div>
@@ -273,7 +273,7 @@ export default function PurchaseTermsPage() {
                 step="1000"
                 value={apartmentPrice}
                 onChange={(e) => setApartmentPrice(Number(e.target.value))}
-                className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#064734]"
+                className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
               <div className="flex flex-wrap gap-2 mt-3">
                 {[45000, 65000, 95000, 140000].map((preset) => (
@@ -281,10 +281,10 @@ export default function PurchaseTermsPage() {
                     key={preset}
                     type="button"
                     onClick={() => setApartmentPrice(preset)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       apartmentPrice === preset
-                        ? 'bg-[#064734] text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
+                        : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     ${preset / 1000}k
@@ -296,14 +296,14 @@ export default function PurchaseTermsPage() {
             {/* Параметр 2: Первоначальный взнос */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600">
+                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
                   Первоначальный взнос ({downPaymentPercent}%):
                 </span>
                 <div className="text-right">
-                  <span className="text-xl font-black text-[#064734]">
+                  <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
                     ${downPaymentAmount.toLocaleString()}
                   </span>
-                  <span className="text-xs text-gray-400 block">
+                  <span className="text-xs text-gray-400 dark:text-neutral-500 block">
                     ≈ {Math.round(downPaymentAmount * usdToKgs).toLocaleString()} сом
                   </span>
                 </div>
@@ -315,7 +315,7 @@ export default function PurchaseTermsPage() {
                 step="5"
                 value={downPaymentPercent}
                 onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
-                className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#064734]"
+                className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
               <div className="flex gap-2 mt-3">
                 {[20, 30, 40, 50].map((pct) => (
@@ -323,10 +323,10 @@ export default function PurchaseTermsPage() {
                     key={pct}
                     type="button"
                     onClick={() => setDownPaymentPercent(pct)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       downPaymentPercent === pct
-                        ? 'bg-[#064734] text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
+                        : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     {pct}% {pct === 20 ? '(мин.)' : ''}
@@ -338,10 +338,10 @@ export default function PurchaseTermsPage() {
             {/* Параметр 3: Срок рассрочки */}
             <div>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600">
+                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
                   Срок выплат:
                 </span>
-                <span className="text-xl font-black text-[#064734]">
+                <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
                   {months} месяцев ({Number((months / 12).toFixed(1))} года)
                 </span>
               </div>
@@ -352,7 +352,7 @@ export default function PurchaseTermsPage() {
                 step="1"
                 value={months}
                 onChange={(e) => setMonths(Number(e.target.value))}
-                className="w-full h-2.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#064734]"
+                className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
               <div className="flex gap-2 mt-3">
                 {[12, 24, 36, 40].map((m) => (
@@ -360,10 +360,10 @@ export default function PurchaseTermsPage() {
                     key={m}
                     type="button"
                     onClick={() => setMonths(m)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors ${
+                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                       months === m
-                        ? 'bg-[#064734] text-white'
-                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
+                        : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     {m} мес. {m === 40 ? '(макс.)' : ''}
@@ -373,19 +373,19 @@ export default function PurchaseTermsPage() {
             </div>
 
             {/* Итоговая панель расчета */}
-            <div className="bg-[#f2f6f4] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="bg-[#f2f6f4] dark:bg-[#040c09] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
               <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-1">
                   Ежемесячный платёж (0% переплат):
                 </span>
-                <div className="text-3xl sm:text-5xl font-black text-[#064734]">
+                <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
                   ${monthlyPayment.toLocaleString()}
-                  <span className="text-sm font-bold text-gray-600 ml-2">/ месяц</span>
+                  <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">/ месяц</span>
                 </div>
-                <div className="text-sm font-semibold text-[#064734]/80 mt-1">
+                <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
                   ≈ {monthlyPaymentKgs.toLocaleString()} сом в месяц
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2">
                   Остаток к распределению: ${remainingAmount.toLocaleString()} • Без комиссии банка
                 </p>
               </div>
@@ -405,38 +405,38 @@ export default function PurchaseTermsPage() {
 
       {/* 5. Trade-in / Экспресс-оценка */}
       <section id="trade-in" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
-        <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
           
           <div className="lg:col-span-6">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
               Программа Trade-in
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] mb-4">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f] mb-4">
               Обменяйте авто или вторичку на новостройку
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-6">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
               Вам не нужно тратить месяцы на продажу машины или старой квартиры. Мы оцениваем ваш актив по справедливой рыночной стоимости и засчитываем его в качестве оплаты квартиры в любом нашем ЖК.
             </p>
 
-            <div className="space-y-3 text-xs font-semibold text-gray-700">
+            <div className="space-y-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">1</span>
                 <span>Оценка экспертом в течение 24 часов</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">2</span>
                 <span>Сумма зачитывается как первый взнос или полная оплата</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">3</span>
                 <span>Юридически чистый договор без скрытых удержаний</span>
               </div>
             </div>
           </div>
 
           {/* Форма быстрой оценки */}
-          <div className="lg:col-span-6 bg-[#f7faf8] p-6 sm:p-8 rounded-2xl border border-gray-200">
-            <h3 className="text-sm font-black uppercase text-gray-900 mb-4">
+          <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 transition-colors">
+            <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white mb-4">
               Заявка на экспресс-оценку:
             </h3>
 
@@ -444,10 +444,10 @@ export default function PurchaseTermsPage() {
               <button
                 type="button"
                 onClick={() => setTradeInType('auto')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   tradeInType === 'auto'
-                    ? 'bg-[#064734] text-white shadow'
-                    : 'bg-white text-gray-700 border border-gray-200'
+                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                    : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
                 }`}
               >
                 <IconCar className="w-4 h-4" />
@@ -456,10 +456,10 @@ export default function PurchaseTermsPage() {
               <button
                 type="button"
                 onClick={() => setTradeInType('realty')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   tradeInType === 'realty'
-                    ? 'bg-[#064734] text-white shadow'
-                    : 'bg-white text-gray-700 border border-gray-200'
+                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                    : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
                 }`}
               >
                 <IconBuilding className="w-4 h-4" />
@@ -469,7 +469,7 @@ export default function PurchaseTermsPage() {
 
             <form onSubmit={handleSendTradeIn} className="space-y-3 text-xs">
               <div>
-                <label className="block text-gray-600 font-medium mb-1">
+                <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">
                   {tradeInType === 'auto' ? 'Марка и модель авто:' : 'Адрес и площадь недвижимости:'}
                 </label>
                 <input
@@ -478,37 +478,37 @@ export default function PurchaseTermsPage() {
                   placeholder={tradeInType === 'auto' ? 'Например: Toyota Camry 70' : 'Например: 2-комн., 54 м², мкр. Асанбай'}
                   value={assetName}
                   onChange={(e) => setAssetName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-300 focus:outline-none focus:border-[#064734]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
                 />
               </div>
 
               {tradeInType === 'auto' && (
                 <div>
-                  <label className="block text-gray-600 font-medium mb-1">Год выпуска:</label>
+                  <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">Год выпуска:</label>
                   <input
                     type="text"
                     placeholder="Например: 2021"
                     value={assetYear}
                     onChange={(e) => setAssetYear(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-300 focus:outline-none focus:border-[#064734]"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-gray-600 font-medium mb-1">Желаемая сумма оценки ($):</label>
+                <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">Желаемая сумма оценки ($):</label>
                 <input
                   type="text"
                   placeholder="Например: $25 000"
                   value={estimatedValue}
                   onChange={(e) => setEstimatedValue(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-300 focus:outline-none focus:border-[#064734]"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider transition-all shadow text-xs flex items-center justify-center gap-1.5"
+                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider transition-all shadow text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Отправить на оценку в WhatsApp</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
@@ -521,50 +521,50 @@ export default function PurchaseTermsPage() {
 
       {/* 6. Сравнительная таблица способов оплаты */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
-        <h2 className="text-2xl sm:text-3xl font-black uppercase text-center text-[#064734] mb-8">
+        <h2 className="text-2xl sm:text-3xl font-black uppercase text-center text-[#064734] dark:text-[#d4b26f] mb-8">
           Сравнение условий покупки
         </h2>
 
-        <div className="overflow-x-auto bg-white rounded-3xl border border-gray-200 shadow-md">
+        <div className="overflow-x-auto bg-white dark:bg-[#0b1b15] rounded-3xl border border-gray-200 dark:border-white/10 shadow-md dark:shadow-none transition-colors">
           <table className="w-full text-left text-xs border-collapse min-w-[600px]">
             <thead>
-              <tr className="bg-[#064734] text-white">
+              <tr className="bg-[#064734] dark:bg-[#021c15] text-white">
                 <th className="p-4 sm:p-5 font-bold">Параметр</th>
                 <th className="p-4 sm:p-5 font-bold">Рассрочка 0%</th>
                 <th className="p-4 sm:p-5 font-bold">Trade-in (Бартер)</th>
                 <th className="p-4 sm:p-5 font-bold">100% Оплата</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10 text-gray-700 dark:text-gray-300">
               <tr>
-                <td className="p-4 font-bold text-gray-900">Первый взнос</td>
+                <td className="p-4 font-bold text-gray-900 dark:text-white">Первый взнос</td>
                 <td className="p-4">От 20% до 30%</td>
                 <td className="p-4">Авто или недвижимость</td>
                 <td className="p-4">100% единовременно</td>
               </tr>
-              <tr className="bg-gray-50/50">
-                <td className="p-4 font-bold text-gray-900">Переплата / Проценты</td>
-                <td className="p-4 text-emerald-700 font-bold">0% (Без переплат)</td>
-                <td className="p-4 text-emerald-700 font-bold">0% (Без переплат)</td>
-                <td className="p-4 text-emerald-700 font-bold">Максимальная скидка</td>
+              <tr className="bg-gray-50/50 dark:bg-white/[0.02]">
+                <td className="p-4 font-bold text-gray-900 dark:text-white">Переплата / Проценты</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">0% (Без переплат)</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">0% (Без переплат)</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">Максимальная скидка</td>
               </tr>
               <tr>
-                <td className="p-4 font-bold text-gray-900">Срок выплаты</td>
+                <td className="p-4 font-bold text-gray-900 dark:text-white">Срок выплаты</td>
                 <td className="p-4">До 40 месяцев</td>
                 <td className="p-4">До 40 месяцев (на остаток)</td>
                 <td className="p-4">Сразу</td>
               </tr>
-              <tr className="bg-gray-50/50">
-                <td className="p-4 font-bold text-gray-900">Необходимые документы</td>
+              <tr className="bg-gray-50/50 dark:bg-white/[0.02]">
+                <td className="p-4 font-bold text-gray-900 dark:text-white">Необходимые документы</td>
                 <td className="p-4">Только паспорт</td>
                 <td className="p-4">Паспорт + техпаспорт авто/жилья</td>
                 <td className="p-4">Только паспорт</td>
               </tr>
               <tr>
-                <td className="p-4 font-bold text-gray-900">Справка о доходах</td>
-                <td className="p-4 text-emerald-700 font-bold">Не требуется</td>
-                <td className="p-4 text-emerald-700 font-bold">Не требуется</td>
-                <td className="p-4 text-emerald-700 font-bold">Не требуется</td>
+                <td className="p-4 font-bold text-gray-900 dark:text-white">Справка о доходах</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">Не требуется</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">Не требуется</td>
+                <td className="p-4 text-emerald-700 dark:text-emerald-400 font-bold">Не требуется</td>
               </tr>
             </tbody>
           </table>
@@ -577,7 +577,7 @@ export default function PurchaseTermsPage() {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
             Часто задаваемые вопросы
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Вопросы об оплате и гарантиях
           </h2>
         </div>
@@ -588,15 +588,15 @@ export default function PurchaseTermsPage() {
             return (
               <div
                 key={index}
-                className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
+                className="bg-white dark:bg-[#0b1b15] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm transition-all"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(isOpen ? null : index)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
-                  <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[#064734] shrink-0">
+                  <span className="w-7 h-7 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-[#064734] dark:text-[#d4b26f] shrink-0">
                     {isOpen ? (
                       <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <line x1="5" y1="12" x2="19" y2="12" />
@@ -610,7 +610,7 @@ export default function PurchaseTermsPage() {
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                  <div className="px-5 pb-5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-white/10 pt-3">
                     {faq.a}
                   </div>
                 )}
@@ -622,7 +622,7 @@ export default function PurchaseTermsPage() {
 
       {/* 8. Консультация юриста и менеджера */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
-        <div className="bg-[#032b20] rounded-3xl p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="bg-[#032b20] rounded-3xl p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
           <div className="max-w-xl">
             <span className="text-xs uppercase font-bold tracking-widest text-[#d4b26f] block mb-2">
               Юридическая чистота

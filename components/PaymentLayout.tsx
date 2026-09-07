@@ -61,20 +61,20 @@ export default function PaymentLayout({
   );
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 selection:bg-[#d4b26f] selection:text-[#064734]">
+    <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. Хлебные крошки */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
-          <Link href="/" className="hover:text-[#064734] transition-colors">
+      <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
+          <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             Главная
           </Link>
           <span>/</span>
-          <Link href="/usloviya" className="hover:text-[#064734] transition-colors">
+          <Link href="/usloviya" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             Условия покупки
           </Link>
           <span>/</span>
-          <span className="text-[#064734] font-bold">{pageTitle}</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">{pageTitle}</span>
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export default function PaymentLayout({
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
+              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#064734]" />
               <span>Получить расчет в WhatsApp</span>
@@ -127,7 +127,7 @@ export default function PaymentLayout({
 
       {/* 3. Быстрое переключение способов оплаты */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-7 relative z-20">
-        <div className="bg-white p-2 rounded-2xl shadow-xl border border-gray-100 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none">
+        <div className="bg-white dark:bg-[#0b1b15] p-2 rounded-2xl shadow-xl dark:shadow-none border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none transition-colors">
           {PAYMENT_TABS.map((tab) => {
             const isActive = currentSlug === tab.slug || pageTitle.toLowerCase().includes(tab.slug);
             return (
@@ -136,8 +136,8 @@ export default function PaymentLayout({
                 href={tab.href}
                 className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all ${
                   isActive
-                    ? 'bg-[#064734] text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                 }`}
               >
                 {tab.label}
@@ -170,7 +170,7 @@ export default function PaymentLayout({
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Подробное описание
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black tracking-tight uppercase text-[#064734]">
+          <h2 className="text-2xl sm:text-4xl font-black tracking-tight uppercase text-[#064734] dark:text-[#d4b26f]">
             {blockTitle}
           </h2>
         </div>
@@ -179,34 +179,34 @@ export default function PaymentLayout({
           
           {/* Левая колонка: описание и документы */}
           <div className="lg:col-span-6 space-y-6">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm">
-              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-3">
+            <div className="bg-white dark:bg-[#0b1b15] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none transition-colors">
+              <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider mb-3">
                 Суть предложения:
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                 {descriptionText}
               </p>
             </div>
 
             {/* Карточка необходимых документов */}
-            <div className="bg-[#f2f6f4] p-6 sm:p-8 rounded-3xl border border-[#064734]/15">
+            <div className="bg-[#f2f6f4] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-[#064734]/15 dark:border-white/10 transition-colors">
               <div className="flex items-center gap-2 mb-3">
-                <IconDocument className="w-5 h-5 text-[#064734]" />
-                <h3 className="text-sm font-black text-[#064734] uppercase tracking-wider">
+                <IconDocument className="w-5 h-5 text-[#064734] dark:text-[#d4b26f]" />
+                <h3 className="text-sm font-black text-[#064734] dark:text-[#d4b26f] uppercase tracking-wider">
                   Пакет документов:
                 </h3>
               </div>
-              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
+              <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
                 {documentsText}
               </p>
-              <div className="mt-4 pt-3 border-t border-[#064734]/10 flex items-center gap-2 text-xs font-bold text-[#064734]">
-                <IconCheck className="w-4 h-4 text-[#064734]" />
+              <div className="mt-4 pt-3 border-t border-[#064734]/10 dark:border-white/10 flex items-center gap-2 text-xs font-bold text-[#064734] dark:text-[#d4b26f]">
+                <IconCheck className="w-4 h-4 text-[#064734] dark:text-[#d4b26f]" />
                 <span>Без справок о доходах и поручителей</span>
               </div>
             </div>
 
             {/* Быстрый переход в WhatsApp */}
-            <div className="p-6 rounded-3xl bg-[#032b20] text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-6 rounded-3xl bg-[#032b20] text-white flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/10">
               <div>
                 <h4 className="text-sm font-bold mb-1">Хотите индивидуальный график?</h4>
                 <p className="text-xs text-gray-300">Сформируем расчет за 2 минуты в мессенджере</p>
@@ -215,7 +215,7 @@ export default function PaymentLayout({
                 href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
+                className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Написать в WhatsApp</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
@@ -225,7 +225,7 @@ export default function PaymentLayout({
 
           {/* Правая колонка: Раскрывающийся аккордеон */}
           <div className="lg:col-span-6 space-y-3">
-            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-4 px-1">
+            <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider mb-4 px-1">
               Частые вопросы по программе:
             </h3>
 
@@ -234,16 +234,16 @@ export default function PaymentLayout({
               return (
                 <div
                   key={idx}
-                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
+                  className="bg-white dark:bg-[#0b1b15] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm dark:shadow-none transition-colors"
                 >
                   <button
                     type="button"
                     onClick={() => toggleFaq(idx)}
                     aria-expanded={isOpen}
-                    className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
+                    className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors cursor-pointer"
                   >
                     <span>{item.q}</span>
-                    <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[#064734] shrink-0">
+                    <span className="w-7 h-7 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-[#064734] dark:text-[#d4b26f] shrink-0">
                       {isOpen ? (
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                           <line x1="5" y1="12" x2="19" y2="12" />
@@ -258,7 +258,7 @@ export default function PaymentLayout({
                   </button>
 
                   {isOpen && (
-                    <div className="px-5 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed border-t border-gray-100 dark:border-white/10 pt-3">
                       {item.a}
                     </div>
                   )}
@@ -278,26 +278,26 @@ export default function PaymentLayout({
       )}
 
       {/* 6. Контакты и связь с офисом продаж */}
-      <section className="bg-white border-t border-gray-100 py-16">
+      <section className="bg-white dark:bg-[#07130e] border-t border-gray-100 dark:border-white/10 py-16 transition-colors">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
               Консультация финансиста
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
               Офис продаж и оформление
             </h2>
           </div>
 
-          <div className="bg-[#fafbfa] rounded-3xl p-6 sm:p-10 border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="bg-[#fafbfa] dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
             <div className="space-y-2 text-center md:text-left">
-              <span className="text-xs text-gray-400 font-bold uppercase tracking-wider block">
+              <span className="text-xs text-gray-400 dark:text-neutral-400 font-bold uppercase tracking-wider block">
                 Центральный офис в Бишкеке:
               </span>
-              <p className="text-base sm:text-lg font-black text-gray-900">
+              <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
                 {COMPANY_INFO.address}
               </p>
-              <div className="space-y-1 text-xs sm:text-sm font-semibold text-gray-700">
+              <div className="space-y-1 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                 {COMPANY_INFO.phones.map((phone, idx) => (
                   <p key={idx}>{phone} {idx === 0 ? '(Пн — Сб 09:00 – 19:00)' : ''}</p>
                 ))}
@@ -309,7 +309,7 @@ export default function PaymentLayout({
                 href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2"
+                className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                 <span>Чат в WhatsApp</span>
@@ -318,9 +318,9 @@ export default function PaymentLayout({
                 href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-3.5 px-6 rounded-xl border border-gray-300 hover:border-[#064734] text-gray-800 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white flex items-center justify-center gap-1.5"
+                className="py-3.5 px-6 rounded-xl border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white dark:bg-[#040c09] flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <IconMapPin className="w-4 h-4 text-[#064734]" />
+                <IconMapPin className="w-4 h-4 text-[#064734] dark:text-[#d4b26f]" />
                 <span>Маршрут в 2GIS</span>
               </a>
             </div>

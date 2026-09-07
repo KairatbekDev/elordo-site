@@ -138,10 +138,10 @@ export default function InstallmentPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Наглядные расчеты
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Примеры платежей по квартирам
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Реальные расчеты для 1-комнатных квартир при первоначальном взносе 30% на 36 месяцев
           </p>
         </div>
@@ -150,7 +150,7 @@ export default function InstallmentPage() {
           {CALCULATION_EXAMPLES.map((item, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-6 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between relative group"
+              className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 border border-gray-200 dark:border-white/10 shadow-lg dark:shadow-none hover:shadow-2xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between relative group"
             >
               {item.badge && (
                 <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
@@ -159,38 +159,38 @@ export default function InstallmentPage() {
               )}
 
               <div>
-                <span className="text-xs font-bold text-gray-400 block mb-1">
+                <span className="text-xs font-bold text-gray-400 dark:text-neutral-400 block mb-1">
                   {item.type}
                 </span>
-                <h4 className="text-xl font-black text-gray-950 mb-1">
+                <h4 className="text-xl font-black text-gray-950 dark:text-white mb-1">
                   {item.complex}
                 </h4>
-                <div className="text-xs font-semibold text-[#064734] mb-5">
+                <div className="text-xs font-semibold text-[#064734] dark:text-[#d4b26f] mb-5">
                   Площадь: {item.area} • {item.priceM2}
                 </div>
 
-                <div className="space-y-3 border-t border-gray-100 pt-4 text-xs">
+                <div className="space-y-3 border-t border-gray-100 dark:border-white/10 pt-4 text-xs">
                   <div className="flex justify-between items-baseline">
-                    <span className="text-gray-500">Общая стоимость:</span>
-                    <strong className="text-sm font-black text-gray-900">{item.totalPrice}</strong>
+                    <span className="text-gray-500 dark:text-neutral-400">Общая стоимость:</span>
+                    <strong className="text-sm font-black text-gray-900 dark:text-white">{item.totalPrice}</strong>
                   </div>
 
                   <div className="flex justify-between items-baseline">
-                    <span className="text-gray-500">Первый взнос:</span>
+                    <span className="text-gray-500 dark:text-neutral-400">Первый взнос:</span>
                     <div className="text-right">
-                      <strong className="font-bold text-gray-900 block">{item.downPayment}</strong>
-                      <span className="text-[10px] text-gray-400">{item.downPaymentKgs}</span>
+                      <strong className="font-bold text-gray-900 dark:text-white block">{item.downPayment}</strong>
+                      <span className="text-[10px] text-gray-400 dark:text-neutral-500">{item.downPaymentKgs}</span>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-2xl bg-[#f2f6f4] border border-[#064734]/15 mt-3">
-                    <span className="text-[11px] font-bold text-gray-500 block">
+                  <div className="p-3 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 dark:border-white/10 mt-3 transition-colors">
+                    <span className="text-[11px] font-bold text-gray-500 dark:text-neutral-400 block">
                       Платеж в месяц (0% переплат):
                     </span>
-                    <div className="text-2xl font-black text-[#064734] my-0.5">
-                      {item.monthly} <span className="text-xs font-semibold text-gray-500">/ мес.</span>
+                    <div className="text-2xl font-black text-[#064734] dark:text-[#d4b26f] my-0.5">
+                      {item.monthly} <span className="text-xs font-semibold text-gray-500 dark:text-neutral-400">/ мес.</span>
                     </div>
-                    <span className="text-[11px] font-semibold text-[#064734]/80 block">
+                    <span className="text-[11px] font-semibold text-[#064734]/80 dark:text-neutral-300 block">
                       {item.monthlyKgs}
                     </span>
                   </div>
@@ -202,15 +202,15 @@ export default function InstallmentPage() {
                   href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                   <span>Забронировать в WhatsApp</span>
                   <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
-                  className="block w-full text-center py-2 text-[11px] font-bold text-gray-500 hover:text-[#064734] transition-colors"
+                  className="block w-full text-center py-2 text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
                 >
                   О комплексе {item.complex}
                 </Link>
@@ -221,15 +221,15 @@ export default function InstallmentPage() {
       </div>
 
       {/* 2. СРАВНИТЕЛЬНАЯ ТАБЛИЦА: EL ORDO vs БАНКОВСКАЯ ИПОТЕКА */}
-      <div className="my-16 bg-white rounded-3xl p-6 sm:p-10 border border-gray-200 shadow-xl">
+      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Финансовая выгода
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             Рассрочка EL ORDO или Ипотека в банке?
           </h3>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
             Сравнение условий приобретения жилья напрямую от застройщика и через коммерческий банк
           </p>
         </div>
@@ -237,68 +237,68 @@ export default function InstallmentPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm border-collapse min-w-[550px]">
             <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="py-4 px-3 text-gray-400 font-bold uppercase text-[11px]">Критерий</th>
-                <th className="py-4 px-3 text-[#064734] font-black uppercase text-xs sm:text-sm bg-emerald-50/70 rounded-t-xl">
+              <tr className="border-b-2 border-gray-200 dark:border-white/10">
+                <th className="py-4 px-3 text-gray-400 dark:text-neutral-400 font-bold uppercase text-[11px]">Критерий</th>
+                <th className="py-4 px-3 text-[#064734] dark:text-[#d4b26f] font-black uppercase text-xs sm:text-sm bg-emerald-50/70 dark:bg-emerald-950/40 rounded-t-xl">
                   Рассрочка EL ORDO
                 </th>
-                <th className="py-4 px-3 text-gray-600 font-bold uppercase text-xs">
+                <th className="py-4 px-3 text-gray-600 dark:text-gray-300 font-bold uppercase text-xs">
                   Ипотека в банке
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100 text-gray-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-white/10 text-gray-700 dark:text-gray-300">
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Процентная переплата</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Процентная переплата</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
                   0% (Переплаты нет)
                 </td>
-                <td className="py-3.5 px-3 text-rose-600 font-bold">
+                <td className="py-3.5 px-3 text-rose-600 dark:text-rose-400 font-bold">
                   от 14% до 18% годовых
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Сумма переплаты за 3 года</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Сумма переплаты за 3 года</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
                   $0 сом
                 </td>
-                <td className="py-3.5 px-3 text-rose-600 font-bold">
+                <td className="py-3.5 px-3 text-rose-600 dark:text-rose-400 font-bold">
                   от $18 000 до $35 000+
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Справка о доходах / Налоги</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Справка о доходах / Налоги</td>
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Не требуется
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Обязательно с официального места
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Дополнительные страховки</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Дополнительные страховки</td>
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Отсутствуют
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Страхование жизни и объекта каждый год
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Пакет документов</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 bg-emerald-50/40">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Пакет документов</td>
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
                   Только паспорт
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   Пакет из 8+ справок, поручители
                 </td>
               </tr>
               <tr>
-                <td className="py-3.5 px-3 font-bold text-gray-900">Срок оформления</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 bg-emerald-50/40 rounded-b-xl">
+                <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">Срок оформления</td>
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-b-xl">
                   В день обращения (40 минут)
                 </td>
-                <td className="py-3.5 px-3 text-gray-500">
+                <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
                   от 2 до 4 недель рассмотрения
                 </td>
               </tr>
@@ -313,7 +313,7 @@ export default function InstallmentPage() {
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
             Прозрачная сделка
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
             4 простых шага к вашей квартире
           </h3>
         </div>
@@ -322,16 +322,16 @@ export default function InstallmentPage() {
           {STEPS.map((s, idx) => (
             <div
               key={idx}
-              className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none flex flex-col justify-between transition-colors"
             >
               <div>
                 <span className="text-3xl font-black text-[#d4b26f] block mb-3">
                   {s.step}
                 </span>
-                <h4 className="text-sm font-black text-gray-950 mb-2">
+                <h4 className="text-sm font-black text-gray-950 dark:text-white mb-2">
                   {s.title}
                 </h4>
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                   {s.desc}
                 </p>
               </div>

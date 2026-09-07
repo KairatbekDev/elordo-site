@@ -155,16 +155,16 @@ export default function ProjectsCatalogPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-20 selection:bg-[#d4b26f] selection:text-[#064734]">
+    <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 pb-20 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. Хлебные крошки */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400">
-          <Link href="/" className="hover:text-[#064734] transition-colors">
+      <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
+          <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             Главная
           </Link>
           <span>/</span>
-          <span className="text-[#064734] font-semibold">Каталог объектов</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-semibold">Каталог объектов</span>
         </div>
       </div>
 
@@ -214,10 +214,10 @@ export default function ProjectsCatalogPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по названию или адресу (например: Сухомлинова, Огонбаева)..."
-              className="w-full pl-10 pr-9 py-3 rounded-2xl bg-white border border-gray-200 text-sm focus:outline-none focus:border-[#064734] shadow-sm transition-all"
+              className="w-full pl-10 pr-9 py-3 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] shadow-sm transition-all"
             />
             <svg
-              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-neutral-400 pointer-events-none"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -233,7 +233,7 @@ export default function ProjectsCatalogPage() {
                 type="button"
                 onClick={() => setSearchQuery('')}
                 aria-label="Очистить поиск"
-                className="w-5 h-5 flex items-center justify-center absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
+                className="w-5 h-5 flex items-center justify-center absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -244,33 +244,33 @@ export default function ProjectsCatalogPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-500 whitespace-nowrap hidden sm:inline">
+            <span className="text-xs font-semibold text-gray-500 dark:text-neutral-400 whitespace-nowrap hidden sm:inline">
               Сортировка:
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="py-3 px-4 rounded-2xl bg-white border border-gray-200 text-xs font-bold text-gray-800 focus:outline-none focus:border-[#064734] shadow-sm cursor-pointer"
+              className="py-3 px-4 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] shadow-sm cursor-pointer"
             >
-              <option value="default">По умолчанию</option>
-              <option value="price-asc">Сначала доступные ($)</option>
-              <option value="price-desc">Сначала премиальные ($$$)</option>
+              <option value="default" className="dark:bg-[#0b1b15]">По умолчанию</option>
+              <option value="price-asc" className="dark:bg-[#0b1b15]">Сначала доступные ($)</option>
+              <option value="price-desc" className="dark:bg-[#0b1b15]">Сначала премиальные ($$$)</option>
             </select>
           </div>
         </div>
 
         {/* Табы фильтров: Статус и Класс */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-white/10">
           
           {/* Статус объекта */}
           <div className="flex flex-wrap gap-2 text-xs font-bold">
             <button
               type="button"
               onClick={() => setStatusFilter('all')}
-              className={`px-4 py-2.5 rounded-xl transition-all ${
+              className={`px-4 py-2.5 rounded-xl transition-all cursor-pointer ${
                 statusFilter === 'all'
-                  ? 'bg-[#064734] text-white shadow-sm'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                  : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
               }`}
             >
               Все объекты ({PROJECTS.length})
@@ -278,10 +278,10 @@ export default function ProjectsCatalogPage() {
             <button
               type="button"
               onClick={() => setStatusFilter('active')}
-              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 ${
+              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
                 statusFilter === 'active'
-                  ? 'bg-[#064734] text-white shadow-sm'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                  : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
               }`}
             >
               <IconCrane className="w-3.5 h-3.5 shrink-0" />
@@ -290,10 +290,10 @@ export default function ProjectsCatalogPage() {
             <button
               type="button"
               onClick={() => setStatusFilter('finished')}
-              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 ${
+              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
                 statusFilter === 'finished'
-                  ? 'bg-[#064734] text-white shadow-sm'
-                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                  : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
               }`}
             >
               <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
@@ -302,8 +302,8 @@ export default function ProjectsCatalogPage() {
           </div>
 
           {/* Класс жилья */}
-          <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-gray-600">
-            <span className="text-[11px] uppercase font-bold text-gray-400 mr-1">Класс:</span>
+          <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300">
+            <span className="text-[11px] uppercase font-bold text-gray-400 dark:text-neutral-400 mr-1">Класс:</span>
             {[
               { id: 'all', label: 'Все' },
               { id: 'premium', label: 'Премиум' },
@@ -314,10 +314,10 @@ export default function ProjectsCatalogPage() {
                 key={cls.id}
                 type="button"
                 onClick={() => setClassFilter(cls.id as typeof classFilter)}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
+                className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   classFilter === cls.id
-                    ? 'bg-gray-900 text-white font-bold'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    ? 'bg-gray-900 dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold'
+                    : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                 }`}
               >
                 {cls.label}
@@ -326,15 +326,15 @@ export default function ProjectsCatalogPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs text-gray-500 font-medium mt-4">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400 font-medium mt-4">
           <span>
-            Найдено комплексов: <strong className="text-gray-900">{filteredProjects.length}</strong>
+            Найдено комплексов: <strong className="text-gray-900 dark:text-white">{filteredProjects.length}</strong>
           </span>
           {(statusFilter !== 'all' || classFilter !== 'all' || searchQuery !== '' || sortBy !== 'default') && (
             <button
               type="button"
               onClick={resetFilters}
-              className="text-[#064734] hover:underline font-bold"
+              className="text-[#064734] dark:text-[#d4b26f] hover:underline font-bold cursor-pointer"
             >
               Сбросить все фильтры
             </button>
@@ -353,7 +353,7 @@ export default function ProjectsCatalogPage() {
               return (
                 <div
                   key={project.slug}
-                  className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl dark:hover:border-[#d4b26f]/30 transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Изображение проекта */}
@@ -388,15 +388,15 @@ export default function ProjectsCatalogPage() {
 
                     {/* Контентная часть */}
                     <div className="p-6">
-                      <h2 className="text-xl font-black text-gray-950 mb-2 group-hover:text-[#064734] transition-colors">
+                      <h2 className="text-xl font-black text-gray-950 dark:text-white mb-2 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
                         {project.name}
                       </h2>
                       
-                      <p className="text-xs text-gray-600 mb-5 leading-relaxed line-clamp-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-5 leading-relaxed line-clamp-2">
                         {project.desc}
                       </p>
 
-                      <div className="space-y-2.5 text-xs text-gray-600 border-t border-gray-100 pt-4 font-medium">
+                      <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-white/10 pt-4 font-medium">
                         <div className="flex items-center gap-2">
                           <IconMapPin className="w-4 h-4 text-[#d4b26f] shrink-0" />
                           <span className="truncate">{project.address}</span>
@@ -417,7 +417,7 @@ export default function ProjectsCatalogPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/${project.slug}`}
-                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2"
                     >
                       <span>Подробнее о проекте</span>
                       <IconArrowRight className="w-4 h-4" />
@@ -428,7 +428,7 @@ export default function ProjectsCatalogPage() {
                         href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 text-[#064734] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5"
+                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5"
                       >
                         <IconWhatsApp className="w-3.5 h-3.5 text-[#25D366]" />
                         <span>Спросить о наличии в WhatsApp</span>
@@ -441,21 +441,21 @@ export default function ProjectsCatalogPage() {
           </div>
         ) : (
           /* Состояние пустого поиска */
-          <div className="py-20 text-center bg-white rounded-3xl border border-gray-200 mt-6 p-8">
-            <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-3 text-gray-400">
+          <div className="py-20 text-center bg-white dark:bg-[#0b1b15] rounded-3xl border border-gray-200 dark:border-white/10 mt-6 p-8 transition-colors">
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-white/10 flex items-center justify-center mx-auto mb-3 text-gray-400 dark:text-neutral-400">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Объекты не найдены</h3>
-            <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Объекты не найдены</h3>
+            <p className="text-xs text-gray-500 dark:text-neutral-400 max-w-sm mx-auto mb-6">
               Попробуйте изменить параметры поиска или сбросить активные фильтры.
             </p>
             <button
               type="button"
               onClick={resetFilters}
-              className="px-6 py-3 rounded-xl bg-[#064734] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors"
+              className="px-6 py-3 rounded-xl bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold text-xs uppercase tracking-wider hover:bg-[#032b20] dark:hover:bg-[#c49f57] transition-colors cursor-pointer"
             >
               Сбросить фильтры
             </button>
@@ -463,15 +463,15 @@ export default function ProjectsCatalogPage() {
         )}
 
         {/* 5. Баннер консультации внизу каталога */}
-        <div className="mt-16 bg-[#dbe3df] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="mt-16 bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
           <div className="max-w-xl text-center md:text-left">
-            <span className="text-xs uppercase font-bold tracking-wider text-[#064734] block mb-1">
+            <span className="text-xs uppercase font-bold tracking-wider text-[#064734] dark:text-[#d4b26f] block mb-1">
               Не знаете, какой объект выбрать?
             </span>
-            <h3 className="text-2xl sm:text-3xl font-black text-[#064734] uppercase mb-2">
+            <h3 className="text-2xl sm:text-3xl font-black text-[#064734] dark:text-white uppercase mb-2">
               ПОЛУЧИТЕ ПОЛНУЮ ШАХМАТКУ И ПЛАНИРОВКИ
             </h3>
-            <p className="text-xs sm:text-sm text-[#064734]/85 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#064734]/85 dark:text-gray-300 leading-relaxed">
               Отдел продаж отправит презентацию по всем комплексам, свободным этажам и рассчитает график платежей по рассрочке прямо в WhatsApp.
             </p>
           </div>
@@ -482,7 +482,7 @@ export default function ProjectsCatalogPage() {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 bg-[#064734] hover:bg-[#032b20] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
+            className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#0a4d38] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent dark:border-white/10"
           >
             <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
             <span>Написать в WhatsApp</span>
