@@ -1,7 +1,9 @@
+'use client';
+
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   IconBuilding,
   IconShieldCheck,
@@ -14,124 +16,102 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
-export const metadata: Metadata = {
-  title: 'О компании EL ORDO GROUP — Надежный застройщик Бишкека',
-  description:
-    'Строительная компания EL ORDO GROUP с 2021 года возводит жилые комплексы премиум, бизнес и комфорт-класса в Бишкеке. 100% сдача объектов, сейсмостойкость 9 баллов, рассрочка 0%.',
-  openGraph: {
-    title: 'О компании EL ORDO GROUP | Архитектура вашего будущего',
-    description: 'Официальная информация, руководство, стандарты монолитно-кирпичного строительства и сданные объекты в Бишкеке.',
-    images: [
-      {
-        url: '/projects/Abu-Dhabi.png',
-        width: 1200,
-        height: 630,
-        alt: 'EL ORDO GROUP',
-      },
-    ],
-  },
-};
-
-interface TeamMember {
-  name: string;
-  role: string;
-  image: string;
-}
-
-const TEAM: TeamMember[] = [
-  {
-    name: 'Керезбек Нуралиев',
-    role: 'Коммерческий директор',
-    image: '/team/kerezbek-nuraliev-1.jpg',
-  },
-  {
-    name: 'Адилет Медетбек уулу',
-    role: 'Технический директор ',
-    image: '/team/adilet-medetbek-uulu-857x1536.jpg',
-  },
-  {
-    name: 'Самаганы Мамасыдык уулу',
-    role: 'Главный прораб ',
-    image: '/team/mamasydyk-uulu-samagany.jpg',
-  },
-  {
-    name: 'Бектур Мусаев',
-    role: 'Руководитель отдела продаж',
-    image: '/team/musaev-bektur-768x1376.jpg',
-  },
-  {
-    name: 'Бекжан Нуржанов',
-    role: 'Руководитель отдела маркетинга',
-    image: '/team/nurzhanov-bekzhan-857x1536.jpg',
-  },
-  {
-    name: 'Атанас Жороев',
-    role: 'Директор по развитию ',
-    image: '/team/zhoroev-atanas.jpg',
-  },
-];
-
-const STATS = [
-  { value: '2021', label: 'Год основания', sub: 'Стабильный рост и надежность' },
-  { value: '6', label: 'Жилых комплексов', sub: 'В ключевых районах Бишкека' },
-  { value: '100%', label: 'Соблюдение сроков', sub: 'Сдача объектов госкомиссии' },
-  { value: '40 мес.', label: 'Рассрочка 0%', sub: 'Прямой договор без банка' },
-];
-
-const STANDARDS = [
-  {
-    icon: <IconBuilding className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
-    title: 'Монолитный железобетон',
-    desc: 'Высокомарочный бетон марки М350 и сертифицированная российская арматура класса А500С.',
-    badge: 'СНиП КР',
-  },
-  {
-    icon: <IconDocument className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
-    title: 'Экологичный жженый кирпич',
-    desc: 'Внутренние и межквартирные перегородки возводятся из кирпича, обеспечивая отличную тишину и микроклимат.',
-    badge: 'Шумоизоляция',
-  },
-  {
-    icon: <IconTree className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
-    title: 'Базальтовое утепление 100 мм',
-    desc: 'Негорючая теплоизоляция высокой плотности сохраняет прохладу летом и держит тепло в зимние морозы.',
-    badge: 'Энергоэффект',
-  },
-  {
-    icon: <IconShieldCheck className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
-    title: 'Сейсмостойкость 9 баллов',
-    desc: 'Каждый проект проходит строгие расчеты сейсмических нагрузок и экспертизу Госстроя Кыргызской Республики.',
-    badge: 'Безопасность',
-  },
-];
-
-const MILESTONES = [
-  {
-    year: '2021',
-    title: 'Основание девелоперской компании',
-    desc: 'Формирование команды ведущих инженеров, архитекторов и старт проектирования первых жилых объектов столицы.',
-  },
-  {
-    year: '2023 – 2024',
-    title: 'Успешный ввод в эксплуатацию',
-    desc: 'Полное завершение, сдача госкомиссии и заселение знакового клубного дома «Ордо» и жилого комплекса «Келечек».',
-  },
-  {
-    year: '2025 – 2026',
-    title: 'Масштабирование и эко-сегмент',
-    desc: 'Строительство ЖК «Madina Residence» в центре города, а также проектов «Айкол» и клубного формата «Айкол +» в чистом предгорье Кок-Жара.',
-  },
-  {
-    year: '2027 – 2029',
-    title: 'Флагманский проект «Abu Dhabi»',
-    desc: 'Возведение двух 25-этажных высотных башен премиум-класса с концепцией «Город в городе» на улице Сухомлинова.',
-  },
-];
-
 export default function AboutPage() {
+  const { t } = useLanguage();
+
   const waAboutText = encodeURIComponent(
     'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить подробную презентацию ваших объектов и разрешительных документов.'
   );
+
+  const team = [
+    {
+      name: 'Керезбек Нуралиев',
+      role: t.aboutPage.roleCommercial,
+      image: '/team/kerezbek-nuraliev-1.jpg',
+    },
+    {
+      name: 'Адилет Медетбек уулу',
+      role: t.aboutPage.roleTechnical,
+      image: '/team/adilet-medetbek-uulu-857x1536.jpg',
+    },
+    {
+      name: 'Самаганы Мамасыдык уулу',
+      role: t.aboutPage.roleForeman,
+      image: '/team/mamasydyk-uulu-samagany.jpg',
+    },
+    {
+      name: 'Бектур Мусаев',
+      role: t.aboutPage.roleSalesHead,
+      image: '/team/musaev-bektur-768x1376.jpg',
+    },
+    {
+      name: 'Бекжан Нуржанов',
+      role: t.aboutPage.roleMarketingHead,
+      image: '/team/nurzhanov-bekzhan-857x1536.jpg',
+    },
+    {
+      name: 'Атанас Жороев',
+      role: t.aboutPage.roleDevelopment,
+      image: '/team/zhoroev-atanas.jpg',
+    },
+  ];
+
+  const stats = [
+    { value: '2021', label: t.aboutPage.stat1Label, sub: t.aboutPage.stat1Sub },
+    { value: '6', label: t.aboutPage.stat2Label, sub: t.aboutPage.stat2Sub },
+    { value: '100%', label: t.aboutPage.stat3Label, sub: t.aboutPage.stat3Sub },
+    { value: t.aboutPage.stat4Value, label: t.aboutPage.stat4Label, sub: t.aboutPage.stat4Sub },
+  ];
+
+  const standards = [
+    {
+      icon: <IconBuilding className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
+      title: t.aboutPage.std1Title,
+      desc: t.aboutPage.std1Desc,
+      badge: t.aboutPage.std1Badge,
+    },
+    {
+      icon: <IconDocument className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
+      title: t.aboutPage.std2Title,
+      desc: t.aboutPage.std2Desc,
+      badge: t.aboutPage.std2Badge,
+    },
+    {
+      icon: <IconTree className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
+      title: t.aboutPage.std3Title,
+      desc: t.aboutPage.std3Desc,
+      badge: t.aboutPage.std3Badge,
+    },
+    {
+      icon: <IconShieldCheck className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />,
+      title: t.aboutPage.std4Title,
+      desc: t.aboutPage.std4Desc,
+      badge: t.aboutPage.std4Badge,
+    },
+  ];
+
+  const milestones = [
+    {
+      year: '2021',
+      title: t.aboutPage.m1Title,
+      desc: t.aboutPage.m1Desc,
+    },
+    {
+      year: '2023 – 2024',
+      title: t.aboutPage.m2Title,
+      desc: t.aboutPage.m2Desc,
+    },
+    {
+      year: '2025 – 2026',
+      title: t.aboutPage.m3Title,
+      desc: t.aboutPage.m3Desc,
+    },
+    {
+      year: '2027 – 2029',
+      title: t.aboutPage.m4Title,
+      desc: t.aboutPage.m4Desc,
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
@@ -140,10 +120,10 @@ export default function AboutPage() {
       <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
-            Главная
+            {t.common.home}
           </Link>
           <span>/</span>
-          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">О компании</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">{t.header.about}</span>
         </div>
       </div>
 
@@ -161,36 +141,36 @@ export default function AboutPage() {
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Девелопмент полного цикла в Бишкеке</span>
+            <span>{t.aboutPage.heroBadge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-tight mb-6 drop-shadow-xl">
-            СТРОИМ НА ВЕКА. <br />
+            {t.aboutPage.heroTitle} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4b26f] via-[#eddab2] to-[#d4b26f]">
-              СОЗДАЕМ ДЛЯ ПОКОЛЕНИЙ.
+              {t.aboutPage.heroTitleAccent}
             </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-white/90 font-light max-w-2xl mx-auto leading-relaxed mb-8">
-            EL ORDO GROUP объединяет передовую архитектуру, бескомпромиссное качество монолита и персональное уважение к каждому дольщику.
+            {t.aboutPage.heroDesc}
           </p>
 
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/projects"
-              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
+              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer"
             >
-              <span>Смотреть наши объекты</span>
+              <span>{t.aboutPage.btnProjects}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </Link>
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-2"
+              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-              <span>Задать вопрос руководству</span>
+              <span>{t.aboutPage.btnAskLeadership}</span>
             </a>
           </div>
         </div>
@@ -199,7 +179,7 @@ export default function AboutPage() {
       {/* 3. Ключевые показатели компании */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-12 relative z-20">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-8 shadow-xl dark:shadow-none border border-gray-100 dark:border-white/10 transition-colors">
-          {STATS.map((stat, idx) => (
+          {stats.map((stat, idx) => (
             <div key={idx} className="text-center p-2 border-r last:border-r-0 border-gray-100 dark:border-white/10">
               <div className="text-2xl sm:text-4xl font-black text-[#064734] dark:text-[#d4b26f] mb-1">
                 {stat.value}
@@ -222,28 +202,28 @@ export default function AboutPage() {
           <div className="lg:col-span-6 space-y-6">
             <div>
               <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-                История и миссия
+                {t.aboutPage.missionBadge}
               </span>
               <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] leading-snug">
-                Надежность, подтвержденная реальными домами
+                {t.aboutPage.missionTitle}
               </h2>
             </div>
 
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-              Строительная компания <strong>EL ORDO GROUP</strong> основана в 2021 году профессионалами с более чем 10-летним стажем в капитальном строительстве Кыргызской Республики. Наша цель — возводить безопасные, эстетичные и энергоэффективные дома, которые растут в цене из года в год.
+              {t.aboutPage.missionP1}
             </p>
 
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 leading-relaxed">
-              Мы не экономим на материалах: применяем сейсмостойкий монолитный каркас, стены из жженого кирпича и трехкамерное остекление с шумоизоляцией. Все объекты имеют <strong>Красные книги</strong>, утвержденные АПУ и положительные заключения Государственной экспертизы.
+              {t.aboutPage.missionP2}
             </p>
 
             {/* Цитата руководства */}
             <div className="p-6 rounded-2xl bg-[#064734]/5 dark:bg-[#064734]/20 border-l-4 border-[#064734] dark:border-[#d4b26f] shadow-sm">
               <p className="text-sm font-semibold italic text-gray-800 dark:text-gray-200 leading-relaxed mb-3">
-                «Для нас дом — это не просто квадратные метры, а семейная крепость, где каждый житель чувствует абсолютную безопасность, комфорт и уверенность в завтрашнем дне».
+                {t.aboutPage.quoteText}
               </p>
               <div className="text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f]">
-                — Руководство строительной компании EL ORDO GROUP
+                {t.aboutPage.quoteAuthor}
               </div>
             </div>
           </div>
@@ -258,13 +238,13 @@ export default function AboutPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex items-end p-8">
                 <div className="text-white">
                   <span className="text-xs font-black uppercase text-[#d4b26f] block mb-1">
-                    Флагман архитектуры
+                    {t.aboutPage.cardBadge}
                   </span>
                   <h3 className="text-xl sm:text-2xl font-black">
-                    ЖК Abu Dhabi • Две 25-этажные башни
+                    {t.aboutPage.cardTitle}
                   </h3>
                   <p className="text-xs text-gray-300 mt-1">
-                    Бишкек, ул. Сухомлинова, 29
+                    {t.aboutPage.cardDesc}
                   </p>
                 </div>
               </div>
@@ -279,18 +259,18 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-              Технологии и контроль
+              {t.aboutPage.standardsBadge}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-              Стандарты строительства EL ORDO
+              {t.aboutPage.standardsTitle}
             </h2>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-2">
-              Каждый этап контролируется сертифицированными инженерами технадзора.
+              {t.aboutPage.standardsSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {STANDARDS.map((std, idx) => (
+            {standards.map((std, idx) => (
               <div
                 key={idx}
                 className="bg-[#fafbfa] dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200/80 dark:border-white/10 hover:border-[#064734]/40 dark:hover:border-[#d4b26f]/40 hover:shadow-xl dark:hover:shadow-none transition-all flex flex-col justify-between"
@@ -319,15 +299,15 @@ export default function AboutPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-            Хронология успеха
+            {t.aboutPage.milestonesBadge}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-            Этапы развития девелопера
+            {t.aboutPage.milestonesTitle}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {MILESTONES.map((item, idx) => (
+          {milestones.map((item, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-[#d4b26f]/30 transition-all relative flex flex-col justify-between"
@@ -353,18 +333,18 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-              Профессиональная команда
+              {t.aboutPage.teamBadge}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-              Руководство EL ORDO GROUP
+              {t.aboutPage.teamTitle}
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-              Эксперты в сфере девелопмента, архитектурного проектирования, юриспруденции и капитального строительства.
+              {t.aboutPage.teamSubtitle}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {TEAM.map((member, idx) => (
+            {team.map((member, idx) => (
               <div
                 key={idx}
                 className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-xl transition-all duration-300 flex flex-col group"
@@ -399,16 +379,16 @@ export default function AboutPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-              Прямая связь
+              {t.aboutPage.officeBadge}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-              Офис продаж и консультации
+              {t.aboutPage.officeTitle}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-3xl mx-auto mb-12">
             <div>
-              <p className="text-xs text-gray-400 dark:text-neutral-400 mb-1">Головной офис компании:</p>
+              <p className="text-xs text-gray-400 dark:text-neutral-400 mb-1">{t.aboutPage.officeAddressLabel}</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white mb-3">
                 {COMPANY_INFO.address}
               </p>
@@ -432,7 +412,7 @@ export default function AboutPage() {
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline"
               >
                 <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
-                <span>Открыть маршрут в 2GIS</span>
+                <span>{t.aboutPage.btnRoute2Gis}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -442,19 +422,19 @@ export default function AboutPage() {
                 href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center border border-transparent dark:border-white/10"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center border border-transparent dark:border-white/10 cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-                <span>Написать в WhatsApp</span>
+                <span>{t.aboutPage.btnWhatsApp}</span>
               </a>
               <a
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center cursor-pointer"
               >
                 <IconInstagram className="w-4 h-4 text-pink-600" />
-                <span>Перейти в Instagram</span>
+                <span>{t.aboutPage.btnInstagram}</span>
               </a>
             </div>
           </div>

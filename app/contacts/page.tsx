@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO, PROJECTS_LIST } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   IconMapPin,
   IconPhone,
@@ -17,16 +18,23 @@ import {
 } from '@/components/Icons';
 
 export default function ContactsPage() {
+  const { t } = useLanguage();
   const [selectedProject, setSelectedProject] = useState<string>('ЖК Abu Dhabi');
-  const [visitTime, setVisitTime] = useState<string>('Сегодня');
+  const [visitTime, setVisitTime] = useState<string>('today');
+
+  const visitTimeLabels: Record<string, string> = {
+    today: t.contactsPage.timeToday,
+    tomorrow: t.contactsPage.timeTomorrow,
+    saturday: t.contactsPage.timeSaturday,
+  };
 
   const handleBookVisit = (e: React.FormEvent) => {
     e.preventDefault();
     const text =
-      `Здравствуйте! Хочу записаться на визит в офис продаж EL ORDO GROUP:\n\n` +
-      `• Интересует объект: ${selectedProject}\n` +
-      `• Удобное время визита: ${visitTime}\n\n` +
-      `Подтвердите, пожалуйста, свободное время менеджера для консультации и просмотра архитектурных макетов.`;
+      `${t.contactsPage.waGreeting}\n\n` +
+      `• ${t.contactsPage.waProject} ${selectedProject}\n` +
+      `• ${t.contactsPage.waTime} ${visitTimeLabels[visitTime] || visitTime}\n\n` +
+      `${t.contactsPage.waConfirm}`;
 
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -38,10 +46,10 @@ export default function ContactsPage() {
       <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
-            Главная
+            {t.common.home}
           </Link>
           <span>/</span>
-          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">Контакты</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-bold">{t.header.contacts}</span>
         </div>
       </div>
 
@@ -58,13 +66,13 @@ export default function ContactsPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
           <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-3 px-3.5 py-1.5 rounded-full bg-black/40 border border-[#d4b26f]/30">
-            Офис продаж и консультации
+            {t.contactsPage.heroBadge}
           </span>
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight mb-4 drop-shadow-md">
-            Свяжитесь с нами
+            {t.contactsPage.heroTitle}
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl mx-auto font-light leading-relaxed">
-            Ждем вас в центральном офисе на просмотр архитектурных 3D-макетов жилых комплексов, подбор планировок и расчет рассрочки 0%.
+            {t.contactsPage.heroDesc}
           </p>
         </div>
       </section>
@@ -80,13 +88,13 @@ export default function ContactsPage() {
                 <IconMapPin className="w-6 h-6" />
               </div>
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
-                Главный офис продаж
+                {t.contactsPage.officeCardBadge}
               </span>
               <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white leading-snug mb-2">
                 {COMPANY_INFO.address}
               </p>
               <p className="text-xs text-gray-500 dark:text-neutral-400 leading-relaxed">
-                Ориентир: перекресток с ул. Тыныстанова / район КГТУ (Политех). Для гостей предусмотрен бесплатный клиентский паркинг.
+                {t.contactsPage.officeCardDesc}
               </p>
             </div>
             <a
@@ -95,7 +103,7 @@ export default function ContactsPage() {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-1.5 text-xs font-black text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline"
             >
-              <span>Построить маршрут в 2GIS</span>
+              <span>{t.contactsPage.officeCardRoute}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -107,7 +115,7 @@ export default function ContactsPage() {
                 <IconPhone className="w-6 h-6 text-[#064734] dark:text-[#d4b26f]" />
               </div>
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
-                Отдел продаж (Звонки и WhatsApp)
+                {t.contactsPage.phoneCardBadge}
               </span>
               <div className="space-y-1.5 text-base sm:text-lg font-black text-gray-900 dark:text-white">
                 {COMPANY_INFO.phones.map((phone, idx) => (
@@ -121,7 +129,7 @@ export default function ContactsPage() {
                 ))}
               </div>
               <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2">
-                Прямая связь со старшими специалистами по наличию видовых этажей.
+                {t.contactsPage.phoneCardDesc}
               </p>
             </div>
             <a
@@ -133,7 +141,7 @@ export default function ContactsPage() {
               className="mt-6 inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-              <span>Написать в WhatsApp</span>
+              <span>{t.contactsPage.phoneCardAction}</span>
             </a>
           </div>
 
@@ -144,19 +152,19 @@ export default function ContactsPage() {
                 <IconClock className="w-6 h-6" />
               </div>
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
-                Режим работы
+                {t.contactsPage.hoursCardBadge}
               </span>
               <p className="text-sm font-black text-gray-900 dark:text-white">
-                Понедельник — Пятница: <span className="text-[#064734] dark:text-[#d4b26f]">09:00 – 18:00</span>
+                {t.contactsPage.hoursMonFri} <span className="text-[#064734] dark:text-[#d4b26f]">09:00 – 18:00</span>
               </p>
               <p className="text-sm font-black text-gray-900 dark:text-white">
-                Суббота: <span className="text-[#064734] dark:text-[#d4b26f]">10:00 – 16:00</span>
+                {t.contactsPage.hoursSat} <span className="text-[#064734] dark:text-[#d4b26f]">10:00 – 16:00</span>
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">
-                Воскресенье: <span className="text-gray-900 dark:text-white font-bold">по предварительной записи</span>
+                {t.contactsPage.hoursSun} <span className="text-gray-900 dark:text-white font-bold">{t.contactsPage.hoursSunValue}</span>
               </p>
               <div className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10">
-                <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-0.5">Официальный аккаунт:</span>
+                <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-0.5">{t.contactsPage.hoursAccountLabel}</span>
                 <a
                   href={COMPANY_INFO.instagram}
                   target="_blank"
@@ -174,7 +182,7 @@ export default function ContactsPage() {
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-1.5 text-xs font-black text-pink-700 dark:text-pink-400 hover:underline"
             >
-              <span>Видео со стройплощадок</span>
+              <span>{t.contactsPage.hoursVideoAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -186,16 +194,16 @@ export default function ContactsPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
           
-          {/* Левая колонка: Что вас ждет в офисе */}
+          {/* Левая колонка */}
           <div className="lg:col-span-6 space-y-4">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block">
-              Личный визит
+              {t.contactsPage.bookingBadge}
             </span>
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f] leading-tight">
-              Запланируйте визит в офис продаж
+              {t.contactsPage.bookingTitle}
             </h2>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-              Посетив наш офис, вы сможете в спокойной обстановке изучить генеральные планы, архитектурные макеты и получить консультацию юриста по оформлению сделки.
+              {t.contactsPage.bookingDesc}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -203,13 +211,13 @@ export default function ContactsPage() {
                 <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
                   <IconCar className="w-4 h-4" />
                 </div>
-                <span>Клиентский паркинг</span>
+                <span>{t.contactsPage.perkParking}</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#fafbfa] dark:bg-[#040c09] border border-gray-100 dark:border-white/10 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
                   <IconBuilding className="w-4 h-4" />
                 </div>
-                <span>Архитектурные 3D-макеты</span>
+                <span>{t.contactsPage.perkModels}</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#fafbfa] dark:bg-[#040c09] border border-gray-100 dark:border-white/10 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
@@ -221,27 +229,27 @@ export default function ContactsPage() {
                     <line x1="14" y1="2" x2="14" y2="4" />
                   </svg>
                 </div>
-                <span>Приватные переговорные</span>
+                <span>{t.contactsPage.perkMeeting}</span>
               </div>
               <div className="p-3.5 rounded-2xl bg-[#fafbfa] dark:bg-[#040c09] border border-gray-100 dark:border-white/10 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
                   <IconDocument className="w-4 h-4" />
                 </div>
-                <span>Оригиналы документов</span>
+                <span>{t.contactsPage.perkDocuments}</span>
               </div>
             </div>
           </div>
 
-          {/* Правая колонка: Быстрая бронь встречи */}
+          {/* Правая колонка: Форма брони */}
           <div className="lg:col-span-6 bg-[#f5f8f6] dark:bg-[#040c09] p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 transition-colors">
             <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white mb-4">
-              Быстрая запись на встречу с менеджером:
+              {t.contactsPage.formTitle}
             </h3>
 
             <form onSubmit={handleBookVisit} className="space-y-4 text-xs">
               <div>
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Какой жилой комплекс вас интересует?
+                  {t.contactsPage.formProjectLabel}
                 </label>
                 <select
                   value={selectedProject}
@@ -253,29 +261,33 @@ export default function ContactsPage() {
                       {proj.name} ({proj.classType})
                     </option>
                   ))}
-                  <option value="Консультация по всем объектам компании" className="dark:bg-[#0b1b15]">
-                    Консультация по всем объектам компании
+                  <option value={t.contactsPage.formAllProjects} className="dark:bg-[#0b1b15]">
+                    {t.contactsPage.formAllProjects}
                   </option>
                 </select>
               </div>
 
               <div>
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Когда вам удобно приехать?
+                  {t.contactsPage.formTimeLabel}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {['Сегодня', 'Завтра', 'В субботу'].map((t) => (
+                  {[
+                    { id: 'today', label: t.contactsPage.timeToday },
+                    { id: 'tomorrow', label: t.contactsPage.timeTomorrow },
+                    { id: 'saturday', label: t.contactsPage.timeSaturday },
+                  ].map((timeOption) => (
                     <button
-                      key={t}
+                      key={timeOption.id}
                       type="button"
-                      onClick={() => setVisitTime(t)}
+                      onClick={() => setVisitTime(timeOption.id)}
                       className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                        visitTime === t
+                        visitTime === timeOption.id
                           ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
                           : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5'
                       }`}
                     >
-                      {t}
+                      {timeOption.label}
                     </button>
                   ))}
                 </div>
@@ -286,10 +298,10 @@ export default function ContactsPage() {
                 className="w-full mt-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-                <span>Подтвердить запись в WhatsApp</span>
+                <span>{t.contactsPage.btnSubmit}</span>
               </button>
               <p className="text-[11px] text-gray-500 dark:text-neutral-400 text-center font-medium">
-                Менеджер встретит вас у входа и подготовит презентационные материалы
+                {t.contactsPage.formNote}
               </p>
             </form>
           </div>
@@ -301,13 +313,13 @@ export default function ContactsPage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="mb-6">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
-            Локация на карте
+            {t.contactsPage.mapBadge}
           </span>
           <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-            Интерактивная карта объектов и офиса
+            {t.contactsPage.mapTitle}
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
-            Нажмите на маркер офиса или интересующего ЖК для детального адреса и прокладки маршрута.
+            {t.contactsPage.mapDesc}
           </p>
         </div>
 
