@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { COMPANY_INFO } from '@/lib/data';
+import ThemeToggle from '@/components/ThemeToggle';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -54,8 +55,10 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-white/95 backdrop-blur-md transition-all duration-200 border-b ${
-          isScrolled ? 'border-gray-200 shadow-md' : 'border-gray-100'
+        className={`sticky top-0 z-50 bg-white/95 dark:bg-[#07130e]/95 backdrop-blur-md transition-all duration-200 border-b ${
+          isScrolled
+            ? 'border-gray-200 dark:border-white/10 shadow-md'
+            : 'border-gray-100 dark:border-white/5'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
@@ -71,14 +74,14 @@ export default function Header() {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-black tracking-tight text-[#064734] uppercase leading-none">
+                <span className="text-lg sm:text-xl font-black tracking-tight text-[#064734] dark:text-neutral-100 uppercase leading-none">
                   El Ordo
                 </span>
-                <span className="text-[10px] bg-[#064734]/10 text-[#064734] font-bold px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] font-bold px-1.5 py-0.5 rounded-md">
                   Group
                 </span>
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-gray-500 font-semibold">
+              <span className="text-[9px] uppercase tracking-wider text-gray-500 dark:text-neutral-400 font-semibold">
                 Строительная компания
               </span>
             </div>
@@ -94,8 +97,8 @@ export default function Header() {
                   href={link.href}
                   className={`px-3.5 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all ${
                     isActive
-                      ? 'bg-[#064734] text-white shadow-sm'
-                      : 'text-gray-700 hover:text-[#064734] hover:bg-gray-100/70'
+                      ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                      : 'text-gray-700 dark:text-neutral-300 hover:text-[#064734] dark:hover:text-[#d4b26f] hover:bg-gray-100/70 dark:hover:bg-white/5'
                   }`}
                 >
                   {link.label}
@@ -104,34 +107,37 @@ export default function Header() {
             })}
           </nav>
 
-          {/* 3. Правый блок: телефон + кнопка заявки */}
-          <div className="flex items-center gap-3 sm:gap-5">
+          {/* 3. Правый блок: телефон + тема + кнопка заявки */}
+          <div className="flex items-center gap-2.5 sm:gap-4">
             
             {/* Прямой телефон и статус (для планшетов и десктопов) */}
             <div className="hidden sm:flex flex-col items-end text-right">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
+                <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 tracking-wider">
                   Отдел продаж онлайн
                 </span>
               </div>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                className="text-xs sm:text-sm font-black text-gray-900 hover:text-[#064734] transition-colors"
+                className="text-xs sm:text-sm font-black text-gray-900 dark:text-neutral-100 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
                 {COMPANY_INFO.phones[0] || '+996 709 115 115'}
               </a>
             </div>
+
+            {/* Кнопка переключения светлой / темной темы */}
+            <ThemeToggle />
 
             {/* Кнопка мгновенной консультации */}
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2"
+              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2.5 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-              <span>Консультация</span>
+              <span className="hidden sm:inline">Консультация</span>
             </a>
 
             {/* Бургер-кнопка для мобильных */}
@@ -139,7 +145,7 @@ export default function Header() {
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-              className="lg:hidden p-2.5 rounded-xl text-gray-700 hover:bg-gray-100 hover:text-[#064734] transition-colors focus:outline-none"
+              className="lg:hidden p-2 rounded-xl text-gray-700 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors focus:outline-none"
             >
               {isOpen ? (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,12 +170,12 @@ export default function Header() {
           onClick={() => setIsOpen(false)}
         >
           <div
-            className="w-full max-w-sm ml-auto h-full bg-white text-gray-900 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto animate-slideInRight"
+            className="w-full max-w-sm ml-auto h-full bg-white dark:bg-[#0b1b15] text-gray-900 dark:text-neutral-100 shadow-2xl flex flex-col justify-between p-6 overflow-y-auto animate-slideInRight"
             onClick={(e) => e.stopPropagation()}
           >
             <div>
               {/* Шапка меню */}
-              <div className="flex items-center justify-between pb-5 border-b border-gray-100">
+              <div className="flex items-center justify-between pb-5 border-b border-gray-100 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1 shadow-sm shrink-0">
                     <img
@@ -178,8 +184,8 @@ export default function Header() {
                       className="w-full h-full object-contain"
                     />
                   </div>
-                  <span className="text-lg font-black text-[#064734] uppercase">EL ORDO</span>
-                  <span className="text-[10px] bg-[#064734]/10 text-[#064734] font-bold px-1.5 py-0.5 rounded">
+                  <span className="text-lg font-black text-[#064734] dark:text-[#d4b26f] uppercase">EL ORDO</span>
+                  <span className="text-[10px] bg-[#064734]/10 dark:bg-white/10 text-[#064734] dark:text-[#d4b26f] font-bold px-1.5 py-0.5 rounded">
                     МЕНЮ
                   </span>
                 </div>
@@ -187,7 +193,7 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   aria-label="Закрыть меню"
-                  className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+                  className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -206,8 +212,8 @@ export default function Header() {
                       onClick={() => setIsOpen(false)}
                       className={`px-4 py-3 rounded-2xl text-sm font-extrabold flex items-center justify-between transition-colors ${
                         isActive
-                          ? 'bg-[#064734] text-white'
-                          : 'text-gray-800 hover:bg-gray-50'
+                          ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
+                          : 'text-gray-800 dark:text-neutral-200 hover:bg-gray-50 dark:hover:bg-white/5'
                       }`}
                     >
                       <span>{link.label}</span>
@@ -218,35 +224,35 @@ export default function Header() {
               </nav>
 
               {/* Быстрый переход к флагманским ЖК */}
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <span className="text-xs uppercase font-extrabold tracking-wider text-gray-400 block mb-3">
+              <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
+                <span className="text-xs uppercase font-extrabold tracking-wider text-gray-400 dark:text-neutral-400 block mb-3">
                   Флагманские объекты:
                 </span>
                 <div className="space-y-2">
                   <Link
                     href="/abu-dhabi"
                     onClick={() => setIsOpen(false)}
-                    className="block p-3 rounded-xl bg-gray-50 hover:bg-[#064734]/10 transition-colors"
+                    className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
-                    <div className="text-xs font-bold text-gray-900">ЖК Abu Dhabi</div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖК Abu Dhabi</div>
                     <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 650 $/м² • Премиум</div>
                   </Link>
 
                   <Link
                     href="/madina-residence"
                     onClick={() => setIsOpen(false)}
-                    className="block p-3 rounded-xl bg-gray-50 hover:bg-[#064734]/10 transition-colors"
+                    className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
-                    <div className="text-xs font-bold text-gray-900">ЖК Madina Residence</div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖК Madina Residence</div>
                     <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 400 $/м² • Бизнес</div>
                   </Link>
 
                   <Link
                     href="/ajkol-plus"
                     onClick={() => setIsOpen(false)}
-                    className="block p-3 rounded-xl bg-gray-50 hover:bg-[#064734]/10 transition-colors"
+                    className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
-                    <div className="text-xs font-bold text-gray-900">ЖД Айкол +</div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖД Айкол +</div>
                     <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 100 $/м² • Эко-зона</div>
                   </Link>
                 </div>
@@ -254,18 +260,18 @@ export default function Header() {
             </div>
 
             {/* Нижняя часть меню: контакты и соцсети */}
-            <div className="pt-6 border-t border-gray-100 mt-6">
+            <div className="pt-6 border-t border-gray-100 dark:border-white/10 mt-6">
               <div className="mb-4">
-                <span className="text-[11px] text-gray-400 block mb-1">Горячая линия:</span>
+                <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">Горячая линия:</span>
                 <a
                   href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                  className="text-base font-black text-[#064734] block"
+                  className="text-base font-black text-[#064734] dark:text-[#d4b26f] block"
                 >
                   {COMPANY_INFO.phones[0] || '+996 709 115 115'}
                 </a>
                 <a
                   href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
-                  className="text-xs text-gray-600 block mt-0.5"
+                  className="text-xs text-gray-600 dark:text-neutral-300 block mt-0.5"
                 >
                   {COMPANY_INFO.phones[1] || '+996 990 115 115'}
                 </a>
@@ -285,7 +291,7 @@ export default function Header() {
                   href={COMPANY_INFO.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-2 rounded-xl border border-gray-200 text-gray-800 font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+                  className="py-3 px-2 rounded-xl border border-gray-200 dark:border-white/15 text-gray-800 dark:text-neutral-200 font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
                 >
                   <IconInstagram className="w-4 h-4 text-pink-600" />
                   <span>Instagram</span>

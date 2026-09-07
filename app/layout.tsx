@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
 import { COMPANY_INFO } from "@/lib/data";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -159,29 +160,31 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="ru" className={`scroll-smooth ${montserrat.variable}`}>
+    <html lang="ru" suppressHydrationWarning className={`scroll-smooth ${montserrat.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${montserrat.className} antialiased min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 overflow-x-hidden selection:bg-[#d4b26f] selection:text-[#064734]`}>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-[#064734] focus:text-[#d4b26f] focus:rounded-xl focus:shadow-2xl focus:font-bold focus:text-xs uppercase tracking-wider"
-        >
-          Перейти к основному контенту
-        </a>
+      <body className={`${montserrat.className} antialiased min-h-screen flex flex-col bg-[#fafbfa] dark:bg-[#07130e] text-neutral-900 dark:text-neutral-100 overflow-x-hidden selection:bg-[#d4b26f] selection:text-[#064734]`}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-[#064734] focus:text-[#d4b26f] focus:rounded-xl focus:shadow-2xl focus:font-bold focus:text-xs uppercase tracking-wider"
+          >
+            Перейти к основному контенту
+          </a>
 
-        <Header />
-        
-        <div id="main-content" className="flex-1 w-full overflow-x-hidden">
-          {children}
-        </div>
+          <Header />
+          
+          <div id="main-content" className="flex-1 w-full overflow-x-hidden">
+            {children}
+          </div>
 
-        <Footer />
-        <FloatingContact />
+          <Footer />
+          <FloatingContact />
+        </ThemeProvider>
       </body>
     </html>
   );
