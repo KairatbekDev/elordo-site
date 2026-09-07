@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import ConsultationForm from '@/components/ConsultationForm';
 import { PROJECTS_LIST, COMPANY_INFO } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   IconBuilding,
   IconCrane,
@@ -22,52 +23,8 @@ import {
   IconStar,
 } from '@/components/Icons';
 
-const PAYMENT_CARDS = [
-  {
-    slug: 'rassrochka',
-    title: 'Рассрочка 0%',
-    badge: 'Без банка',
-    desc: 'Беспроцентная внутренняя рассрочка от застройщика до 40 месяцев без справок о доходах и кредитных проверок.',
-    icon: <IconCalendar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
-    actionText: 'Условия и расчет платежа',
-  },
-  {
-    slug: 'trade-in',
-    title: 'Trade-in (Бартер)',
-    badge: 'Оценка за 24 ч',
-    desc: 'Быстрый обмен вашего автомобиля или вторичной недвижимости в счет первого взноса за новую квартиру.',
-    icon: <IconCar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
-    actionText: 'Оценить авто или жилье',
-  },
-  {
-    slug: 'polniy-raschet',
-    title: '100% Расчет',
-    badge: 'Макс. выгода',
-    desc: 'Индивидуальная специальная скидка при единовременной оплате и приоритетный выбор лучших видовых этажей.',
-    icon: <IconDiamond className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
-    actionText: 'Узнать размер скидки',
-  },
-];
-
-const ADVANTAGES = [
-  {
-    icon: <IconBuilding className="w-7 h-7 text-[#d4b26f]" />,
-    title: 'Монолит + жженый кирпич',
-    desc: 'Каркас из прочного железобетона марки М350 с заполнением экологичным жженым кирпичом. Высокая звукоизоляция и сейсмостойкость 9 баллов.',
-  },
-  {
-    icon: <IconDocument className="w-7 h-7 text-[#d4b26f]" />,
-    title: 'Прямой ДДУ и Красная книга',
-    desc: 'Все объекты возводятся на собственных участках с Красными книгами. Оформление официального Договора долевого участия с госрегистрацией в КР.',
-  },
-  {
-    icon: <IconTree className="w-7 h-7 text-[#d4b26f]" />,
-    title: 'Экология и панорамные виды',
-    desc: 'Локации в престижном центре столицы и экологически чистом южном предгорье с постоянным притоком горного воздуха и видом на хребет Ала-Тоо.',
-  },
-];
-
 export default function Home() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'finished'>('all');
 
   const filteredProjects =
@@ -77,6 +34,51 @@ export default function Home() {
 
   const activeCount = PROJECTS_LIST.filter((p) => p.category === 'active').length;
   const finishedCount = PROJECTS_LIST.filter((p) => p.category === 'finished').length;
+
+  const paymentCards = [
+    {
+      slug: 'rassrochka',
+      title: t.paymentsSection.card1Title,
+      badge: t.paymentsSection.card1Badge,
+      desc: t.paymentsSection.card1Desc,
+      icon: <IconCalendar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
+      actionText: t.paymentsSection.card1Action,
+    },
+    {
+      slug: 'trade-in',
+      title: t.paymentsSection.card2Title,
+      badge: t.paymentsSection.card2Badge,
+      desc: t.paymentsSection.card2Desc,
+      icon: <IconCar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
+      actionText: t.paymentsSection.card2Action,
+    },
+    {
+      slug: 'polniy-raschet',
+      title: t.paymentsSection.card3Title,
+      badge: t.paymentsSection.card3Badge,
+      desc: t.paymentsSection.card3Desc,
+      icon: <IconDiamond className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
+      actionText: t.paymentsSection.card3Action,
+    },
+  ];
+
+  const advantages = [
+    {
+      icon: <IconBuilding className="w-7 h-7 text-[#d4b26f]" />,
+      title: t.advantages.adv1Title,
+      desc: t.advantages.adv1Desc,
+    },
+    {
+      icon: <IconDocument className="w-7 h-7 text-[#d4b26f]" />,
+      title: t.advantages.adv2Title,
+      desc: t.advantages.adv2Desc,
+    },
+    {
+      icon: <IconTree className="w-7 h-7 text-[#d4b26f]" />,
+      title: t.advantages.adv3Title,
+      desc: t.advantages.adv3Desc,
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
@@ -97,59 +99,59 @@ export default function Home() {
           
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-lg animate-fadeIn">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Строительная компания EL ORDO GROUP • Бишкек</span>
+            <span>{t.hero.badge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tight leading-tight sm:leading-none mb-6 drop-shadow-xl">
-            АРХИТЕКТУРА ВАШЕГО СТАТУСА <br />
+            {t.hero.titleMain} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4b26f] via-[#eddab2] to-[#d4b26f]">
-              И СЕМЕЙНОГО УЮТА
+              {t.hero.titleAccent}
             </span>
           </h1>
 
           <p className="text-sm sm:text-lg md:text-xl text-white/90 font-light leading-relaxed max-w-2xl mb-10 px-2 drop-shadow">
-            С 2021 года возводим современные жилые комплексы в Бишкеке. Монолитно-кирпичная надежность, сейсмостойкость 9 баллов и честная рассрочка 0% до 40 месяцев без участия банков.
+            {t.hero.desc}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
             <a
               href="#projects"
-              className="w-full sm:w-auto bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl shadow-[#d4b26f]/20 text-center"
+              className="w-full sm:w-auto bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl shadow-[#d4b26f]/20 text-center cursor-pointer"
             >
-              Выбрать жилой комплекс
+              {t.hero.btnProjects}
             </a>
             <Link
               href="/rassrochka"
               className="w-full sm:w-auto bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-xs sm:text-sm border border-white/25 transition-all backdrop-blur-md text-center"
             >
-              Условия рассрочки 0%
+              {t.hero.btnTerms}
             </Link>
           </div>
 
           {/* Полоса доверия (Trust Bar) */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 w-full max-w-4xl mt-14 pt-8 border-t border-white/15 text-left">
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
-              <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">0%</span>
+              <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">{t.hero.trust0Title}</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Рассрочка до 40 мес. без банка
+                {t.hero.trust0Desc}
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
-              <span className="text-xl sm:text-2xl font-black text-white block">9 баллов</span>
+              <span className="text-xl sm:text-2xl font-black text-white block">{t.hero.trust9Title}</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Сейсмостойкость по нормам СНиП
+                {t.hero.trust9Desc}
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
-              <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">Trade-in</span>
+              <span className="text-xl sm:text-2xl font-black text-[#d4b26f] block">{t.hero.trustTradeTitle}</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Обмен авто или жилья за 24 ч
+                {t.hero.trustTradeDesc}
               </span>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10">
-              <span className="text-xl sm:text-2xl font-black text-white block">100%</span>
+              <span className="text-xl sm:text-2xl font-black text-white block">{t.hero.trust100Title}</span>
               <span className="text-[11px] sm:text-xs text-gray-300 font-medium leading-tight block mt-0.5">
-                Госрегистрация ДДУ и чистота
+                {t.hero.trust100Desc}
               </span>
             </div>
           </div>
@@ -161,15 +163,15 @@ export default function Home() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-            Безупречные стандарты
+            {t.advantages.badge}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
-            Почему нам доверяют семьи Бишкека
+            {t.advantages.title}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {ADVANTAGES.map((adv, idx) => (
+          {advantages.map((adv, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 border border-gray-100 dark:border-white/10 shadow-md hover:shadow-xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between"
@@ -197,19 +199,19 @@ export default function Home() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
             <div>
               <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-                Флагманские проекты
+                {t.projectsSection.badge}
               </span>
               <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
-                Наши жилые комплексы
+                {t.projectsSection.title}
               </h2>
             </div>
 
             {/* Фильтры объектов с иконками */}
             <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 shadow-sm overflow-x-auto scrollbar-none">
               {[
-                { id: 'all', label: `Все (${PROJECTS_LIST.length})`, icon: null },
-                { id: 'active', label: `В продаже (${activeCount})`, icon: <IconCrane className="w-3.5 h-3.5 shrink-0" /> },
-                { id: 'finished', label: `Сданные (${finishedCount})`, icon: <IconCheck className="w-3.5 h-3.5 shrink-0" /> },
+                { id: 'all', label: `${t.projectsSection.tabAll} (${PROJECTS_LIST.length})`, icon: null },
+                { id: 'active', label: `${t.projectsSection.tabActive} (${activeCount})`, icon: <IconCrane className="w-3.5 h-3.5 shrink-0" /> },
+                { id: 'finished', label: `${t.projectsSection.tabFinished} (${finishedCount})`, icon: <IconCheck className="w-3.5 h-3.5 shrink-0" /> },
               ].map((tab) => {
                 const isActive = activeTab === tab.id;
                 return (
@@ -261,7 +263,7 @@ export default function Home() {
                           }`}
                         >
                           {isFinished && <IconCheck className="w-3.5 h-3.5 text-emerald-400" />}
-                          <span>{isFinished ? 'Сдан' : project.classType}</span>
+                          <span>{isFinished ? t.projectsSection.statusFinished : project.classType}</span>
                         </span>
                       </div>
 
@@ -302,7 +304,7 @@ export default function Home() {
                       href={`/${project.slug}`}
                       className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] dark:text-[#064734] hover:text-white dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-lg"
                     >
-                      <span>Подробнее о проекте</span>
+                      <span>{t.projectsSection.detailsBtn}</span>
                       <IconArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -316,7 +318,7 @@ export default function Home() {
               href="/projects"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white dark:bg-[#0b1b15] hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-300 dark:border-white/15 text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f] shadow-sm hover:shadow transition-all"
             >
-              <span>Посмотреть полный каталог всех {PROJECTS_LIST.length} объектов</span>
+              <span>{t.projectsSection.viewAllBtn} ({PROJECTS_LIST.length})</span>
               <IconArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -328,15 +330,15 @@ export default function Home() {
       <section id="payments" className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 scroll-mt-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-            Прозрачные расчеты
+            {t.paymentsSection.badge}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
-            Условия приобретения жилья
+            {t.paymentsSection.title}
           </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {PAYMENT_CARDS.map((method, idx) => (
+          {paymentCards.map((method, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 border border-gray-200 dark:border-white/10 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between"
@@ -376,10 +378,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-              Реальные истории
+              {t.reviewsSection.badge}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
-              Отзывы наших покупателей
+              {t.reviewsSection.title}
             </h2>
           </div>
 
@@ -429,16 +431,16 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-              Ждем вас в гости
+              {t.officeSection.badge}
             </span>
             <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
-              Головной офис продаж
+              {t.officeSection.title}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-3xl mx-auto mb-14">
             <div>
-              <p className="text-xs text-gray-400 dark:text-gray-400 mb-1">Адрес офиса:</p>
+              <p className="text-xs text-gray-400 dark:text-gray-400 mb-1">{t.officeSection.addressLabel}</p>
               <p className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 {COMPANY_INFO.address}
               </p>
@@ -459,7 +461,7 @@ export default function Home() {
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline transition-all"
               >
                 <IconMapPin className="w-4 h-4 text-[#d4b26f]" />
-                <span>Открыть маршрут в 2GIS</span>
+                <span>{t.officeSection.route2Gis}</span>
                 <IconArrowRight className="w-3 h-3" />
               </a>
             </div>
@@ -471,19 +473,19 @@ export default function Home() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] text-white px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-                <span>Записаться в WhatsApp</span>
+                <span>{t.officeSection.btnWhatsApp}</span>
               </a>
               <a
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center cursor-pointer"
               >
                 <IconInstagram className="w-4 h-4 text-pink-600" />
-                <span>Перейти в Instagram</span>
+                <span>{t.officeSection.btnInstagram}</span>
               </a>
             </div>
           </div>

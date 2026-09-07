@@ -29,11 +29,7 @@ export default function Header() {
   // Отслеживание скролла для легкой тени
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 15) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 15);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -41,11 +37,7 @@ export default function Header() {
 
   // Блокировка прокрутки экрана при открытом мобильном меню
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -85,7 +77,7 @@ export default function Header() {
                 </span>
               </div>
               <span className="text-[9px] uppercase tracking-wider text-gray-500 dark:text-neutral-400 font-semibold">
-                Строительная компания
+                {t.header.companySubtitle}
               </span>
             </div>
           </Link>
@@ -111,10 +103,10 @@ export default function Header() {
           </nav>
 
           {/* 3. Правый блок: телефон + язык + тема + консультация */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
             {/* Прямой телефон и статус */}
-            <div className="hidden sm:flex flex-col items-end text-right">
+            <div className="hidden xl:flex flex-col items-end text-right mr-1">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 tracking-wider">
@@ -140,10 +132,10 @@ export default function Header() {
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2.5 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2"
+              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-              <span className="hidden sm:inline">{t.header.consultation}</span>
+              <span className="hidden md:inline">{t.header.consultation}</span>
             </a>
 
             {/* Бургер-кнопка для мобильных */}
@@ -192,7 +184,7 @@ export default function Header() {
                   </div>
                   <span className="text-lg font-black text-[#064734] dark:text-[#d4b26f] uppercase">EL ORDO</span>
                   <span className="text-[10px] bg-[#064734]/10 dark:bg-white/10 text-[#064734] dark:text-[#d4b26f] font-bold px-1.5 py-0.5 rounded">
-                    МЕНЮ
+                    {t.header.menu}
                   </span>
                 </div>
                 <button
@@ -232,7 +224,7 @@ export default function Header() {
               {/* Быстрый переход к объектам */}
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
                 <span className="text-xs uppercase font-extrabold tracking-wider text-gray-400 dark:text-neutral-400 block mb-3">
-                  Флагманские объекты:
+                  {t.header.flagshipProjects}
                 </span>
                 <div className="space-y-2">
                   <Link
@@ -268,7 +260,7 @@ export default function Header() {
             {/* Нижняя часть меню */}
             <div className="pt-6 border-t border-gray-100 dark:border-white/10 mt-6">
               <div className="mb-4">
-                <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">Горячая линия:</span>
+                <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">{t.header.hotline}</span>
                 <a
                   href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
                   className="text-base font-black text-[#064734] dark:text-[#d4b26f] block"
@@ -288,7 +280,7 @@ export default function Header() {
                   href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-2 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow"
+                  className="py-3 px-2 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                   <span>WhatsApp</span>
@@ -297,7 +289,7 @@ export default function Header() {
                   href={COMPANY_INFO.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-2 rounded-xl border border-gray-200 dark:border-white/15 text-gray-800 dark:text-neutral-200 font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
+                  className="py-3 px-2 rounded-xl border border-gray-200 dark:border-white/15 text-gray-800 dark:text-neutral-200 font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
                 >
                   <IconInstagram className="w-4 h-4 text-pink-600" />
                   <span>Instagram</span>

@@ -50,7 +50,7 @@ const TEAM: TeamMember[] = [
     image: '/team/adilet-medetbek-uulu-857x1536.jpg',
   },
   {
-    name: 'Самаган Мамасыдык уулу',
+    name: 'Самаганы Мамасыдык уулу',
     role: 'Главный прораб ',
     image: '/team/mamasydyk-uulu-samagany.jpg',
   },
