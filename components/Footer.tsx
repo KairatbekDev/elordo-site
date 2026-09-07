@@ -37,10 +37,6 @@ export default function Footer() {
                   src="/logo-icon.png"
                   alt="EL ORDO GROUP"
                   className="w-full h-full object-contain"
-                  style={{
-                    filter:
-                      'brightness(0) saturate(100%) invert(19%) sepia(60%) saturate(5) hue-rotate(125deg) brightness(0.9) contrast(1.1)',
-                  }}
                 />
               </div>
               <div className="flex flex-col">
