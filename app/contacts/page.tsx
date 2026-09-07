@@ -147,7 +147,7 @@ export default function ContactsPage() {
                 Режим работы
               </span>
               <p className="text-sm font-black text-gray-900">
-                Понедельник — Суббота: <span className="text-[#064734]">09:00 – 19:00</span>
+                Понедельник — Суббота: <span className="text-[#064734]">09:00 – 18:00</span>
               </p>
               <p className="text-xs text-gray-600 mt-1 font-medium">
                 Воскресенье: <span className="text-gray-900 font-bold">по предварительной записи</span>
