@@ -28,7 +28,7 @@ const PAYMENT_CARDS = [
     title: 'Рассрочка 0%',
     badge: 'Без банка',
     desc: 'Беспроцентная внутренняя рассрочка от застройщика до 40 месяцев без справок о доходах и кредитных проверок.',
-    icon: <IconCalendar className="w-7 h-7 text-[#064734]" />,
+    icon: <IconCalendar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
     actionText: 'Условия и расчет платежа',
   },
   {
@@ -36,7 +36,7 @@ const PAYMENT_CARDS = [
     title: 'Trade-in (Бартер)',
     badge: 'Оценка за 24 ч',
     desc: 'Быстрый обмен вашего автомобиля или вторичной недвижимости в счет первого взноса за новую квартиру.',
-    icon: <IconCar className="w-7 h-7 text-[#064734]" />,
+    icon: <IconCar className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
     actionText: 'Оценить авто или жилье',
   },
   {
@@ -44,7 +44,7 @@ const PAYMENT_CARDS = [
     title: '100% Расчет',
     badge: 'Макс. выгода',
     desc: 'Индивидуальная специальная скидка при единовременной оплате и приоритетный выбор лучших видовых этажей.',
-    icon: <IconDiamond className="w-7 h-7 text-[#064734]" />,
+    icon: <IconDiamond className="w-7 h-7 text-[#064734] dark:text-[#d4b26f]" />,
     actionText: 'Узнать размер скидки',
   },
 ];
@@ -79,7 +79,7 @@ export default function Home() {
   const finishedCount = PROJECTS_LIST.filter((p) => p.category === 'finished').length;
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 selection:bg-[#d4b26f] selection:text-[#064734]">
+    <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
       {/* 1. ГЛАВНЫЙ ЭКРАН (HERO) */}
       <section className="relative min-h-[92dvh] sm:min-h-[640px] md:min-h-[720px] flex items-center justify-center bg-[#064734] text-white pt-24 pb-20 px-4 sm:px-6 overflow-hidden">
@@ -163,7 +163,7 @@ export default function Home() {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             Безупречные стандарты
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
             Почему нам доверяют семьи Бишкека
           </h2>
         </div>
@@ -172,16 +172,16 @@ export default function Home() {
           {ADVANTAGES.map((adv, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-8 border border-gray-100 shadow-md hover:shadow-xl hover:border-[#064734]/30 transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 border border-gray-100 dark:border-white/10 shadow-md hover:shadow-xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 flex items-center justify-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 flex items-center justify-center mb-6">
                   {adv.icon}
                 </div>
-                <h3 className="text-lg font-black text-gray-900 mb-3">
+                <h3 className="text-lg font-black text-gray-900 dark:text-white mb-3">
                   {adv.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                   {adv.desc}
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function Home() {
       </section>
 
       {/* 3. КАТАЛОГ ОБЪЕКТОВ С БЫСТРЫМИ ТАБАМИ */}
-      <section id="projects" className="bg-[#f0f4f1] py-16 sm:py-24 px-4 sm:px-6 scroll-mt-20">
+      <section id="projects" className="bg-[#f0f4f1] dark:bg-[#040c09] py-16 sm:py-24 px-4 sm:px-6 scroll-mt-20 border-y border-transparent dark:border-white/5 transition-colors">
         <div className="max-w-6xl mx-auto">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
@@ -199,13 +199,13 @@ export default function Home() {
               <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
                 Флагманские проекты
               </span>
-              <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+              <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
                 Наши жилые комплексы
               </h2>
             </div>
 
             {/* Фильтры объектов с иконками */}
-            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white border border-gray-200 shadow-sm overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 shadow-sm overflow-x-auto scrollbar-none">
               {[
                 { id: 'all', label: `Все (${PROJECTS_LIST.length})`, icon: null },
                 { id: 'active', label: `В продаже (${activeCount})`, icon: <IconCrane className="w-3.5 h-3.5 shrink-0" /> },
@@ -217,13 +217,17 @@ export default function Home() {
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
+                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                       isActive
-                        ? 'bg-[#064734] text-white shadow-md'
-                        : 'text-gray-600 hover:text-gray-950 hover:bg-gray-100'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md'
+                        : 'text-gray-600 dark:text-gray-300 hover:text-gray-950 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10'
                     }`}
                   >
-                    {tab.icon && <span className={isActive ? 'text-white' : 'text-[#064734]'}>{tab.icon}</span>}
+                    {tab.icon && (
+                      <span className={isActive ? 'text-white dark:text-[#064734]' : 'text-[#064734] dark:text-[#d4b26f]'}>
+                        {tab.icon}
+                      </span>
+                    )}
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -238,7 +242,7 @@ export default function Home() {
               return (
                 <div
                   key={project.slug}
-                  className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-2xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     <div className="relative h-60 w-full overflow-hidden bg-neutral-900">
@@ -269,14 +273,14 @@ export default function Home() {
                     </div>
 
                     <div className="p-6">
-                      <h3 className="text-xl font-black text-gray-950 mb-2 group-hover:text-[#064734] transition-colors">
+                      <h3 className="text-xl font-black text-gray-950 dark:text-white mb-2 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
                         {project.name}
                       </h3>
-                      <p className="text-xs text-gray-600 mb-5 leading-relaxed line-clamp-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-5 leading-relaxed line-clamp-2">
                         {project.desc}
                       </p>
 
-                      <div className="space-y-2 text-xs text-gray-600 border-t border-gray-100 pt-4 font-medium">
+                      <div className="space-y-2 text-xs text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-white/10 pt-4 font-medium">
                         <div className="flex items-center gap-2">
                           <IconMapPin className="w-4 h-4 text-[#d4b26f] shrink-0" />
                           <span className="truncate">{project.address}</span>
@@ -296,7 +300,7 @@ export default function Home() {
                   <div className="p-6 pt-0">
                     <Link
                       href={`/${project.slug}`}
-                      className="w-full bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-lg"
+                      className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] dark:text-[#064734] hover:text-white dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 group-hover:shadow-lg"
                     >
                       <span>Подробнее о проекте</span>
                       <IconArrowRight className="w-4 h-4" />
@@ -310,7 +314,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/projects"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-gray-50 border border-gray-300 text-xs font-black uppercase tracking-wider text-[#064734] shadow-sm hover:shadow transition-all"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-white dark:bg-[#0b1b15] hover:bg-gray-50 dark:hover:bg-white/5 border border-gray-300 dark:border-white/15 text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f] shadow-sm hover:shadow transition-all"
             >
               <span>Посмотреть полный каталог всех {PROJECTS_LIST.length} объектов</span>
               <IconArrowRight className="w-4 h-4" />
@@ -326,7 +330,7 @@ export default function Home() {
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             Прозрачные расчеты
           </span>
-          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
             Условия приобретения жилья
           </h2>
         </div>
@@ -335,29 +339,29 @@ export default function Home() {
           {PAYMENT_CARDS.map((method, idx) => (
             <div
               key={idx}
-              className="bg-white rounded-3xl p-8 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] rounded-3xl p-8 border border-gray-200 dark:border-white/10 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/30 transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 flex items-center justify-center">
+                  <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 flex items-center justify-center">
                     {method.icon}
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-[#064734]/10 text-[#064734]">
+                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f]">
                     {method.badge}
                   </span>
                 </div>
 
-                <h3 className="text-xl font-black text-gray-950 mb-3">
+                <h3 className="text-xl font-black text-gray-950 dark:text-white mb-3">
                   {method.title}
                 </h3>
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-6">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
                   {method.desc}
                 </p>
               </div>
 
               <Link
                 href={`/${method.slug}`}
-                className="w-full bg-[#064734] hover:bg-[#032b20] text-white font-bold py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow flex items-center justify-center gap-2"
+                className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow flex items-center justify-center gap-2 border border-transparent dark:border-white/10"
               >
                 <span>{method.actionText}</span>
                 <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
@@ -368,13 +372,13 @@ export default function Home() {
       </section>
 
       {/* 5. ОТЗЫВЫ РЕЗИДЕНТОВ И ИНВЕСТОРОВ */}
-      <section className="bg-[#f2f6f4] py-16 sm:py-20 px-4 sm:px-6 border-y border-gray-200">
+      <section className="bg-[#f2f6f4] dark:bg-[#040c09] py-16 sm:py-20 px-4 sm:px-6 border-y border-gray-200 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
               Реальные истории
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
               Отзывы наших покупателей
             </h2>
           </div>
@@ -383,7 +387,7 @@ export default function Home() {
             {COMPANY_INFO.reviews.map((rev, idx) => (
               <div
                 key={idx}
-                className="bg-white rounded-3xl p-7 border border-gray-100 shadow-sm flex flex-col justify-between"
+                className="bg-white dark:bg-[#0b1b15] rounded-3xl p-7 border border-gray-100 dark:border-white/10 shadow-sm flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center gap-1 mb-4">
@@ -391,21 +395,21 @@ export default function Home() {
                       <IconStar key={i} className="w-4 h-4 text-[#d4b26f]" />
                     ))}
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic mb-6">
+                  <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed italic mb-6">
                     «{rev.text}»
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100 flex items-center gap-3">
+                <div className="pt-4 border-t border-gray-100 dark:border-white/10 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-[#064734] text-[#d4b26f] font-black text-sm flex items-center justify-center shrink-0">
                     {rev.author[0]}
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-black text-gray-900 leading-tight">
+                    <h4 className="text-xs sm:text-sm font-black text-gray-900 dark:text-white leading-tight">
                       {rev.author}
                     </h4>
                     {rev.role && (
-                      <span className="text-[11px] text-gray-400 block mt-0.5">
+                      <span className="text-[11px] text-gray-400 dark:text-gray-400 block mt-0.5">
                         {rev.role}
                       </span>
                     )}
@@ -421,28 +425,28 @@ export default function Home() {
       <ConsultationForm />
 
       {/* 7. ОФИС ПРОДАЖ И ИНТЕРАКТИВНАЯ КАРТА БИШКЕКА */}
-      <section className="bg-white border-t border-gray-100 py-16 sm:py-24">
+      <section className="bg-white dark:bg-[#07130e] border-t border-gray-100 dark:border-white/10 py-16 sm:py-24 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
               Ждем вас в гости
             </span>
-            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
               Головной офис продаж
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center max-w-3xl mx-auto mb-14">
             <div>
-              <p className="text-xs text-gray-400 mb-1">Адрес офиса:</p>
-              <p className="text-lg font-bold text-gray-900 mb-4">
+              <p className="text-xs text-gray-400 dark:text-gray-400 mb-1">Адрес офиса:</p>
+              <p className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 {COMPANY_INFO.address}
               </p>
-              <div className="space-y-2 text-sm font-semibold text-gray-800 mb-5">
+              <div className="space-y-2 text-sm font-semibold text-gray-800 dark:text-gray-200 mb-5">
                 {COMPANY_INFO.phones.map((phone, idx) => (
                   <div key={idx}>
-                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 hover:text-[#064734] transition-colors">
-                      <IconPhone className="w-4 h-4 text-[#064734]" />
+                    <a href={`tel:${phone.replace(/\s+/g, '')}`} className="inline-flex items-center gap-2 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
+                      <IconPhone className="w-4 h-4 text-[#064734] dark:text-[#d4b26f]" />
                       <span>{phone}</span>
                     </a>
                   </div>
@@ -452,7 +456,7 @@ export default function Home() {
                 href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:text-[#d4b26f] hover:underline transition-all"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline transition-all"
               >
                 <IconMapPin className="w-4 h-4 text-[#d4b26f]" />
                 <span>Открыть маршрут в 2GIS</span>
@@ -476,7 +480,7 @@ export default function Home() {
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 dark:border-white/15 hover:border-[#064734] dark:hover:border-[#d4b26f] text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/5 px-6 py-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
               >
                 <IconInstagram className="w-4 h-4 text-pink-600" />
                 <span>Перейти в Instagram</span>
