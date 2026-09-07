@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { COMPANY_INFO } from '@/lib/data';
 import {
   IconCheck,
   IconWhatsApp,
@@ -93,14 +94,14 @@ export default function ConsultationForm() {
       `• Телефон для связи: ${phone}\n\n` +
       `Отправьте, пожалуйста, актуальную шахматку, планировки и график платежей.`;
 
-    const waUrl = `https://wa.me/996709115115?text=${encodeURIComponent(message)}`;
+    const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(message)}`;
 
-    // Открытие чата в WhatsApp
-    window.location.href = waUrl;
+    // Открытие чата в новой вкладке
+    window.open(waUrl, '_blank');
 
     setTimeout(() => {
       setIsSubmitting(false);
-    }, 2500);
+    }, 2000);
   };
 
   return (

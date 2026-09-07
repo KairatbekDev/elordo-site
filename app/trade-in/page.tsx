@@ -1,6 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
+import { COMPANY_INFO } from '@/lib/data';
+import {
+  IconCheck,
+  IconCar,
+  IconBuilding,
+  IconDocument,
+  IconWhatsApp,
+  IconArrowRight,
+} from '@/components/Icons';
 
 export const metadata: Metadata = {
   title: 'Trade-in (Бартер) квартир в Бишкеке — Обмен авто и жилья на новостройку | EL ORDO GROUP',
@@ -66,19 +75,25 @@ const TRADE_IN_CASES = [
 
 const ACCEPTED_CATEGORIES = [
   {
-    icon: '🚗',
+    icon: <IconCar className="w-7 h-7 text-[#064734]" />,
     title: 'Автомобили и внедорожники',
     desc: 'Ликвидные иномарки (Toyota, Lexus, Hyundai, Kia, BMW, Mercedes и др.) в исправном техническом состоянии с чистой юридической историей.',
     reqs: 'Техпаспорт ТС, паспорт владельца, отсутствие арестов и штрафов.',
   },
   {
-    icon: '🏢',
+    icon: <IconBuilding className="w-7 h-7 text-[#064734]" />,
     title: 'Вторичные квартиры в Бишкеке',
     desc: '1-, 2-, 3-комнатные квартиры 104, 105, 106 серий, индивидуальных планировок, а также сданные новостройки в черте города.',
     reqs: 'Правоустанавливающие документы, техпаспорт БТИ, справка об отсутствии обременений.',
   },
   {
-    icon: '📐',
+    icon: (
+      <svg className="w-7 h-7 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    ),
     title: 'Земельные участки и коммерция',
     desc: 'Ликвидные земельные участки под ИЖС в черте Бишкека и южном предгорье, а также помещения свободного назначения.',
     reqs: 'Красная книга (госакт), правоустанавливающие документы, согласованный АПУ.',
@@ -150,7 +165,7 @@ export default function TradeInPage() {
         },
       ]}
     >
-      {/* 🌟 1. КЕЙСЫ РЕАЛЬНОГО ОБМЕНА */}
+      {/* 1. КЕЙСЫ РЕАЛЬНОГО ОБМЕНА */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -203,24 +218,27 @@ export default function TradeInPage() {
                     <span className="text-gray-600 text-[11px]">{item.targetApartment}</span>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-semibold text-[11px] leading-relaxed">
-                    ✓ {item.result}
+                  <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-800 font-semibold text-[11px] leading-relaxed flex items-center gap-1.5">
+                    <IconCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>{item.result}</span>
                   </div>
 
-                  <p className="text-[11px] text-gray-500 leading-relaxed">
-                    💡 {item.surplus}
+                  <p className="text-[11px] text-gray-500 leading-relaxed pl-1">
+                    {item.surplus}
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 pt-3 space-y-2">
                 <a
-                  href={`https://wa.me/996709115115?text=${encodeURIComponent(item.waText)}`}
+                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
                 >
-                  Оценить похожее авто в WhatsApp →
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <span>Оценить похожее авто</span>
+                  <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
@@ -234,7 +252,7 @@ export default function TradeInPage() {
         </div>
       </div>
 
-      {/* 🌟 2. СРАВНЕНИЕ: TRADE-IN EL ORDO vs САМОСТОЯТЕЛЬНАЯ ПРОДАЖА */}
+      {/* 2. СРАВНЕНИЕ: TRADE-IN EL ORDO vs САМОСТОЯТЕЛЬНАЯ ПРОДАЖА */}
       <div className="my-16 bg-white rounded-3xl p-6 sm:p-10 border border-gray-200 shadow-xl">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -312,7 +330,7 @@ export default function TradeInPage() {
         </div>
       </div>
 
-      {/* 🌟 3. ЧТО МЫ ПРИНИМАЕМ В ЗАЧЕТ */}
+      {/* 3. ЧТО МЫ ПРИНИМАЕМ В ЗАЧЕТ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -330,7 +348,7 @@ export default function TradeInPage() {
               className="bg-white p-7 rounded-3xl border border-gray-200 shadow-sm hover:shadow-xl transition-all flex flex-col justify-between"
             >
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-3xl mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center mb-5">
                   {cat.icon}
                 </div>
                 <h4 className="text-lg font-black text-gray-900 mb-2">
@@ -350,7 +368,7 @@ export default function TradeInPage() {
         </div>
       </div>
 
-      {/* 🌟 4. ПОШАГОВЫЙ РЕГЛАМЕНТ СДЕЛКИ */}
+      {/* 4. ПОШАГОВЫЙ РЕГЛАМЕНТ СДЕЛКИ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">

@@ -1,167 +1,333 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import {
+  IconCheck,
+  IconDocument,
   IconWhatsApp,
-  IconInstagram,
   IconMapPin,
+  IconArrowRight,
 } from '@/components/Icons';
 
-export default function FloatingContact() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [showBadge, setShowBadge] = useState(true);
+interface FaqItem {
+  q: string;
+  a: string;
+}
 
-  // Закрытие по нажатию клавиши Escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+interface PaymentLayoutProps {
+  pageTitle: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroImage?: string;
+  noticeText: string;
+  blockTitle: string;
+  descriptionText: string;
+  documentsText: string;
+  faqList: FaqItem[];
+  currentSlug?: 'rassrochka' | 'trade-in' | 'polniy-raschet';
+  children?: React.ReactNode;
+}
 
-  // Скрытие подсказки при первом открытии
-  const toggleMenu = () => {
-    setIsOpen((prev) => !prev);
-    if (showBadge) setShowBadge(false);
+const PAYMENT_TABS = [
+  { href: '/rassrochka', label: 'Рассрочка 0%', slug: 'rassrochka' },
+  { href: '/trade-in', label: 'Trade-in (Бартер)', slug: 'trade-in' },
+  { href: '/polniy-raschet', label: '100% расчет', slug: 'polniy-raschet' },
+];
+
+export default function PaymentLayout({
+  pageTitle,
+  heroTitle,
+  heroSubtitle,
+  heroImage = '/projects/Abu-Dhabi.png',
+  noticeText,
+  blockTitle,
+  descriptionText,
+  documentsText,
+  faqList,
+  currentSlug,
+  children,
+}: PaymentLayoutProps) {
+  // По умолчанию первый вопрос открыт
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index);
   };
 
-  const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-    'Здравствуйте! Хочу получить консультацию по объектам EL ORDO GROUP.'
-  )}`;
+  const waMessage = encodeURIComponent(
+    `Здравствуйте! Меня интересует программа оплаты «${pageTitle}» в компании EL ORDO GROUP. Подскажите, пожалуйста, подробные условия и расчет.`
+  );
 
   return (
-    <>
-      {/* 1. Фоновый полупрозрачный оверлей */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[3px] transition-opacity animate-fadeIn"
-          aria-hidden="true"
-        />
-      )}
+    <main className="min-h-screen bg-[#fafbfa] text-gray-900 selection:bg-[#d4b26f] selection:text-[#064734]">
+      
+      {/* 1. Хлебные крошки */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
+          <Link href="/" className="hover:text-[#064734] transition-colors">
+            Главная
+          </Link>
+          <span>/</span>
+          <Link href="/usloviya" className="hover:text-[#064734] transition-colors">
+            Условия покупки
+          </Link>
+          <span>/</span>
+          <span className="text-[#064734] font-bold">{pageTitle}</span>
+        </div>
+      </div>
 
-      {/* 2. Плавающий контейнер (bottom-20 на мобилках для исключения наложения на нижний бар) */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-3 font-sans select-none">
-        
-        {/* Интерактивное меню каналов связи */}
-        {isOpen && (
-          <div className="flex flex-col gap-2.5 bg-white/95 backdrop-blur-xl p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 min-w-[270px] animate-slideInRight">
-            
-            {/* Статус-панель отдела продаж */}
-            <div className="flex items-center justify-between px-1 pb-2 border-b border-gray-100">
-              <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
-                Отдел продаж EL ORDO
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Онлайн
-              </span>
-            </div>
+      {/* 2. Hero-секция программы */}
+      <section className="relative min-h-[480px] sm:min-h-[540px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img
+            src={heroImage}
+            alt={pageTitle}
+            className="w-full h-full object-cover object-center opacity-30 scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#021c15] via-[#064734]/85 to-black/70" />
+        </div>
 
-            {/* WhatsApp */}
+        <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
+          <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-4 px-3.5 py-1.5 rounded-full bg-black/40 border border-[#d4b26f]/30 shadow-md">
+            Финансовые программы застройщика
+          </span>
+
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-tight mb-5 drop-shadow-xl">
+            {heroTitle}
+          </h1>
+
+          <p className="text-sm sm:text-base md:text-lg text-white/90 font-light max-w-2xl mx-auto mb-8 leading-relaxed">
+            {heroSubtitle}
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={waUrl}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#25D366]/10 hover:bg-[#25D366]/20 active:scale-[0.98] text-[#128C7E] font-extrabold text-xs sm:text-sm transition-all border border-[#25D366]/20 shadow-sm"
+              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
             >
-              <div className="w-8 h-8 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm">
-                <IconWhatsApp className="w-4 h-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="leading-tight">Чат в WhatsApp</span>
-                <span className="text-[10px] text-gray-500 font-normal">Ответим за 2 минуты</span>
-              </div>
+              <IconWhatsApp className="w-4 h-4 text-[#064734]" />
+              <span>Получить расчет в WhatsApp</span>
             </a>
+            <a
+              href="#details"
+              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-1.5"
+            >
+              <span>Изучить условия</span>
+              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
 
-            {/* Прямые звонки (два номера из COMPANY_INFO) */}
-            <div className="p-2.5 rounded-2xl bg-gray-50 border border-gray-100">
-              <span className="text-[10px] font-bold text-gray-400 block mb-1">Позвонить менеджеру:</span>
-              <a
-                href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors"
+      {/* 3. Быстрое переключение способов оплаты */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-7 relative z-20">
+        <div className="bg-white p-2 rounded-2xl shadow-xl border border-gray-100 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none">
+          {PAYMENT_TABS.map((tab) => {
+            const isActive = currentSlug === tab.slug || pageTitle.toLowerCase().includes(tab.slug);
+            return (
+              <Link
+                key={tab.slug}
+                href={tab.href}
+                className={`px-4 sm:px-6 py-2.5 rounded-xl text-xs sm:text-sm font-black whitespace-nowrap transition-all ${
+                  isActive
+                    ? 'bg-[#064734] text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
               >
-                <span>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</span>
-                <span className="text-[10px] font-bold text-[#d4b26f]">Основной</span>
-              </a>
-              <a
-                href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors border-t border-gray-200/50 mt-1 pt-1"
-              >
-                <span>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</span>
-                <span className="text-[10px] font-bold text-gray-400">Доп. линия</span>
-              </a>
+                {tab.label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Информационная плашка ключевой выгоды */}
+      <section id="details" className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 scroll-mt-24">
+        <div className="bg-gradient-to-r from-[#064734] to-[#0b3b2c] text-white rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-xl border border-white/10">
+          <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 border border-[#d4b26f]/30 flex items-center justify-center shrink-0 text-[#d4b26f]">
+            <IconCheck className="w-6 h-6" />
+          </div>
+          <div>
+            <span className="text-[11px] font-black uppercase tracking-wider text-[#d4b26f] block mb-1">
+              Официальные условия девелопера
+            </span>
+            <p className="text-sm sm:text-base text-white/95 leading-relaxed font-light">
+              {noticeText}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Условия программы и Аккордеон FAQ */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+        <div className="mb-10">
+          <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+            Подробное описание
+          </span>
+          <h2 className="text-2xl sm:text-4xl font-black tracking-tight uppercase text-[#064734]">
+            {blockTitle}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+          
+          {/* Левая колонка: описание и документы */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-gray-200 shadow-sm">
+              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-3">
+                Суть предложения:
+              </h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {descriptionText}
+              </p>
             </div>
 
-            {/* Instagram и 2GIS (с чистыми SVG) */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            {/* Карточка необходимых документов */}
+            <div className="bg-[#f2f6f4] p-6 sm:p-8 rounded-3xl border border-[#064734]/15">
+              <div className="flex items-center gap-2 mb-3">
+                <IconDocument className="w-5 h-5 text-[#064734]" />
+                <h3 className="text-sm font-black text-[#064734] uppercase tracking-wider">
+                  Пакет документов:
+                </h3>
+              </div>
+              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed font-medium">
+                {documentsText}
+              </p>
+              <div className="mt-4 pt-3 border-t border-[#064734]/10 flex items-center gap-2 text-xs font-bold text-[#064734]">
+                <IconCheck className="w-4 h-4 text-[#064734]" />
+                <span>Без справок о доходах и поручителей</span>
+              </div>
+            </div>
+
+            {/* Быстрый переход в WhatsApp */}
+            <div className="p-6 rounded-3xl bg-[#032b20] text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div>
+                <h4 className="text-sm font-bold mb-1">Хотите индивидуальный график?</h4>
+                <p className="text-xs text-gray-300">Сформируем расчет за 2 минуты в мессенджере</p>
+              </div>
               <a
-                href={COMPANY_INFO.instagram}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 font-bold text-[11px] transition-colors border border-pink-100"
+                className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
               >
-                <IconInstagram className="w-3.5 h-3.5 text-pink-600" />
-                <span>Instagram</span>
+                <span>Написать в WhatsApp</span>
+                <IconArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Правая колонка: Раскрывающийся аккордеон */}
+          <div className="lg:col-span-6 space-y-3">
+            <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-4 px-1">
+              Частые вопросы по программе:
+            </h3>
+
+            {faqList.map((item, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm transition-all"
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(idx)}
+                    aria-expanded={isOpen}
+                    className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
+                  >
+                    <span>{item.q}</span>
+                    <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[#064734] shrink-0">
+                      {isOpen ? (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                      {item.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {/* Дополнительные интерактивные блоки страницы */}
+      {children && (
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
+          {children}
+        </section>
+      )}
+
+      {/* 6. Контакты и связь с офисом продаж */}
+      <section className="bg-white border-t border-gray-100 py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+              Консультация финансиста
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734]">
+              Офис продаж и оформление
+            </h2>
+          </div>
+
+          <div className="bg-[#fafbfa] rounded-3xl p-6 sm:p-10 border border-gray-200 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="space-y-2 text-center md:text-left">
+              <span className="text-xs text-gray-400 font-bold uppercase tracking-wider block">
+                Центральный офис в Бишкеке:
+              </span>
+              <p className="text-base sm:text-lg font-black text-gray-900">
+                {COMPANY_INFO.address}
+              </p>
+              <div className="space-y-1 text-xs sm:text-sm font-semibold text-gray-700">
+                {COMPANY_INFO.phones.map((phone, idx) => (
+                  <p key={idx}>{phone} {idx === 0 ? '(Пн — Сб 09:00 – 19:00)' : ''}</p>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <a
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2"
+              >
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                <span>Чат в WhatsApp</span>
               </a>
               <a
                 href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#064734] font-bold text-[11px] transition-colors border border-emerald-100"
+                className="py-3.5 px-6 rounded-xl border border-gray-300 hover:border-[#064734] text-gray-800 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white flex items-center justify-center gap-1.5"
               >
-                <IconMapPin className="w-3.5 h-3.5 text-[#064734]" />
-                <span>Офис в 2GIS</span>
+                <IconMapPin className="w-4 h-4 text-[#064734]" />
+                <span>Маршрут в 2GIS</span>
               </a>
             </div>
-
           </div>
-        )}
-
-        {/* Кнопка-триггер и плавающий бейдж-подсказка */}
-        <div className="flex items-center gap-2">
-          
-          {showBadge && !isOpen && (
-            <div
-              onClick={toggleMenu}
-              className="cursor-pointer hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#064734] text-white border border-[#d4b26f]/40 shadow-xl animate-bounce"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-extrabold text-[#d4b26f]">Консультация 0%</span>
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={toggleMenu}
-            aria-expanded={isOpen}
-            aria-label="Связаться с отделом продаж"
-            className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white shadow-2xl transition-all border-2 border-[#d4b26f]/40 cursor-pointer"
-          >
-            {!isOpen && (
-              <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-40 animate-ping pointer-events-none" />
-            )}
-
-            {isOpen ? (
-              <svg className="w-6 h-6 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            ) : (
-              <IconWhatsApp className="w-7 h-7 text-[#d4b26f]" />
-            )}
-          </button>
-
         </div>
+      </section>
 
-      </div>
-    </>
+    </main>
   );
 }

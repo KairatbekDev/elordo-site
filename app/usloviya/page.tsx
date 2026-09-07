@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { COMPANY_INFO } from '@/lib/data';
 import {
   IconCheck,
   IconCar,
@@ -10,7 +11,6 @@ import {
   IconCalendar,
   IconWhatsApp,
   IconArrowRight,
-  IconDocument,
 } from '@/components/Icons';
 
 export default function PurchaseTermsPage() {
@@ -44,7 +44,7 @@ export default function PurchaseTermsPage() {
       `• Ежемесячный платеж: $${monthlyPayment.toLocaleString()}/мес. (~${monthlyPaymentKgs.toLocaleString()} сом)\n\n` +
       `Подскажите, какие объекты и этажи доступны под этот расчет?`;
 
-    window.open(`https://wa.me/996709115115?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const handleSendTradeIn = (e: React.FormEvent) => {
@@ -58,7 +58,7 @@ export default function PurchaseTermsPage() {
       `• Желаемая оценка: $${estimatedValue || 'Требуется оценка'}\n\n` +
       `Подскажите, как пройти процедуру оценки для зачета в первый взнос?`;
 
-    window.open(`https://wa.me/996709115115?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const faqs = [
@@ -142,9 +142,12 @@ export default function PurchaseTermsPage() {
             </div>
             <a
               href="#calculator"
-              className="mt-6 block text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm"
+              className="mt-6 text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm flex items-center justify-center gap-1.5"
             >
-              Рассчитать график платежей ↓
+              <span>Рассчитать график платежей</span>
+              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
             </a>
           </div>
 
@@ -180,9 +183,12 @@ export default function PurchaseTermsPage() {
             </div>
             <a
               href="#trade-in"
-              className="mt-6 block text-center bg-[#d4b26f] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#c49f57] transition-colors shadow-md"
+              className="mt-6 text-center bg-[#d4b26f] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#c49f57] transition-colors shadow-md flex items-center justify-center gap-1.5"
             >
-              Оценить объект онлайн ↓
+              <span>Оценить объект онлайн</span>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
             </a>
           </div>
 
@@ -214,7 +220,9 @@ export default function PurchaseTermsPage() {
               </ul>
             </div>
             <a
-              href="https://wa.me/996709115115?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D1%83%D0%B7%D0%BD%D0%B0%D1%82%D1%8c%20%D1%80%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%20%D1%81%D0%BA%D0%B8%D0%B4%D0%BA%D0%B8%20%D0%BF%D1%80%D0%B8%20100%25%20%D0%BE%D0%BF%D0%BB%D0%B0%D1%82%D0%B5"
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+                'Здравствуйте! Хочу узнать размер персональной скидки при 100% оплате за квартиру в EL ORDO GROUP.'
+              )}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm flex items-center justify-center gap-1.5"
@@ -227,7 +235,7 @@ export default function PurchaseTermsPage() {
         </div>
       </div>
 
-      {/* 4. Интерактивный калькулятор рассрочки с кнопками-пресетами */}
+      {/* 4. Интерактивный калькулятор рассрочки */}
       <section id="calculator" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl">
           <div className="text-center max-w-xl mx-auto mb-10">
@@ -395,7 +403,7 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 5. Trade-in / Онлайн-заявка на оценку объекта */}
+      {/* 5. Trade-in / Экспресс-оценка */}
       <section id="trade-in" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
@@ -588,8 +596,17 @@ export default function PurchaseTermsPage() {
                   className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
                 >
                   <span>{faq.q}</span>
-                  <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-sm font-mono text-[#064734] shrink-0">
-                    {isOpen ? '−' : '+'}
+                  <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[#064734] shrink-0">
+                    {isOpen ? (
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    ) : (
+                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <line x1="12" y1="5" x2="12" y2="19" />
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                      </svg>
+                    )}
                   </span>
                 </button>
                 {isOpen && (
@@ -619,7 +636,9 @@ export default function PurchaseTermsPage() {
           </div>
 
           <a
-            href="https://wa.me/996709115115?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8c%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E%20%D0%BF%D0%BE%20%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F%D0%BC%20%D0%BF%D0%BE%D0%BA%D1%83%D0%BF%D0%BA%D0%B8"
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+              'Здравствуйте! Хочу получить консультацию по условиям покупки и рассрочки в EL ORDO GROUP.'
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"

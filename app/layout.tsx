@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import FloatingContact from "../components/FloatingContact";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import FloatingContact from "@/components/FloatingContact";
+import { COMPANY_INFO } from "@/lib/data";
 
-// Подключение системного шрифта девелопмента с нулевым сдвигом макета (Zero CLS)
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
@@ -68,9 +68,11 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/logo.png',
+    icon: [
+      { url: '/logo-icon.png', type: 'image/png' },
+    ],
+    shortcut: '/logo-icon.png',
+    apple: '/logo-icon.png',
   },
   openGraph: {
     type: 'website',
@@ -103,7 +105,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Расширенная микроразметка Schema.org для поисковых систем (Google / Яндекс)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'RealEstateAgent',
@@ -112,7 +113,7 @@ export default function RootLayout({
     image: `${SITE_URL}/projects/Abu-Dhabi.png`,
     '@id': SITE_URL,
     url: SITE_URL,
-    telephone: ['+996709115115', '+996990115115'],
+    telephone: COMPANY_INFO.phones.map((phone) => phone.replace(/\s+/g, '')),
     priceRange: '$$$',
     currenciesAccepted: 'USD, KGS',
     paymentAccepted: 'Беспроцентная рассрочка, безналичный расчет, наличные, Trade-in (бартер авто/недвижимости)',
@@ -127,7 +128,7 @@ export default function RootLayout({
     },
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'ул. Исы Ахунбаева, 137/1',
+      streetAddress: COMPANY_INFO.address,
       addressLocality: 'Бишкек',
       addressCountry: 'KG',
     },
@@ -137,8 +138,8 @@ export default function RootLayout({
       longitude: 74.59448,
     },
     sameAs: [
-      'https://instagram.com/elordo.group',
-      'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
+      COMPANY_INFO.instagram,
+      COMPANY_INFO.gisUrl,
     ],
     openingHoursSpecification: [
       {
@@ -166,8 +167,6 @@ export default function RootLayout({
         />
       </head>
       <body className={`${montserrat.className} antialiased min-h-screen flex flex-col bg-[#fafbfa] text-neutral-900 overflow-x-hidden selection:bg-[#d4b26f] selection:text-[#064734]`}>
-        
-        {/* Кнопка доступности для клавиатурной навигации и скринридеров */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-[#064734] focus:text-[#d4b26f] focus:rounded-xl focus:shadow-2xl focus:font-bold focus:text-xs uppercase tracking-wider"
@@ -177,7 +176,6 @@ export default function RootLayout({
 
         <Header />
         
-        {/* Контейнер страниц без нарушения спецификации landmark */}
         <div id="main-content" className="flex-1 w-full overflow-x-hidden">
           {children}
         </div>

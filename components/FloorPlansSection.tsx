@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { COMPANY_INFO } from '@/lib/data';
 import {
   IconWhatsApp,
   IconArrowRight,
@@ -27,7 +28,7 @@ interface FloorPlansSectionProps {
 export default function FloorPlansSection({
   projectName,
   plans,
-  whatsappNumber = '996709115115',
+  whatsappNumber = COMPANY_INFO.whatsapp,
   theme = 'dark',
 }: FloorPlansSectionProps) {
   const isDark = theme === 'dark';
@@ -202,9 +203,7 @@ export default function FloorPlansSection({
 
       </div>
 
-      {/* ========================================================================= */}
-      {/* МОДАЛЬНОЕ ОКНО ДЕТАЛЬНОГО ПРОСМОТРА С КРУПНЫМ ШРИФТОМ И ЗУМОМ             */}
-      {/* ========================================================================= */}
+      {/* МОДАЛЬНОЕ ОКНО ДЕТАЛЬНОГО ПРОСМОТРА */}
       {selectedPlan && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-xl animate-fadeIn"
@@ -242,7 +241,7 @@ export default function FloorPlansSection({
                   className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all border border-white/10"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
@@ -251,7 +250,7 @@ export default function FloorPlansSection({
             {/* Тело модалки */}
             <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12">
               
-              {/* Левая часть: чертеж с инструментами зума (7 колонок) */}
+              {/* Левая часть: чертеж с зумом */}
               <div className="lg:col-span-7 relative bg-neutral-900 p-6 sm:p-10 flex flex-col items-center justify-center min-h-[380px] sm:min-h-[480px] border-b lg:border-b-0 lg:border-r border-white/10 overflow-hidden">
                 
                 {/* Панель инструментов масштаба */}
@@ -286,7 +285,7 @@ export default function FloorPlansSection({
                   </button>
                 </div>
 
-                {/* Белый подиум чертежа для максимальной видимости */}
+                {/* Белый подиум чертежа */}
                 <div
                   className="relative z-10 w-full h-full flex items-center justify-center bg-white rounded-2xl p-6 sm:p-8 shadow-2xl transition-transform duration-300 ease-out cursor-zoom-in"
                   style={{ transform: `scale(${zoomLevel})` }}
@@ -309,7 +308,7 @@ export default function FloorPlansSection({
                 </span>
               </div>
 
-              {/* Правая часть: параметры и кнопка заявки (5 колонок) */}
+              {/* Правая часть: параметры */}
               <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-[#1b211e]">
                 <div>
                   <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-2">
@@ -364,7 +363,7 @@ export default function FloorPlansSection({
                   </div>
                 </div>
 
-                {/* Большая кнопка связи в WhatsApp */}
+                {/* Кнопка WhatsApp */}
                 <div>
                   <a
                     href={getWhatsAppLink(selectedPlan)}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { COMPANY_INFO } from '@/lib/data';
 import {
   IconCheck,
   IconDocument,
@@ -103,7 +104,7 @@ export default function PaymentLayout({
 
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={`https://wa.me/996709115115?text=${waMessage}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
@@ -113,9 +114,12 @@ export default function PaymentLayout({
             </a>
             <a
               href="#details"
-              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm"
+              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-1.5"
             >
-              Изучить условия ↓
+              <span>Изучить условия</span>
+              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 5v14M19 12l-7 7-7-7" />
+              </svg>
             </a>
           </div>
         </div>
@@ -208,7 +212,7 @@ export default function PaymentLayout({
                 <p className="text-xs text-gray-300">Сформируем расчет за 2 минуты в мессенджере</p>
               </div>
               <a
-                href={`https://wa.me/996709115115?text=${waMessage}`}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
@@ -239,8 +243,17 @@ export default function PaymentLayout({
                     className="w-full text-left p-5 flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
                   >
                     <span>{item.q}</span>
-                    <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-sm font-mono text-[#064734] shrink-0">
-                      {isOpen ? '−' : '+'}
+                    <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-[#064734] shrink-0">
+                      {isOpen ? (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      )}
                     </span>
                   </button>
 
@@ -282,17 +295,18 @@ export default function PaymentLayout({
                 Центральный офис в Бишкеке:
               </span>
               <p className="text-base sm:text-lg font-black text-gray-900">
-                ул. Исы Ахунбаева, 137/1
+                {COMPANY_INFO.address}
               </p>
               <div className="space-y-1 text-xs sm:text-sm font-semibold text-gray-700">
-                <p>+996 709 115 115 (Пн — Сб 09:00 – 19:00)</p>
-                <p>+996 990 115 115</p>
+                {COMPANY_INFO.phones.map((phone, idx) => (
+                  <p key={idx}>{phone} {idx === 0 ? '(Пн — Сб 09:00 – 19:00)' : ''}</p>
+                ))}
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               <a
-                href={`https://wa.me/996709115115?text=${waMessage}`}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2"
@@ -301,7 +315,7 @@ export default function PaymentLayout({
                 <span>Чат в WhatsApp</span>
               </a>
               <a
-                href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
+                href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3.5 px-6 rounded-xl border border-gray-300 hover:border-[#064734] text-gray-800 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white flex items-center justify-center gap-1.5"

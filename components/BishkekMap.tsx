@@ -2,6 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import {
+  IconBuilding,
+  IconCrane,
+  IconCheck,
+  IconMapPin,
+  IconArrowRight,
+} from '@/components/Icons';
 
 interface MapPoint {
   id: string;
@@ -141,7 +148,17 @@ export default function BishkekMap() {
         const isOffice = point.category === 'office';
         const isFinished = point.category === 'finished';
         const pinColor = isOffice ? '#d4b26f' : isFinished ? '#2b2b2b' : '#064734';
-        const innerIcon = isOffice ? '🏢' : isFinished ? '✓' : '🏗️';
+        const iconColor = isOffice ? '#064734' : '#ffffff';
+
+        // Векторные SVG внутри маркера вместо эмодзи
+        let svgInside = '';
+        if (isOffice) {
+          svgInside = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>`;
+        } else if (isFinished) {
+          svgInside = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+        } else {
+          svgInside = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20V4l13 6"/><path d="M12 7.5V20"/></svg>`;
+        }
 
         const iconHtml = `
           <div style="
@@ -159,14 +176,12 @@ export default function BishkekMap() {
             cursor: pointer;
             transition: transform 0.2s ease;
           ">
-            <span style="
+            <div style="
               transform: rotate(45deg);
-              font-size: 14px;
-              line-height: 1;
-              display: block;
-              color: ${isOffice ? '#064734' : '#ffffff'};
-              font-weight: 900;
-            ">${innerIcon}</span>
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            ">${svgInside}</div>
           </div>
         `;
 
@@ -181,11 +196,11 @@ export default function BishkekMap() {
         const marker = L.marker(point.coords, { icon: customIcon }).addTo(map);
 
         const projectBtn = !isOffice
-          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 10px; font-weight: 800; padding: 6px 8px; border-radius: 6px; text-decoration: none;">О проекте →</a>`
+          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">О проекте</a>`
           : '';
 
         const popupContent = `
-          <div style="font-family: inherit; padding: 2px; min-width: 190px;">
+          <div style="font-family: inherit; padding: 3px; min-width: 190px;">
             <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
               ${point.categoryLabel}
             </div>
@@ -193,12 +208,12 @@ export default function BishkekMap() {
               ${point.name}
             </div>
             <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
-              📍 ${point.address}
+              ${point.address}
             </div>
-            <div style="display: flex; gap: 4px;">
+            <div style="display: flex; gap: 6px;">
               ${projectBtn}
-              <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 10px; font-weight: 700; padding: 6px 8px; border-radius: 6px; text-decoration: none; border: 1px solid #dbe3df;">
-                В 2ГИС 📍
+              <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
+                В 2GIS
               </a>
             </div>
           </div>
@@ -291,35 +306,38 @@ export default function BishkekMap() {
           <button
             type="button"
             onClick={() => setFilter('office')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
               filter === 'office'
                 ? 'bg-[#d4b26f] text-[#064734] shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            🏢 Офис
+            <IconBuilding className="w-3.5 h-3.5 shrink-0" />
+            <span>Офис</span>
           </button>
           <button
             type="button"
             onClick={() => setFilter('active')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
               filter === 'active'
                 ? 'bg-[#064734] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            🏗️ Строящиеся
+            <IconCrane className="w-3.5 h-3.5 shrink-0" />
+            <span>Строящиеся</span>
           </button>
           <button
             type="button"
             onClick={() => setFilter('finished')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
               filter === 'finished'
                 ? 'bg-[#2b2b2b] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            ✓ Сданные
+            <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+            <span>Сданные</span>
           </button>
         </div>
 
@@ -327,9 +345,11 @@ export default function BishkekMap() {
           href="https://2gis.kg/bishkek/search/%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-bold text-[#064734] hover:text-[#032b20] flex items-center gap-1 shrink-0 self-end sm:self-auto"
+          className="text-xs font-bold text-[#064734] hover:text-[#032b20] flex items-center gap-1.5 shrink-0 self-end sm:self-auto"
         >
-          <span>📍</span> Офис в 2ГИС →
+          <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
+          <span>Офис в 2GIS</span>
+          <IconArrowRight className="w-3 h-3" />
         </a>
       </div>
 
@@ -382,21 +402,23 @@ export default function BishkekMap() {
                 <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
                   {point.name}
                 </h4>
-                <p className="text-[11px] text-gray-500 line-clamp-1 mt-0.5">
-                  📍 {point.address}
-                </p>
+                <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mt-1">
+                  <IconMapPin className="w-3 h-3 text-[#d4b26f] shrink-0" />
+                  <span className="truncate">{point.address}</span>
+                </div>
 
                 {isSelected && (
                   <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
                     {point.category !== 'office' ? (
                       <Link
                         href={`/${point.id}`}
-                        className="text-[11px] font-extrabold text-[#064734] hover:underline"
+                        className="text-[11px] font-extrabold text-[#064734] hover:underline inline-flex items-center gap-1"
                       >
-                        О проекте →
+                        <span>О проекте</span>
+                        <IconArrowRight className="w-3 h-3" />
                       </Link>
                     ) : (
-                      <span className="text-[10px] text-gray-500">Главный офис</span>
+                      <span className="text-[10px] text-gray-500 font-medium">Главный офис</span>
                     )}
 
                     <a
@@ -405,7 +427,7 @@ export default function BishkekMap() {
                       rel="noopener noreferrer"
                       className="text-[10px] font-bold text-gray-600 hover:text-[#064734] underline"
                     >
-                      В 2ГИС 📍
+                      В 2GIS
                     </a>
                   </div>
                 )}

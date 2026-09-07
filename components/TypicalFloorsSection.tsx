@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { COMPANY_INFO } from '@/lib/data';
 import { IconWhatsApp } from '@/components/Icons';
 
 export interface TypicalFloorItem {
@@ -20,7 +21,7 @@ interface TypicalFloorsSectionProps {
 export default function TypicalFloorsSection({
   projectName,
   floors,
-  whatsappNumber = '996709115115',
+  whatsappNumber = COMPANY_INFO.whatsapp,
   theme = 'light',
 }: TypicalFloorsSectionProps) {
   const isDark = theme === 'dark';
@@ -262,9 +263,7 @@ export default function TypicalFloorsSection({
 
       </div>
 
-      {/* ======================================================== */}
-      {/* ПОЛНОЭКРАННЫЙ ПРОСМОТР ЧЕРТЕЖА ЭТАЖА (LIGHTBOX)          */}
-      {/* ======================================================== */}
+      {/* ПОЛНОЭКРАННЫЙ ПРОСМОТР ЧЕРТЕЖА ЭТАЖА */}
       {isFullscreen && (
         <div
           className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4 sm:p-8 animate-fadeIn"
@@ -313,7 +312,7 @@ export default function TypicalFloorsSection({
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all ml-3"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>

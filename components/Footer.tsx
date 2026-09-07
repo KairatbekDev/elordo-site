@@ -31,9 +31,13 @@ export default function Footer() {
           
           {/* Колонка 1: Бренд и статус (4 колонки) */}
           <div className="lg:col-span-4 space-y-4">
-            <Link href="/" className="inline-flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center text-[#d4b26f] font-black text-base shadow-sm group-hover:bg-[#042e22] transition-colors">
-                EO
+            <Link href="/" className="inline-flex items-center gap-2.5 group">
+              <div className="w-10 h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#042e22] group-hover:scale-105 transition-all shrink-0">
+                <img
+                  src="/logo-icon.png"
+                  alt="EL ORDO GROUP"
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">

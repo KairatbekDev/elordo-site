@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
+import { COMPANY_INFO } from '@/lib/data';
+import { IconWhatsApp, IconArrowRight } from '@/components/Icons';
 
 export const metadata: Metadata = {
   title: 'Квартиры в рассрочку 0% до 40 месяцев в Бишкеке без банка | EL ORDO GROUP',
@@ -130,7 +132,7 @@ export default function InstallmentPage() {
         },
       ]}
     >
-      {/* 🌟 1. БЛОК ГОТОВЫХ РАСЧЕТОВ ПО ОБЪЕКТАМ */}
+      {/* 1. БЛОК ГОТОВЫХ РАСЧЕТОВ ПО ОБЪЕКТАМ */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -197,12 +199,14 @@ export default function InstallmentPage() {
 
               <div className="mt-6 pt-3 space-y-2">
                 <a
-                  href={`https://wa.me/996709115115?text=${encodeURIComponent(item.waText)}`}
+                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
                 >
-                  Забронировать расчет в WhatsApp →
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <span>Забронировать в WhatsApp</span>
+                  <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
@@ -216,7 +220,7 @@ export default function InstallmentPage() {
         </div>
       </div>
 
-      {/* 🌟 2. СРАВНИТЕЛЬНАЯ ТАБЛИЦА: EL ORDO vs БАНКОВСКАЯ ИПОТЕКА */}
+      {/* 2. СРАВНИТЕЛЬНАЯ ТАБЛИЦА: EL ORDO vs БАНКОВСКАЯ ИПОТЕКА */}
       <div className="my-16 bg-white rounded-3xl p-6 sm:p-10 border border-gray-200 shadow-xl">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -303,7 +307,7 @@ export default function InstallmentPage() {
         </div>
       </div>
 
-      {/* 🌟 3. ПОШАГОВЫЙ ПРОЦЕСС ПОКУПКИ */}
+      {/* 3. ПОШАГОВЫЙ ПРОЦЕСС ПОКУПКИ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">

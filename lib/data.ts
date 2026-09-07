@@ -16,6 +16,7 @@ export interface CompanyInfo {
   name: string;
   fullName: string;
   legalName: string;
+  logo: string;
   foundedYear: string;
   builtArea: string;
   projectsCount: string;
@@ -83,6 +84,7 @@ export const COMPANY_INFO: CompanyInfo = {
   name: 'EL ORDO',
   fullName: 'EL ORDO GROUP',
   legalName: 'ОсОО Строительная компания EL ORDO GROUP',
+  logo: '/logo-icon.png',
   foundedYear: '2021',
   builtArea: '180 000+ м²',
   projectsCount: '6 объектов',
@@ -101,7 +103,6 @@ export const COMPANY_INFO: CompanyInfo = {
     quote: 'Мы не просто строим дома — мы проектируем безопасное пространство для поколений.',
     text: 'История EL ORDO началась с амбициозной цели — доказать, что качественное жилье в Бишкеке может сочетать высокую эстетику, монолитную надежность и честные условия покупки. Нашим первым флагманом стал клубный дом «Ордо», а следом был успешно сдан и заселен жилой комплекс «Келечек». Сегодня мы реализуем знаковые для столицы высотные проекты «Abu Dhabi», статусный комплекс «Madina Residence», а также экологические дома «Айкол» и «Айкол +» в предгорье.',
   },
-  // Реальные пути к фотографиям из папки public/team
   team: [
     {
       name: 'Керезбек Нуралиев',

@@ -2,6 +2,16 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { COMPANY_INFO } from '@/lib/data';
+import {
+  IconBuilding,
+  IconCrane,
+  IconCheck,
+  IconMapPin,
+  IconCalendar,
+  IconArrowRight,
+  IconWhatsApp,
+} from '@/components/Icons';
 
 interface Project {
   slug: string;
@@ -13,7 +23,7 @@ interface Project {
   address: string;
   deadline: string;
   price: string | null;
-  priceNum: number; // Для точной числовой сортировки
+  priceNum: number;
   floors: string;
   desc: string;
 }
@@ -114,11 +124,8 @@ export default function ProjectsCatalogPage() {
   // Фильтрация и сортировка
   const filteredProjects = useMemo(() => {
     return PROJECTS.filter((item) => {
-      // Фильтр готовности
       if (statusFilter !== 'all' && item.category !== statusFilter) return false;
-      // Фильтр класса
       if (classFilter !== 'all' && item.classCategory !== classFilter) return false;
-      // Поиск по названию или адресу
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase();
         const matchName = item.name.toLowerCase().includes(query);
@@ -148,7 +155,7 @@ export default function ProjectsCatalogPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-20">
+    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-20 selection:bg-[#d4b26f] selection:text-[#064734]">
       
       {/* 1. Хлебные крошки */}
       <div className="bg-white border-b border-gray-100">
@@ -196,7 +203,7 @@ export default function ProjectsCatalogPage() {
         </div>
       </section>
 
-      {/* 3. Интерактивная панель поиска и фильтров */}
+      {/* 3. Панель поиска и фильтров */}
       <div className="max-w-6xl mx-auto px-6 mt-8">
         
         {/* Верхняя панель: Поиск и Сортировка */}
@@ -207,18 +214,31 @@ export default function ProjectsCatalogPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Поиск по названию или адресу (например: Сухомлинова, Огонбаева)..."
-              className="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-gray-200 text-sm focus:outline-none focus:border-[#064734] shadow-sm transition-all"
+              className="w-full pl-10 pr-9 py-3 rounded-2xl bg-white border border-gray-200 text-sm focus:outline-none focus:border-[#064734] shadow-sm transition-all"
             />
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
-              🔍
-            </span>
+            <svg
+              className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-bold"
+                aria-label="Очистить поиск"
+                className="w-5 h-5 flex items-center justify-center absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
               >
-                ✕
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             )}
           </div>
@@ -258,24 +278,26 @@ export default function ProjectsCatalogPage() {
             <button
               type="button"
               onClick={() => setStatusFilter('active')}
-              className={`px-4 py-2.5 rounded-xl transition-all ${
+              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 ${
                 statusFilter === 'active'
                   ? 'bg-[#064734] text-white shadow-sm'
                   : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
             >
-              🏗️ Строящиеся ({activeCount})
+              <IconCrane className="w-3.5 h-3.5 shrink-0" />
+              <span>Строящиеся ({activeCount})</span>
             </button>
             <button
               type="button"
               onClick={() => setStatusFilter('finished')}
-              className={`px-4 py-2.5 rounded-xl transition-all ${
+              className={`px-4 py-2.5 rounded-xl transition-all inline-flex items-center gap-1.5 ${
                 statusFilter === 'finished'
                   ? 'bg-[#064734] text-white shadow-sm'
                   : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
               }`}
             >
-              ✓ Сданные ({finishedCount})
+              <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+              <span>Сданные ({finishedCount})</span>
             </button>
           </div>
 
@@ -345,13 +367,14 @@ export default function ProjectsCatalogPage() {
                       {/* Бейдж статуса */}
                       <div className="absolute top-4 left-4">
                         <span
-                          className={`text-[11px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow-md ${
+                          className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow-md ${
                             isFinished
                               ? 'bg-[#2b2b2b] text-white'
                               : 'bg-[#d4b26f] text-[#064734]'
                           }`}
                         >
-                          {isFinished ? 'Сдан' : project.classType}
+                          {isFinished && <IconCheck className="w-3.5 h-3.5 text-emerald-400" />}
+                          <span>{isFinished ? 'Сдан' : project.classType}</span>
                         </span>
                       </div>
 
@@ -373,18 +396,18 @@ export default function ProjectsCatalogPage() {
                         {project.desc}
                       </p>
 
-                      <div className="space-y-2.5 text-xs text-gray-600 border-t border-gray-100 pt-4">
+                      <div className="space-y-2.5 text-xs text-gray-600 border-t border-gray-100 pt-4 font-medium">
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f] text-sm">📍</span>
-                          <span className="font-medium">{project.address}</span>
+                          <IconMapPin className="w-4 h-4 text-[#d4b26f] shrink-0" />
+                          <span className="truncate">{project.address}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f] text-sm">🗓️</span>
-                          <span className="font-medium">{project.deadline}</span>
+                          <IconCalendar className="w-4 h-4 text-[#d4b26f] shrink-0" />
+                          <span>{project.deadline}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[#d4b26f] text-sm">🏢</span>
-                          <span className="font-medium">{project.floors}</span>
+                          <IconBuilding className="w-4 h-4 text-[#d4b26f] shrink-0" />
+                          <span>{project.floors}</span>
                         </div>
                       </div>
                     </div>
@@ -394,19 +417,21 @@ export default function ProjectsCatalogPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/${project.slug}`}
-                      className="block w-full text-center bg-[#064734] hover:bg-[#042e22] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md"
+                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2"
                     >
-                      Подробнее о проекте →
+                      <span>Подробнее о проекте</span>
+                      <IconArrowRight className="w-4 h-4" />
                     </Link>
 
                     {!isFinished && (
                       <a
-                        href={`https://wa.me/996709115115?text=${waProjectText}`}
+                        href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block w-full text-center bg-gray-100 hover:bg-[#064734]/10 text-[#064734] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors"
+                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 text-[#064734] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5"
                       >
-                        Спросить о наличии в WhatsApp
+                        <IconWhatsApp className="w-3.5 h-3.5 text-[#25D366]" />
+                        <span>Спросить о наличии в WhatsApp</span>
                       </a>
                     )}
                   </div>
@@ -417,7 +442,12 @@ export default function ProjectsCatalogPage() {
         ) : (
           /* Состояние пустого поиска */
           <div className="py-20 text-center bg-white rounded-3xl border border-gray-200 mt-6 p-8">
-            <span className="text-4xl block mb-3">🔍</span>
+            <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-3 text-gray-400">
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+            </div>
             <h3 className="text-lg font-bold text-gray-900 mb-2">Объекты не найдены</h3>
             <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
               Попробуйте изменить параметры поиска или сбросить активные фильтры.
@@ -425,7 +455,7 @@ export default function ProjectsCatalogPage() {
             <button
               type="button"
               onClick={resetFilters}
-              className="px-6 py-3 rounded-xl bg-[#064734] text-white font-bold text-xs uppercase tracking-wider"
+              className="px-6 py-3 rounded-xl bg-[#064734] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors"
             >
               Сбросить фильтры
             </button>
@@ -447,12 +477,15 @@ export default function ProjectsCatalogPage() {
           </div>
 
           <a
-            href="https://wa.me/996709115115?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8c%20%D0%BF%D0%BE%D0%BB%D0%BD%D1%8B%D0%B9%20%D0%BA%D0%B0%D1%82%D0%B0%D0%BB%D0%BE%D0%B3%20%D0%B8%20%D1%88%D0%B0%D1%85%D0%BC%D0%B0%D1%82%D0%BA%D1%83%20%D0%BE%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%D0%BE%D0%B2"
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+              'Здравствуйте! Хочу получить полный каталог и шахматку объектов EL ORDO GROUP.'
+            )}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-[#064734] hover:bg-[#032b20] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
           >
-            <span>💬</span> Написать в WhatsApp
+            <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+            <span>Написать в WhatsApp</span>
           </a>
         </div>
       </div>

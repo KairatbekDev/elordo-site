@@ -60,10 +60,14 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
-          {/* 1. Логотип компании */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#064734] flex items-center justify-center text-[#d4b26f] font-black text-base shadow-sm group-hover:bg-[#032b20] transition-colors">
-              EO
+          {/* 1. Логотип компании с официальной круглой эмблемой */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#032b20] group-hover:scale-105 transition-all shrink-0">
+              <img
+                src="/logo-icon.png"
+                alt="EL ORDO GROUP"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
@@ -166,7 +170,14 @@ export default function Header() {
             <div>
               {/* Шапка меню */}
               <div className="flex items-center justify-between pb-5 border-b border-gray-100">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1 shadow-sm shrink-0">
+                    <img
+                      src="/logo-icon.png"
+                      alt="EL ORDO GROUP"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
                   <span className="text-lg font-black text-[#064734] uppercase">EL ORDO</span>
                   <span className="text-[10px] bg-[#064734]/10 text-[#064734] font-bold px-1.5 py-0.5 rounded">
                     МЕНЮ

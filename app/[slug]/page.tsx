@@ -123,23 +123,18 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
     legalText:
       'ЖК Abu Dhabi возводится в строгом соответствии со СНиП КР. Полный пакет разрешительной документации, Красная книга и положительное заключение Госэкспертизы доступны в офисе продаж.',
     plans: [
-      // 1-комнатные
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.48 м²', image: '/layouts/abu-dhabi/1 1room-abu.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '49.73 м²', image: '/layouts/abu-dhabi/2 1room-abu.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок А', area: '50.88 м²', image: '/layouts/abu-dhabi/3 1room-abu.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '54.68 м²', image: '/layouts/abu-dhabi/4 1room-abu.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '55.62 м²', image: '/layouts/abu-dhabi/5 1room-abu.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Abu Dhabi блок Б', area: '58.05 м²', image: '/layouts/abu-dhabi/6 1room-abu.png' },
-
-      // 2-комнатные
       { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '78.30 м²', image: '/layouts/abu-dhabi/1 2room-abu.png' },
       { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '79.77 м²', image: '/layouts/abu-dhabi/2 2room-abu.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '80.26 м²', image: '/layouts/abu-dhabi/3 2room-abu.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок Б', area: '81.59 м²', image: '/layouts/abu-dhabi/4 2room-abu.png' },
       { rooms: 2, title: '2-ком квартира в ЖК Abu Dhabi блок А', area: '83.58 м²', image: '/layouts/abu-dhabi/5 2room-abu.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Abu Dhabi блок А', area: '83.99 м²', image: '/layouts/abu-dhabi/6 2room-abu.png' },
-
-      // 3-комнатная
       { rooms: 3, title: '3х ком квартира в ЖК Abu Dhabi блок Б', area: '119.32 м²', image: '/layouts/abu-dhabi/1 3room-abu.png' },
     ],
   },
@@ -206,7 +201,6 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
     legalText:
       'Объект возводится на земельном участке с Красной книгой. Оформление по ДДУ с государственной регистрацией в Госрегистре КР.',
     plans: [
-      // 1-комнатные
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок А', area: '43.59 м²', image: '/layouts/madina-residence/1 1room-madina.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок А', area: '45.21 м²', image: '/layouts/madina-residence/2 1room-madina.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок В', area: '46.47 м²', image: '/layouts/madina-residence/3 1room-madina.png' },
@@ -219,8 +213,6 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок В', area: '53.15 м²', image: '/layouts/madina-residence/1 1room-madina.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок А', area: '53.88 м²', image: '/layouts/madina-residence/2 1room-madina.png' },
       { rooms: 1, title: '1-ком квартира в ЖК Madina Residence блок Б', area: '57.87 м²', image: '/layouts/madina-residence/3 1room-madina.png' },
-
-      // 2-комнатные
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок А', area: '71.00 м²', image: '/layouts/madina-residence/1 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок В', area: '71.07 м²', image: '/layouts/madina-residence/2 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок Б', area: '74.30 м²', image: '/layouts/madina-residence/3 2room-madina.png' },
@@ -232,8 +224,6 @@ const COMPLEXES_DATA: Record<string, ComplexData> = {
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок В', area: '81.31 м²', image: '/layouts/madina-residence/9 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок А', area: '83.78 м²', image: '/layouts/madina-residence/10 2room-madina.png' },
       { rooms: 2, title: '2х ком квартира в ЖК Madina Residence блок В', area: '84.09 м²', image: '/layouts/madina-residence/11 2room-madina.png' },
-
-      // 3-комнатная
       { rooms: 3, title: '3х ком квартира в ЖК Madina Residence блок Б', area: '108.48 м²', image: '/layouts/madina-residence/1 3room-madina.png' },
     ],
   },
@@ -575,7 +565,7 @@ export default async function ComplexPage({
         </div>
       </div>
 
-      {/* 2. Hero-секция с выводом ключевых параметров */}
+      {/* 2. Hero-секция */}
       <section className="relative min-h-[580px] sm:min-h-[640px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -625,7 +615,7 @@ export default async function ComplexPage({
 
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl flex items-center gap-2"
@@ -773,7 +763,7 @@ export default async function ComplexPage({
               Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в {project.name} менеджер отправит вам напрямую в мессенджер.
             </p>
             <a
-              href={`https://wa.me/996709115115?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md"
@@ -933,8 +923,8 @@ export default async function ComplexPage({
               <p className="text-base font-black mb-3">{project.hero.address}</p>
               
               <div className="space-y-1 text-sm font-semibold mb-4">
-                <p>+996 709 115 115</p>
-                <p>+996 990 115 115</p>
+                <p>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</p>
+                <p>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</p>
               </div>
 
               <a
@@ -944,13 +934,14 @@ export default async function ComplexPage({
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#d4b26f] hover:underline"
               >
                 <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
-                <span>Открыть локацию в 2GIS →</span>
+                <span>Открыть локацию в 2GIS</span>
+                <IconArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
 
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
@@ -975,14 +966,14 @@ export default async function ComplexPage({
       {/* 11. Мобильный Sticky Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden p-3 bg-neutral-950/95 backdrop-blur-xl border-t border-white/10 flex items-center gap-2 shadow-2xl">
         <a
-          href="tel:+996709115115"
+          href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
           className="flex-1 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider text-center border border-white/15 transition-all flex items-center justify-center gap-1.5"
         >
           <IconPhone className="w-3.5 h-3.5 text-white" />
           <span>Позвонить</span>
         </a>
         <a
-          href={`https://wa.me/996709115115?text=${whatsappHeroText}`}
+          href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex-[2] py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] font-black text-xs uppercase tracking-wider text-center shadow-lg flex items-center justify-center gap-1.5 transition-all"

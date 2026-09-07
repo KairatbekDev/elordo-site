@@ -1,6 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
+import { COMPANY_INFO } from '@/lib/data';
+import {
+  IconCheck,
+  IconDiamond,
+  IconWhatsApp,
+  IconArrowRight,
+} from '@/components/Icons';
 
 export const metadata: Metadata = {
   title: '100% оплата квартир в Бишкеке со скидкой от застройщика | EL ORDO GROUP',
@@ -66,22 +73,35 @@ const DISCOUNT_CASES = [
 
 const PRIVILEGES = [
   {
-    icon: '🏷️',
+    icon: <IconDiamond className="w-6 h-6 text-[#064734]" />,
     title: 'Максимальный дисконт от руководства',
     desc: 'Вы получаете минимально возможную цену за квадратный метр. Сэкономленные средства можно направить на дизайнерский ремонт или меблировку.',
   },
   {
-    icon: '🏔️',
+    icon: (
+      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+      </svg>
+    ),
     title: 'Приоритетный выбор видовых этажей',
     desc: 'Покупателям со 100% оплатой открывается ранний доступ к лучшим планировкам, верхним этажам и панорамным видам на горный хребет Ала-Тоо.',
   },
   {
-    icon: '⚡',
+    icon: (
+      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+      </svg>
+    ),
     title: 'Моментальная регистрация ДДУ за 24 часа',
     desc: 'Полное юридическое сопровождение сделки штатными юристами застройщика. Быстрая регистрация в госорганах без очередей.',
   },
   {
-    icon: '📈',
+    icon: (
+      <svg className="w-6 h-6 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+        <polyline points="16 7 22 7 22 13" />
+      </svg>
+    ),
     title: 'Высокая инвестиционная доходность (ROI)',
     desc: 'Покупка на стадии строительства за полную стоимость обеспечивает прирост капитала до 25–35% к моменту ввода дома в эксплуатацию.',
   },
@@ -148,7 +168,7 @@ export default function FullPaymentPage() {
         },
       ]}
     >
-      {/* 🌟 1. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ */}
+      {/* 1. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -168,9 +188,11 @@ export default function FullPaymentPage() {
               key={idx}
               className="bg-white rounded-3xl p-6 border border-gray-200 shadow-lg hover:shadow-2xl hover:border-[#064734]/30 transition-all flex flex-col justify-between relative group"
             >
-              <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
-                {item.badge}
-              </div>
+              {item.badge && (
+                <div className="absolute -top-3 right-6 bg-[#d4b26f] text-[#064734] text-[10px] font-black uppercase px-3 py-1 rounded-full shadow">
+                  {item.badge}
+                </div>
+              )}
 
               <div>
                 <span className="text-xs font-bold text-gray-400 block mb-1">
@@ -196,25 +218,28 @@ export default function FullPaymentPage() {
                     <div className="text-2xl font-black text-[#064734] my-0.5">
                       {item.cashPrice}
                     </div>
-                    <span className="text-xs font-black text-emerald-700 block">
-                      ✓ {item.saving} ({item.savingKgs})
-                    </span>
+                    <div className="text-xs font-black text-emerald-700 flex items-center gap-1">
+                      <IconCheck className="w-3.5 h-3.5 shrink-0" />
+                      <span>{item.saving} ({item.savingKgs})</span>
+                    </div>
                   </div>
 
                   <p className="text-[11px] text-gray-600 leading-relaxed italic pt-1">
-                    💡 {item.benefit}
+                    {item.benefit}
                   </p>
                 </div>
               </div>
 
               <div className="mt-6 pt-3 space-y-2">
                 <a
-                  href={`https://wa.me/996709115115?text=${encodeURIComponent(item.waText)}`}
+                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow"
+                  className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2"
                 >
-                  Зафиксировать скидку в WhatsApp →
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <span>Зафиксировать скидку</span>
+                  <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link
                   href={`/${item.slug}`}
@@ -228,7 +253,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 🌟 2. ПРИВИЛЕГИИ 100% ПОКУПАТЕЛЯ */}
+      {/* 2. ПРИВИЛЕГИИ 100% ПОКУПАТЕЛЯ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -261,7 +286,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 🌟 3. ИНВЕСТИЦИОННЫЙ ПОТЕНЦИАЛ (ИНВЕСТОРАМ) */}
+      {/* 3. ИНВЕСТИЦИОННЫЙ ПОТЕНЦИАЛ (ИНВЕСТОРАМ) */}
       <div className="my-16 bg-[#032b20] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
@@ -291,7 +316,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 🌟 4. ПОШАГОВЫЙ ПРОЦЕСС ОФОРМЛЕНИЯ */}
+      {/* 4. ПОШАГОВЫЙ ПРОЦЕСС ОФОРМЛЕНИЯ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">

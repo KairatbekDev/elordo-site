@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import BishkekMap from '@/components/BishkekMap';
+import { COMPANY_INFO } from '@/lib/data';
 import {
   IconBuilding,
   IconShieldCheck,
@@ -183,7 +184,7 @@ export default function AboutPage() {
               <IconArrowRight className="w-3.5 h-3.5" />
             </Link>
             <a
-              href={`https://wa.me/996709115115?text=${waAboutText}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-2"
@@ -347,7 +348,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 7. Руководство и команда компании (с локальным массивом TEAM) */}
+      {/* 7. Руководство и команда компании */}
       <section className="bg-[#f0f4f1] border-t border-gray-200 py-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -409,37 +410,36 @@ export default function AboutPage() {
             <div>
               <p className="text-xs text-gray-400 mb-1">Головной офис компании:</p>
               <p className="text-lg font-bold text-gray-900 mb-3">
-                г. Бишкек, ул. И. Ахунбаева, 137/1
+                {COMPANY_INFO.address}
               </p>
               <div className="space-y-1.5 text-sm font-semibold text-gray-800 mb-4">
-                <p>
-                  <a href="tel:+996709115115" className="hover:text-[#064734] transition-colors inline-flex items-center gap-2">
-                    <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
-                    <span>+996 709 115 115</span>
-                  </a>
-                </p>
-                <p>
-                  <a href="tel:+996990115115" className="hover:text-[#064734] transition-colors inline-flex items-center gap-2">
-                    <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
-                    <span>+996 990 115 115</span>
-                  </a>
-                </p>
+                {COMPANY_INFO.phones.map((phone, idx) => (
+                  <p key={idx}>
+                    <a
+                      href={`tel:${phone.replace(/\s+/g, '')}`}
+                      className="hover:text-[#064734] transition-colors inline-flex items-center gap-2"
+                    >
+                      <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
+                      <span>{phone}</span>
+                    </a>
+                  </p>
+                ))}
               </div>
               <a
-                href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
+                href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:text-[#d4b26f] hover:underline"
               >
                 <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
                 <span>Открыть маршрут в 2GIS</span>
-                <IconArrowRight className="w-3 h-3" />
+                <IconArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
 
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/996709115115?text=${waAboutText}`}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
@@ -448,7 +448,7 @@ export default function AboutPage() {
                 <span>Написать в WhatsApp</span>
               </a>
               <a
-                href="https://instagram.com/elordo.group"
+                href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
