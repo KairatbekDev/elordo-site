@@ -62,27 +62,26 @@ export default function Header() {
           
           {/* 1. Логотип компании с официальной круглой эмблемой */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#032b20] group-hover:scale-105 transition-all shrink-0">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#064734] border border-white/15 flex items-center justify-center p-1.5 shadow-sm group-hover:scale-105 transition-all shrink-0 overflow-hidden">
               <img
                 src="/logo-icon.png"
                 alt="EL ORDO GROUP"
                 className="w-full h-full object-contain"
                 style={{
-                  filter:
-                    'brightness(0) saturate(100%) invert(19%) sepia(60%) saturate(5) hue-rotate(125deg) brightness(0.9) contrast(1.1)',
+                  filter: 'brightness(0) invert(1) drop-shadow(0 0 2px rgba(255,255,255,0.5))',
                 }}
               />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-black tracking-tight text-[#064734] uppercase leading-none">
+                <span className="text-lg sm:text-xl font-black tracking-tight text-white uppercase leading-none drop-shadow-sm">
                   El Ordo
                 </span>
-                <span className="text-[10px] bg-[#064734]/10 text-[#064734] font-bold px-1.5 py-0.5 rounded-md">
+                <span className="text-[10px] bg-white text-[#064734] font-bold px-1.5 py-0.5 rounded-md">
                   Group
                 </span>
               </div>
-              <span className="text-[9px] uppercase tracking-wider text-gray-500 font-semibold">
+              <span className="text-[9px] uppercase tracking-wider text-white/80 font-semibold">
                 Строительная компания
               </span>
             </div>
@@ -175,14 +174,13 @@ export default function Header() {
               {/* Шапка меню */}
               <div className="flex items-center justify-between pb-5 border-b border-gray-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1 shadow-sm shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#064734] border border-white/15 flex items-center justify-center p-1.5 shadow-sm shrink-0">
                     <img
                       src="/logo-icon.png"
                       alt="EL ORDO GROUP"
                       className="w-full h-full object-contain"
                       style={{
-                        filter:
-                          'brightness(0) saturate(100%) invert(19%) sepia(60%) saturate(5) hue-rotate(125deg) brightness(0.9) contrast(1.1)',
+                        filter: 'brightness(0) invert(1) drop-shadow(0 0 2px rgba(255,255,255,0.5))',
                       }}
                     />
                   </div>
