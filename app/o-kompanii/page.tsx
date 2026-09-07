@@ -41,32 +41,32 @@ interface TeamMember {
 const TEAM: TeamMember[] = [
   {
     name: 'Керезбек Нуралиев',
-    role: 'Генеральный директор / Учредитель',
+    role: 'Коммерческий директор',
     image: '/team/kerezbek-nuraliev-1.jpg',
   },
   {
     name: 'Адилет Медетбек уулу',
-    role: 'Исполнительный директор',
+    role: 'Технический директор ',
     image: '/team/adilet-medetbek-uulu-857x1536.jpg',
   },
   {
     name: 'Самаган Мамасыдык уулу',
-    role: 'Технический директор',
+    role: 'Главный прораб ',
     image: '/team/mamasydyk-uulu-samagany.jpg',
   },
   {
     name: 'Бектур Мусаев',
-    role: 'Главный инженер проектов',
+    role: 'Руководитель отдела продаж',
     image: '/team/musaev-bektur-768x1376.jpg',
   },
   {
     name: 'Бекжан Нуржанов',
-    role: 'Руководитель отдела продаж',
+    role: 'Руководитель отдела маркетинга',
     image: '/team/nurzhanov-bekzhan-857x1536.jpg',
   },
   {
     name: 'Атанас Жороев',
-    role: 'Главный юрист компании',
+    role: 'Директор по развитию ',
     image: '/team/zhoroev-atanas.jpg',
   },
 ];
