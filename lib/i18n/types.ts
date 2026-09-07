@@ -2,6 +2,7 @@ export type Locale = 'ru' | 'kg' | 'kz' | 'uk' | 'en' | 'zh';
 
 export interface TranslationDictionary {
   header: {
+    companySubtitle: string;
     catalog: string;
     terms: string;
     about: string;
@@ -9,6 +10,18 @@ export interface TranslationDictionary {
     salesOnline: string;
     consultation: string;
     workTime: string;
+    flagshipProjects: string;
+    hotline: string;
+    menu: string;
+  };
+  hero: {
+    badge: string;
+    titleMain: string;
+    titleAccent: string;
+    desc: string;
+    btnProjects: string;
+    btnTerms: string;
+    consultationTag: string;
   };
   common: {
     moreDetails: string;

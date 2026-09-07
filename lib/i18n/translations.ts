@@ -3,6 +3,7 @@ import { Locale, TranslationDictionary } from './types';
 export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   ru: {
     header: {
+      companySubtitle: 'Строительная компания',
       catalog: 'Каталог объектов',
       terms: 'Условия и рассрочка',
       about: 'О компании',
@@ -10,6 +11,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: 'ОТДЕЛ ПРОДАЖ ОНЛАЙН',
       consultation: 'Консультация',
       workTime: 'Пн-Сб 09:00 - 18:00',
+      flagshipProjects: 'Флагманские объекты:',
+      hotline: 'Горячая линия:',
+      menu: 'МЕНЮ',
+    },
+    hero: {
+      badge: 'Строительная компания EL ORDO GROUP • Бишкек',
+      titleMain: 'АРХИТЕКТУРА ВАШЕГО',
+      titleAccent: 'СТАТУСА И СЕМЕЙНОГО УЮТА',
+      desc: 'С 2021 года возводим современные жилые комплексы в Бишкеке. Монолитно-кирпичная надежность, сейсмостойкость 9 баллов и честная рассрочка 0% до 40 месяцев без участия банков.',
+      btnProjects: 'Выбрать жилой комплекс',
+      btnTerms: 'Условия рассрочки 0%',
+      consultationTag: 'Консультация 0%',
     },
     common: {
       moreDetails: 'Подробнее о проекте',
@@ -23,6 +36,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   },
   kg: {
     header: {
+      companySubtitle: 'Курулуш компаниясы',
       catalog: 'Объекттер каталогу',
       terms: 'Бөлүп төлөө шарттары',
       about: 'Компания жөнүндө',
@@ -30,6 +44,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: 'САТУУ БӨЛҮМҮ ОНЛАЙН',
       consultation: 'Кеңеш алуу',
       workTime: 'Дүй-Иш 09:00 - 18:00',
+      flagshipProjects: 'Негизги долбоорлор:',
+      hotline: 'Түз байланыш линиясы:',
+      menu: 'МЕНЮ',
+    },
+    hero: {
+      badge: 'EL ORDO GROUP курулуш компаниясы • Бишкек',
+      titleMain: 'СИЗДИН ДАРАЖАҢЫЗ ЖАНА',
+      titleAccent: 'ҮЙ-БҮЛӨЛҮК ЫҢГАЙЛУУЛУГУҢУЗДУН АРХИТЕКТУРАСЫ',
+      desc: '2021-жылдан бери Бишкекте заманбап турак жай комплекстерин куруп келебиз. Монолит-кыш ишенимдүүлүгү, 9 баллдык сейсмотуруктуулук жана банктарсыз 40 айга чейин 0% бөлүп төлөө.',
+      btnProjects: 'Турак жай комплексин тандоо',
+      btnTerms: '0% бөлүп төлөө шарттары',
+      consultationTag: '0% кеңеш алуу',
     },
     common: {
       moreDetails: 'Долбоор тууралуу толук',
@@ -43,6 +69,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   },
   kz: {
     header: {
+      companySubtitle: 'Құрылыс компаниясы',
       catalog: 'Нысандар каталогы',
       terms: 'Бөліп төлеу шарттары',
       about: 'Компания туралы',
@@ -50,6 +77,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: 'ОНЛАЙН САТУ БӨЛІМІ',
       consultation: 'Кеңес алу',
       workTime: 'Дс-Сб 09:00 - 18:00',
+      flagshipProjects: 'Негізгі жобалар:',
+      hotline: 'Жедел желі:',
+      menu: 'МӘЗІР',
+    },
+    hero: {
+      badge: 'EL ORDO GROUP құрылыс компаниясы • Бішкек',
+      titleMain: 'СІЗДІҢ МӘРТЕБЕҢІЗ БЕН',
+      titleAccent: 'ОТБАСЫЛЫҚ ЖАЙЛЫЛЫҒЫҢЫЗДЫҢ АРХИТЕКТУРАСЫ',
+      desc: '2021 жылдан бері Бішкекте заманауи тұрғын үй кешендерін салып келеміз. Монолитті-кірпіш сенімділігі, 9 балдық сейсмикалық төзімділік және банксіз 40 айға дейін 0% бөліп төлеу.',
+      btnProjects: 'Тұрғын үй кешенін таңдау',
+      btnTerms: '0% бөліп төлеу шарттары',
+      consultationTag: '0% кеңес алу',
     },
     common: {
       moreDetails: 'Жоба туралы толығырақ',
@@ -63,6 +102,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   },
   uk: {
     header: {
+      companySubtitle: 'Будівельна компанія',
       catalog: 'Каталог об’єктів',
       terms: 'Умови та розстрочка',
       about: 'Про компанію',
@@ -70,6 +110,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: 'ВІДДІЛ ПРОДАЖІВ ОНЛАЙН',
       consultation: 'Консультація',
       workTime: 'Пн-Сб 09:00 - 18:00',
+      flagshipProjects: 'Флагманські об’єкти:',
+      hotline: 'Гаряча лінія:',
+      menu: 'МЕНЮ',
+    },
+    hero: {
+      badge: 'Будівельна компанія EL ORDO GROUP • Бішкек',
+      titleMain: 'АРХІТЕКТУРА ВАШОГО СТАТУСУ',
+      titleAccent: 'ТА СІМЕЙНОГО ЗАТИШКУ',
+      desc: 'З 2021 року зводимо сучасні житлові комплекси у Бішкеку. Монолітно-цегляна надійність, сейсмостійкість 9 балів та чесна розстрочка 0% до 40 місяців без участі банків.',
+      btnProjects: 'Обрати житловий комплекс',
+      btnTerms: 'Умови розстрочки 0%',
+      consultationTag: 'Консультація 0%',
     },
     common: {
       moreDetails: 'Детальніше про проєкт',
@@ -83,6 +135,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   },
   en: {
     header: {
+      companySubtitle: 'Construction Company',
       catalog: 'Project Catalog',
       terms: 'Payment & Terms',
       about: 'About Company',
@@ -90,6 +143,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: 'SALES OFFICE ONLINE',
       consultation: 'Consultation',
       workTime: 'Mon-Sat 09:00 - 18:00',
+      flagshipProjects: 'Flagship Projects:',
+      hotline: 'Hotline:',
+      menu: 'MENU',
+    },
+    hero: {
+      badge: 'Construction Company EL ORDO GROUP • Bishkek',
+      titleMain: 'ARCHITECTURE OF YOUR STATUS',
+      titleAccent: 'AND FAMILY COMFORT',
+      desc: 'Building modern residential complexes in Bishkek since 2021. Monolithic brick reliability, 9-point seismic resistance, and 0% installment plans up to 40 months without bank involvement.',
+      btnProjects: 'Choose a residential complex',
+      btnTerms: '0% installment terms',
+      consultationTag: '0% Consultation',
     },
     common: {
       moreDetails: 'Project details',
@@ -103,6 +168,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
   },
   zh: {
     header: {
+      companySubtitle: '建筑开发公司',
       catalog: '楼盘目录',
       terms: '付款方式与分期',
       about: '关于我们',
@@ -110,6 +176,18 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       salesOnline: '线上销售中心',
       consultation: '咨询',
       workTime: '周一至周六 09:00 - 18:00',
+      flagshipProjects: '旗舰楼盘:',
+      hotline: '热线电话:',
+      menu: '菜单',
+    },
+    hero: {
+      badge: 'EL ORDO GROUP 建筑开发公司 • 比什凯克',
+      titleMain: '彰显尊贵身份与',
+      titleAccent: '家庭温馨的建筑典范',
+      desc: '自2021年起在比什凯克打造现代化高品质住宅区。钢筋混凝土与砖砌结构稳固耐用，抗震烈度达9度，提供长达40个月的零利息分期付款（无需银行担保）。',
+      btnProjects: '选择心仪住宅',
+      btnTerms: '0% 分期付款方案',
+      consultationTag: '免费咨询 0%',
     },
     common: {
       moreDetails: '查看详情',
