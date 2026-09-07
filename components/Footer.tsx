@@ -1,6 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { COMPANY_INFO } from '@/lib/data';
+import {
+  IconWhatsApp,
+  IconInstagram,
+  IconCheck,
+  IconArrowRight,
+} from '@/components/Icons';
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -87,13 +94,19 @@ export default function Footer() {
               <li>
                 <Link href="/kelechek" className="text-gray-300 hover:text-white transition-colors flex items-center justify-between group">
                   <span>ЖК Келечек</span>
-                  <span className="text-[10px] text-gray-400 font-bold">Сдан ✓</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 font-bold">
+                    <span>Сдан</span>
+                    <IconCheck className="w-3 h-3 text-emerald-400" />
+                  </span>
                 </Link>
               </li>
               <li>
                 <Link href="/ordo" className="text-gray-300 hover:text-white transition-colors flex items-center justify-between group">
                   <span>Клубный дом Ордо</span>
-                  <span className="text-[10px] text-gray-400 font-bold">Сдан ✓</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] text-gray-400 font-bold">
+                    <span>Сдан</span>
+                    <IconCheck className="w-3 h-3 text-emerald-400" />
+                  </span>
                 </Link>
               </li>
             </ul>
@@ -111,18 +124,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/usloviya#calculator" className="hover:text-white transition-colors">
-                  Калькулятор 0%
+                <Link href="/rassrochka" className="hover:text-white transition-colors">
+                  Рассрочка 0%
                 </Link>
               </li>
               <li>
-                <Link href="/usloviya#trade-in" className="hover:text-white transition-colors">
+                <Link href="/trade-in" className="hover:text-white transition-colors">
                   Бартер / Trade-in
                 </Link>
               </li>
               <li>
-                <Link href="/usloviya" className="hover:text-white transition-colors">
-                  Условия 100% оплаты
+                <Link href="/polniy-raschet" className="hover:text-white transition-colors">
+                  100% расчет
                 </Link>
               </li>
               <li>
@@ -163,36 +176,37 @@ export default function Footer() {
             <div>
               <span className="text-[11px] text-gray-400 block mb-0.5">Центральный офис продаж:</span>
               <p className="text-xs text-white/90 leading-snug">
-                г. Бишкек, ул. Исы Ахунбаева, 137/1
+                {COMPANY_INFO.address}
               </p>
               <a
-                href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
+                href={COMPANY_INFO.gisUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[11px] font-bold text-[#d4b26f] hover:underline inline-block mt-1"
+                className="text-[11px] font-bold text-[#d4b26f] hover:underline inline-flex items-center gap-1 mt-1"
               >
-                Маршрут в 2GIS →
+                <span>Маршрут в 2GIS</span>
+                <IconArrowRight className="w-3 h-3" />
               </a>
             </div>
 
             <div className="pt-2 flex flex-col gap-2">
               <a
-                href={`https://wa.me/996709115115?text=${waFooterText}`}
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waFooterText}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white text-xs font-black uppercase tracking-wider transition-all shadow border border-emerald-500/30"
               >
-                <span>💬</span>
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                 <span>Написать в WhatsApp</span>
               </a>
 
               <a
-                href="https://instagram.com/elordo.group"
+                href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 text-white/90 hover:text-white text-xs font-bold transition-all border border-white/10"
               >
-                <span>📸</span>
+                <IconInstagram className="w-4 h-4 text-pink-500" />
                 <span>Instagram @elordo.group</span>
               </a>
             </div>
@@ -212,10 +226,12 @@ export default function Footer() {
           <button
             type="button"
             onClick={scrollToTop}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/15 active:scale-95 text-xs font-bold text-[#d4b26f] border border-white/10 transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/15 active:scale-95 text-xs font-bold text-[#d4b26f] border border-white/10 transition-all cursor-pointer"
           >
             <span>Наверх страницы</span>
-            <span>↑</span>
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m18 15-6-6-6 6" />
+            </svg>
           </button>
         </div>
 

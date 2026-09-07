@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { COMPANY_INFO } from '@/lib/data';
+import {
+  IconWhatsApp,
+  IconInstagram,
+  IconArrowRight,
+} from '@/components/Icons';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -106,26 +112,27 @@ export default function Header() {
                 </span>
               </div>
               <a
-                href="tel:+996709115115"
+                href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
                 className="text-xs sm:text-sm font-black text-gray-900 hover:text-[#064734] transition-colors"
               >
-                +996 709 115 115
+                {COMPANY_INFO.phones[0] || '+996 709 115 115'}
               </a>
             </div>
 
             {/* Кнопка мгновенной консультации */}
             <a
-              href={`https://wa.me/996709115115?text=${waConsultationText}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5"
+              className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3.5 py-2.5 sm:px-5 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2"
             >
-              <span>💬</span>
+              <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
               <span>Консультация</span>
             </a>
 
             {/* Бургер-кнопка для мобильных */}
             <button
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
               className="lg:hidden p-2.5 rounded-xl text-gray-700 hover:bg-gray-100 hover:text-[#064734] transition-colors focus:outline-none"
@@ -168,9 +175,12 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+                  aria-label="Закрыть меню"
+                  className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
                 >
-                  ✕
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -190,7 +200,7 @@ export default function Header() {
                       }`}
                     >
                       <span>{link.label}</span>
-                      <span>→</span>
+                      <IconArrowRight className="w-4 h-4 opacity-70" />
                     </Link>
                   );
                 })}
@@ -236,30 +246,38 @@ export default function Header() {
             <div className="pt-6 border-t border-gray-100 mt-6">
               <div className="mb-4">
                 <span className="text-[11px] text-gray-400 block mb-1">Горячая линия:</span>
-                <a href="tel:+996709115115" className="text-base font-black text-[#064734] block">
-                  +996 709 115 115
+                <a
+                  href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
+                  className="text-base font-black text-[#064734] block"
+                >
+                  {COMPANY_INFO.phones[0] || '+996 709 115 115'}
                 </a>
-                <a href="tel:+996990115115" className="text-xs text-gray-600 block mt-0.5">
-                  +996 990 115 115
+                <a
+                  href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
+                  className="text-xs text-gray-600 block mt-0.5"
+                >
+                  {COMPANY_INFO.phones[1] || '+996 990 115 115'}
                 </a>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/996709115115?text=${waConsultationText}`}
+                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-2 rounded-xl bg-[#064734] text-white font-bold text-xs text-center flex items-center justify-center gap-1.5 shadow"
+                  className="py-3 px-2 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow"
                 >
-                  <span>💬</span> WhatsApp
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <span>WhatsApp</span>
                 </a>
                 <a
-                  href="https://instagram.com/elordo.group"
+                  href={COMPANY_INFO.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="py-3 px-2 rounded-xl border border-gray-200 text-gray-800 font-bold text-xs text-center flex items-center justify-center gap-1.5 hover:bg-gray-50"
+                  className="py-3 px-2 rounded-xl border border-gray-200 text-gray-800 font-bold text-xs text-center flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
                 >
-                  <span>📸</span> Instagram
+                  <IconInstagram className="w-4 h-4 text-pink-600" />
+                  <span>Instagram</span>
                 </a>
               </div>
             </div>
