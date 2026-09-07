@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { COMPANY_INFO } from '@/lib/data';
 import ThemeToggle from '@/components/ThemeToggle';
+import LanguageSelector from '@/components/LanguageSelector';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -15,12 +17,13 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const navLinks = [
-    { href: '/projects', label: 'Каталог объектов' },
-    { href: '/usloviya', label: 'Условия и рассрочка' },
-    { href: '/o-kompanii', label: 'О компании' },
-    { href: '/contacts', label: 'Контакты' },
+    { href: '/projects', label: t.header.catalog },
+    { href: '/usloviya', label: t.header.terms },
+    { href: '/o-kompanii', label: t.header.about },
+    { href: '/contacts', label: t.header.contacts },
   ];
 
   // Отслеживание скролла для легкой тени
@@ -63,7 +66,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           
-          {/* 1. Логотип компании с официальной круглой эмблемой */}
+          {/* 1. Логотип компании */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#032b20] group-hover:scale-105 transition-all shrink-0">
               <img
@@ -87,7 +90,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* 2. Навигация для десктопа с подсветкой активного пункта */}
+          {/* 2. Навигация для десктопа с переводом */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -107,15 +110,15 @@ export default function Header() {
             })}
           </nav>
 
-          {/* 3. Правый блок: телефон + тема + кнопка заявки */}
-          <div className="flex items-center gap-2.5 sm:gap-4">
+          {/* 3. Правый блок: телефон + язык + тема + консультация */}
+          <div className="flex items-center gap-2 sm:gap-3">
             
-            {/* Прямой телефон и статус (для планшетов и десктопов) */}
+            {/* Прямой телефон и статус */}
             <div className="hidden sm:flex flex-col items-end text-right">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 tracking-wider">
-                  Отдел продаж онлайн
+                  {t.header.salesOnline}
                 </span>
               </div>
               <a
@@ -126,10 +129,13 @@ export default function Header() {
               </a>
             </div>
 
-            {/* Кнопка переключения светлой / темной темы */}
+            {/* Выбор языка */}
+            <LanguageSelector />
+
+            {/* Переключатель светлой / темной темы */}
             <ThemeToggle />
 
-            {/* Кнопка мгновенной консультации */}
+            {/* Кнопка WhatsApp */}
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
               target="_blank"
@@ -137,7 +143,7 @@ export default function Header() {
               className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2.5 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-              <span className="hidden sm:inline">Консультация</span>
+              <span className="hidden sm:inline">{t.header.consultation}</span>
             </a>
 
             {/* Бургер-кнопка для мобильных */}
@@ -145,7 +151,7 @@ export default function Header() {
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-              className="lg:hidden p-2 rounded-xl text-gray-700 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors focus:outline-none"
+              className="lg:hidden p-2 rounded-xl text-gray-700 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors focus:outline-none cursor-pointer"
             >
               {isOpen ? (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -193,7 +199,7 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsOpen(false)}
                   aria-label="Закрыть меню"
-                  className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors"
+                  className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -223,7 +229,7 @@ export default function Header() {
                 })}
               </nav>
 
-              {/* Быстрый переход к флагманским ЖК */}
+              {/* Быстрый переход к объектам */}
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
                 <span className="text-xs uppercase font-extrabold tracking-wider text-gray-400 dark:text-neutral-400 block mb-3">
                   Флагманские объекты:
@@ -259,7 +265,7 @@ export default function Header() {
               </div>
             </div>
 
-            {/* Нижняя часть меню: контакты и соцсети */}
+            {/* Нижняя часть меню */}
             <div className="pt-6 border-t border-gray-100 dark:border-white/10 mt-6">
               <div className="mb-4">
                 <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">Горячая линия:</span>
