@@ -148,6 +148,8 @@ export default function ContactsPage() {
               </span>
               <p className="text-sm font-black text-gray-900">
                 Понедельник — Пятница: <span className="text-[#064734]">09:00 – 18:00</span>
+              </p>
+              <p className="text-sm font-black text-gray-900">
                 Суббота: <span className="text-[#064734]">10:00 – 16:00</span>
               </p>
               <p className="text-xs text-gray-600 mt-1 font-medium">
