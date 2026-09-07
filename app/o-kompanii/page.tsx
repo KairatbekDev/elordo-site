@@ -1,6 +1,17 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import BishkekMap from '@/components/BishkekMap';
+import {
+  IconBuilding,
+  IconShieldCheck,
+  IconDocument,
+  IconTree,
+  IconMapPin,
+  IconPhone,
+  IconWhatsApp,
+  IconInstagram,
+  IconArrowRight,
+} from '@/components/Icons';
 
 export const metadata: Metadata = {
   title: 'О компании EL ORDO GROUP — Надежный застройщик Бишкека',
@@ -68,21 +79,25 @@ const STATS = [
 
 const STANDARDS = [
   {
+    icon: <IconBuilding className="w-6 h-6 text-[#064734]" />,
     title: 'Монолитный железобетон',
     desc: 'Высокомарочный бетон марки М350 и сертифицированная российская арматура класса А500С.',
     badge: 'СНиП КР',
   },
   {
+    icon: <IconDocument className="w-6 h-6 text-[#064734]" />,
     title: 'Экологичный жженый кирпич',
     desc: 'Внутренние и межквартирные перегородки возводятся из кирпича, обеспечивая отличную тишину и микроклимат.',
     badge: 'Шумоизоляция',
   },
   {
+    icon: <IconTree className="w-6 h-6 text-[#064734]" />,
     title: 'Базальтовое утепление 100 мм',
     desc: 'Негорючая теплоизоляция высокой плотности сохраняет прохладу летом и держит тепло в зимние морозы.',
     badge: 'Энергоэффект',
   },
   {
+    icon: <IconShieldCheck className="w-6 h-6 text-[#064734]" />,
     title: 'Сейсмостойкость 9 баллов',
     desc: 'Каждый проект проходит строгие расчеты сейсмических нагрузок и экспертизу Госстроя Кыргызской Республики.',
     badge: 'Безопасность',
@@ -131,7 +146,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* 2. Hero-блок с глубоким визуальным стилем */}
+      {/* 2. Hero-блок */}
       <section className="relative min-h-[500px] sm:min-h-[560px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
@@ -162,17 +177,19 @@ export default function AboutPage() {
           <div className="flex flex-wrap justify-center gap-3">
             <Link
               href="/projects"
-              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg"
+              className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
             >
-              Смотреть наши объекты
+              <span>Смотреть наши объекты</span>
+              <IconArrowRight className="w-3.5 h-3.5" />
             </Link>
             <a
               href={`https://wa.me/996709115115?text=${waAboutText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm"
+              className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-2"
             >
-              Задать вопрос руководству
+              <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+              <span>Задать вопрос руководству</span>
             </a>
           </div>
         </div>
@@ -278,7 +295,10 @@ export default function AboutPage() {
                 className="bg-[#fafbfa] p-7 rounded-3xl border border-gray-200/80 hover:border-[#064734]/40 hover:shadow-xl transition-all flex flex-col justify-between"
               >
                 <div>
-                  <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-[#064734]/10 text-[#064734] mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 flex items-center justify-center mb-4">
+                    {std.icon}
+                  </div>
+                  <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 rounded-md bg-[#064734]/10 text-[#064734] mb-3">
                     {std.badge}
                   </span>
                   <h3 className="text-base font-black text-gray-900 mb-2">
@@ -327,7 +347,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 7. Руководство и команда компании */}
+      {/* 7. Руководство и команда компании (с локальным массивом TEAM) */}
       <section className="bg-[#f0f4f1] border-t border-gray-200 py-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -348,7 +368,6 @@ export default function AboutPage() {
                 key={idx}
                 className="bg-white rounded-3xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
-                {/* Фото с фиксацией фокуса на лице (object-top) */}
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100">
                   <img
                     src={member.image}
@@ -358,7 +377,6 @@ export default function AboutPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                {/* Информация */}
                 <div className="p-6 flex-1 flex flex-col justify-between bg-white">
                   <div>
                     <h3 className="text-base sm:text-lg font-black text-gray-900 mb-1 group-hover:text-[#064734] transition-colors">
@@ -395,13 +413,15 @@ export default function AboutPage() {
               </p>
               <div className="space-y-1.5 text-sm font-semibold text-gray-800 mb-4">
                 <p>
-                  <a href="tel:+996709115115" className="hover:text-[#064734] transition-colors">
-                    +996 709 115 115
+                  <a href="tel:+996709115115" className="hover:text-[#064734] transition-colors inline-flex items-center gap-2">
+                    <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
+                    <span>+996 709 115 115</span>
                   </a>
                 </p>
                 <p>
-                  <a href="tel:+996990115115" className="hover:text-[#064734] transition-colors">
-                    +996 990 115 115
+                  <a href="tel:+996990115115" className="hover:text-[#064734] transition-colors inline-flex items-center gap-2">
+                    <IconPhone className="w-3.5 h-3.5 text-[#064734]" />
+                    <span>+996 990 115 115</span>
                   </a>
                 </p>
               </div>
@@ -409,9 +429,11 @@ export default function AboutPage() {
                 href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#064734] hover:text-[#d4b26f] hover:underline"
               >
-                <span>📍</span> Открыть маршрут в 2GIS →
+                <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
+                <span>Открыть маршрут в 2GIS</span>
+                <IconArrowRight className="w-3 h-3" />
               </a>
             </div>
 
@@ -420,17 +442,19 @@ export default function AboutPage() {
                 href={`https://wa.me/996709115115?text=${waAboutText}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow"
+                className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center"
               >
-                <span>💬</span> Написать в WhatsApp
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                <span>Написать в WhatsApp</span>
               </a>
               <a
                 href="https://instagram.com/elordo.group"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all"
+                className="inline-flex items-center justify-center gap-2 border border-gray-300 hover:border-[#064734] text-gray-800 px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all text-center"
               >
-                <span>📸</span> Перейти в Instagram
+                <IconInstagram className="w-4 h-4 text-pink-600" />
+                <span>Перейти в Instagram</span>
               </a>
             </div>
           </div>

@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import {
+  IconWhatsApp,
+  IconArrowRight,
+  IconDocument,
+} from '@/components/Icons';
 
 export interface ApartmentPlan {
   rooms: 1 | 2 | 3 | number;
@@ -189,7 +194,7 @@ export default function FloorPlansSection({
                 }`}
               >
                 <span>Подробнее о квартире</span>
-                <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <IconArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           ))}
@@ -198,7 +203,7 @@ export default function FloorPlansSection({
       </div>
 
       {/* ========================================================================= */}
-      {/* 🔍 МОДАЛЬНОЕ ОКНО ДЕТАЛЬНОГО ПРОСМОТРА С КРУПНЫМ ШРИФТОМ И ЗУМОМ         */}
+      {/* МОДАЛЬНОЕ ОКНО ДЕТАЛЬНОГО ПРОСМОТРА С КРУПНЫМ ШРИФТОМ И ЗУМОМ             */}
       {/* ========================================================================= */}
       {selectedPlan && (
         <div
@@ -294,8 +299,13 @@ export default function FloorPlansSection({
                   />
                 </div>
 
-                <span className="relative z-20 mt-4 text-xs font-semibold text-gray-300 bg-black/60 px-4 py-1.5 rounded-full border border-white/10">
-                  💡 Нажмите на изображение для быстрого увеличения
+                <span className="relative z-20 mt-4 text-xs font-semibold text-gray-300 bg-black/60 px-4 py-1.5 rounded-full border border-white/10 flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5 text-[#d4b26f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                    <line x1="12" y1="16" x2="12" y2="12" strokeWidth="2" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" strokeWidth="2" />
+                  </svg>
+                  <span>Нажмите на изображение для быстрого увеличения</span>
                 </span>
               </div>
 
@@ -314,7 +324,7 @@ export default function FloorPlansSection({
                     {selectedPlan.area}
                   </div>
 
-                  {/* Крупная сетка характеристик */}
+                  {/* Сетка характеристик */}
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
                       <span className="text-xs text-gray-400 font-semibold block mb-1">Потолки</span>
@@ -347,7 +357,7 @@ export default function FloorPlansSection({
 
                   {/* Гарантии */}
                   <div className="p-4 rounded-2xl bg-[#064734]/30 border border-[#064734] flex items-start gap-3 mb-6">
-                    <span className="text-2xl">📋</span>
+                    <IconDocument className="w-5 h-5 text-[#d4b26f] shrink-0 mt-0.5" />
                     <p className="text-xs sm:text-sm text-emerald-100 font-medium leading-relaxed">
                       Прямой договор с застройщиком. Возможность оформления по программе Trade-in (бартер на авто или вторичную недвижимость).
                     </p>
@@ -362,7 +372,7 @@ export default function FloorPlansSection({
                     rel="noopener noreferrer"
                     className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-sm sm:text-base uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-3 border border-emerald-500/30"
                   >
-                    <span className="text-xl">💬</span>
+                    <IconWhatsApp className="w-5 h-5 text-[#25D366]" />
                     <span>Узнать цену и свободные этажи</span>
                   </a>
                   <span className="text-xs text-gray-400 text-center block mt-3 font-medium">

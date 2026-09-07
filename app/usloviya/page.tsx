@@ -2,6 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  IconCheck,
+  IconCar,
+  IconBuilding,
+  IconDiamond,
+  IconCalendar,
+  IconWhatsApp,
+  IconArrowRight,
+  IconDocument,
+} from '@/components/Icons';
 
 export default function PurchaseTermsPage() {
   // Состояние калькулятора рассрочки
@@ -28,10 +38,10 @@ export default function PurchaseTermsPage() {
   const handleSendCalculation = () => {
     const text =
       `Здравствуйте! Рассчитал условия рассрочки на сайте EL ORDO:\n\n` +
-      `💵 Стоимость квартиры: $${apartmentPrice.toLocaleString()}\n` +
-      `💰 Первоначальный взнос (${downPaymentPercent}%): $${downPaymentAmount.toLocaleString()} (~${Math.round(downPaymentAmount * usdToKgs).toLocaleString()} сом)\n` +
-      `🗓️ Срок рассрочки: ${months} мес.\n` +
-      `📌 Ежемесячный платеж: $${monthlyPayment.toLocaleString()}/мес. (~${monthlyPaymentKgs.toLocaleString()} сом)\n\n` +
+      `• Стоимость квартиры: $${apartmentPrice.toLocaleString()}\n` +
+      `• Первоначальный взнос (${downPaymentPercent}%): $${downPaymentAmount.toLocaleString()} (~${Math.round(downPaymentAmount * usdToKgs).toLocaleString()} сом)\n` +
+      `• Срок рассрочки: ${months} мес.\n` +
+      `• Ежемесячный платеж: $${monthlyPayment.toLocaleString()}/мес. (~${monthlyPaymentKgs.toLocaleString()} сом)\n\n` +
       `Подскажите, какие объекты и этажи доступны под этот расчет?`;
 
     window.open(`https://wa.me/996709115115?text=${encodeURIComponent(text)}`, '_blank');
@@ -42,10 +52,10 @@ export default function PurchaseTermsPage() {
     const typeLabel = tradeInType === 'auto' ? 'Автомобиль' : 'Вторичная недвижимость';
     const text =
       `Здравствуйте! Хочу оценить объект по программе Trade-in в EL ORDO GROUP:\n\n` +
-      `📌 Тип: ${typeLabel}\n` +
-      `🏷️ Модель / Описание: ${assetName || 'Не указано'}\n` +
-      (tradeInType === 'auto' && assetYear ? `📅 Год выпуска: ${assetYear}\n` : '') +
-      `💵 Желаемая оценка: $${estimatedValue || 'Требуется оценка'}\n\n` +
+      `• Тип: ${typeLabel}\n` +
+      `• Модель / Описание: ${assetName || 'Не указано'}\n` +
+      (tradeInType === 'auto' && assetYear ? `• Год выпуска: ${assetYear}\n` : '') +
+      `• Желаемая оценка: $${estimatedValue || 'Требуется оценка'}\n\n` +
       `Подскажите, как пройти процедуру оценки для зачета в первый взнос?`;
 
     window.open(`https://wa.me/996709115115?text=${encodeURIComponent(text)}`, '_blank');
@@ -71,27 +81,27 @@ export default function PurchaseTermsPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-24">
+    <main className="min-h-screen bg-[#fafbfa] text-gray-900 pb-24 selection:bg-[#d4b26f] selection:text-[#064734]">
       
       {/* 1. Хлебные крошки */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400">
           <Link href="/" className="hover:text-[#064734] transition-colors">
             Главная
           </Link>
           <span>/</span>
-          <span className="text-[#064734] font-semibold">Условия покупки</span>
+          <span className="text-[#064734] font-bold">Условия покупки</span>
         </div>
       </div>
 
-      {/* 2. Заголовок */}
-      <section className="bg-[#064734] text-white py-16 px-6 relative overflow-hidden">
+      {/* 2. Hero-секция */}
+      <section className="bg-[#064734] text-white py-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-            ПРОЗРАЧНЫЕ И ВЫГОДНЫЕ УСЛОВИЯ
+            Прозрачные и выгодные условия
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wide mb-4">
-            КАК КУПИТЬ КВАРТИРУ В EL ORDO
+          <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight mb-4">
+            Как купить квартиру в EL ORDO
           </h1>
           <p className="text-sm sm:text-base text-white/80 max-w-2xl mx-auto font-light leading-relaxed">
             Прямая покупка от застройщика без банковских процентов. Беспроцентная рассрочка до 40 месяцев, зачет авто и недвижимости по Trade-in и персональные графики платежей.
@@ -100,14 +110,14 @@ export default function PurchaseTermsPage() {
       </section>
 
       {/* 3. Карточки программ покупки */}
-      <div className="max-w-6xl mx-auto px-6 -mt-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Рассрочка 0% */}
           <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-xl mb-4 font-black">
-                0%
+              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-lg mb-5 font-black">
+                <IconCalendar className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-black text-gray-950 mb-2">
                 Рассрочка до 40 мес.
@@ -117,13 +127,16 @@ export default function PurchaseTermsPage() {
               </p>
               <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Взнос от 20% до 50%
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Взнос от 20% до 50%</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Гибкий график (ежемесячно / ежеквартально)
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Гибкий график (ежемесячно / ежеквартально)</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Оформление по паспорту
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Оформление только по паспорту</span>
                 </li>
               </ul>
             </div>
@@ -141,8 +154,8 @@ export default function PurchaseTermsPage() {
               Хит продаж
             </div>
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 text-2xl flex items-center justify-center mb-4">
-                🚗
+              <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 text-[#064734] flex items-center justify-center mb-5">
+                <IconCar className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-black text-gray-950 mb-2">
                 Бартер / Trade-in
@@ -152,13 +165,16 @@ export default function PurchaseTermsPage() {
               </p>
               <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Оценка объекта за 24 часа
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Оценка объекта за 24 часа</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Справедливая рыночная цена
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Справедливая рыночная цена</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Полное юридическое сопровождение
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Полное юридическое сопровождение</span>
                 </li>
               </ul>
             </div>
@@ -173,8 +189,8 @@ export default function PurchaseTermsPage() {
           {/* 100% расчет */}
           <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100 flex flex-col justify-between hover:shadow-xl transition-shadow">
             <div>
-              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center text-xl mb-4 font-black">
-                100%
+              <div className="w-12 h-12 rounded-2xl bg-[#064734]/10 text-[#064734] flex items-center justify-center mb-5">
+                <IconDiamond className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-black text-gray-950 mb-2">
                 Полный расчет
@@ -184,13 +200,16 @@ export default function PurchaseTermsPage() {
               </p>
               <ul className="space-y-2.5 text-xs text-gray-700 font-medium">
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Индивидуальная скидка на м²
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Индивидуальная скидка на м²</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Приоритетный выбор видовых этажей
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Приоритетный выбор видовых этажей</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-[#064734] font-bold">✓</span> Быстрая регистрация ДДУ
+                  <IconCheck className="w-4 h-4 text-[#064734] shrink-0" />
+                  <span>Быстрая регистрация ДДУ</span>
                 </li>
               </ul>
             </div>
@@ -198,9 +217,10 @@ export default function PurchaseTermsPage() {
               href="https://wa.me/996709115115?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%2C%20%D1%85%D0%BE%D1%87%D1%83%20%D1%83%D0%B7%D0%BD%D0%B0%D1%82%D1%8c%20%D1%80%D0%B0%D0%B7%D0%BC%D0%B5%D1%80%20%D1%81%D0%BA%D0%B8%D0%B4%D0%BA%D0%B8%20%D0%BF%D1%80%D0%B8%20100%25%20%D0%BE%D0%BF%D0%BB%D0%B0%D1%82%D0%B5"
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 block text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm"
+              className="mt-6 text-center bg-[#064734] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#032b20] transition-colors shadow-sm flex items-center justify-center gap-1.5"
             >
-              Узнать размер скидки →
+              <span>Узнать размер скидки</span>
+              <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
             </a>
           </div>
 
@@ -208,7 +228,7 @@ export default function PurchaseTermsPage() {
       </div>
 
       {/* 4. Интерактивный калькулятор рассрочки с кнопками-пресетами */}
-      <section id="calculator" className="max-w-5xl mx-auto px-6 mt-20 scroll-mt-24">
+      <section id="calculator" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl">
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
@@ -367,7 +387,7 @@ export default function PurchaseTermsPage() {
                 onClick={handleSendCalculation}
                 className="w-full md:w-auto shrink-0 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black px-8 py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
               >
-                <span>💬</span>
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                 <span>Зафиксировать расчет в WhatsApp</span>
               </button>
             </div>
@@ -376,7 +396,7 @@ export default function PurchaseTermsPage() {
       </section>
 
       {/* 5. Trade-in / Онлайн-заявка на оценку объекта */}
-      <section id="trade-in" className="max-w-5xl mx-auto px-6 mt-20 scroll-mt-24">
+      <section id="trade-in" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white rounded-3xl p-6 sm:p-12 border border-gray-200 shadow-xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           <div className="lg:col-span-6">
@@ -392,15 +412,15 @@ export default function PurchaseTermsPage() {
 
             <div className="space-y-3 text-xs font-semibold text-gray-700">
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px]">1</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">1</span>
                 <span>Оценка экспертом в течение 24 часов</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px]">2</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">2</span>
                 <span>Сумма зачитывается как первый взнос или полная оплата</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px]">3</span>
+                <span className="w-6 h-6 rounded-full bg-[#064734] text-white flex items-center justify-center text-[10px] font-bold">3</span>
                 <span>Юридически чистый договор без скрытых удержаний</span>
               </div>
             </div>
@@ -416,24 +436,26 @@ export default function PurchaseTermsPage() {
               <button
                 type="button"
                 onClick={() => setTradeInType('auto')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   tradeInType === 'auto'
                     ? 'bg-[#064734] text-white shadow'
                     : 'bg-white text-gray-700 border border-gray-200'
                 }`}
               >
-                🚗 Автомобиль
+                <IconCar className="w-4 h-4" />
+                <span>Автомобиль</span>
               </button>
               <button
                 type="button"
                 onClick={() => setTradeInType('realty')}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   tradeInType === 'realty'
                     ? 'bg-[#064734] text-white shadow'
                     : 'bg-white text-gray-700 border border-gray-200'
                 }`}
               >
-                🏢 Недвижимость
+                <IconBuilding className="w-4 h-4" />
+                <span>Недвижимость</span>
               </button>
             </div>
 
@@ -478,9 +500,10 @@ export default function PurchaseTermsPage() {
 
               <button
                 type="submit"
-                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider transition-all shadow text-xs"
+                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider transition-all shadow text-xs flex items-center justify-center gap-1.5"
               >
-                Отправить на оценку в WhatsApp →
+                <span>Отправить на оценку в WhatsApp</span>
+                <IconArrowRight className="w-3.5 h-3.5" />
               </button>
             </form>
           </div>
@@ -489,7 +512,7 @@ export default function PurchaseTermsPage() {
       </section>
 
       {/* 6. Сравнительная таблица способов оплаты */}
-      <section className="max-w-5xl mx-auto px-6 mt-20">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
         <h2 className="text-2xl sm:text-3xl font-black uppercase text-center text-[#064734] mb-8">
           Сравнение условий покупки
         </h2>
@@ -515,7 +538,7 @@ export default function PurchaseTermsPage() {
                 <td className="p-4 font-bold text-gray-900">Переплата / Проценты</td>
                 <td className="p-4 text-emerald-700 font-bold">0% (Без переплат)</td>
                 <td className="p-4 text-emerald-700 font-bold">0% (Без переплат)</td>
-                <td className="p-4 text-emerald-700 font-bold">Макс. скидка</td>
+                <td className="p-4 text-emerald-700 font-bold">Максимальная скидка</td>
               </tr>
               <tr>
                 <td className="p-4 font-bold text-gray-900">Срок выплаты</td>
@@ -541,7 +564,7 @@ export default function PurchaseTermsPage() {
       </section>
 
       {/* 7. Вопросы и ответы (FAQ Accordion) */}
-      <section className="max-w-4xl mx-auto px-6 mt-20">
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 mt-20">
         <div className="text-center mb-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
             Часто задаваемые вопросы
@@ -565,7 +588,7 @@ export default function PurchaseTermsPage() {
                   className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm text-gray-900 hover:text-[#064734] transition-colors"
                 >
                   <span>{faq.q}</span>
-                  <span className="text-lg text-gray-400 font-normal">
+                  <span className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-sm font-mono text-[#064734] shrink-0">
                     {isOpen ? '−' : '+'}
                   </span>
                 </button>
@@ -581,7 +604,7 @@ export default function PurchaseTermsPage() {
       </section>
 
       {/* 8. Консультация юриста и менеджера */}
-      <section className="max-w-5xl mx-auto px-6 mt-20">
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
         <div className="bg-[#032b20] rounded-3xl p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="max-w-xl">
             <span className="text-xs uppercase font-bold tracking-widest text-[#d4b26f] block mb-2">
@@ -601,7 +624,8 @@ export default function PurchaseTermsPage() {
             rel="noopener noreferrer"
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2"
           >
-            <span>💬</span> Написать в WhatsApp
+            <IconWhatsApp className="w-4 h-4 text-[#064734]" />
+            <span>Написать в WhatsApp</span>
           </a>
         </div>
       </section>

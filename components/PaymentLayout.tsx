@@ -2,6 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  IconCheck,
+  IconDocument,
+  IconWhatsApp,
+  IconMapPin,
+  IconArrowRight,
+} from '@/components/Icons';
 
 interface FaqItem {
   q: string;
@@ -101,7 +108,7 @@ export default function PaymentLayout({
               rel="noopener noreferrer"
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2"
             >
-              <span>💬</span>
+              <IconWhatsApp className="w-4 h-4 text-[#064734]" />
               <span>Получить расчет в WhatsApp</span>
             </a>
             <a
@@ -139,8 +146,8 @@ export default function PaymentLayout({
       {/* 4. Информационная плашка ключевой выгоды */}
       <section id="details" className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 scroll-mt-24">
         <div className="bg-gradient-to-r from-[#064734] to-[#0b3b2c] text-white rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-xl border border-white/10">
-          <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 border border-[#d4b26f]/30 flex items-center justify-center shrink-0 text-[#d4b26f] font-black text-xl">
-            ✓
+          <div className="w-12 h-12 rounded-2xl bg-[#d4b26f]/20 border border-[#d4b26f]/30 flex items-center justify-center shrink-0 text-[#d4b26f]">
+            <IconCheck className="w-6 h-6" />
           </div>
           <div>
             <span className="text-[11px] font-black uppercase tracking-wider text-[#d4b26f] block mb-1">
@@ -180,7 +187,7 @@ export default function PaymentLayout({
             {/* Карточка необходимых документов */}
             <div className="bg-[#f2f6f4] p-6 sm:p-8 rounded-3xl border border-[#064734]/15">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">📄</span>
+                <IconDocument className="w-5 h-5 text-[#064734]" />
                 <h3 className="text-sm font-black text-[#064734] uppercase tracking-wider">
                   Пакет документов:
                 </h3>
@@ -189,7 +196,8 @@ export default function PaymentLayout({
                 {documentsText}
               </p>
               <div className="mt-4 pt-3 border-t border-[#064734]/10 flex items-center gap-2 text-xs font-bold text-[#064734]">
-                <span>✓ Без справок о доходах и поручителей</span>
+                <IconCheck className="w-4 h-4 text-[#064734]" />
+                <span>Без справок о доходах и поручителей</span>
               </div>
             </div>
 
@@ -203,9 +211,10 @@ export default function PaymentLayout({
                 href={`https://wa.me/996709115115?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all"
+                className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5"
               >
-                Написать в WhatsApp →
+                <span>Написать в WhatsApp</span>
+                <IconArrowRight className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
@@ -248,7 +257,7 @@ export default function PaymentLayout({
         </div>
       </section>
 
-      {/* 🌟 ДОПОЛНИТЕЛЬНЫЕ ИНТЕРАКТИВНЫЕ БЛОКИ СТРАНИЦЫ (КАЛЬКУЛЯТОРЫ, ТАБЛИЦЫ, ПРИМЕРЫ) */}
+      {/* Дополнительные интерактивные блоки страницы */}
       {children && (
         <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
           {children}
@@ -286,17 +295,19 @@ export default function PaymentLayout({
                 href={`https://wa.me/996709115115?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow"
+                className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2"
               >
-                💬 Чат в WhatsApp
+                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                <span>Чат в WhatsApp</span>
               </a>
               <a
                 href="https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-3.5 px-6 rounded-xl border border-gray-300 hover:border-[#064734] text-gray-800 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white"
+                className="py-3.5 px-6 rounded-xl border border-gray-300 hover:border-[#064734] text-gray-800 font-bold text-xs uppercase tracking-wider text-center transition-all bg-white flex items-center justify-center gap-1.5"
               >
-                📍 Маршрут в 2GIS
+                <IconMapPin className="w-4 h-4 text-[#064734]" />
+                <span>Маршрут в 2GIS</span>
               </a>
             </div>
           </div>

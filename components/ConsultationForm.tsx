@@ -1,6 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import {
+  IconCheck,
+  IconWhatsApp,
+  IconShieldCheck,
+} from '@/components/Icons';
 
 const PROJECTS_LIST = [
   'Все объекты / Нужна консультация',
@@ -83,9 +88,9 @@ export default function ConsultationForm() {
     const message =
       `Здравствуйте! Меня зовут ${clientName}.\n` +
       `Заявка на консультацию с сайта EL ORDO GROUP:\n\n` +
-      `🏢 Объект: ${selectedProject}\n` +
-      `🎯 Цель обращения: ${selectedGoal}\n` +
-      `📞 Телефон для связи: ${phone}\n\n` +
+      `• Объект: ${selectedProject}\n` +
+      `• Цель обращения: ${selectedGoal}\n` +
+      `• Телефон для связи: ${phone}\n\n` +
       `Отправьте, пожалуйста, актуальную шахматку, планировки и график платежей.`;
 
     const waUrl = `https://wa.me/996709115115?text=${encodeURIComponent(message)}`;
@@ -207,7 +212,7 @@ export default function ConsultationForm() {
 
           {/* Сообщение об ошибке */}
           {error && (
-            <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center animate-shake">
+            <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center">
               <p className="text-xs text-rose-200 font-bold">
                 {error}
               </p>
@@ -219,9 +224,9 @@ export default function ConsultationForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl shadow-black/20 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl shadow-black/20 flex items-center justify-center gap-2.5 cursor-pointer"
             >
-              <span>💬</span>
+              <IconWhatsApp className="w-4 h-4 text-[#064734]" />
               <span>{isSubmitting ? 'Открываем WhatsApp...' : 'Получить расчет и шахматку в WhatsApp'}</span>
             </button>
           </div>
@@ -229,19 +234,23 @@ export default function ConsultationForm() {
           {/* Гарантии и защита данных */}
           <div className="pt-3 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11px] text-white/70">
             <span className="flex items-center gap-1.5">
-              <span className="text-[#d4b26f] font-bold">✓</span> Прямой расчет без скрытых переплат
+              <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
+              <span>Прямой расчет без скрытых переплат</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-[#d4b26f] font-bold">✓</span> Консультация бесплатна
+              <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
+              <span>Консультация бесплатна</span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="text-[#d4b26f] font-bold">✓</span> Ответ за 5 минут
+              <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
+              <span>Ответ за 5 минут</span>
             </span>
           </div>
 
           <div className="text-center pt-1">
-            <span className="text-[10px] text-white/50">
-              🔒 Ваши данные надежно защищены и используются исключительно для связи менеджера с вами
+            <span className="text-[10px] text-white/50 inline-flex items-center gap-1.5 justify-center">
+              <IconShieldCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
+              <span>Ваши данные надежно защищены и используются исключительно для связи менеджера с вами</span>
             </span>
           </div>
 
