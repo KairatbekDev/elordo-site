@@ -12,8 +12,12 @@ import {
   IconCalendar,
   IconArrowRight,
   IconWhatsApp,
-  IconMapPin,
 } from '@/components/Icons';
+
+interface ProgressBreakdown {
+  label: Record<Locale, string>;
+  percent: number;
+}
 
 interface ReportItem {
   id: string;
@@ -23,7 +27,11 @@ interface ReportItem {
   stage: Record<Locale, string>;
   progress: number;
   image: string;
-  isDrone?: boolean;
+  videoUrl?: string; // Ссылка на YouTube Embed (например, https://www.youtube.com/embed/dQw4w9WgXcQ)
+  videoDuration?: string;
+  workersOnSite: number;
+  cranesOnSite: number;
+  breakdown: ProgressBreakdown[];
   desc: Record<Locale, string>;
   points: Record<Locale, string[]>;
 }
@@ -49,9 +57,58 @@ const REPORTS: ReportItem[] = [
       en: 'Monolithic frame on 16th floor',
       zh: '第16层现浇混凝土主体施工',
     },
-    progress: 42,
+    progress: 45,
     image: '/projects/Abu-Dhabi.png',
-    isDrone: true,
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Замените на реальный YouTube ID видео с дрона
+    videoDuration: '02:45 • 4K Drone',
+    workersOnSite: 54,
+    cranesOnSite: 2,
+    breakdown: [
+      {
+        label: {
+          ru: 'Монолитный каркас',
+          kg: 'Монолиттик каркас',
+          kz: 'Монолитті қаңқа',
+          uk: 'Монолітний каркас',
+          en: 'Concrete Core',
+          zh: '主体结构',
+        },
+        percent: 65,
+      },
+      {
+        label: {
+          ru: 'Кирпичная кладка',
+          kg: 'Кыш кыноо',
+          kz: 'Кірпіш қалау',
+          uk: 'Цегляна кладка',
+          en: 'Brick Masonry',
+          zh: '红砖砌体',
+        },
+        percent: 38,
+      },
+      {
+        label: {
+          ru: 'Фасадные работы',
+          kg: 'Фасад иштери',
+          kz: 'Қасбет жұмыстары',
+          uk: 'Фасадні роботи',
+          en: 'Façade Insulation',
+          zh: '外墙保温',
+        },
+        percent: 15,
+      },
+      {
+        label: {
+          ru: 'Инженерные сети',
+          kg: 'Инженердик түйүндөр',
+          kz: 'Инженерлік желілер',
+          uk: 'Інженерні мережі',
+          en: 'MEP Engineering',
+          zh: '机电管网',
+        },
+        percent: 20,
+      },
+    ],
     desc: {
       ru: 'Завершена заливка перекрытия 15 этажа в Блоке А. Ведется армирование колонн и пилонов 16 этажа. Параллельно начата кирпичная кладка автоклавным жженым кирпичом на уровнях 7-9 этажей.',
       kg: 'А блогунда 15-кабаттын жабуусун куюу аяктады. 16-кабаттын колонналарын бекемдөө жүрүп жатат. Ошол эле учурда 7-9-кабаттарда бышкан кыш менен дубалдарды тургузуу башталды.',
@@ -113,9 +170,58 @@ const REPORTS: ReportItem[] = [
       en: 'Exterior brickwork & window glazing',
       zh: '外立面红砖砌筑与全景系统门窗安装',
     },
-    progress: 68,
+    progress: 72,
     image: '/projects/Madina-Residense.png',
-    isDrone: true,
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoDuration: '03:10 • 4K Drone',
+    workersOnSite: 38,
+    cranesOnSite: 1,
+    breakdown: [
+      {
+        label: {
+          ru: 'Монолитный каркас',
+          kg: 'Монолиттик каркас',
+          kz: 'Монолитті қаңқа',
+          uk: 'Монолітний каркас',
+          en: 'Concrete Core',
+          zh: '主体结构',
+        },
+        percent: 100,
+      },
+      {
+        label: {
+          ru: 'Кирпичная кладка',
+          kg: 'Кыш кыноо',
+          kz: 'Кірпіш қалау',
+          uk: 'Цегляна кладка',
+          en: 'Brick Masonry',
+          zh: '红砖砌体',
+        },
+        percent: 85,
+      },
+      {
+        label: {
+          ru: 'Остекление окон',
+          kg: 'Терезе салуу',
+          kz: 'Терезе орнату',
+          uk: 'Скління вікон',
+          en: 'Window Glazing',
+          zh: '节能系统窗',
+        },
+        percent: 60,
+      },
+      {
+        label: {
+          ru: 'Инженерные сети',
+          kg: 'Инженердик түйүндөр',
+          kz: 'Инженерлік желілер',
+          uk: 'Інженерні мережі',
+          en: 'MEP Engineering',
+          zh: '机电管网',
+        },
+        percent: 45,
+      },
+    ],
     desc: {
       ru: 'Монолитный каркас здания полностью завершен. Ведутся работы по монтажу энергоэффективных панорамных стеклопакетов на 5-9 этажах, а также разводка внутренних инженерных сетей водоснабжения.',
       kg: 'Имараттын монолиттик каркасы толугу менен аяктады. 5-9-кабаттарда энергияны үнөмдөөчү панорамалык терезелерди орнотуу жана суу түтүктөрүн тартуу иштери жүрүүдө.',
@@ -177,8 +283,58 @@ const REPORTS: ReportItem[] = [
       en: 'Construction of 7th floor',
       zh: '低密纯洋房第7层主体砌筑封顶',
     },
-    progress: 54,
+    progress: 58,
     image: '/projects/Aikolplus.png',
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    videoDuration: '02:15 • 4K Drone',
+    workersOnSite: 29,
+    cranesOnSite: 1,
+    breakdown: [
+      {
+        label: {
+          ru: 'Монолитный каркас',
+          kg: 'Монолиттик каркас',
+          kz: 'Монолитті қаңқа',
+          uk: 'Монолітний каркас',
+          en: 'Concrete Core',
+          zh: '主体结构',
+        },
+        percent: 75,
+      },
+      {
+        label: {
+          ru: 'Кирпичная кладка',
+          kg: 'Кыш кыноо',
+          kz: 'Кірпіш қалау',
+          uk: 'Цегляна кладка',
+          en: 'Brick Masonry',
+          zh: '红砖砌体',
+        },
+        percent: 55,
+      },
+      {
+        label: {
+          ru: 'Кровельные работы',
+          kg: 'Чатыр иштери',
+          kz: 'Шатыр жұмыстары',
+          uk: 'Покрівельні роботи',
+          en: 'Roofing',
+          zh: '屋面防水',
+        },
+        percent: 20,
+      },
+      {
+        label: {
+          ru: 'Инженерные сети',
+          kg: 'Инженердик түйүндөр',
+          kz: 'Инженерлік желілер',
+          uk: 'Інженерні мережі',
+          en: 'MEP Engineering',
+          zh: '机电管网',
+        },
+        percent: 25,
+      },
+    ],
     desc: {
       ru: 'В экологическом районе Кок-Жар ведутся активные монолитные работы. Завершена гидроизоляция подземного паркинга. Качество бетона прошло лабораторный контроль на прочность.',
       kg: 'Көк-Жар экологиялык аймагында монолиттик курулуш жүрүп жатат. Жер астындагы паркингдин гидроизоляциясы аяктады. Бетон лабораториялык текшерүүдөн өттү.',
@@ -220,94 +376,39 @@ const REPORTS: ReportItem[] = [
       ],
     },
   },
-  {
-    id: 'rep-ajkol-1',
-    projectSlug: 'ajkol',
-    projectName: 'ЖД Айкол',
-    date: {
-      ru: 'Июль 2026',
-      kg: 'Июль 2026',
-      kz: 'Шілде 2026',
-      uk: 'Липень 2026',
-      en: 'July 2026',
-      zh: '2026年7月',
-    },
-    stage: {
-      ru: 'Фасадные работы и благоустройство',
-      kg: 'Фасад иштери жана аймакты көрктөндүрүү',
-      kz: 'Қасбет жұмыстары және аумақты абаттандыру',
-      uk: 'Фасадні роботи та благоустрій',
-      en: 'Façade finishes & courtyard landscaping',
-      zh: '艺术外立面收尾与全景观庭院园林造景',
-    },
-    progress: 88,
-    image: '/projects/ajkol.jpg',
-    desc: {
-      ru: 'Дом на финишной прямой перед сдачей в эксплуатацию. Полностью утеплен фасад базальтовой ватой толщиной 10 см. Установлены бесшумные скоростные лифты, начато мощение брусчатки во дворе.',
-      kg: 'Үй пайдаланууга берүү алдында. Фасад 10 см базальт буласы менен жылууланды. Тез жүрүүчү тынч лифттер орнотулду, короого брусчатка төшөө башталды.',
-      kz: 'Үй пайдалануға берудің алдында. Қасбет 10 см базальт жүнімен толық жылытылды. Шусыз жылдам лифттер орнатылды, аулаға тас төсеу басталды.',
-      uk: 'Будинок на фінішній прямій перед здачею в експлуатацію. Фасад утеплено базальтовою ватою 10 см. Встановлено безшумні швидкісні ліфти, розпочато благоустрій двору.',
-      en: 'Building in final completion stage before handover. 10cm basalt rockwool thermal insulation completed. Whisper-quiet high-speed elevators installed, paving active.',
-      zh: '楼盘已全面迈入综合竣工交付收尾冲刺阶段。外墙全覆盖铺设100mm高密度防火玄武岩保温岩棉板。原装高速静音电梯完成安装与调试。',
-    },
-    points: {
-      ru: [
-        'Утепление фасада: 95%',
-        'Установка скоростных лифтов: 100%',
-        'Закрытый двор без машин: благоустройство',
-      ],
-      kg: [
-        'Фасадды жылуулоо: 95%',
-        'Тез жүрүүчү лифттерди орнотуу: 100%',
-        'Унаасыз жабык короо: көрктөндүрүү',
-      ],
-      kz: [
-        'Қасбетті жылыту: 95%',
-        'Жылдам лифттерді орнату: 100%',
-        'Көліксіз жабық аула: абаттандыру',
-      ],
-      uk: [
-        'Утеплення фасаду: 95%',
-        'Монтаж швидкісних ліфтів: 100%',
-        'Закритий двір без машин: благоустрій',
-      ],
-      en: [
-        'Façade insulation: 95%',
-        'High-speed elevator installation: 100%',
-        'Private car-free courtyard landscaping',
-      ],
-      zh: [
-        '外立面一体化保温施工：95%',
-        '智能静音高速客用电梯系统：100% 验收',
-        '封闭式人车分流景观庭院石材铺装中',
-      ],
-    },
-  },
 ];
 
 const UI = {
   ru: {
     heroBadge: 'ДНЕВНИК СТРОЙКИ • EL ORDO GROUP',
     heroTitle: 'ХОД СТРОИТЕЛЬСТВА ОБЪЕКТОВ',
-    heroDesc: 'Ежемесячные фото- и видеоотчеты с наших стройплощадок. Мы открыто демонстрируем каждый этап: от заливки фундамента до финишной отделки фасадов.',
+    heroDesc: 'Ежемесячные 4K видеоотчеты с дрона и фотофиксация каждого этапа. Следите за возведением вашего дома в реальном времени с полной прозрачностью.',
     filterAll: 'Все комплексы',
-    droneBadge: '4K Аэросъемка',
-    readiness: 'Готовность объекта:',
-    pointsTitle: 'Выполненные работы за период:',
+    watchDroneBtn: 'Смотреть видео с дрона',
+    workersLabel: 'Строителей на смене:',
+    cranesLabel: 'Башенных кранов:',
+    readiness: 'Общая готовность:',
+    breakdownTitle: 'Прогресс по ключевым этапам:',
+    pointsTitle: 'Выполненные работы за отчетный период:',
     detailsBtn: 'О комплексе',
     tourBadge: 'Персональный аудит',
     tourTitle: 'Хотите лично посетить стройплощадку?',
     tourDesc: 'Инженер отдела продаж проведет для вас индивидуальную экскурсию в каске по строящемуся объекту, покажет качество кладки и вид из будущей квартиры.',
     tourBtn: 'Записаться на экскурсию',
     tourWaText: 'Здравствуйте! Хочу записаться на персональную экскурсию на стройплощадку объекта ',
+    videoModalTitle: 'Аэросъемка с дрона 4K',
+    closeModal: 'Закрыть',
   },
   kg: {
     heroBadge: 'КУРУЛУШ КҮНДӨЛҮГҮ • EL ORDO GROUP',
     heroTitle: 'ОБЪЕКТТЕРДИН КУРУЛУШ ЖҮРҮШҮ',
-    heroDesc: 'Курулуш аянтчаларыбыздан ай сайын фото жана видео отчеттор. Биз ар бир этапты ачык көрсөтөбүз: пайдубал куюудан баштап фасад иштерине чейин.',
+    heroDesc: 'Дрондон тартылган ай сайынкы 4K видеолор жана ар бир этаптын фотолору. Үйүңүздүн курулушуна толук ачыктык менен көз салыңыз.',
     filterAll: 'Бардык комплекстер',
-    droneBadge: '4K Дрондон тартуу',
-    readiness: 'Объекттин даярдыгы:',
+    watchDroneBtn: 'Дрон видеосун көрүү',
+    workersLabel: 'Сменадагы куруучулар:',
+    cranesLabel: 'Башендик крандар:',
+    readiness: 'Жалпы даярдыгы:',
+    breakdownTitle: 'Негизги этаптар боюнча прогресс:',
     pointsTitle: 'Мезгил ичинде аткарылган иштер:',
     detailsBtn: 'Комплекс тууралуу',
     tourBadge: 'Жеке текшерүү',
@@ -315,14 +416,19 @@ const UI = {
     tourDesc: 'Сатуу бөлүмүнүн инженери курулуп жаткан объект боюнча жеке экскурсия өткөрүп, кыштын сапатын жана болочоктогу батирдин көрүнүшүн көрсөтөт.',
     tourBtn: 'Экскурсияга жазылуу',
     tourWaText: 'Саламатсызбы! Мен курулуш аянтчасына жеке экскурсияга жазылгым келет: ',
+    videoModalTitle: 'Дрондон 4K аэросъемка',
+    closeModal: 'Жабуу',
   },
   kz: {
     heroBadge: 'ҚҰРЫЛЫС КҮНДЕЛІГІ • EL ORDO GROUP',
     heroTitle: 'НЫСАНДАРДЫҢ САЛЫНУ БАРЫСЫ',
-    heroDesc: 'Құрылыс алаңдарымыздан ай сайынғы фото және бейне есептер. Біз іргетас құюдан бастап қасбетті әрлеуге дейінгі барлық кезеңді ашық көрсетеміз.',
+    heroDesc: 'Дроннан түсірілген ай сайынғы 4K бейне есептер және фотофиксация. Үйіңіздің салынуына толық ашықтықпен қадағалаңыз.',
     filterAll: 'Барлық кешендер',
-    droneBadge: '4K Дрон түсірілімі',
-    readiness: 'Нысанның дайындығы:',
+    watchDroneBtn: 'Дрон бейнесін көру',
+    workersLabel: 'Ауысымдағы құрылысшылар:',
+    cranesLabel: 'Мұнаралы крандар:',
+    readiness: 'Жалпы дайындығы:',
+    breakdownTitle: 'Негізгі кезеңдер бойынша прогресс:',
     pointsTitle: 'Кезең ішінде орындалған жұмыстар:',
     detailsBtn: 'Кешен туралы',
     tourBadge: 'Жеке тексеру',
@@ -330,51 +436,68 @@ const UI = {
     tourDesc: 'Сату бөлімінің инженері салынып жатқан нысан бойынша жеке экскурсия өткізіп, қалау сапасы мен болашақ пәтер көрінісін көрсетеді.',
     tourBtn: 'Экскурсияға жазылу',
     tourWaText: 'Сәлеметсіз бе! Мен құрылыс алаңына жеке экскурсияға жазылғым келеді: ',
+    videoModalTitle: 'Дроннан 4K аэротүсірілім',
+    closeModal: 'Жабу',
   },
   uk: {
     heroBadge: 'ЩОДЕННИК БУДІВНИЦТВА • EL ORDO GROUP',
     heroTitle: 'ХІД БУДІВНИЦТВА ОБ’ЄКТІВ',
-    heroDesc: 'Щомісячні фото- та відеозвіти з наших будівельних майданчиків. Ми відкрито демонструємо кожен етап: від заливки фундаменту до оздоблення фасаду.',
+    heroDesc: 'Щомісячні 4K відеозвіти з дрона та фотофіксація кожного етапу. Слідкуйте за зведенням вашого будинку в реальному часі.',
     filterAll: 'Всі комплекси',
-    droneBadge: '4K Аерозйомка',
-    readiness: 'Готовність об’єкта:',
-    pointsTitle: 'Виконані роботи за період:',
+    watchDroneBtn: 'Дивитися відео з дрона',
+    workersLabel: 'Будівельників на зміні:',
+    cranesLabel: 'Баштових кранів:',
+    readiness: 'Загальна готовність:',
+    breakdownTitle: 'Прогрес за ключовими етапами:',
+    pointsTitle: 'Виконані роботи за звітний період:',
     detailsBtn: 'Про комплекс',
     tourBadge: 'Персональний візит',
     tourTitle: 'Бажаєте особисто відвідати будівельний майданчик?',
     tourDesc: 'Інженер відділу продажів проведе для вас індивідуальну екскурсію будівельним майданчиком та покаже якість робіт.',
     tourBtn: 'Записатися на екскурсію',
     tourWaText: 'Доброго дня! Хочу записатися на персональну екскурсію на будівельний майданчик об’єкта ',
+    videoModalTitle: 'Аерозйомка з дрона 4K',
+    closeModal: 'Закрити',
   },
   en: {
     heroBadge: 'CONSTRUCTION DIARY • EL ORDO GROUP',
     heroTitle: 'CONSTRUCTION PROGRESS REPORTS',
-    heroDesc: 'Monthly verified photographic and drone progress logs from our sites. We maintain transparent reporting from foundation engineering to façade installation.',
+    heroDesc: 'Monthly 4K aerial drone walkthroughs and engineering stage updates. Watch your future home rise with complete accountability.',
     filterAll: 'All Developments',
-    droneBadge: '4K Drone Aerial',
-    readiness: 'Development Completion:',
-    pointsTitle: 'Works accomplished during the period:',
+    watchDroneBtn: 'Watch 4K Drone Video',
+    workersLabel: 'Craftsmen on Shift:',
+    cranesLabel: 'Tower Cranes Active:',
+    readiness: 'Overall Completion:',
+    breakdownTitle: 'Milestone Progress Breakdown:',
+    pointsTitle: 'Accomplished during the current cycle:',
     detailsBtn: 'Project Details',
     tourBadge: 'Site Inspection',
     tourTitle: 'Would you like to inspect the site in person?',
     tourDesc: 'Our project engineer will accompany you on an exclusive hard-hat site tour, showcasing brickwork craftsmanship and panoramic window vistas.',
     tourBtn: 'Book Personal Site Tour',
     tourWaText: 'Hello! I would like to book a private on-site inspection for development ',
+    videoModalTitle: '4K Drone Aerial Survey',
+    closeModal: 'Close',
   },
   zh: {
     heroBadge: '工程进度家书 • EL ORDO GROUP',
     heroTitle: '各楼盘最新工程建设进度',
-    heroDesc: '直击施工现场一手高清影像与无人机航拍全景。我们坚持严谨透明的精工履约原则，向全球业主如实呈现从深基坑浇筑到外立面落成的每一道工序。',
+    heroDesc: '每月全景呈现4K超高清无人机航拍与实景工序复盘。恪守精工准则，让您从地基到封顶全程了然于心。',
     filterAll: '全部开发楼盘',
-    droneBadge: '4K超清航拍巡检',
-    readiness: '综合施工进度：',
-    pointsTitle: '本施工周期重点节点总结：',
+    watchDroneBtn: '观看4K航拍视频',
+    workersLabel: '当班精工匠人：',
+    cranesLabel: '运行塔吊台数：',
+    readiness: '综合完成度：',
+    breakdownTitle: '关键施工工序节点细分：',
+    pointsTitle: '本周期重要施工节点完成情况：',
     detailsBtn: '查看楼盘详情',
     tourBadge: '实地工地品鉴',
     tourTitle: '想亲自踏入工地实地感受精工品质？',
-    tourDesc: '项目总工与置业顾问将为您安排专业安全护航的工地一对一实景探访，零距离见证钢筋红砖用料与未来居所窗外视野。',
+    tourDesc: '项目总工与置业顾问将为您安排专业安全护航的工地一对一实景探访，零距离见证用料与窗外视野。',
     tourBtn: '预约工地实地考察',
     tourWaText: '您好！我想预约前往施工现场进行一对一实地工程探访，目标楼盘：',
+    videoModalTitle: '4K全景航拍漫游',
+    closeModal: '关闭',
   },
 };
 
@@ -384,6 +507,7 @@ export default function ConstructionProgressPage() {
   const t = UI[currentLang] || UI.ru;
 
   const [selectedSlug, setSelectedSlug] = useState<string>('all');
+  const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
 
   const filteredReports = useMemo(() => {
     if (selectedSlug === 'all') return REPORTS;
@@ -395,7 +519,6 @@ export default function ConstructionProgressPage() {
     { slug: 'abu-dhabi', label: 'ЖК Abu Dhabi' },
     { slug: 'madina-residence', label: 'ЖК Madina Residence' },
     { slug: 'ajkol-plus', label: 'ЖД Айкол +' },
-    { slug: 'ajkol', label: 'ЖД Айкол' },
   ];
 
   return (
@@ -449,8 +572,8 @@ export default function ConstructionProgressPage() {
         </div>
       </div>
 
-      {/* Список отчетов */}
-      <section className="max-w-6xl mx-auto px-6 mt-10 space-y-10">
+      {/* Список отчетов с видео и подробными шкалами */}
+      <section className="max-w-6xl mx-auto px-6 mt-10 space-y-12">
         {filteredReports.map((report) => {
           const waText = encodeURIComponent(`${t.tourWaText}"${report.projectName}"`);
           const waLink = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${waText}`;
@@ -460,41 +583,77 @@ export default function ConstructionProgressPage() {
               key={report.id}
               className="bg-white dark:bg-[#0b1b15] rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 grid grid-cols-1 lg:grid-cols-12"
             >
-              {/* Фото/Видео медиа блок */}
-              <div className="lg:col-span-6 relative min-h-[320px] lg:min-h-[440px] bg-neutral-900 overflow-hidden group">
+              {/* Медиа-блок (Превью + Кнопка запуска 4K видео) */}
+              <div className="lg:col-span-6 relative min-h-[340px] lg:min-h-[500px] bg-neutral-900 overflow-hidden group">
                 <img
                   src={report.image}
                   alt={report.projectName}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 
-                {/* Бейдж с датой */}
-                <div className="absolute top-4 left-4 flex flex-wrap gap-2">
+                {/* Бейджи вверху */}
+                <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
                   <span className="bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/15 flex items-center gap-1.5 shadow">
                     <IconCalendar className="w-3.5 h-3.5 text-[#d4b26f]" />
                     <span>{report.date[currentLang] || report.date.ru}</span>
                   </span>
 
-                  {report.isDrone && (
-                    <span className="bg-[#d4b26f] text-[#064734] text-[11px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow">
-                      {t.droneBadge}
+                  {report.videoDuration && (
+                    <span className="bg-[#d4b26f] text-[#064734] text-[11px] font-black uppercase px-3 py-1.5 rounded-xl shadow">
+                      {report.videoDuration}
                     </span>
                   )}
                 </div>
 
-                {/* Плашка ЖК внизу фото */}
-                <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md text-white p-3 rounded-2xl border border-white/10">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-extrabold uppercase text-[#d4b26f]">{report.projectName}</span>
-                    <span className="text-gray-300">{report.stage[currentLang] || report.stage.ru}</span>
+                {/* Центр: Кнопка воспроизведения видео с дрона */}
+                {report.videoUrl && (
+                  <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/30 group-hover:bg-black/40 transition-colors">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveVideo({
+                          url: report.videoUrl!,
+                          title: `${report.projectName} • ${report.date[currentLang] || report.date.ru}`,
+                        })
+                      }
+                      className="group/btn flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/90 dark:bg-[#07130e]/90 hover:bg-[#064734] dark:hover:bg-[#d4b26f] text-gray-900 dark:text-white hover:text-white dark:hover:text-[#064734] backdrop-blur-md border border-white/40 shadow-2xl transition-all duration-300 scale-100 hover:scale-105 cursor-pointer"
+                    >
+                      <span className="w-10 h-10 rounded-full bg-[#064734] group-hover/btn:bg-white text-white group-hover/btn:text-[#064734] flex items-center justify-center shadow transition-colors">
+                        <svg className="w-4 h-4 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </span>
+                      <div className="text-left">
+                        <span className="block text-xs font-black uppercase tracking-wider">
+                          {t.watchDroneBtn}
+                        </span>
+                        <span className="block text-[10px] text-gray-500 dark:text-gray-400 group-hover/btn:text-white/80 dark:group-hover/btn:text-[#064734]/80">
+                          {report.videoDuration}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+
+                {/* Живой статус со стройплощадки внизу фото */}
+                <div className="absolute bottom-4 left-4 right-4 bg-black/75 backdrop-blur-md text-white p-3.5 rounded-2xl border border-white/10 z-10">
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-gray-400 text-[10px] block">{t.workersLabel}</span>
+                      <strong className="font-extrabold text-[#d4b26f]">{report.workersOnSite} чел.</strong>
+                    </div>
+                    <div>
+                      <span className="text-gray-400 text-[10px] block">{t.cranesLabel}</span>
+                      <strong className="font-extrabold text-white">{report.cranesOnSite} ед.</strong>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Текстовый блок с прогрессом */}
+              {/* Текстовый блок со шкалами и выполненными работами */}
               <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center justify-between gap-4 mb-3">
+                  <div className="flex items-center justify-between gap-4 mb-2">
                     <h2 className="text-xl sm:text-2xl font-black text-gray-950 dark:text-white">
                       {report.projectName}
                     </h2>
@@ -507,15 +666,15 @@ export default function ConstructionProgressPage() {
                     </Link>
                   </div>
 
-                  <p className="text-xs font-bold text-[#8c6b23] dark:text-[#d4b26f] uppercase tracking-wider mb-4">
+                  <p className="text-xs font-bold text-[#8c6b23] dark:text-[#d4b26f] uppercase tracking-wider mb-5">
                     {report.stage[currentLang] || report.stage.ru}
                   </p>
 
-                  {/* Шкала готовности объекта */}
-                  <div className="mb-6 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
-                    <div className="flex items-center justify-between text-xs font-black mb-2">
+                  {/* Общая шкала готовности */}
+                  <div className="mb-5 p-4 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+                    <div className="flex items-center justify-between text-xs font-black mb-1.5">
                       <span className="text-gray-600 dark:text-gray-300">{t.readiness}</span>
-                      <span className="text-[#064734] dark:text-[#d4b26f] text-sm">{report.progress}%</span>
+                      <span className="text-[#064734] dark:text-[#d4b26f] text-base">{report.progress}%</span>
                     </div>
                     <div className="w-full h-2.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
                       <div
@@ -525,19 +684,44 @@ export default function ConstructionProgressPage() {
                     </div>
                   </div>
 
+                  {/* Детальная разбивка по ключевым этапам */}
+                  <div className="mb-5">
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-2.5">
+                      {t.breakdownTitle}
+                    </span>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {report.breakdown.map((item, idx) => (
+                        <div key={idx} className="p-2.5 rounded-xl bg-gray-50/70 dark:bg-white/5 border border-gray-100 dark:border-white/5">
+                          <div className="flex justify-between text-[11px] font-bold mb-1">
+                            <span className="text-gray-600 dark:text-gray-300 truncate">
+                              {item.label[currentLang] || item.label.ru}
+                            </span>
+                            <span className="text-[#064734] dark:text-[#d4b26f]">{item.percent}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-200 dark:bg-white/10 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#064734] dark:bg-[#d4b26f] rounded-full"
+                              style={{ width: `${item.percent}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Описание работ */}
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-5">
                     {report.desc[currentLang] || report.desc.ru}
                   </p>
 
                   {/* Выполненные пункты */}
-                  <div className="space-y-2 mb-6">
+                  <div className="space-y-1.5 mb-6">
                     <span className="text-[11px] font-extrabold uppercase tracking-wider text-gray-400 dark:text-neutral-400 block">
                       {t.pointsTitle}
                     </span>
                     {(report.points[currentLang] || report.points.ru).map((pt, i) => (
                       <div key={i} className="flex items-start gap-2 text-xs text-gray-700 dark:text-gray-200 font-medium">
-                        <IconCheck className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                        <IconCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                         <span>{pt}</span>
                       </div>
                     ))}
@@ -562,7 +746,42 @@ export default function ConstructionProgressPage() {
         })}
       </section>
 
-      {/* Баннер персональной экскурсии */}
+      {/* Модальное окно просмотра видео с дрона */}
+      {activeVideo && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
+          onClick={() => setActiveVideo(null)}
+        >
+          <div
+            className="bg-neutral-900 w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 sm:px-6 flex items-center justify-between border-b border-white/10 text-white">
+              <span className="text-xs sm:text-sm font-black uppercase text-[#d4b26f]">
+                {activeVideo.title}
+              </span>
+              <button
+                type="button"
+                onClick={() => setActiveVideo(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="relative aspect-video w-full bg-black">
+              <iframe
+                src={`${activeVideo.url}?autoplay=1`}
+                title={activeVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full border-0"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Баннер экскурсии */}
       <section className="max-w-6xl mx-auto px-6 mt-16">
         <div className="bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
           <div className="max-w-xl text-center md:text-left">
