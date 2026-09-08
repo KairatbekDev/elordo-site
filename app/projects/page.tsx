@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   IconBuilding,
   IconCrane,
@@ -28,102 +29,103 @@ interface Project {
   desc: string;
 }
 
-const PROJECTS: Project[] = [
-  {
-    slug: 'abu-dhabi',
-    name: 'ЖК Abu Dhabi',
-    category: 'active',
-    classType: 'Премиум-класс',
-    classCategory: 'premium',
-    image: '/projects/Abu-Dhabi.png',
-    address: 'ул. Сухомлинова, 29',
-    deadline: '2029 г. 3 квартал',
-    price: 'от 1 650 $/м²',
-    priceNum: 1650,
-    floors: '25 этажей (2 башни)',
-    desc: 'Флагманский архитектурный проект столицы с панорамным остеклением и видами на горы Ала-Тоо.',
-  },
-  {
-    slug: 'madina-residence',
-    name: 'ЖК Madina Residence',
-    category: 'active',
-    classType: 'Бизнес-класс',
-    classCategory: 'business',
-    image: '/projects/Madina-Residense.png',
-    address: 'ул. Огонбаева, 12',
-    deadline: '2027 г. 3 квартал',
-    price: 'от 1 400 $/м²',
-    priceNum: 1400,
-    floors: '14 этажей',
-    desc: 'Статусный жилой комплекс в развитом деловом центре столицы с закрытой охраняемой территорией.',
-  },
-  {
-    slug: 'ajkol-plus',
-    name: 'ЖД Айкол +',
-    category: 'active',
-    classType: 'Комфорт+',
-    classCategory: 'comfort',
-    image: '/projects/Aikolplus.png',
-    address: 'с. Кок-Жар, ул. Баялинова, 6',
-    deadline: '2028 г. 3 квартал',
-    price: 'от 1 100 $/м²',
-    priceNum: 1100,
-    floors: '10 этажей',
-    desc: 'Клубный формат жизни в экологически благоприятном южном предгорье с кристально чистым воздухом.',
-  },
-  {
-    slug: 'ajkol',
-    name: 'ЖД Айкол',
-    category: 'active',
-    classType: 'Комфорт-класс',
-    classCategory: 'comfort',
-    image: '/projects/ajkol.jpg',
-    address: 'ул. Арашан, 10',
-    deadline: '2026 г. 2 квартал',
-    price: 'от 950 $/м²',
-    priceNum: 950,
-    floors: '9 этажей',
-    desc: 'Надежный монолитно-кирпичный дом в высокой степени готовности. Скорый ввод в эксплуатацию.',
-  },
-  {
-    slug: 'kelechek',
-    name: 'ЖК Келечек',
-    category: 'finished',
-    classType: 'Комфорт-класс',
-    classCategory: 'comfort',
-    image: '/projects/Kelechek.jpg',
-    address: 'ул. Космическая, 153',
-    deadline: 'Сдан в эксплуатацию',
-    price: 'Все квартиры проданы',
-    priceNum: 0,
-    floors: '9 этажей',
-    desc: 'Полностью завершенный, введенный в эксплуатацию и заселенный жилой комплекс в тихом районе.',
-  },
-  {
-    slug: 'ordo',
-    name: 'КД Ордо',
-    category: 'finished',
-    classType: 'Клубный дом',
-    classCategory: 'premium',
-    image: '/projects/Ordo.jpg',
-    address: 'ул. Тверская, 20',
-    deadline: 'Сдан в эксплуатацию',
-    price: 'Все квартиры проданы',
-    priceNum: 0,
-    floors: '7 этажей',
-    desc: 'Первый знаковый клубный дом компании с авторской архитектурой, подземным паркингом и террасой.',
-  },
-];
-
 export default function ProjectsCatalogPage() {
+  const { t } = useLanguage();
+
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'finished'>('all');
   const [classFilter, setClassFilter] = useState<'all' | 'premium' | 'business' | 'comfort'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
 
-  // Фильтрация и сортировка
+  const projects: Project[] = useMemo(() => [
+    {
+      slug: 'abu-dhabi',
+      name: 'ЖК Abu Dhabi',
+      category: 'active',
+      classType: t.projectsPage.abuDhabiClass,
+      classCategory: 'premium',
+      image: '/projects/Abu-Dhabi.png',
+      address: 'ул. Сухомлинова, 29',
+      deadline: t.projectsPage.abuDhabiDeadline,
+      price: `${t.common.fromPrice} 1 650 ${t.common.sqm}`,
+      priceNum: 1650,
+      floors: t.projectsPage.abuDhabiFloors,
+      desc: t.projectsPage.abuDhabiDesc,
+    },
+    {
+      slug: 'madina-residence',
+      name: 'ЖК Madina Residence',
+      category: 'active',
+      classType: t.projectsPage.madinaClass,
+      classCategory: 'business',
+      image: '/projects/Madina-Residense.png',
+      address: 'ул. Огонбаева, 12',
+      deadline: t.projectsPage.madinaDeadline,
+      price: `${t.common.fromPrice} 1 400 ${t.common.sqm}`,
+      priceNum: 1400,
+      floors: t.projectsPage.madinaFloors,
+      desc: t.projectsPage.madinaDesc,
+    },
+    {
+      slug: 'ajkol-plus',
+      name: 'ЖД Айкол +',
+      category: 'active',
+      classType: t.projectsPage.ajkolPlusClass,
+      classCategory: 'comfort',
+      image: '/projects/Aikolplus.png',
+      address: 'с. Кок-Жар, ул. Баялинова, 6',
+      deadline: t.projectsPage.ajkolPlusDeadline,
+      price: `${t.common.fromPrice} 1 100 ${t.common.sqm}`,
+      priceNum: 1100,
+      floors: t.projectsPage.ajkolPlusFloors,
+      desc: t.projectsPage.ajkolPlusDesc,
+    },
+    {
+      slug: 'ajkol',
+      name: 'ЖД Айкол',
+      category: 'active',
+      classType: t.projectsPage.ajkolClass,
+      classCategory: 'comfort',
+      image: '/projects/ajkol.jpg',
+      address: 'ул. Арашан, 10',
+      deadline: t.projectsPage.ajkolDeadline,
+      price: `${t.common.fromPrice} 950 ${t.common.sqm}`,
+      priceNum: 950,
+      floors: t.projectsPage.ajkolFloors,
+      desc: t.projectsPage.ajkolDesc,
+    },
+    {
+      slug: 'kelechek',
+      name: 'ЖК Келечек',
+      category: 'finished',
+      classType: t.projectsPage.kelechekClass,
+      classCategory: 'comfort',
+      image: '/projects/Kelechek.jpg',
+      address: 'ул. Космическая, 153',
+      deadline: t.projectsPage.statusFinishedFull,
+      price: t.projectsPage.soldOut,
+      priceNum: 0,
+      floors: t.projectsPage.kelechekFloors,
+      desc: t.projectsPage.kelechekDesc,
+    },
+    {
+      slug: 'ordo',
+      name: 'КД Ордо',
+      category: 'finished',
+      classType: t.projectsPage.ordoClass,
+      classCategory: 'premium',
+      image: '/projects/Ordo.jpg',
+      address: 'ул. Тверская, 20',
+      deadline: t.projectsPage.statusFinishedFull,
+      price: t.projectsPage.soldOut,
+      priceNum: 0,
+      floors: t.projectsPage.ordoFloors,
+      desc: t.projectsPage.ordoDesc,
+    },
+  ], [t]);
+
   const filteredProjects = useMemo(() => {
-    return PROJECTS.filter((item) => {
+    return projects.filter((item) => {
       if (statusFilter !== 'all' && item.category !== statusFilter) return false;
       if (classFilter !== 'all' && item.classCategory !== classFilter) return false;
       if (searchQuery.trim() !== '') {
@@ -142,10 +144,10 @@ export default function ProjectsCatalogPage() {
       }
       return 0;
     });
-  }, [statusFilter, classFilter, searchQuery, sortBy]);
+  }, [projects, statusFilter, classFilter, searchQuery, sortBy]);
 
-  const activeCount = PROJECTS.filter((p) => p.category === 'active').length;
-  const finishedCount = PROJECTS.filter((p) => p.category === 'finished').length;
+  const activeCount = projects.filter((p) => p.category === 'active').length;
+  const finishedCount = projects.filter((p) => p.category === 'finished').length;
 
   const resetFilters = () => {
     setStatusFilter('all');
@@ -161,10 +163,10 @@ export default function ProjectsCatalogPage() {
       <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
-            Главная
+            {t.common.home}
           </Link>
           <span>/</span>
-          <span className="text-[#064734] dark:text-[#d4b26f] font-semibold">Каталог объектов</span>
+          <span className="text-[#064734] dark:text-[#d4b26f] font-semibold">{t.header.catalog}</span>
         </div>
       </div>
 
@@ -172,32 +174,32 @@ export default function ProjectsCatalogPage() {
       <section className="bg-[#064734] text-white py-16 px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-            ПОРТФОЛИО EL ORDO GROUP
+            {t.projectsPage.heroBadge}
           </span>
           <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wide mb-4">
-            ЖИЛЫЕ КОМПЛЕКСЫ В БИШКЕКЕ
+            {t.projectsPage.heroTitle}
           </h1>
           <p className="text-sm sm:text-base text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-            От масштабных высотных башен премиум-класса до уютных клубных домов в предгорье. Выберите подходящий объект для жизни или инвестиций.
+            {t.projectsPage.heroDesc}
           </p>
 
           {/* Быстрые цифры */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">Всего объектов:</span>
-              <strong className="text-lg font-black text-white">{PROJECTS.length} комплекса</strong>
+              <span className="text-[11px] text-gray-300 block">{t.projectsPage.statTotalLabel}</span>
+              <strong className="text-lg font-black text-white">{t.projectsPage.statTotalVal}</strong>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">Стоимость:</span>
-              <strong className="text-lg font-black text-[#d4b26f]">от 950 $/м²</strong>
+              <span className="text-[11px] text-gray-300 block">{t.projectsPage.statPriceLabel}</span>
+              <strong className="text-lg font-black text-[#d4b26f]">{t.projectsPage.statPriceVal}</strong>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">Рассрочка:</span>
-              <strong className="text-lg font-black text-white">до 40 месяцев 0%</strong>
+              <span className="text-[11px] text-gray-300 block">{t.projectsPage.statInstallmentLabel}</span>
+              <strong className="text-lg font-black text-white">{t.projectsPage.statInstallmentVal}</strong>
             </div>
             <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">Бартер:</span>
-              <strong className="text-lg font-black text-white">Trade-in (Авто)</strong>
+              <span className="text-[11px] text-gray-300 block">{t.projectsPage.statBarterLabel}</span>
+              <strong className="text-lg font-black text-white">{t.projectsPage.statBarterVal}</strong>
             </div>
           </div>
         </div>
@@ -213,7 +215,7 @@ export default function ProjectsCatalogPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Поиск по названию или адресу (например: Сухомлинова, Огонбаева)..."
+              placeholder={t.projectsPage.searchPlaceholder}
               className="w-full pl-10 pr-9 py-3 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] shadow-sm transition-all"
             />
             <svg
@@ -232,7 +234,6 @@ export default function ProjectsCatalogPage() {
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                aria-label="Очистить поиск"
                 className="w-5 h-5 flex items-center justify-center absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -245,16 +246,16 @@ export default function ProjectsCatalogPage() {
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-gray-500 dark:text-neutral-400 whitespace-nowrap hidden sm:inline">
-              Сортировка:
+              {t.projectsPage.sortLabel}
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
               className="py-3 px-4 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] shadow-sm cursor-pointer"
             >
-              <option value="default" className="dark:bg-[#0b1b15]">По умолчанию</option>
-              <option value="price-asc" className="dark:bg-[#0b1b15]">Сначала доступные ($)</option>
-              <option value="price-desc" className="dark:bg-[#0b1b15]">Сначала премиальные ($$$)</option>
+              <option value="default" className="dark:bg-[#0b1b15]">{t.projectsPage.sortDefault}</option>
+              <option value="price-asc" className="dark:bg-[#0b1b15]">{t.projectsPage.sortPriceAsc}</option>
+              <option value="price-desc" className="dark:bg-[#0b1b15]">{t.projectsPage.sortPriceDesc}</option>
             </select>
           </div>
         </div>
@@ -273,7 +274,7 @@ export default function ProjectsCatalogPage() {
                   : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
               }`}
             >
-              Все объекты ({PROJECTS.length})
+              {t.projectsPage.tabAll} ({projects.length})
             </button>
             <button
               type="button"
@@ -285,7 +286,7 @@ export default function ProjectsCatalogPage() {
               }`}
             >
               <IconCrane className="w-3.5 h-3.5 shrink-0" />
-              <span>Строящиеся ({activeCount})</span>
+              <span>{t.projectsPage.tabActive} ({activeCount})</span>
             </button>
             <button
               type="button"
@@ -297,18 +298,18 @@ export default function ProjectsCatalogPage() {
               }`}
             >
               <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-              <span>Сданные ({finishedCount})</span>
+              <span>{t.projectsPage.tabFinished} ({finishedCount})</span>
             </button>
           </div>
 
           {/* Класс жилья */}
           <div className="flex flex-wrap items-center gap-1.5 text-xs font-semibold text-gray-600 dark:text-gray-300">
-            <span className="text-[11px] uppercase font-bold text-gray-400 dark:text-neutral-400 mr-1">Класс:</span>
+            <span className="text-[11px] uppercase font-bold text-gray-400 dark:text-neutral-400 mr-1">{t.projectsPage.classLabel}</span>
             {[
-              { id: 'all', label: 'Все' },
-              { id: 'premium', label: 'Премиум' },
-              { id: 'business', label: 'Бизнес' },
-              { id: 'comfort', label: 'Комфорт' },
+              { id: 'all', label: t.projectsPage.classAll },
+              { id: 'premium', label: t.projectsPage.classPremium },
+              { id: 'business', label: t.projectsPage.classBusiness },
+              { id: 'comfort', label: t.projectsPage.classComfort },
             ].map((cls) => (
               <button
                 key={cls.id}
@@ -328,7 +329,7 @@ export default function ProjectsCatalogPage() {
 
         <div className="flex items-center justify-between text-xs text-gray-500 dark:text-neutral-400 font-medium mt-4">
           <span>
-            Найдено комплексов: <strong className="text-gray-900 dark:text-white">{filteredProjects.length}</strong>
+            {t.projectsPage.foundCount} <strong className="text-gray-900 dark:text-white">{filteredProjects.length}</strong>
           </span>
           {(statusFilter !== 'all' || classFilter !== 'all' || searchQuery !== '' || sortBy !== 'default') && (
             <button
@@ -336,7 +337,7 @@ export default function ProjectsCatalogPage() {
               onClick={resetFilters}
               className="text-[#064734] dark:text-[#d4b26f] hover:underline font-bold cursor-pointer"
             >
-              Сбросить все фильтры
+              {t.projectsPage.resetFilters}
             </button>
           )}
         </div>
@@ -347,7 +348,7 @@ export default function ProjectsCatalogPage() {
             {filteredProjects.map((project) => {
               const isFinished = project.category === 'finished';
               const waProjectText = encodeURIComponent(
-                `Здравствуйте! Интересует ${project.name}. Подскажите актуальные цены и свободные варианты.`
+                t.projectsPage.waProjectText.replace('{name}', project.name)
               );
 
               return (
@@ -374,7 +375,7 @@ export default function ProjectsCatalogPage() {
                           }`}
                         >
                           {isFinished && <IconCheck className="w-3.5 h-3.5 text-emerald-400" />}
-                          <span>{isFinished ? 'Сдан' : project.classType}</span>
+                          <span>{isFinished ? t.projectsPage.statusFinished : project.classType}</span>
                         </span>
                       </div>
 
@@ -417,9 +418,9 @@ export default function ProjectsCatalogPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/${project.slug}`}
-                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>Подробнее о проекте</span>
+                      <span>{t.projectsPage.detailsBtn}</span>
                       <IconArrowRight className="w-4 h-4" />
                     </Link>
 
@@ -428,10 +429,10 @@ export default function ProjectsCatalogPage() {
                         href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5"
+                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <IconWhatsApp className="w-3.5 h-3.5 text-[#25D366]" />
-                        <span>Спросить о наличии в WhatsApp</span>
+                        <span>{t.projectsPage.askAvailabilityBtn}</span>
                       </a>
                     )}
                   </div>
@@ -448,16 +449,16 @@ export default function ProjectsCatalogPage() {
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
             </div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Объекты не найдены</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t.projectsPage.emptyTitle}</h3>
             <p className="text-xs text-gray-500 dark:text-neutral-400 max-w-sm mx-auto mb-6">
-              Попробуйте изменить параметры поиска или сбросить активные фильтры.
+              {t.projectsPage.emptyDesc}
             </p>
             <button
               type="button"
               onClick={resetFilters}
               className="px-6 py-3 rounded-xl bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold text-xs uppercase tracking-wider hover:bg-[#032b20] dark:hover:bg-[#c49f57] transition-colors cursor-pointer"
             >
-              Сбросить фильтры
+              {t.projectsPage.emptyResetBtn}
             </button>
           </div>
         )}
@@ -466,26 +467,24 @@ export default function ProjectsCatalogPage() {
         <div className="mt-16 bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
           <div className="max-w-xl text-center md:text-left">
             <span className="text-xs uppercase font-bold tracking-wider text-[#064734] dark:text-[#d4b26f] block mb-1">
-              Не знаете, какой объект выбрать?
+              {t.projectsPage.ctaBadge}
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-[#064734] dark:text-white uppercase mb-2">
-              ПОЛУЧИТЕ ПОЛНУЮ ШАХМАТКУ И ПЛАНИРОВКИ
+              {t.projectsPage.ctaTitle}
             </h3>
             <p className="text-xs sm:text-sm text-[#064734]/85 dark:text-gray-300 leading-relaxed">
-              Отдел продаж отправит презентацию по всем комплексам, свободным этажам и рассчитает график платежей по рассрочке прямо в WhatsApp.
+              {t.projectsPage.ctaDesc}
             </p>
           </div>
 
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-              'Здравствуйте! Хочу получить полный каталог и шахматку объектов EL ORDO GROUP.'
-            )}`}
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(t.projectsPage.waCatalogText)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#0a4d38] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent dark:border-white/10"
+            className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#0a4d38] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-            <span>Написать в WhatsApp</span>
+            <span>{t.projectsPage.ctaBtn}</span>
           </a>
         </div>
       </div>

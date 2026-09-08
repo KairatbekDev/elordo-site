@@ -2,15 +2,116 @@
 
 import { useState, useEffect } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconWhatsApp,
   IconInstagram,
   IconMapPin,
 } from '@/components/Icons';
 
+interface FloatingContactContent {
+  badge: string;
+  ariaLabel: string;
+  salesDept: string;
+  online: string;
+  chatWhatsapp: string;
+  replyTime: string;
+  callManager: string;
+  mainPhone: string;
+  secondaryPhone: string;
+  office2gis: string;
+  waText: string;
+}
+
+const CONTENT: Record<Locale, FloatingContactContent> = {
+  ru: {
+    badge: 'Консультация 0%',
+    ariaLabel: 'Связаться с отделом продаж',
+    salesDept: 'Отдел продаж EL ORDO',
+    online: 'Онлайн',
+    chatWhatsapp: 'Чат в WhatsApp',
+    replyTime: 'Ответим за 2 минуты',
+    callManager: 'Позвонить менеджеру:',
+    mainPhone: 'Основной',
+    secondaryPhone: 'Доп. линия',
+    office2gis: 'Офис в 2GIS',
+    waText: 'Здравствуйте! Хочу получить консультацию по объектам EL ORDO GROUP.',
+  },
+  kg: {
+    badge: 'Кеңеш алуу 0%',
+    ariaLabel: 'Сатуу бөлүмү менен байланышуу',
+    salesDept: 'EL ORDO сатуу бөлүмү',
+    online: 'Онлайн',
+    chatWhatsapp: 'WhatsApp аркылуу баарлашуу',
+    replyTime: '2 мүнөттө жооп беребиз',
+    callManager: 'Менеджерге чалуу:',
+    mainPhone: 'Негизги',
+    secondaryPhone: 'Кошумча линия',
+    office2gis: '2GIS аркылуу офис',
+    waText: 'Саламатсызбы! EL ORDO GROUP объектилери боюнча кеңеш алгым келет.',
+  },
+  kz: {
+    badge: 'Кеңес алу 0%',
+    ariaLabel: 'Сату бөлімімен байланысу',
+    salesDept: 'EL ORDO сату бөлімі',
+    online: 'Онлайн',
+    chatWhatsapp: 'WhatsApp-та жазуу',
+    replyTime: '2 минутта жауап береміз',
+    callManager: 'Менеджерге қоңырау шалу:',
+    mainPhone: 'Негізгі',
+    secondaryPhone: 'Қосымша желі',
+    office2gis: '2GIS кеңсесі',
+    waText: 'Сәлеметсіз бе! EL ORDO GROUP нысандары бойынша кеңес алғым келеді.',
+  },
+  uk: {
+    badge: 'Консультація 0%',
+    ariaLabel: 'Зв’язатися з відділом продажів',
+    salesDept: 'Відділ продажів EL ORDO',
+    online: 'Онлайн',
+    chatWhatsapp: 'Чат у WhatsApp',
+    replyTime: 'Відповімо за 2 хвилини',
+    callManager: 'Зателефонувати менеджеру:',
+    mainPhone: 'Основний',
+    secondaryPhone: 'Дод. лінія',
+    office2gis: 'Офіс у 2GIS',
+    waText: 'Доброго дня! Хочу отримати консультацію щодо об’єктів EL ORDO GROUP.',
+  },
+  en: {
+    badge: '0% Consultation',
+    ariaLabel: 'Contact sales department',
+    salesDept: 'EL ORDO Sales Team',
+    online: 'Online',
+    chatWhatsapp: 'Chat on WhatsApp',
+    replyTime: 'Replies within 2 minutes',
+    callManager: 'Call a manager:',
+    mainPhone: 'Main line',
+    secondaryPhone: 'Direct line',
+    office2gis: 'Office in 2GIS',
+    waText: 'Hello! I would like to get a consultation on EL ORDO GROUP developments.',
+  },
+  zh: {
+    badge: '0% 置业咨询',
+    ariaLabel: '联系品牌营销中心',
+    salesDept: 'EL ORDO 营销中心',
+    online: '顾问在线',
+    chatWhatsapp: 'WhatsApp 咨询',
+    replyTime: '2分钟内极速响应',
+    callManager: '一键致电顾问：',
+    mainPhone: '主线电话',
+    secondaryPhone: '专线电话',
+    office2gis: '2GIS 导航到店',
+    waText: '您好！我想咨询了解 EL ORDO GROUP 旗下各住宅楼盘详情。',
+  },
+};
+
 export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
   const [showBadge, setShowBadge] = useState(true);
+
+  const langContext = useLanguage() as any;
+  const currentLang: Locale = (langContext?.locale || langContext?.language || 'ru') as Locale;
+  const c = CONTENT[currentLang] || CONTENT.ru;
 
   // Закрытие по нажатию клавиши Escape
   useEffect(() => {
@@ -27,9 +128,7 @@ export default function FloatingContact() {
     if (showBadge) setShowBadge(false);
   };
 
-  const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-    'Здравствуйте! Хочу получить консультацию по объектам EL ORDO GROUP.'
-  )}`;
+  const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(c.waText)}`;
 
   return (
     <>
@@ -42,7 +141,7 @@ export default function FloatingContact() {
         />
       )}
 
-      {/* 2. Плавающий контейнер (bottom-20 на мобилках для исключения наложения на нижний бар) */}
+      {/* 2. Плавающий контейнер */}
       <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-3 font-sans select-none">
         
         {/* Интерактивное меню каналов связи */}
@@ -52,11 +151,11 @@ export default function FloatingContact() {
             {/* Статус-панель отдела продаж */}
             <div className="flex items-center justify-between px-1 pb-2 border-b border-gray-100">
               <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
-                Отдел продаж EL ORDO
+                {c.salesDept}
               </span>
               <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Онлайн
+                {c.online}
               </span>
             </div>
 
@@ -72,21 +171,21 @@ export default function FloatingContact() {
                 <IconWhatsApp className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
-                <span className="leading-tight">Чат в WhatsApp</span>
-                <span className="text-[10px] text-gray-500 font-normal">Ответим за 2 минуты</span>
+                <span className="leading-tight">{c.chatWhatsapp}</span>
+                <span className="text-[10px] text-gray-500 font-normal">{c.replyTime}</span>
               </div>
             </a>
 
-            {/* Прямые звонки (два номера из COMPANY_INFO) */}
+            {/* Прямые звонки */}
             <div className="p-2.5 rounded-2xl bg-gray-50 border border-gray-100">
-              <span className="text-[10px] font-bold text-gray-400 block mb-1">Позвонить менеджеру:</span>
+              <span className="text-[10px] font-bold text-gray-400 block mb-1">{c.callManager}</span>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
                 onClick={() => setIsOpen(false)}
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors"
               >
                 <span>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</span>
-                <span className="text-[10px] font-bold text-[#d4b26f]">Основной</span>
+                <span className="text-[10px] font-bold text-[#d4b26f]">{c.mainPhone}</span>
               </a>
               <a
                 href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
@@ -94,11 +193,11 @@ export default function FloatingContact() {
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors border-t border-gray-200/50 mt-1 pt-1"
               >
                 <span>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</span>
-                <span className="text-[10px] font-bold text-gray-400">Доп. линия</span>
+                <span className="text-[10px] font-bold text-gray-400">{c.secondaryPhone}</span>
               </a>
             </div>
 
-            {/* Instagram и 2GIS (с чистыми SVG) */}
+            {/* Instagram и 2GIS */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               <a
                 href={COMPANY_INFO.instagram}
@@ -118,7 +217,7 @@ export default function FloatingContact() {
                 className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#064734] font-bold text-[11px] transition-colors border border-emerald-100"
               >
                 <IconMapPin className="w-3.5 h-3.5 text-[#064734]" />
-                <span>Офис в 2GIS</span>
+                <span>{c.office2gis}</span>
               </a>
             </div>
 
@@ -134,7 +233,7 @@ export default function FloatingContact() {
               className="cursor-pointer hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#064734] text-white border border-[#d4b26f]/40 shadow-xl animate-bounce"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-extrabold text-[#d4b26f]">Консультация 0%</span>
+              <span className="text-xs font-extrabold text-[#d4b26f]">{c.badge}</span>
             </div>
           )}
 
@@ -142,7 +241,7 @@ export default function FloatingContact() {
             type="button"
             onClick={toggleMenu}
             aria-expanded={isOpen}
-            aria-label="Связаться с отделом продаж"
+            aria-label={c.ariaLabel}
             className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white shadow-2xl transition-all border-2 border-[#d4b26f]/40 cursor-pointer"
           >
             {!isOpen && (
