@@ -22,10 +22,7 @@ export default function TypicalFloorsSection({
   projectName,
   floors,
   whatsappNumber = COMPANY_INFO.whatsapp,
-  theme = 'light',
 }: TypicalFloorsSectionProps) {
-  const isDark = theme === 'dark';
-
   const [activeFloorId, setActiveFloorId] = useState<string>(floors[0]?.id || '2');
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -80,9 +77,7 @@ export default function TypicalFloorsSection({
   const waMessage = `Здравствуйте! Интересует поэтажная шахматка (${currentFloor.label}) в объекте ${projectName}. Отправьте, пожалуйста, список свободных квартир и актуальные цены.`;
 
   return (
-    <section className={`py-20 px-4 sm:px-6 relative border-t ${
-      isDark ? 'bg-[#151917] text-white border-white/10' : 'bg-white text-gray-900 border-gray-100'
-    }`}>
+    <section className="py-20 px-4 sm:px-6 relative border-t bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 border-gray-100 dark:border-white/10 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
         
         {/* Заголовок секции */}
@@ -90,10 +85,10 @@ export default function TypicalFloorsSection({
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             Архитектурный план здания
           </span>
-          <h2 className={`text-2xl sm:text-4xl font-black uppercase tracking-tight mb-3 ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+          <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tight mb-3 text-[#064734] dark:text-[#d4b26f]">
             Типовые этажи
           </h2>
-          <p className={`text-xs sm:text-sm leading-relaxed ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+          <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-neutral-400">
             Выберите интересующий уровень, чтобы изучить схему подъезда, лифтовых холлов и ориентацию квартир по сторонам света.
           </p>
         </div>
@@ -103,7 +98,7 @@ export default function TypicalFloorsSection({
           <button
             type="button"
             onClick={handlePrevFloor}
-            className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white flex items-center justify-center transition-all text-sm font-bold shadow-sm"
+            className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white dark:hover:bg-[#d4b26f] dark:hover:text-[#064734] flex items-center justify-center transition-all text-sm font-bold shadow-sm cursor-pointer"
             title="Предыдущий этаж"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -112,7 +107,7 @@ export default function TypicalFloorsSection({
             </svg>
           </button>
 
-          <div className="flex flex-wrap justify-center items-center gap-2 p-1.5 rounded-2xl bg-gray-100 dark:bg-black/40 border border-gray-200 dark:border-white/10">
+          <div className="flex flex-wrap justify-center items-center gap-2 p-1.5 rounded-2xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10">
             {floors.map((floor) => {
               const isActive = activeFloorId === floor.id;
               return (
@@ -123,12 +118,10 @@ export default function TypicalFloorsSection({
                     setZoomLevel(1);
                     setActiveFloorId(floor.id);
                   }}
-                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 ${
+                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? 'bg-[#064734] text-white shadow-md scale-105'
-                      : isDark
-                      ? 'text-gray-300 hover:text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:text-gray-950 hover:bg-white'
+                      ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md scale-105'
+                      : 'text-gray-700 dark:text-neutral-300 hover:text-gray-950 dark:hover:text-white hover:bg-white dark:hover:bg-white/10'
                   }`}
                 >
                   {floor.label}
@@ -140,7 +133,7 @@ export default function TypicalFloorsSection({
           <button
             type="button"
             onClick={handleNextFloor}
-            className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white flex items-center justify-center transition-all text-sm font-bold shadow-sm"
+            className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white dark:hover:bg-[#d4b26f] dark:hover:text-[#064734] flex items-center justify-center transition-all text-sm font-bold shadow-sm cursor-pointer"
             title="Следующий этаж"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -150,10 +143,8 @@ export default function TypicalFloorsSection({
           </button>
         </div>
 
-        {/* Чертеж / План этажа */}
-        <div className={`rounded-3xl p-4 sm:p-8 border shadow-xl max-w-5xl mx-auto flex flex-col justify-between ${
-          isDark ? 'bg-[#1b221e] border-white/10' : 'bg-[#fafbfa] border-gray-200'
-        }`}>
+        {/* Карточка со схемой этажа */}
+        <div className="rounded-3xl p-4 sm:p-8 border shadow-xl max-w-5xl mx-auto flex flex-col justify-between bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors duration-200">
           
           {/* Панель инструментов масштабирования */}
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4 px-2">
@@ -161,16 +152,16 @@ export default function TypicalFloorsSection({
               <span className="text-xs sm:text-sm font-black text-[#064734] dark:text-[#d4b26f] uppercase">
                 Схема: {currentFloor.label}
               </span>
-              <span className="text-gray-400">•</span>
-              <span className="text-xs text-gray-500">Масштаб: {Math.round(zoomLevel * 100)}%</span>
+              <span className="text-gray-400 dark:text-neutral-600">•</span>
+              <span className="text-xs text-gray-500 dark:text-neutral-400">Масштаб: {Math.round(zoomLevel * 100)}%</span>
             </div>
 
-            <div className="flex items-center gap-1.5 bg-white dark:bg-black/60 p-1 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 p-1 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
               <button
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.8}
-                className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors"
+                className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors cursor-pointer text-gray-700 dark:text-neutral-200"
                 title="Уменьшить"
               >
                 −
@@ -179,7 +170,7 @@ export default function TypicalFloorsSection({
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 2.5}
-                className="w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors"
+                className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors cursor-pointer text-gray-700 dark:text-neutral-200"
                 title="Приблизить"
               >
                 +
@@ -187,15 +178,15 @@ export default function TypicalFloorsSection({
               <button
                 type="button"
                 onClick={handleResetZoom}
-                className="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-500 dark:text-gray-300 transition-colors"
+                className="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-neutral-300 transition-colors cursor-pointer"
               >
                 Сброс
               </button>
-              <div className="h-4 w-px bg-gray-200 dark:bg-white/20 mx-1" />
+              <div className="h-4 w-px bg-gray-300 dark:bg-white/20 mx-1" />
               <button
                 type="button"
                 onClick={() => setIsFullscreen(true)}
-                className="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg bg-[#064734] text-white hover:bg-[#032b20] transition-colors"
+                className="px-2.5 py-1 text-[11px] font-bold uppercase rounded-lg bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] hover:bg-[#032b20] dark:hover:bg-[#c49f57] transition-colors cursor-pointer"
               >
                 Во весь экран
               </button>
@@ -204,7 +195,7 @@ export default function TypicalFloorsSection({
 
           {/* Интерактивное полотно чертежа */}
           <div
-            className="relative w-full h-[420px] sm:h-[560px] bg-white rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200/80 shadow-inner cursor-zoom-in"
+            className="relative w-full h-[420px] sm:h-[560px] bg-[#f7f9f8] dark:bg-[#06120d] rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-inner cursor-zoom-in transition-colors"
             onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.6 : 1))}
           >
             <img
@@ -214,8 +205,8 @@ export default function TypicalFloorsSection({
               style={{ transform: `scale(${zoomLevel})` }}
             />
 
-            <span className="absolute bottom-3 right-3 text-[10px] font-semibold text-gray-500 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-md border border-gray-200 pointer-events-none flex items-center gap-1.5">
-              <svg className="w-3.5 h-3.5 text-[#064734]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span className="absolute bottom-3 right-3 text-[10px] font-semibold text-gray-600 dark:text-neutral-300 bg-white/90 dark:bg-[#0b1b15]/90 backdrop-blur-md px-2.5 py-1 rounded-md border border-gray-200 dark:border-white/10 pointer-events-none flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="10" strokeWidth="2" />
                 <line x1="12" y1="16" x2="12" y2="12" strokeWidth="2" />
                 <line x1="12" y1="8" x2="12.01" y2="8" strokeWidth="2" />
@@ -228,22 +219,22 @@ export default function TypicalFloorsSection({
           <div className="mt-8 pt-6 border-t border-gray-200 dark:border-white/10 flex flex-col lg:flex-row items-center justify-between gap-5">
             
             {/* Легенда цветов */}
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-black/30 border border-gray-200 dark:border-white/10">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-semibold">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <span className="w-3.5 h-3.5 rounded bg-[#99d5b8] border border-[#52a77c]" />
-                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>1-комнатные квартиры</span>
+                <span className="text-gray-700 dark:text-neutral-300">1-комнатные квартиры</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-black/30 border border-gray-200 dark:border-white/10">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
                 <span className="w-3.5 h-3.5 rounded bg-[#f5b8b8] border border-[#d67272]" />
-                <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>2-комнатные квартиры</span>
+                <span className="text-gray-700 dark:text-neutral-300">2-комнатные квартиры</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white dark:bg-black/30 border border-gray-200 dark:border-white/10">
-                <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                <svg className="w-4 h-4 text-gray-400 dark:text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect width="18" height="18" x="3" y="3" rx="2" />
                   <path d="m9 10 3-3 3 3" />
                   <path d="m9 14 3 3 3-3" />
                 </svg>
-                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Бесшумные скоростные лифты</span>
+                <span className="text-gray-500 dark:text-neutral-400">Бесшумные скоростные лифты</span>
               </div>
             </div>
 
@@ -252,9 +243,9 @@ export default function TypicalFloorsSection({
               href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md text-center flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-[0.98] text-white dark:text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer"
             >
-              <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+              <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
               <span>Запросить шахматку {currentFloor.label}</span>
             </a>
           </div>
@@ -263,16 +254,15 @@ export default function TypicalFloorsSection({
 
       </div>
 
-      {/* ПОЛНОЭКРАННЫЙ ПРОСМОТР ЧЕРТЕЖА ЭТАЖА */}
+      {/* Полноэкранный просмотр чертежа */}
       {isFullscreen && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex flex-col justify-between p-4 sm:p-8 animate-fadeIn"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-8 animate-fadeIn"
           onClick={() => {
             setIsFullscreen(false);
             setZoomLevel(1);
           }}
         >
-          {/* Верхняя панель в полноэкранном режиме */}
           <div
             className="flex items-center justify-between text-white border-b border-white/15 pb-4"
             onClick={(e) => e.stopPropagation()}
@@ -291,7 +281,7 @@ export default function TypicalFloorsSection({
                 type="button"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.8}
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold"
+                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold cursor-pointer"
               >
                 −
               </button>
@@ -299,7 +289,7 @@ export default function TypicalFloorsSection({
                 type="button"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 2.5}
-                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold"
+                className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold cursor-pointer"
               >
                 +
               </button>
@@ -309,7 +299,7 @@ export default function TypicalFloorsSection({
                   setIsFullscreen(false);
                   setZoomLevel(1);
                 }}
-                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all ml-3"
+                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all ml-3 cursor-pointer"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -318,7 +308,6 @@ export default function TypicalFloorsSection({
             </div>
           </div>
 
-          {/* Чертеж во весь экран */}
           <div className="flex-1 flex items-center justify-center overflow-hidden p-4">
             <img
               src={currentFloor.image}
