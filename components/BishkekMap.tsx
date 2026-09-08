@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconBuilding,
   IconCrane,
@@ -10,107 +12,349 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
-interface MapPoint {
+interface MapPointRaw {
   id: string;
   name: string;
   category: 'office' | 'active' | 'finished';
-  categoryLabel: string;
+  categoryLabel: Record<Locale, string>;
   address: string;
   coords: [number, number];
-  deadline?: string;
-  price?: string;
-  desc: string;
+  deadline?: Record<Locale, string>;
+  price?: Record<Locale, string>;
+  desc: Record<Locale, string>;
   gisUrl: string;
 }
 
-const POINTS: MapPoint[] = [
+const RAW_POINTS: MapPointRaw[] = [
   {
     id: 'office',
     name: 'Главный офис EL ORDO',
     category: 'office',
-    categoryLabel: 'Офис продаж',
+    categoryLabel: {
+      ru: 'Офис продаж',
+      kg: 'Сатуу кеңсеси',
+      kz: 'Сату кеңсесі',
+      uk: 'Офіс продажів',
+      en: 'Sales Office',
+      zh: '品牌营销中心',
+    },
     address: 'ул. Исы Ахунбаева, 137/1',
     coords: [42.84356, 74.59448],
-    desc: 'Консультации, показ макетов, оформление договоров и рассрочки.',
+    desc: {
+      ru: 'Консультации, показ макетов, оформление договоров и рассрочки.',
+      kg: 'Кеңеш берүү, макеттерди көрсөтүү, келишимдерди жана бөлүп төлөөнү тариздөө.',
+      kz: 'Кеңес беру, макеттерді көрсету, шарттарды және бөліп төлеуді рәсімдеу.',
+      uk: 'Консультації, демонстрація макетів, оформлення договорів та розстрочки.',
+      en: 'Consultations, architectural scale models, contract and installment processing.',
+      zh: '一对一置业咨询、实体规划沙盘品鉴、合同签约与免息分期办理。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
   },
   {
     id: 'abu-dhabi',
     name: 'ЖК Abu Dhabi',
     category: 'active',
-    categoryLabel: 'Премиум-класс',
+    categoryLabel: {
+      ru: 'Премиум-класс',
+      kg: 'Премиум-класс',
+      kz: 'Премиум-класс',
+      uk: 'Преміум-клас',
+      en: 'Premium Class',
+      zh: '尊享级 (Premium)',
+    },
     address: 'ул. Сухомлинова, 29',
     coords: [42.84694, 74.58175],
-    deadline: '2029 г. 3 кв.',
-    price: 'от 1650 $/м²',
-    desc: 'Две 25-этажные башни премиум-класса с панорамными видами.',
+    deadline: {
+      ru: '2029 г. 3 кв.',
+      kg: '2029-ж. 3-кв.',
+      kz: '2029 ж. 3 т.',
+      uk: '3 кв. 2029 р.',
+      en: 'Q3 2029',
+      zh: '2029年第3季度',
+    },
+    price: {
+      ru: 'от 1 650 $/м²',
+      kg: '1 650 $/м² баштап',
+      kz: '1 650 $/м² бастап',
+      uk: 'від 1 650 $/м²',
+      en: 'from $1,650/m²',
+      zh: '1 650 $/m² 起',
+    },
+    desc: {
+      ru: 'Две 25-этажные башни премиум-класса с панорамными видами.',
+      kg: 'Панорамалык көрүнүшү бар эки 25 кабаттуу премиум-класстагы мунара.',
+      kz: 'Панорамалық көрінісі бар екі 25 қабатты премиум-санаттағы мұнара.',
+      uk: 'Дві 25-поверхові вежі преміум-класу з панорамними видами.',
+      en: 'Twin 25-story premium towers with panoramic mountain vistas.',
+      zh: '双子25层超高层建筑，全景落地窗幕墙设计。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%A1%D1%83%D1%85%D0%BE%D0%BC%D0%BB%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%2029',
   },
   {
     id: 'madina-residence',
     name: 'ЖК Madina Residence',
     category: 'active',
-    categoryLabel: 'Бизнес-класс',
+    categoryLabel: {
+      ru: 'Бизнес-класс',
+      kg: 'Бизнес-класс',
+      kz: 'Бизнес-класс',
+      uk: 'Бізнес-клас',
+      en: 'Business Class',
+      zh: '商务级 (Business)',
+    },
     address: 'ул. Огонбаева, 12',
     coords: [42.87785, 74.63916],
-    deadline: '2027 г. 3 кв.',
-    price: 'от 1400 $/м²',
-    desc: 'Символ статуса в центральной части Бишкека.',
+    deadline: {
+      ru: '2027 г. 3 кв.',
+      kg: '2027-ж. 3-кв.',
+      kz: '2027 ж. 3 т.',
+      uk: '3 кв. 2027 р.',
+      en: 'Q3 2027',
+      zh: '2027年第3季度',
+    },
+    price: {
+      ru: 'от 1 400 $/м²',
+      kg: '1 400 $/м² баштап',
+      kz: '1 400 $/м² бастап',
+      uk: 'від 1 400 $/м²',
+      en: 'from $1,400/m²',
+      zh: '1 400 $/m² 起',
+    },
+    desc: {
+      ru: 'Символ статуса в центральной части Бишкека.',
+      kg: 'Бишкектин борбордук бөлүгүндөгү кадыр-барктын символу.',
+      kz: 'Бішкектің орталық бөлігіндегі мәртебе символы.',
+      uk: 'Символ статусу в центральній частині Бішкека.',
+      en: 'A symbol of prestige in the central district of Bishkek.',
+      zh: '坐落于比什凯克核心政商街区的高端社区。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9E%D0%B3%D0%BE%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%2012',
   },
   {
     id: 'ajkol-plus',
     name: 'ЖД Айкол +',
     category: 'active',
-    categoryLabel: 'Комфорт+',
+    categoryLabel: {
+      ru: 'Комфорт+',
+      kg: 'Комфорт+',
+      kz: 'Комфорт+',
+      uk: 'Комфорт+',
+      en: 'Comfort+',
+      zh: '舒适+ (Comfort+)',
+    },
     address: 'с. Кок-Жар, ул. Баялинова, 6',
     coords: [42.81725, 74.64607],
-    deadline: '2028 г. 3 кв.',
-    price: 'от 1100 $/м²',
-    desc: 'Экологический клубный дом в предгорье с чистым воздухом.',
+    deadline: {
+      ru: '2028 г. 3 кв.',
+      kg: '2028-ж. 3-кв.',
+      kz: '2028 ж. 3 т.',
+      uk: '3 кв. 2028 р.',
+      en: 'Q3 2028',
+      zh: '2028年第3季度',
+    },
+    price: {
+      ru: 'от 1 100 $/м²',
+      kg: '1 100 $/м² баштап',
+      kz: '1 100 $/м² бастап',
+      uk: 'від 1 100 $/м²',
+      en: 'from $1,100/m²',
+      zh: '1 100 $/m² 起',
+    },
+    desc: {
+      ru: 'Экологический клубный дом в предгорье с чистым воздухом.',
+      kg: 'Таза абасы бар тоо этегиндеги экологиялык клубдук үй.',
+      kz: 'Таза ауасы бар тау бөктеріндегі экологиялық клубтық үй.',
+      uk: 'Екологічний клубний будинок у передгір’ї з чистим повітрям.',
+      en: 'Boutique eco-residence in the pristine mountain foothills.',
+      zh: '南部生态麓区纯正低密洋房，四季清新山风。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9A%D0%BE%D0%BA-%D0%96%D0%B0%D1%80%20%D0%91%D0%B0%D1%8F%D0%BB%D0%B8%D0%BD%D0%BE%D0%B2%D0%B0%206',
   },
   {
     id: 'ajkol',
     name: 'ЖД Айкол',
     category: 'active',
-    categoryLabel: 'Комфорт',
+    categoryLabel: {
+      ru: 'Комфорт',
+      kg: 'Комфорт',
+      kz: 'Комфорт',
+      uk: 'Комфорт',
+      en: 'Comfort',
+      zh: '舒适级 (Comfort)',
+    },
     address: 'ул. Арашан, 10',
     coords: [42.8171, 74.64892],
-    deadline: '2026 г. 2 кв.',
-    price: 'от 950 $/м²',
-    desc: 'Завершение монолитно-кирпичной коробки, скорая сдача.',
+    deadline: {
+      ru: '2026 г. 2 кв.',
+      kg: '2026-ж. 2-кв.',
+      kz: '2026 ж. 2 т.',
+      uk: '2 кв. 2026 р.',
+      en: 'Q2 2026',
+      zh: '2026年第2季度',
+    },
+    price: {
+      ru: 'от 950 $/м²',
+      kg: '950 $/м² баштап',
+      kz: '950 $/м² бастап',
+      uk: 'від 950 $/м²',
+      en: 'from $950/m²',
+      zh: '950 $/m² 起',
+    },
+    desc: {
+      ru: 'Завершение монолитно-кирпичной коробки, скорая сдача.',
+      kg: 'Монолит-кыш курулушунун аякташы, жакында тапшырылат.',
+      kz: 'Монолитті-кірпіш қаңқасының аяқталуы, жуырда тапсырылады.',
+      uk: 'Завершення монолітно-цегляного каркаса, швидка здача.',
+      en: 'Monolithic brick frame completed, nearing handover.',
+      zh: '现浇主体与红砖砌体高进度封顶，即将竣工验收。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%90%D1%80%D0%B0%D1%88%D0%B0%D0%BD%2010',
   },
   {
     id: 'kelechek',
     name: 'ЖК Келечек',
     category: 'finished',
-    categoryLabel: 'Сдан',
+    categoryLabel: {
+      ru: 'Сдан',
+      kg: 'Бүткөн',
+      kz: 'Берілген',
+      uk: 'Зданий',
+      en: 'Completed',
+      zh: '已交付',
+    },
     address: 'ул. Космическая, 153',
     coords: [42.84588, 74.55136],
-    desc: 'Полностью построенный, введенный в эксплуатацию дом.',
+    desc: {
+      ru: 'Полностью построенный, введенный в эксплуатацию дом.',
+      kg: 'Толук курулуп, пайдаланууга берилген үй.',
+      kz: 'Толық салынып, пайдалануға берілген тұрғын үй.',
+      uk: 'Повністю збудований, введений в експлуатацію будинок.',
+      en: 'Fully built, commissioned, and resident-occupied development.',
+      zh: '全盘竣工交付并顺利入住的宜居社区。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%9A%D0%BE%D1%81%D0%BC%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B0%D1%8F%20153',
   },
   {
     id: 'ordo',
     name: 'КД Ордо',
     category: 'finished',
-    categoryLabel: 'Сдан',
+    categoryLabel: {
+      ru: 'Сдан',
+      kg: 'Бүткөн',
+      kz: 'Берілген',
+      uk: 'Зданий',
+      en: 'Completed',
+      zh: '已交付',
+    },
     address: 'ул. Тверская, 20',
     coords: [42.87974, 74.54623],
-    desc: 'Первый клубный дом компании с панорамой на горы.',
+    desc: {
+      ru: 'Первый клубный дом компании с панорамой на горы.',
+      kg: 'Компаниянын тоолорго панорамасы бар алгачкы клубдук үйү.',
+      kz: 'Компанияның тауға панорамасы бар алғашқы клубтық үйі.',
+      uk: 'Перший клубний будинок компанії з панорамою на гори.',
+      en: 'The company’s inaugural boutique club house with mountain panorama.',
+      zh: '品牌首座精品低密洋房，远眺壮丽雪山。',
+    },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%A2%D0%B2%D0%B5%D1%80%D1%81%D0%BA%D0%B0%D1%8F%2020',
   },
 ];
 
+const UI_TEXT = {
+  ru: {
+    all: 'Все',
+    office: 'Офис',
+    active: 'Строящиеся',
+    finished: 'Сданные',
+    office2gis: 'Офис в 2GIS',
+    clickPrompt: 'Нажмите на объект для перехода:',
+    aboutProject: 'О проекте',
+    mainOffice: 'Главный офис',
+    to2gis: 'В 2GIS',
+  },
+  kg: {
+    all: 'Баары',
+    office: 'Офис',
+    active: 'Курулуп жаткандар',
+    finished: 'Бүткөндөр',
+    office2gis: '2GIS аркылуу офис',
+    clickPrompt: 'Өтүү үчүн объектти басыңыз:',
+    aboutProject: 'Долбоор тууралуу',
+    mainOffice: 'Башкы офис',
+    to2gis: '2GIS аркылуу',
+  },
+  kz: {
+    all: 'Барлығы',
+    office: 'Кеңсе',
+    active: 'Салынып жатқандар',
+    finished: 'Берілгендер',
+    office2gis: '2GIS кеңсесі',
+    clickPrompt: 'Өту үшін нысанды басыңыз:',
+    aboutProject: 'Жоба туралы',
+    mainOffice: 'Бас кеңсе',
+    to2gis: '2GIS арқылы',
+  },
+  uk: {
+    all: 'Всі',
+    office: 'Офіс',
+    active: 'Споруджувані',
+    finished: 'Здані',
+    office2gis: 'Офіс у 2GIS',
+    clickPrompt: 'Натисніть на об\'єкт для переходу:',
+    aboutProject: 'Про проєкт',
+    mainOffice: 'Головний офіс',
+    to2gis: 'У 2GIS',
+  },
+  en: {
+    all: 'All',
+    office: 'Office',
+    active: 'Under Construction',
+    finished: 'Completed',
+    office2gis: 'Office in 2GIS',
+    clickPrompt: 'Click an item to view details:',
+    aboutProject: 'About Project',
+    mainOffice: 'Head Office',
+    to2gis: 'In 2GIS',
+  },
+  zh: {
+    all: '全部',
+    office: '营销中心',
+    active: '在建在售',
+    finished: '已交付',
+    office2gis: '2GIS 导航到店',
+    clickPrompt: '点击楼盘查看详情：',
+    aboutProject: '查看详情',
+    mainOffice: '总部营销中心',
+    to2gis: '在 2GIS 中打开',
+  },
+};
+
 export default function BishkekMap() {
+  const { locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const ui = UI_TEXT[currentLang] || UI_TEXT.ru;
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<{ [key: string]: any }>({});
   const itemsRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [selectedId, setSelectedId] = useState<string>('office');
   const [filter, setFilter] = useState<'all' | 'office' | 'active' | 'finished'>('all');
+
+  const points = useMemo(() => {
+    return RAW_POINTS.map((p) => ({
+      id: p.id,
+      name: p.name,
+      category: p.category,
+      categoryLabel: p.categoryLabel[currentLang] || p.categoryLabel.ru,
+      address: p.address,
+      coords: p.coords,
+      deadline: p.deadline ? (p.deadline[currentLang] || p.deadline.ru) : undefined,
+      price: p.price ? (p.price[currentLang] || p.price.ru) : undefined,
+      desc: p.desc[currentLang] || p.desc.ru,
+      gisUrl: p.gisUrl,
+    }));
+  }, [currentLang]);
 
   useEffect(() => {
     // Подключение CSS Leaflet
@@ -139,18 +383,17 @@ export default function BishkekMap() {
         maxZoom: 18,
       }).addTo(map);
 
-      // Принудительный пересчет размера для устранения серых тайлов
+      // Пересчет размера для устранения серых тайлов
       setTimeout(() => {
         map.invalidateSize();
       }, 200);
 
-      POINTS.forEach((point) => {
+      points.forEach((point) => {
         const isOffice = point.category === 'office';
         const isFinished = point.category === 'finished';
         const pinColor = isOffice ? '#d4b26f' : isFinished ? '#2b2b2b' : '#064734';
         const iconColor = isOffice ? '#064734' : '#ffffff';
 
-        // Векторные SVG внутри маркера вместо эмодзи
         let svgInside = '';
         if (isOffice) {
           svgInside = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>`;
@@ -196,7 +439,7 @@ export default function BishkekMap() {
         const marker = L.marker(point.coords, { icon: customIcon }).addTo(map);
 
         const projectBtn = !isOffice
-          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">О проекте</a>`
+          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">${ui.aboutProject}</a>`
           : '';
 
         const popupContent = `
@@ -213,7 +456,7 @@ export default function BishkekMap() {
             <div style="display: flex; gap: 6px;">
               ${projectBtn}
               <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
-                В 2GIS
+                ${ui.to2gis}
               </a>
             </div>
           </div>
@@ -221,7 +464,6 @@ export default function BishkekMap() {
 
         marker.bindPopup(popupContent);
 
-        // Клик по маркеру: синхронизация и плавный скролл в списке
         marker.on('click', () => {
           setSelectedId(point.id);
           const el = itemsRef.current[point.id];
@@ -260,10 +502,44 @@ export default function BishkekMap() {
     };
   }, []);
 
+  // Обновление попапов при смене языка
+  useEffect(() => {
+    if (!mapRef.current) return;
+    points.forEach((point) => {
+      const marker = markersRef.current[point.id];
+      if (!marker) return;
+      const isOffice = point.category === 'office';
+      const projectBtn = !isOffice
+        ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">${ui.aboutProject}</a>`
+        : '';
+
+      const popupContent = `
+        <div style="font-family: inherit; padding: 3px; min-width: 190px;">
+          <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
+            ${point.categoryLabel}
+          </div>
+          <div style="font-size: 13px; font-weight: 900; color: #111; margin-bottom: 3px; line-height: 1.2;">
+            ${point.name}
+          </div>
+          <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+            ${point.address}
+          </div>
+          <div style="display: flex; gap: 6px;">
+            ${projectBtn}
+            <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
+              ${ui.to2gis}
+            </a>
+          </div>
+        </div>
+      `;
+      marker.setPopupContent(popupContent);
+    });
+  }, [points, ui]);
+
   // Синхронизация маркеров при переключении фильтров
   useEffect(() => {
     if (!mapRef.current) return;
-    POINTS.forEach((point) => {
+    points.forEach((point) => {
       const marker = markersRef.current[point.id];
       if (!marker) return;
       if (filter === 'all' || point.category === filter) {
@@ -272,9 +548,9 @@ export default function BishkekMap() {
         if (mapRef.current.hasLayer(marker)) mapRef.current.removeLayer(marker);
       }
     });
-  }, [filter]);
+  }, [filter, points]);
 
-  const handleSelectPoint = (point: MapPoint) => {
+  const handleSelectPoint = (point: typeof points[0]) => {
     setSelectedId(point.id);
     if (mapRef.current) {
       mapRef.current.flyTo(point.coords, 15, { duration: 0.8 });
@@ -284,7 +560,7 @@ export default function BishkekMap() {
   };
 
   const filteredPoints =
-    filter === 'all' ? POINTS : POINTS.filter((p) => p.category === filter);
+    filter === 'all' ? points : points.filter((p) => p.category === filter);
 
   return (
     <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
@@ -295,49 +571,49 @@ export default function BishkekMap() {
           <button
             type="button"
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
               filter === 'all'
                 ? 'bg-[#064734] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
-            Все ({POINTS.length})
+            {ui.all} ({points.length})
           </button>
           <button
             type="button"
             onClick={() => setFilter('office')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'office'
                 ? 'bg-[#d4b26f] text-[#064734] shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <IconBuilding className="w-3.5 h-3.5 shrink-0" />
-            <span>Офис</span>
+            <span>{ui.office}</span>
           </button>
           <button
             type="button"
             onClick={() => setFilter('active')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'active'
                 ? 'bg-[#064734] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <IconCrane className="w-3.5 h-3.5 shrink-0" />
-            <span>Строящиеся</span>
+            <span>{ui.active}</span>
           </button>
           <button
             type="button"
             onClick={() => setFilter('finished')}
-            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'finished'
                 ? 'bg-[#2b2b2b] text-white shadow-sm'
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
             }`}
           >
             <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
-            <span>Сданные</span>
+            <span>{ui.finished}</span>
           </button>
         </div>
 
@@ -348,7 +624,7 @@ export default function BishkekMap() {
           className="text-xs font-bold text-[#064734] hover:text-[#032b20] flex items-center gap-1.5 shrink-0 self-end sm:self-auto"
         >
           <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
-          <span>Офис в 2GIS</span>
+          <span>{ui.office2gis}</span>
           <IconArrowRight className="w-3 h-3" />
         </a>
       </div>
@@ -363,7 +639,7 @@ export default function BishkekMap() {
         {/* Список объектов */}
         <div className="lg:col-span-4 h-[250px] sm:h-[370px] lg:h-[490px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-3 sm:p-4 space-y-2 bg-gray-50/50">
           <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
-            Нажмите на объект для перехода:
+            {ui.clickPrompt}
           </p>
           {filteredPoints.map((point) => {
             const isSelected = selectedId === point.id;
@@ -414,11 +690,11 @@ export default function BishkekMap() {
                         href={`/${point.id}`}
                         className="text-[11px] font-extrabold text-[#064734] hover:underline inline-flex items-center gap-1"
                       >
-                        <span>О проекте</span>
+                        <span>{ui.aboutProject}</span>
                         <IconArrowRight className="w-3 h-3" />
                       </Link>
                     ) : (
-                      <span className="text-[10px] text-gray-500 font-medium">Главный офис</span>
+                      <span className="text-[10px] text-gray-500 font-medium">{ui.mainOffice}</span>
                     )}
 
                     <a
@@ -427,7 +703,7 @@ export default function BishkekMap() {
                       rel="noopener noreferrer"
                       className="text-[10px] font-bold text-gray-600 hover:text-[#064734] underline"
                     >
-                      В 2GIS
+                      {ui.to2gis}
                     </a>
                   </div>
                 )}
