@@ -13,20 +13,36 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
+const CONSTRUCTION_LABELS: Record<string, string> = {
+  ru: 'Ход строительства',
+  kg: 'Курулуш жүрүшү',
+  kz: 'Құрылыс барысы',
+  uk: 'Хід будівництва',
+  en: 'Construction',
+  zh: '工程进度',
+};
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
+
+  const currentLang = locale || 'ru';
+  const constructionLabel =
+    (t.header as Record<string, string>)?.construction ||
+    CONSTRUCTION_LABELS[currentLang] ||
+    CONSTRUCTION_LABELS.ru;
 
   const navLinks = [
     { href: '/projects', label: t.header.catalog },
+    { href: '/hod-stroitelstva', label: constructionLabel },
     { href: '/usloviya', label: t.header.terms },
     { href: '/o-kompanii', label: t.header.about },
     { href: '/contacts', label: t.header.contacts },
   ];
 
-  // Отслеживание скролла для легкой тени
+  // Отслеживание скролла для тени
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 15);
@@ -90,7 +106,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3.5 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all ${
+                  className={`px-3 py-2 rounded-xl text-xs xl:text-sm font-bold transition-all ${
                     isActive
                       ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
                       : 'text-gray-700 dark:text-neutral-300 hover:text-[#064734] dark:hover:text-[#d4b26f] hover:bg-gray-100/70 dark:hover:bg-white/5'
