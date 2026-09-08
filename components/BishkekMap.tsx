@@ -357,7 +357,6 @@ export default function BishkekMap() {
   }, [currentLang]);
 
   useEffect(() => {
-    // Подключение CSS Leaflet
     if (!document.getElementById('leaflet-css')) {
       const link = document.createElement('link');
       link.id = 'leaflet-css';
@@ -383,7 +382,6 @@ export default function BishkekMap() {
         maxZoom: 18,
       }).addTo(map);
 
-      // Пересчет размера для устранения серых тайлов
       setTimeout(() => {
         map.invalidateSize();
       }, 200);
@@ -502,7 +500,6 @@ export default function BishkekMap() {
     };
   }, []);
 
-  // Обновление попапов при смене языка
   useEffect(() => {
     if (!mapRef.current) return;
     points.forEach((point) => {
@@ -536,7 +533,6 @@ export default function BishkekMap() {
     });
   }, [points, ui]);
 
-  // Синхронизация маркеров при переключении фильтров
   useEffect(() => {
     if (!mapRef.current) return;
     points.forEach((point) => {
@@ -563,18 +559,18 @@ export default function BishkekMap() {
     filter === 'all' ? points : points.filter((p) => p.category === filter);
 
   return (
-    <div className="w-full bg-white rounded-2xl sm:rounded-3xl border border-gray-200 overflow-hidden shadow-sm">
+    <div className="w-full bg-white dark:bg-[#0b1b15] rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm transition-colors duration-200">
       
       {/* Шапка с фильтрами */}
-      <div className="p-3 sm:p-5 border-b border-gray-100 bg-[#f9faf9] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="p-3 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-[#f9faf9] dark:bg-[#07130e] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs font-bold whitespace-nowrap">
           <button
             type="button"
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all cursor-pointer ${
               filter === 'all'
-                ? 'bg-[#064734] text-white shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
             }`}
           >
             {ui.all} ({points.length})
@@ -585,7 +581,7 @@ export default function BishkekMap() {
             className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'office'
                 ? 'bg-[#d4b26f] text-[#064734] shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
             }`}
           >
             <IconBuilding className="w-3.5 h-3.5 shrink-0" />
@@ -596,8 +592,8 @@ export default function BishkekMap() {
             onClick={() => setFilter('active')}
             className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'active'
-                ? 'bg-[#064734] text-white shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
             }`}
           >
             <IconCrane className="w-3.5 h-3.5 shrink-0" />
@@ -608,8 +604,8 @@ export default function BishkekMap() {
             onClick={() => setFilter('finished')}
             className={`px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer ${
               filter === 'finished'
-                ? 'bg-[#2b2b2b] text-white shadow-sm'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                ? 'bg-[#2b2b2b] dark:bg-white/20 text-white shadow-sm'
+                : 'bg-white dark:bg-[#0b1b15] text-gray-700 dark:text-neutral-300 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10'
             }`}
           >
             <IconCheck className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
@@ -621,7 +617,7 @@ export default function BishkekMap() {
           href="https://2gis.kg/bishkek/search/%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-bold text-[#064734] hover:text-[#032b20] flex items-center gap-1.5 shrink-0 self-end sm:self-auto"
+          className="text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:text-[#032b20] dark:hover:text-[#c49f57] flex items-center gap-1.5 shrink-0 self-end sm:self-auto transition-colors"
         >
           <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f]" />
           <span>{ui.office2gis}</span>
@@ -632,13 +628,13 @@ export default function BishkekMap() {
       {/* Сетка: Карта + Список */}
       <div className="grid grid-cols-1 lg:grid-cols-12">
         {/* Карта */}
-        <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef]">
+        <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef] dark:bg-[#040c09]">
           <div ref={mapContainerRef} className="w-full h-full" />
         </div>
 
         {/* Список объектов */}
-        <div className="lg:col-span-4 h-[250px] sm:h-[370px] lg:h-[490px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 p-3 sm:p-4 space-y-2 bg-gray-50/50">
-          <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase tracking-wider px-1">
+        <div className="lg:col-span-4 h-[250px] sm:h-[370px] lg:h-[490px] overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-100 dark:border-white/10 p-3 sm:p-4 space-y-2 bg-gray-50/50 dark:bg-[#07130e]/60 transition-colors">
+          <p className="text-[10px] sm:text-[11px] font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider px-1">
             {ui.clickPrompt}
           </p>
           {filteredPoints.map((point) => {
@@ -652,56 +648,56 @@ export default function BishkekMap() {
                 onClick={() => handleSelectPoint(point)}
                 className={`p-3 rounded-xl cursor-pointer transition-all border text-left ${
                   isSelected
-                    ? 'bg-white border-[#064734] shadow-sm ring-1 ring-[#064734]/20'
-                    : 'bg-white border-gray-200 hover:border-gray-300'
+                    ? 'bg-white dark:bg-[#0f241c] border-[#064734] dark:border-[#d4b26f] shadow-sm ring-1 ring-[#064734]/20 dark:ring-[#d4b26f]/30'
+                    : 'bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <span
                     className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
                       point.category === 'office'
-                        ? 'bg-[#d4b26f]/20 text-[#8c6b23]'
+                        ? 'bg-[#d4b26f]/20 text-[#8c6b23] dark:text-[#d4b26f]'
                         : point.category === 'finished'
-                        ? 'bg-gray-200 text-gray-700'
-                        : 'bg-[#064734]/10 text-[#064734]'
+                        ? 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-neutral-300'
+                        : 'bg-[#064734]/10 dark:bg-[#064734]/40 text-[#064734] dark:text-emerald-400'
                     }`}
                   >
                     {point.categoryLabel}
                   </span>
                   {point.price && (
-                    <span className="text-[11px] font-bold text-[#064734]">
+                    <span className="text-[11px] font-bold text-[#064734] dark:text-[#d4b26f]">
                       {point.price}
                     </span>
                   )}
                 </div>
 
-                <h4 className="text-xs sm:text-sm font-bold text-gray-900 leading-snug">
+                <h4 className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white leading-snug">
                   {point.name}
                 </h4>
-                <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mt-1">
+                <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-neutral-400 mt-1">
                   <IconMapPin className="w-3 h-3 text-[#d4b26f] shrink-0" />
                   <span className="truncate">{point.address}</span>
                 </div>
 
                 {isSelected && (
-                  <div className="mt-2.5 pt-2 border-t border-gray-100 flex items-center justify-between gap-2">
+                  <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-white/10 flex items-center justify-between gap-2">
                     {point.category !== 'office' ? (
                       <Link
                         href={`/${point.id}`}
-                        className="text-[11px] font-extrabold text-[#064734] hover:underline inline-flex items-center gap-1"
+                        className="text-[11px] font-extrabold text-[#064734] dark:text-[#d4b26f] hover:underline inline-flex items-center gap-1"
                       >
                         <span>{ui.aboutProject}</span>
                         <IconArrowRight className="w-3 h-3" />
                       </Link>
                     ) : (
-                      <span className="text-[10px] text-gray-500 font-medium">{ui.mainOffice}</span>
+                      <span className="text-[10px] text-gray-500 dark:text-neutral-400 font-medium">{ui.mainOffice}</span>
                     )}
 
                     <a
                       href={point.gisUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] font-bold text-gray-600 hover:text-[#064734] underline"
+                      className="text-[10px] font-bold text-gray-600 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] underline"
                     >
                       {ui.to2gis}
                     </a>
