@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
@@ -27,7 +27,7 @@ interface ReportItem {
   stage: Record<Locale, string>;
   progress: number;
   image: string;
-  videoUrl?: string; // Ссылка на YouTube Embed (например, https://www.youtube.com/embed/dQw4w9WgXcQ)
+  videoUrl?: string; // Поддерживает: '/videos/file.mp4', 'https://youtu.be/...', 'https://www.youtube.com/watch?v=...' или embed
   videoDuration?: string;
   workersOnSite: number;
   cranesOnSite: number;
@@ -36,6 +36,33 @@ interface ReportItem {
   points: Record<Locale, string[]>;
 }
 
+// Хелпер преобразования любых ссылок YouTube в формат embed с автовоспроизведением
+function formatVideoSource(url: string) {
+  const isDirectVideo = url.endsWith('.mp4') || url.endsWith('.webm') || url.startsWith('/videos/');
+
+  if (isDirectVideo) {
+    return { isDirectVideo: true, src: url };
+  }
+
+  let embedUrl = url;
+
+  // Обработка youtu.be/ID
+  if (url.includes('youtu.be/')) {
+    const videoId = url.split('youtu.be/')[1]?.split(/[?#]/)[0];
+    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  }
+  // Обработка youtube.com/watch?v=ID
+  else if (url.includes('watch?v=')) {
+    const videoId = url.split('watch?v=')[1]?.split(/[&#]/)[0];
+    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
+  }
+
+  // Добавление автостарта
+  const separator = embedUrl.includes('?') ? '&' : '?';
+  embedUrl = `${embedUrl}${separator}autoplay=1&rel=0`;
+
+  return { isDirectVideo: false, src: embedUrl };
+}
 const REPORTS: ReportItem[] = [
   {
     id: 'rep-abu-dhabi-1',
@@ -59,7 +86,9 @@ const REPORTS: ReportItem[] = [
     },
     progress: 45,
     image: '/projects/Abu-Dhabi.png',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', // Замените на реальный YouTube ID видео с дрона
+    // Если используете файл MP4, укажите путь: '/videos/abu-dhabi.mp4'
+    // Если YouTube, вставьте ссылку на ролик: 'https://youtu.be/...'
+    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     videoDuration: '02:45 • 4K Drone',
     workersOnSite: 54,
     cranesOnSite: 2,
@@ -509,6 +538,25 @@ export default function ConstructionProgressPage() {
   const [selectedSlug, setSelectedSlug] = useState<string>('all');
   const [activeVideo, setActiveVideo] = useState<{ url: string; title: string } | null>(null);
 
+  // Закрытие модалки по клавише ESC и блокировка скролла
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setActiveVideo(null);
+    };
+
+    if (activeVideo) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activeVideo]);
+
   const filteredReports = useMemo(() => {
     if (selectedSlug === 'all') return REPORTS;
     return REPORTS.filter((r) => r.projectSlug === selectedSlug);
@@ -746,40 +794,56 @@ export default function ConstructionProgressPage() {
         })}
       </section>
 
-      {/* Модальное окно просмотра видео с дрона */}
-      {activeVideo && (
-        <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
-          onClick={() => setActiveVideo(null)}
-        >
+      {/* Универсальное модальное окно (YouTube + локальный .mp4) */}
+      {activeVideo && (() => {
+        const { isDirectVideo, src } = formatVideoSource(activeVideo.url);
+
+        return (
           <div
-            className="bg-neutral-900 w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6 animate-fadeIn"
+            onClick={() => setActiveVideo(null)}
           >
-            <div className="p-4 sm:px-6 flex items-center justify-between border-b border-white/10 text-white">
-              <span className="text-xs sm:text-sm font-black uppercase text-[#d4b26f]">
-                {activeVideo.title}
-              </span>
-              <button
-                type="button"
-                onClick={() => setActiveVideo(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="relative aspect-video w-full bg-black">
-              <iframe
-                src={`${activeVideo.url}?autoplay=1`}
-                title={activeVideo.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="w-full h-full border-0"
-              />
+            <div
+              className="bg-neutral-950 w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-white/20 flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="p-4 sm:px-6 flex items-center justify-between border-b border-white/10 text-white bg-neutral-900">
+                <span className="text-xs sm:text-sm font-black uppercase text-[#d4b26f]">
+                  {activeVideo.title}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setActiveVideo(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
+                  aria-label={t.closeModal}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="relative aspect-video w-full bg-black flex items-center justify-center">
+                {isDirectVideo ? (
+                  <video
+                    src={src}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <iframe
+                    src={src}
+                    title={activeVideo.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Баннер экскурсии */}
       <section className="max-w-6xl mx-auto px-6 mt-16">
