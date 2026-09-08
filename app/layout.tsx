@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
+import DynamicSeo from "@/components/DynamicSeo";
 import { COMPANY_INFO } from "@/lib/data";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -31,8 +32,9 @@ export const metadata: Metadata = {
     template: '%s | EL ORDO GROUP',
   },
   description:
-    'Строительная компания EL ORDO GROUP в Бишкеке. Продажа квартир премиум, бизнес и комфорт-класса от застройщика. Беспроцентная рассрочка до 40 месяцев, программа Trade-in. ЖК Abu Dhabi, Madina Residence, Айкол+.',
+    'Строительная компания EL ORDO GROUP в Бишкеке. Продажа квартир премиум, бизнес и комфорт-класса от застройщика. Беспроцентная рассрочка 0% до 40 месяцев, программа Trade-in. ЖК Abu Dhabi, Madina Residence, Айкол+.',
   keywords: [
+    // RU
     'EL ORDO',
     'Эл Ордо',
     'купить квартиру Бишкек',
@@ -43,6 +45,23 @@ export const metadata: Metadata = {
     'Madina Residence',
     'ЖД Айкол',
     'недвижимость Кыргызстан',
+    // KG
+    'Бишкекте батир сатып алуу',
+    'жаңы курулуштар Бишкек',
+    'пайызсыз бөлүп төлөө',
+    // KZ
+    'Бішкектен пәтер сатып алу',
+    'жаңа құрылыстар Бішкек',
+    // EN
+    'buy apartment in Bishkek',
+    'property in Kyrgyzstan',
+    'real estate Bishkek developer',
+    'apartments installment 0%',
+    // ZH
+    '比什凯克买房',
+    '比什凯克公寓',
+    '吉尔吉斯斯坦房地产',
+    '比什凯克免息分期楼盘',
   ],
   formatDetection: {
     telephone: false,
@@ -57,6 +76,15 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: './',
+    languages: {
+      'ru': './',
+      'ky-KG': './?lang=kg',
+      'kk-KZ': './?lang=kz',
+      'uk-UA': './?lang=uk',
+      'en': './?lang=en',
+      'zh-CN': './?lang=zh',
+      'x-default': './',
+    },
   },
   robots: {
     index: true,
@@ -79,11 +107,12 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ru_KG',
+    alternateLocale: ['ky_KG', 'kk_KZ', 'uk_UA', 'en_US', 'zh_CN'],
     url: SITE_URL,
     siteName: 'EL ORDO GROUP',
-    title: 'EL ORDO GROUP — Квартиры от застройщика в Бишкеке',
+    title: 'EL ORDO GROUP — Квартиры от застройщика в Бишкеке | Рассрочка 0%',
     description:
-      'Надежные жилые комплексы премиум, бизнес и комфорт-класса в Бишкеке. Рассрочка 0% до 40 месяцев, выгодный обмен по программе Trade-in.',
+      'Надежные жилые комплексы премиум, бизнес и комфорт-класса в Бишкеке. Беспроцентная рассрочка 0% до 40 месяцев без банка, программа Trade-in.',
     images: [
       {
         url: '/projects/Abu-Dhabi.png',
@@ -97,7 +126,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'EL ORDO GROUP — Строительная компания в Бишкеке',
     description:
-      'Квартиры премиум и бизнес-класса в Бишкеке. Рассрочка до 40 месяцев от застройщика.',
+      'Квартиры премиум и бизнес-класса в Бишкеке. Беспроцентная рассрочка до 40 месяцев от застройщика.',
     images: ['/projects/Abu-Dhabi.png'],
   },
 };
@@ -171,6 +200,7 @@ export default function RootLayout({
       <body className={`${montserrat.className} antialiased min-h-screen flex flex-col bg-[#fafbfa] dark:bg-[#07130e] text-neutral-900 dark:text-neutral-100 overflow-x-hidden selection:bg-[#d4b26f] selection:text-[#064734]`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <LanguageProvider>
+            <DynamicSeo />
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-[#064734] focus:text-[#d4b26f] focus:rounded-xl focus:shadow-2xl focus:font-bold focus:text-xs uppercase tracking-wider"
