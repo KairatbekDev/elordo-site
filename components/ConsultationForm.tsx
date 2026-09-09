@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
@@ -28,6 +28,7 @@ interface FormTexts {
   guarantee3: string;
   privacy: string;
   phoneError: string;
+  serverError: string;
   successTitle: string;
   successDesc: (name: string, phone: string) => string;
   successProjectLabel: string;
@@ -57,6 +58,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: 'Ответ за 5 минут',
     privacy: 'Ваши данные надежно защищены и используются исключительно для связи менеджера с вами',
     phoneError: 'Пожалуйста, введите полный номер телефона: +996 (XXX) XX-XX-XX',
+    serverError: 'Не удалось отправить заявку. Пожалуйста, напишите нам в WhatsApp.',
     successTitle: 'Заявка успешно принята!',
     successDesc: (name, phone) => `Спасибо, ${name}! Менеджер отдела продаж свяжется с вами по номеру ${phone} в течение 5–10 минут.`,
     successProjectLabel: 'Выбранный объект:',
@@ -100,6 +102,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: '5 мүнөттө жооп беребиз',
     privacy: 'Сиздин маалыматтарыңыз корголгон жана байланыш үчүн гана колдонулат',
     phoneError: 'Сураныч, толук телефон номериңизди жазыңыз: +996 (XXX) XX-XX-XX',
+    serverError: 'Табыштама жөнөтүлбөй калды. WhatsApp аркылуу жазыңыз.',
     successTitle: 'Табыштамаңыз кабыл алынды!',
     successDesc: (name, phone) => `Ыракмат, ${name}! Сатуу бөлүмүнүн менеджери ${phone} номери боюнча 5–10 мүнөттүн ичинде байланышат.`,
     successProjectLabel: 'Кызыктырган объект:',
@@ -143,6 +146,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: '5 минут ішінде жауап',
     privacy: 'Деректеріңіз қауіпсіз қорғалған және тек байланыс орнату үшін пайдаланылады',
     phoneError: 'Толық телефон нөміріңізді енгізіңіз: +996 (XXX) XX-XX-XX',
+    serverError: 'Өтінімді жөнелту мүмкін болмады. WhatsApp арқылы жазыңыз.',
     successTitle: 'Өтініміңіз сәтті қабылданды!',
     successDesc: (name, phone) => `Рақмет, ${name}! Сату бөлімінің менеджері ${phone} нөмірі бойынша 5–10 минутта хабарласады.`,
     successProjectLabel: 'Таңдалған нысан:',
@@ -186,6 +190,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: 'Відповідь за 5 хвилин',
     privacy: 'Ваші дані надійно захищені та використовуються виключно для зв’язку менеджера з вами',
     phoneError: 'Будь ласка, введіть повний номер телефону: +996 (XXX) XX-XX-XX',
+    serverError: 'Не вдалося надіслати заявку. Напишіть нам у WhatsApp.',
     successTitle: 'Заявку успішно прийнято!',
     successDesc: (name, phone) => `Дякуємо, ${name}! Менеджер зв’яжеться з вами за номером ${phone} протягом 5–10 хвилин.`,
     successProjectLabel: 'Обраний об’єкт:',
@@ -229,6 +234,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: 'Response within 5 minutes',
     privacy: 'Your personal data is strictly protected and used exclusively to service your inquiry',
     phoneError: 'Please enter your complete phone number: +996 (XXX) XX-XX-XX',
+    serverError: 'Failed to send inquiry. Please reach out to us on WhatsApp.',
     successTitle: 'Inquiry Successfully Received!',
     successDesc: (name, phone) => `Thank you, ${name}! Our sales manager will contact you at ${phone} within 5–10 minutes.`,
     successProjectLabel: 'Selected Project:',
@@ -272,6 +278,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee3: '5分钟内快速响应',
     privacy: '您的隐私信息受到严格加密保护，仅用于置业顾问向您提供专属服务',
     phoneError: '请完整填写有效联系电话：+996 (XXX) XX-XX-XX',
+    serverError: '提交失败，请直接通过 WhatsApp 与我们取得联系。',
     successTitle: '置业申请已成功受理！',
     successDesc: (name, phone) => `感谢您的垂询，${name}！专属置业经理将在5–10分钟内致电 ${phone} 为您服务。`,
     successProjectLabel: '目标楼盘：',
@@ -309,6 +316,7 @@ export default function ConsultationForm() {
   const [phone, setPhone] = useState('+996 ');
   const [selectedProject, setSelectedProject] = useState(ui.projects[0]);
   const [selectedGoal, setSelectedGoal] = useState(ui.goals[0]);
+  const [honeypot, setHoneypot] = useState(''); // Скрытая ловушка для ботов
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -357,15 +365,16 @@ export default function ConsultationForm() {
     return true;
   };
 
-  // Отправка в реальный API /api/lead
+  // Отправка в реальный API /api/lead с защитой
   const handleDirectCallback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validatePhone()) return;
 
     setIsSubmitting(true);
+    setError('');
 
     try {
-      await fetch('/api/lead', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -374,15 +383,25 @@ export default function ConsultationForm() {
           project: selectedProject,
           goal: selectedGoal,
           lang: currentLang,
+          website: honeypot, // Отправляем значение honeypot
           source: 'ConsultationForm',
           createdAt: new Date().toISOString(),
         }),
       });
+
+      const resData = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        setError(resData?.error || ui.serverError);
+        return;
+      }
+
+      setIsSuccess(true);
     } catch (err) {
       console.error('Lead submission network error:', err);
+      setError(ui.serverError);
     } finally {
       setIsSubmitting(false);
-      setIsSuccess(true);
     }
   };
 
@@ -425,6 +444,7 @@ export default function ConsultationForm() {
               onClick={() => {
                 setIsSuccess(false);
                 setName('');
+                setHoneypot('');
                 setPhone('+996 ');
               }}
               className="text-xs uppercase font-bold text-[#d4b26f] hover:underline cursor-pointer"
@@ -446,8 +466,22 @@ export default function ConsultationForm() {
               </p>
             </div>
 
-            <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto">
+            <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto relative">
               
+              {/* Скрытая honeypot-ловушка для спам-ботов */}
+              <div className="hidden opacity-0 pointer-events-none absolute -left-[9999px]" aria-hidden="true">
+                <label htmlFor="company_website_input">Leave blank</label>
+                <input
+                  id="company_website_input"
+                  type="text"
+                  name="website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                />
+              </div>
+
               {/* Чипы выбора темы */}
               <div>
                 <label className="block text-[11px] font-black uppercase tracking-wider text-gray-300 mb-2">
@@ -534,7 +568,7 @@ export default function ConsultationForm() {
 
               {/* Ошибка */}
               {error && (
-                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center">
+                <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center animate-fadeIn">
                   <p className="text-xs text-rose-200 font-bold">{error}</p>
                 </div>
               )}
