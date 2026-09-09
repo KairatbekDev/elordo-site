@@ -271,6 +271,8 @@ const UI_TEXT = {
     aboutProject: 'О проекте',
     mainOffice: 'Главный офис',
     to2gis: 'В 2GIS',
+    enableTouch: 'Нажмите для управления картой',
+    lockScroll: 'Зафиксировать скролл',
   },
   kg: {
     all: 'Баары',
@@ -282,6 +284,8 @@ const UI_TEXT = {
     aboutProject: 'Долбоор тууралуу',
     mainOffice: 'Башкы офис',
     to2gis: '2GIS аркылуу',
+    enableTouch: 'Картаны башкаруу үчүн басыңыз',
+    lockScroll: 'Скроллду бекитүү',
   },
   kz: {
     all: 'Барлығы',
@@ -293,6 +297,8 @@ const UI_TEXT = {
     aboutProject: 'Жоба туралы',
     mainOffice: 'Бас кеңсе',
     to2gis: '2GIS арқылы',
+    enableTouch: 'Картаны басқару үшін басыңыз',
+    lockScroll: 'Скроллды бекіту',
   },
   uk: {
     all: 'Всі',
@@ -304,6 +310,8 @@ const UI_TEXT = {
     aboutProject: 'Про проєкт',
     mainOffice: 'Головний офіс',
     to2gis: 'У 2GIS',
+    enableTouch: 'Натисніть для керування картою',
+    lockScroll: 'Зафіксувати скрол',
   },
   en: {
     all: 'All',
@@ -315,6 +323,8 @@ const UI_TEXT = {
     aboutProject: 'About Project',
     mainOffice: 'Head Office',
     to2gis: 'In 2GIS',
+    enableTouch: 'Tap to interact with map',
+    lockScroll: 'Lock scroll',
   },
   zh: {
     all: '全部',
@@ -326,6 +336,8 @@ const UI_TEXT = {
     aboutProject: '查看详情',
     mainOffice: '总部营销中心',
     to2gis: '在 2GIS 中打开',
+    enableTouch: '点击解锁地图并浏览',
+    lockScroll: '锁定页面滚动',
   },
 };
 
@@ -340,6 +352,7 @@ export default function BishkekMap() {
   const itemsRef = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const [selectedId, setSelectedId] = useState<string>('office');
   const [filter, setFilter] = useState<'all' | 'office' | 'active' | 'finished'>('all');
+  const [isMapActive, setIsMapActive] = useState<boolean>(false);
 
   const points = useMemo(() => {
     return RAW_POINTS.map((p) => ({
@@ -369,10 +382,15 @@ export default function BishkekMap() {
       const L = (window as any).L;
       if (!L || !mapContainerRef.current || mapRef.current) return;
 
+      const isMobile = window.innerWidth < 1024;
+
       const map = L.map(mapContainerRef.current, {
         center: [42.848, 74.598],
         zoom: 12,
         scrollWheelZoom: false,
+        dragging: !isMobile,
+        touchZoom: !isMobile,
+        tap: !isMobile,
       });
 
       mapRef.current = map;
@@ -487,6 +505,11 @@ export default function BishkekMap() {
     const handleResize = () => {
       if (mapRef.current) {
         mapRef.current.invalidateSize();
+        const isMobile = window.innerWidth < 1024;
+        if (!isMobile) {
+          mapRef.current.dragging?.enable();
+          mapRef.current.touchZoom?.enable();
+        }
       }
     };
     window.addEventListener('resize', handleResize);
@@ -499,6 +522,21 @@ export default function BishkekMap() {
       }
     };
   }, []);
+
+  // Динамическое включение/выключение жестов на карте при взаимодействии
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      if (isMapActive) {
+        mapRef.current.dragging?.enable();
+        mapRef.current.touchZoom?.enable();
+      } else {
+        mapRef.current.dragging?.disable();
+        mapRef.current.touchZoom?.disable();
+      }
+    }
+  }, [isMapActive]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -626,10 +664,36 @@ export default function BishkekMap() {
       </div>
 
       {/* Сетка: Карта + Список */}
-      <div className="grid grid-cols-1 lg:grid-cols-12">
-        {/* Карта */}
-        <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef] dark:bg-[#040c09]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 relative">
+        
+        {/* Карта с защитой от залипания скролла */}
+        <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef] dark:bg-[#040c09] overflow-hidden">
           <div ref={mapContainerRef} className="w-full h-full" />
+
+          {/* Мобильный оверлей: свободный скролл страницы */}
+          {!isMapActive && (
+            <div
+              onClick={() => setIsMapActive(true)}
+              className="lg:hidden absolute inset-0 z-[400] bg-black/10 dark:bg-black/25 flex items-center justify-center cursor-pointer transition-opacity touch-pan-y"
+            >
+              <div className="px-4 py-2 rounded-xl bg-[#064734]/95 text-white text-xs font-bold shadow-xl border border-[#d4b26f]/40 flex items-center gap-2 backdrop-blur-sm animate-pulse">
+                <IconMapPin className="w-4 h-4 text-[#d4b26f]" />
+                <span>{ui.enableTouch}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Мобильная кнопка: фиксация скролла */}
+          {isMapActive && (
+            <button
+              type="button"
+              onClick={() => setIsMapActive(false)}
+              className="lg:hidden absolute top-3 right-3 z-[450] px-3 py-1.5 rounded-xl bg-[#064734]/90 text-white text-xs font-black shadow-lg border border-[#d4b26f]/40 flex items-center gap-1.5 backdrop-blur-md cursor-pointer active:scale-95 transition-all"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400" />
+              <span>{ui.lockScroll}</span>
+            </button>
+          )}
         </div>
 
         {/* Список объектов */}
