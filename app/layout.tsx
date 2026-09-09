@@ -16,7 +16,7 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elordo.group';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elordogroup.kg';
 
 export const viewport: Viewport = {
   themeColor: '#064734',
@@ -32,10 +32,11 @@ export const metadata: Metadata = {
     template: '%s | EL ORDO GROUP',
   },
   description:
-    'Строительная компания EL ORDO GROUP в Бишкеке. Продажа квартир премиум, бизнес и комфорт-класса от застройщика. Беспроцентная рассрочка 0% до 40 месяцев, программа Trade-in. ЖК Abu Dhabi, Madina Residence, Айкол+.',
+    'Строительная компания EL ORDO GROUP в Бишкеке. Продажа квартир премиум, бизнес и комфорт-класса напрямую от надежного застройщика. Беспроцентная рассрочка 0% до 40 месяцев без банка, программа Trade-in. ЖК Abu Dhabi, Madina Residence, Айкол+.',
   keywords: [
     // RU
     'EL ORDO',
+    'EL ORDO GROUP',
     'Эл Ордо',
     'купить квартиру Бишкек',
     'новостройки Бишкек',
@@ -49,19 +50,23 @@ export const metadata: Metadata = {
     'Бишкекте батир сатып алуу',
     'жаңы курулуштар Бишкек',
     'пайызсыз бөлүп төлөө',
+    'Эл Ордо курулуш компаниясы',
     // KZ
     'Бішкектен пәтер сатып алу',
     'жаңа құрылыстар Бішкек',
+    'пайызсыз бөліп төлеу',
     // EN
     'buy apartment in Bishkek',
     'property in Kyrgyzstan',
     'real estate Bishkek developer',
     'apartments installment 0%',
+    'EL ORDO development',
     // ZH
     '比什凯克买房',
     '比什凯克公寓',
     '吉尔吉斯斯坦房地产',
     '比什凯克免息分期楼盘',
+    'EL ORDO 建筑开发公司',
   ],
   formatDetection: {
     telephone: false,
@@ -147,7 +152,7 @@ export default function RootLayout({
     telephone: COMPANY_INFO.phones.map((phone) => phone.replace(/\s+/g, '')),
     priceRange: '$$$',
     currenciesAccepted: 'USD, KGS',
-    paymentAccepted: 'Беспроцентная рассрочка, безналичный расчет, наличные, Trade-in (бартер авто/недвижимости)',
+    paymentAccepted: 'Беспроцентная рассрочка 0%, безналичный расчет, наличные, Trade-in (бартер авто/недвижимости)',
     founder: {
       '@type': 'Person',
       name: 'Керезбек Нуралиев',
