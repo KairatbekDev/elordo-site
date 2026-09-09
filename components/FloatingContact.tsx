@@ -8,6 +8,7 @@ import {
   IconWhatsApp,
   IconInstagram,
   IconMapPin,
+  IconPhone,
 } from '@/components/Icons';
 
 interface FloatingContactContent {
@@ -109,8 +110,8 @@ export default function FloatingContact() {
   const [isOpen, setIsOpen] = useState(false);
   const [showBadge, setShowBadge] = useState(true);
 
-  const langContext = useLanguage() as any;
-  const currentLang: Locale = (langContext?.locale || langContext?.language || 'ru') as Locale;
+  const { locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[currentLang] || CONTENT.ru;
 
   // Закрытие по нажатию клавиши Escape
@@ -122,7 +123,6 @@ export default function FloatingContact() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Скрытие подсказки при первом открытии
   const toggleMenu = () => {
     setIsOpen((prev) => !prev);
     if (showBadge) setShowBadge(false);
@@ -132,81 +132,89 @@ export default function FloatingContact() {
 
   return (
     <>
-      {/* 1. Фоновый полупрозрачный оверлей */}
+      {/* 1. Фоновый полупрозрачный оверлей при открытом меню */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-black/35 backdrop-blur-[3px] transition-opacity animate-fadeIn"
+          className="fixed inset-0 z-40 bg-black/40 dark:bg-black/60 backdrop-blur-[2px] transition-opacity animate-fadeIn"
           aria-hidden="true"
         />
       )}
 
-      {/* 2. Плавающий контейнер */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-3 font-sans select-none">
+      {/* 2. Плавающий контейнер с учетом safe-area на смартфонах */}
+      <div className="fixed bottom-5 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 font-sans select-none">
         
-        {/* Интерактивное меню каналов связи */}
+        {/* Интерактивное всплывающее меню каналов связи */}
         {isOpen && (
-          <div className="flex flex-col gap-2.5 bg-white/95 backdrop-blur-xl p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-gray-100 min-w-[270px] animate-slideInRight">
+          <div className="flex flex-col gap-2.5 bg-white/95 dark:bg-[#0b1b15]/95 backdrop-blur-xl p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border border-gray-100 dark:border-white/10 w-[290px] max-w-[calc(100vw-2rem)] animate-slideInRight text-gray-900 dark:text-gray-100">
             
             {/* Статус-панель отдела продаж */}
-            <div className="flex items-center justify-between px-1 pb-2 border-b border-gray-100">
-              <span className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+            <div className="flex items-center justify-between px-1 pb-2 border-b border-gray-100 dark:border-white/10">
+              <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400">
                 {c.salesDept}
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full font-bold">
+              <span className="inline-flex items-center gap-1.5 text-[10px] text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200/60 dark:border-emerald-800/40 px-2 py-0.5 rounded-full font-bold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 {c.online}
               </span>
             </div>
 
-            {/* WhatsApp */}
+            {/* Быстрый чат WhatsApp */}
             <a
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#25D366]/10 hover:bg-[#25D366]/20 active:scale-[0.98] text-[#128C7E] font-extrabold text-xs sm:text-sm transition-all border border-[#25D366]/20 shadow-sm"
+              className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#25D366]/10 dark:bg-[#25D366]/15 hover:bg-[#25D366]/20 active:scale-[0.98] text-[#128C7E] dark:text-[#25D366] font-extrabold text-xs sm:text-sm transition-all border border-[#25D366]/25 shadow-sm"
             >
               <div className="w-8 h-8 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm">
                 <IconWhatsApp className="w-4 h-4" />
               </div>
               <div className="flex flex-col">
                 <span className="leading-tight">{c.chatWhatsapp}</span>
-                <span className="text-[10px] text-gray-500 font-normal">{c.replyTime}</span>
+                <span className="text-[10px] text-gray-500 dark:text-neutral-400 font-normal">{c.replyTime}</span>
               </div>
             </a>
 
-            {/* Прямые звонки */}
-            <div className="p-2.5 rounded-2xl bg-gray-50 border border-gray-100">
-              <span className="text-[10px] font-bold text-gray-400 block mb-1">{c.callManager}</span>
+            {/* Прямые звонки в отдел продаж */}
+            <div className="p-2.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
+              <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400 block mb-1">{c.callManager}</span>
+              
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors"
+                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
-                <span>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</span>
+                <div className="flex items-center gap-1.5">
+                  <IconPhone className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f]" />
+                  <span>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</span>
+                </div>
                 <span className="text-[10px] font-bold text-[#d4b26f]">{c.mainPhone}</span>
               </a>
+
               <a
                 href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 hover:text-[#064734] transition-colors border-t border-gray-200/50 mt-1 pt-1"
+                className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors border-t border-gray-200/50 dark:border-white/10 mt-1 pt-1"
               >
-                <span>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</span>
-                <span className="text-[10px] font-bold text-gray-400">{c.secondaryPhone}</span>
+                <div className="flex items-center gap-1.5">
+                  <IconPhone className="w-3.5 h-3.5 text-gray-400 dark:text-neutral-400" />
+                  <span>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</span>
+                </div>
+                <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400">{c.secondaryPhone}</span>
               </a>
             </div>
 
             {/* Instagram и 2GIS */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="grid grid-cols-2 gap-2 pt-0.5">
               <a
                 href={COMPANY_INFO.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 font-bold text-[11px] transition-colors border border-pink-100"
+                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-pink-50 dark:bg-pink-950/30 hover:bg-pink-100 dark:hover:bg-pink-900/40 text-pink-700 dark:text-pink-300 font-bold text-[11px] transition-colors border border-pink-100 dark:border-pink-900/30"
               >
-                <IconInstagram className="w-3.5 h-3.5 text-pink-600" />
+                <IconInstagram className="w-3.5 h-3.5 text-pink-600 dark:text-pink-400" />
                 <span>Instagram</span>
               </a>
               <a
@@ -214,9 +222,9 @@ export default function FloatingContact() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#064734] font-bold text-[11px] transition-colors border border-emerald-100"
+                className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-[#064734] dark:text-[#d4b26f] font-bold text-[11px] transition-colors border border-emerald-100 dark:border-emerald-900/30"
               >
-                <IconMapPin className="w-3.5 h-3.5 text-[#064734]" />
+                <IconMapPin className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f]" />
                 <span>{c.office2gis}</span>
               </a>
             </div>
@@ -230,10 +238,10 @@ export default function FloatingContact() {
           {showBadge && !isOpen && (
             <div
               onClick={toggleMenu}
-              className="cursor-pointer hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#064734] text-white border border-[#d4b26f]/40 shadow-xl animate-bounce"
+              className="cursor-pointer hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-[#064734] text-white border border-[#d4b26f]/50 shadow-xl animate-bounce"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-xs font-extrabold text-[#d4b26f]">{c.badge}</span>
+              <span className="text-xs font-black text-[#d4b26f]">{c.badge}</span>
             </div>
           )}
 
@@ -242,10 +250,10 @@ export default function FloatingContact() {
             onClick={toggleMenu}
             aria-expanded={isOpen}
             aria-label={c.ariaLabel}
-            className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white shadow-2xl transition-all border-2 border-[#d4b26f]/40 cursor-pointer"
+            className="relative flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white shadow-2xl transition-all border-2 border-[#d4b26f]/50 cursor-pointer"
           >
             {!isOpen && (
-              <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-40 animate-ping pointer-events-none" />
+              <span className="absolute -inset-1 rounded-full bg-emerald-400 opacity-30 animate-ping pointer-events-none" />
             )}
 
             {isOpen ? (
