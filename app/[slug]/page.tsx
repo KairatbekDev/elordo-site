@@ -2034,13 +2034,13 @@ export default function ComplexPage() {
         </div>
       </section>
 
-      {/* 9. Отзывы резидентов (Мультиязычные) */}
+     {/* 9. Отзывы резидентов (Мультиязычные) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
         <div className="absolute inset-0 z-0">
           <img
-            src="/projects/Abu-Dhabi.png"
-            alt="Отзывы"
-            className="w-full h-full object-cover opacity-15"
+            src={project.hero.image}
+            alt={project.name}
+            className="w-full h-full object-cover opacity-20 scale-105"
           />
           <div className="absolute inset-0 bg-[#032b20]/90" />
         </div>
