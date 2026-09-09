@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useTheme } from 'next-themes';
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -17,7 +17,8 @@ export default function ThemeToggle() {
     );
   }
 
-  const isDark = theme === 'dark';
+  // resolvedTheme точно знает, темный сейчас экран или светлый (даже при режиме 'system')
+  const isDark = resolvedTheme === 'dark';
 
   return (
     <button
@@ -27,7 +28,7 @@ export default function ThemeToggle() {
       className="w-9 h-9 rounded-xl flex items-center justify-center border border-gray-200 dark:border-white/15 bg-white dark:bg-[#07130e] text-[#064734] dark:text-[#d4b26f] hover:border-[#064734]/40 dark:hover:border-[#d4b26f]/50 transition-all shadow-sm active:scale-95 cursor-pointer"
     >
       {isDark ? (
-        /* Иконка Солнца (для темной темы) */
+        /* Иконка Солнца (активна тёмная тема -> клик включит светлую) */
         <svg
           className="w-4 h-4"
           viewBox="0 0 24 24"
@@ -48,7 +49,7 @@ export default function ThemeToggle() {
           <path d="m19.07 4.93-1.41 1.41" />
         </svg>
       ) : (
-        /* Иконка Луны (для светлой темы) */
+        /* Иконка Луны (активна светлая тема -> клик включит тёмную) */
         <svg
           className="w-4 h-4"
           viewBox="0 0 24 24"

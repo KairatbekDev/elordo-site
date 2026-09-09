@@ -1,7 +1,13 @@
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+
+/* Корректный вариант переключения тем в Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   :root {
+    /* Запрещает мобильным браузерам (Xiaomi Force Dark) принудительно делать светлую тему серой */
+    color-scheme: light;
+
     /* Фирменная палитра EL ORDO GROUP */
     --brand-primary: #064734;
     --brand-primary-hover: #032b20;
@@ -12,6 +18,11 @@
 
     /* Сглаживание и типографика */
     --font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  :root.dark,
+  .dark {
+    color-scheme: dark;
   }
 
   html {

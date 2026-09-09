@@ -16,7 +16,12 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elordogroup.kg';
+// Автоматическое определение актуального адреса (Production домен -> Vercel preview -> локалка)
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+  'https://elordo-site.vercel.app';
 
 export const viewport: Viewport = {
   themeColor: '#064734',
@@ -104,10 +109,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/logo-icon.png', type: 'image/png' },
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/favicon.ico' },
     ],
-    shortcut: '/logo-icon.png',
-    apple: '/logo-icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
   },
   openGraph: {
     type: 'website',
@@ -123,7 +129,8 @@ export const metadata: Metadata = {
         url: '/projects/Abu-Dhabi.png',
         width: 1200,
         height: 630,
-        alt: 'Жилые комплексы EL ORDO GROUP в Бишкеке',
+        type: 'image/png',
+        alt: 'Жилой комплекс премиум-класса Abu Dhabi — EL ORDO GROUP',
       },
     ],
   },
