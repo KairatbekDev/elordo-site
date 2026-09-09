@@ -8,6 +8,7 @@ import TypicalFloorsSection, { TypicalFloorItem } from '@/components/TypicalFloo
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { TRANSLATIONS } from '@/lib/i18n/translations';
 import {
   IconCheck,
   IconMapPin,
@@ -1660,7 +1661,9 @@ export default function ComplexPage() {
   const currentLang: Locale = (langContext.locale || langContext.currentLang || langContext.language || 'ru') as Locale;
   const t = langContext.t;
 
-  const rawProject = COMPLEXES[slug];
+  // Безопасный поиск комплекса с поддержкой алиаса kele-chek -> kelechek
+  const lookupKey = slug === 'kele-chek' ? 'kelechek' : slug;
+  const rawProject = COMPLEXES[lookupKey];
 
   const project = useMemo(() => {
     if (!rawProject) return null;
@@ -1711,6 +1714,7 @@ export default function ComplexPage() {
   }
 
   const ui = UI_STRINGS[currentLang] || UI_STRINGS.ru;
+  const localizedReviews = TRANSLATIONS[currentLang]?.reviewsSection?.items || COMPANY_INFO.reviews;
 
   const isSold =
     project.hero.price.includes('проданы') ||
@@ -2030,7 +2034,7 @@ export default function ComplexPage() {
         </div>
       </section>
 
-      {/* 9. Отзывы резидентов */}
+      {/* 9. Отзывы резидентов (Мультиязычные) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
         <div className="absolute inset-0 z-0">
           <img
@@ -2052,7 +2056,7 @@ export default function ComplexPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {COMPANY_INFO.reviews.map((rev, idx) => (
+            {localizedReviews.map((rev, idx) => (
               <div
                 key={idx}
                 className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left"

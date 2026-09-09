@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO } from '@/lib/data';
@@ -14,13 +15,25 @@ import {
   IconWhatsApp,
   IconInstagram,
   IconArrowRight,
+  IconCheck,
 } from '@/components/Icons';
 
 export default function AboutPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const [selectedDoc, setSelectedDoc] = useState<null | {
+    title: string;
+    serial: string;
+    issuer: string;
+    desc: string;
+    badge: string;
+  }>(null);
+
+  const isRu = locale === 'ru';
+  const isKg = locale === 'kg';
+  const isEn = locale === 'en';
 
   const waAboutText = encodeURIComponent(
-    'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить подробную презентацию ваших объектов и разрешительных документов.'
+    'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить презентацию объектов и юридический пакет разрешительных документов.'
   );
 
   const team = [
@@ -61,6 +74,53 @@ export default function AboutPage() {
     { value: '6', label: t.aboutPage.stat2Label, sub: t.aboutPage.stat2Sub },
     { value: '100%', label: t.aboutPage.stat3Label, sub: t.aboutPage.stat3Sub },
     { value: t.aboutPage.stat4Value, label: t.aboutPage.stat4Label, sub: t.aboutPage.stat4Sub },
+  ];
+
+  const documents = [
+    {
+      badge: isKg ? 'Мамкурулуш лицензиясы' : isEn ? 'State License' : 'Лицензия Госстроя КР',
+      title: isKg ? 'Курулуш-монтаждоо иштерине мамлекеттик лицензия' : isEn ? 'State Construction & Engineering License' : 'Государственная строительная лицензия',
+      serial: 'Серия КРЦ-2 №08603',
+      issuer: isKg ? 'КР Министрлер Кабинетине караштуу Мамкурулуш' : isEn ? 'State Agency for Architecture & Construction of the KR' : 'Госстрой при Кабинете Министров КР',
+      desc: isKg
+        ? 'III деңгээлдеги жоопкерчиликтеги монолиттүү көп кабаттуу турак жайларды долбоорлоо жана куруу укугун тастыктайт.'
+        : isEn
+        ? 'Authorizes capital multi-story reinforced concrete construction and high-rise structural engineering.'
+        : 'Подтверждает право на возведение капитальных монолитных высотных жилых комплексов и выполнение строительно-монтажных работ.',
+    },
+    {
+      badge: isKg ? 'Кызыл китептер' : isEn ? 'Private Land Title' : 'Красные книги участков',
+      title: isKg ? 'Жеке менчик укугу жөнүндө мамлекеттик актылар' : isEn ? 'Private Land Ownership State Deeds (Red Books)' : 'Государственные акты на право частной собственности',
+      serial: isKg ? 'Мамкаттоо КР' : isEn ? 'State Cadastre KR' : 'Госрегистр КР',
+      issuer: isKg ? 'КР Кадастр мамлекеттик мекемеси' : isEn ? 'State Land Cadastre of the Kyrgyz Republic' : 'ГУ «Кадастр» / Департамент кадастра КР',
+      desc: isKg
+        ? 'Бардык объектилер жеке менчик жеринде курулат. Аренда же жер тилкеси боюнча талаш-тартыштар жок.'
+        : isEn
+        ? 'All complexes are built exclusively on developer-owned land plots with clean titles, free of municipal lease risks.'
+        : 'Все жилые комплексы возводятся на собственных земельных участках с Красными книгами без арендных рисков.',
+    },
+    {
+      badge: isKg ? 'АПУ жана ИТУ' : isEn ? 'Town Planning Approval' : 'АПУ и техусловия ИТУ',
+      title: isKg ? 'Архитектуралык-пландоо шарттары жана инженердик тармактар' : isEn ? 'Architectural Master Plan & Utility Approvals' : 'Архитектурно-планировочные условия и техусловия',
+      serial: '№ АПУ-2023 / ИТУ',
+      issuer: isKg ? '«Бишкекбашкыархитектура» МИ' : isEn ? 'Bishkek Master Architecture Agency' : 'МП «Бишкекглавархитектура»',
+      desc: isKg
+        ? 'Шаар куруу талаптарына толук шайкештик жана бардык борбордук коммуникацияларга (жылуулук, суу, жарык) кошулуу кепилдиги.'
+        : isEn
+        ? 'Full compliance with city master zoning codes and guaranteed direct connection to municipal central heating, water, and power.'
+        : 'Утвержденные градостроительные параметры этажности и гарантированное подключение к центральным коммуникациям столицы.',
+    },
+    {
+      badge: isKg ? 'Мамэкспертиза' : isEn ? 'State Seismic Audit' : 'Государственная экспертиза',
+      title: isKg ? 'Мамлекеттик ведомстволор аралык экспертизанын корутундусу' : isEn ? 'State Interdepartmental Expert Seismic Conclusion' : 'Положительное заключение Государственной экспертизы',
+      serial: 'СНиП КР 20-02:2018',
+      issuer: isKg ? 'Мамкурулуш алдындагы Мамэкспертиза департаменти' : isEn ? 'Department of State Expertise of the KR' : 'Департамент государственной экспертизы Госстроя КР',
+      desc: isKg
+        ? '9 баллдык сейсмотуруктуулуктун эсептөөлөрү так текшерилген жана конструкциялык коопсуздугу 100% тастыкталган.'
+        : isEn
+        ? 'Certified structural resilience rated for 9-magnitude seismic safety according to state codes.'
+        : 'Официальное экспертное подтверждение сейсмостойкости 9 баллов и соответствия прочности монолитного железобетонного каркаса.',
+    },
   ];
 
   const standards = [
@@ -198,7 +258,6 @@ export default function AboutPage() {
       {/* 4. История и принципы застройщика */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
           <div className="lg:col-span-6 space-y-6">
             <div>
               <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
@@ -217,7 +276,6 @@ export default function AboutPage() {
               {t.aboutPage.missionP2}
             </p>
 
-            {/* Цитата руководства */}
             <div className="p-6 rounded-2xl bg-[#064734]/5 dark:bg-[#064734]/20 border-l-4 border-[#064734] dark:border-[#d4b26f] shadow-sm">
               <p className="text-sm font-semibold italic text-gray-800 dark:text-gray-200 leading-relaxed mb-3">
                 {t.aboutPage.quoteText}
@@ -250,7 +308,6 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-
         </div>
       </section>
 
@@ -295,41 +352,130 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 6. Таймлайн развития компании */}
+      {/* 6. ОФИЦИАЛЬНЫЕ ДОКУМЕНТЫ И РАЗРЕШЕНИЯ (Юридический щит) */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-            {t.aboutPage.milestonesBadge}
+            {isKg ? 'Юридикалык тазалык' : isEn ? 'Legal Guarantee' : '100% Юридическая чистота'}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-            {t.aboutPage.milestonesTitle}
+            {isKg ? 'Мамлекеттик документтер жана уруксаттар' : isEn ? 'Official Permits & Construction Titles' : 'Разрешительная документация и лицензии'}
           </h2>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
+            {isKg
+              ? 'Биздин бардык объектилер Кызыл китептери бар жеке жерлерде курулат жана мамлекеттик каттоодон өтөт.'
+              : isEn
+              ? 'Every development is built on privately-owned land with official Red Books and state-registered contracts.'
+              : 'Каждый наш объект строится в строгом соответствии с законами КР. Мы открыто предоставляем оригиналы документов для вашего юриста.'}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {milestones.map((item, idx) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+          {documents.map((doc, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-[#d4b26f]/30 transition-all relative flex flex-col justify-between"
+              className="bg-white dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200 dark:border-white/10 hover:border-[#d4b26f]/50 hover:shadow-xl dark:hover:border-[#d4b26f]/40 transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="text-2xl font-black text-[#d4b26f] mb-3">
-                  {item.year}
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-black uppercase px-3 py-1 rounded-full bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f]">
+                    <IconCheck className="w-3.5 h-3.5" />
+                    <span>{doc.badge}</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-gray-500 dark:text-neutral-400 bg-gray-100 dark:bg-white/5 px-2.5 py-0.5 rounded-lg">
+                    {doc.serial}
+                  </span>
                 </div>
-                <h3 className="text-sm font-black text-gray-950 dark:text-white mb-2">
-                  {item.title}
+
+                <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mb-2 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
+                  {doc.title}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {item.desc}
+
+                <p className="text-xs text-[#8c6b23] dark:text-[#eddab2] font-semibold mb-3">
+                  {doc.issuer}
+                </p>
+
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+                  {doc.desc}
                 </p>
               </div>
+
+              <button
+                onClick={() => setSelectedDoc(doc)}
+                className="inline-flex items-center justify-between w-full pt-4 border-t border-gray-100 dark:border-white/10 text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f] hover:underline cursor-pointer"
+              >
+                <span>{isKg ? 'Чоо-жайын көрүү' : isEn ? 'Inspect Document' : 'Ознакомиться подробнее'}</span>
+                <IconArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
           ))}
         </div>
+
+        {/* Инфо-плашка для юристов покупателя */}
+        <div className="rounded-3xl p-6 sm:p-8 bg-[#064734] text-white border border-[#d4b26f]/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="max-w-2xl text-center md:text-left">
+            <h4 className="text-lg font-black uppercase tracking-tight text-[#d4b26f] mb-1">
+              {isKg ? 'Юристиңиз менен келип таанышыңыз' : isEn ? 'Bring Your Legal Counsel' : 'Юридическая проверка перед покупкой'}
+            </h4>
+            <p className="text-xs sm:text-sm text-white/85 leading-relaxed">
+              {isKg
+                ? 'Биз башкы сатуу кеңсесинде бардык түп нуска документтерди көрсөтүүгө даярбыз же PDF форматында юристиңизге жөнөтөбүз.'
+                : isEn
+                ? 'We welcome independent legal audits. We will provide all original title deeds and permits in person or send a PDF bundle.'
+                : 'Готовы предоставить оригиналы Красных книг, лицензии и ДДУ для проверки вашим независимым юристом в центральном офисе.'}
+            </p>
+          </div>
+          <a
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+              'Здравствуйте! Хочу получить полный пакет документов (сканы лицензии Госстроя, Красной книги и типовой ДДУ) для проверки юристом.'
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
+          >
+            <IconWhatsApp className="w-4 h-4 text-[#064734]" />
+            <span>{isKg ? 'Документтерди WhatsAppтан алуу' : isEn ? 'Request Legal PDF Bundle' : 'Запросить PDF документов'}</span>
+          </a>
+        </div>
       </section>
 
-      {/* 7. Руководство и команда компании */}
-      <section className="bg-[#f0f4f1] dark:bg-[#040c09] border-t border-gray-200 dark:border-white/10 py-20 px-4 sm:px-6 transition-colors">
+      {/* 7. Таймлайн развития компании */}
+      <section className="bg-white dark:bg-[#07130e] border-y border-gray-100 dark:border-white/10 py-20 px-4 sm:px-6 transition-colors">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
+              {t.aboutPage.milestonesBadge}
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
+              {t.aboutPage.milestonesTitle}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {milestones.map((item, idx) => (
+              <div
+                key={idx}
+                className="bg-[#fafbfa] dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-md dark:hover:border-[#d4b26f]/30 transition-all relative flex flex-col justify-between"
+              >
+                <div>
+                  <div className="text-2xl font-black text-[#d4b26f] mb-3">
+                    {item.year}
+                  </div>
+                  <h3 className="text-sm font-black text-gray-950 dark:text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. Руководство и команда компании */}
+      <section className="bg-[#f0f4f1] dark:bg-[#040c09] py-20 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
@@ -374,7 +520,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 8. Контакты офиса продаж и карта */}
+      {/* 9. Контакты офиса продаж и карта */}
       <section className="bg-white dark:bg-[#07130e] border-t border-gray-100 dark:border-white/10 py-16 sm:py-20 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -442,6 +588,55 @@ export default function AboutPage() {
           <BishkekMap />
         </div>
       </section>
+
+      {/* Модальное окно просмотра документа */}
+      {selectedDoc && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 max-w-lg w-full rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+            <button
+              onClick={() => setSelectedDoc(null)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-black w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <span className="inline-block text-[11px] font-black uppercase px-3 py-1 rounded-full bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] mb-3">
+              {selectedDoc.badge}
+            </span>
+
+            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">
+              {selectedDoc.title}
+            </h3>
+
+            <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs space-y-1 mb-4">
+              <p className="text-gray-500 dark:text-neutral-400">
+                Регистрационный номер: <strong className="text-gray-900 dark:text-white">{selectedDoc.serial}</strong>
+              </p>
+              <p className="text-gray-500 dark:text-neutral-400">
+                Орган выдачи: <strong className="text-gray-900 dark:text-white">{selectedDoc.issuer}</strong>
+              </p>
+            </div>
+
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+              {selectedDoc.desc}
+            </p>
+
+            <div className="flex gap-3">
+              <a
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+                  `Здравствуйте! Прошу выслать официальный скан документа «${selectedDoc.title} (${selectedDoc.serial})» в PDF формате.`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow text-center flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <IconWhatsApp className="w-4 h-4" />
+                <span>Получить скан в WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
     </main>
   );

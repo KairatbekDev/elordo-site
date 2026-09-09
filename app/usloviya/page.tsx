@@ -15,7 +15,10 @@ import {
 } from '@/components/Icons';
 
 export default function PurchaseTermsPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+
+  const isKg = locale === 'kg';
+  const isEn = locale === 'en';
 
   // Состояние калькулятора рассрочки
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
@@ -37,6 +40,12 @@ export default function PurchaseTermsPage() {
   const remainingAmount = apartmentPrice - downPaymentAmount;
   const monthlyPayment = months > 0 ? Math.round(remainingAmount / months) : 0;
   const monthlyPaymentKgs = Math.round(monthlyPayment * usdToKgs);
+
+  const rateDisclaimer = isKg
+    ? '* Эсептөө болжолдуу мүнөзгө ээ. Сом түрүндөгү суммалар келишим түзүлгөн жана төлөм жүргүзүлгөн күнү Улуттук банктын (УБ) расмий курсу боюнча такталат.'
+    : isEn
+    ? '* Calculations are indicative. Exact amounts in Kyrgyz Som (KGS) are determined based on the official NBKR exchange rate on the date of contract signing and payment.'
+    : '* Расчет носит предварительный характер. Точная сумма в национальной валюте (сом) фиксируется по учетному курсу НБКР на день заключения договора и внесения платежа.';
 
   const handleSendCalculation = () => {
     const text =
@@ -373,9 +382,9 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Итоговая панель расчета */}
+            {/* Итоговая панель расчета с дисклеймером курса НБКР */}
             <div className="bg-[#f2f6f4] dark:bg-[#040c09] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
-              <div>
+              <div className="max-w-xl">
                 <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-1">
                   {t.termsPage.calcMonthlyLabel}
                 </span>
@@ -386,8 +395,13 @@ export default function PurchaseTermsPage() {
                 <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
                   ≈ {monthlyPaymentKgs.toLocaleString()} {t.termsPage.calcSomPerMonth}
                 </div>
-                <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2">
+                <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2 font-medium">
                   {t.termsPage.calcRemaining} ${remainingAmount.toLocaleString()} • {t.termsPage.calcNoBankFee}
+                </p>
+
+                {/* Официальный дисклеймер НБКР */}
+                <p className="text-[11px] text-gray-500 dark:text-neutral-400/90 mt-3 pt-3 border-t border-gray-200 dark:border-white/10 leading-relaxed italic">
+                  {rateDisclaimer}
                 </p>
               </div>
 

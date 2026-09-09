@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { TRANSLATIONS } from '@/lib/i18n/translations';
 import {
   IconBuilding,
   IconCrane,
@@ -362,7 +363,7 @@ const CONTENT: Record<Locale, HomeContent> = {
     viewAllBtn: '查看全部楼盘',
     detailsBtn: '查看楼盘详情',
     fromPrice: '起',
-    sqm: '$/m²',
+    sqm: '$/м²',
     statusFinished: '已交付',
     mapBadge: '核心地理区位',
     mapTitle: 'EL ORDO 项目全景电子沙盘',
@@ -469,6 +470,8 @@ export default function HomePage() {
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[currentLang] || CONTENT.ru;
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
+  const reviews = t.reviewsSection?.items || COMPANY_INFO.reviews;
 
   const waHeroLink = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(c.waHeroMsg)}`;
 
@@ -778,7 +781,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 6. ОТЗЫВЫ РЕЗИДЕНТОВ */}
+      {/* 6. ОТЗЫВЫ РЕЗИДЕНТОВ (МУЛЬТИЯЗЫЧНЫЕ) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white my-16">
         <div className="absolute inset-0 z-0">
           <img
@@ -800,7 +803,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {COMPANY_INFO.reviews.map((rev, idx) => (
+            {reviews.map((rev, idx) => (
               <div
                 key={idx}
                 className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left"

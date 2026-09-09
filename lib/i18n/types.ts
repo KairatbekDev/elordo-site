@@ -66,9 +66,14 @@ export interface TranslationDictionary {
     card3Desc: string;
     card3Action: string;
   };
-  reviewsSection: {
+ reviewsSection: {
     badge: string;
     title: string;
+    items: Array<{
+      author: string;
+      text: string;
+      role: string;
+    }>;
   };
   officeSection: {
     badge: string;

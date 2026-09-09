@@ -70,6 +70,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: 'Реальные истории',
       title: 'Отзывы наших покупателей',
+      items: [
+        {
+          author: 'Омурбек Нуржанов',
+          text: 'Приобрели квартиру на объекте Мадина. Хочу отметить сервис и условия рассрочки. Все выполнено качественно и точно в срок.',
+          role: 'Резидент ЖК Madina Residence',
+        },
+        {
+          author: 'Жаныбек Убайдуллаев',
+          text: 'Искренне благодарен компании EL ORDO за быстрое и качественное воплощение проекта. Слаженная работа бригад и профессионализм.',
+          role: 'Дольщик ЖК Abu Dhabi',
+        },
+        {
+          author: 'Nusratullo Sangakov',
+          text: 'Отличная строительная компания! EL ORDO GROUP показали высокий профессионализм, пунктуальность и ответственность на всех этапах.',
+          role: 'Инвестор',
+        },
+      ],
     },
     officeSection: {
       badge: 'Ждем вас в гости',
@@ -472,6 +489,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: 'Чыныгы окуялар',
       title: 'Биздин сатып алуучулардын пикирлери',
+      items: [
+        {
+          author: 'Өмүрбек Нуржанов',
+          text: '«Мадина» объектисинен батир сатып алдык. Тейлөөнү жана бөлүп төлөө шарттарын өзгөчө белгилегим келет. Баары сапаттуу жана так өз убагында аткарылган.',
+          role: '«Madina Residence» ТЖКнын резиденти',
+        },
+        {
+          author: 'Жаныбек Убайдуллаев',
+          text: 'Долбоорду тез жана сапаттуу ишке ашыргандыгы үчүн EL ORDO компаниясына терең ыраазычылык билдирем. Бригадалардын так иштеши жана кесипкөйлүгү жогору.',
+          role: '«Abu Dhabi» ТЖКнын үлүшчүсү',
+        },
+        {
+          author: 'Nusratullo Sangakov',
+          text: 'Мыкты курулуш компаниясы! EL ORDO GROUP бардык этаптарда жогорку кесипкөйлүктү, тактыкты жана жоопкерчиликти көрсөттү.',
+          role: 'Инвестор',
+        },
+      ],
     },
     officeSection: {
       badge: 'Бизге конокко келиңиз',
@@ -874,6 +908,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: 'Шынайы оқиғалар',
       title: 'Біздің сатып алушылардың пікірлері',
+      items: [
+        {
+          author: 'Өмірбек Нұржанов',
+          text: '«Мадина» нысанынан пәтер сатып алдық. Қызмет көрсету мен бөліп төлеу шарттарын ерекше атап өткім келеді. Барлығы сапалы және дәл уақытында орындалды.',
+          role: '«Madina Residence» ТҮК резиденті',
+        },
+        {
+          author: 'Жаныбек Убайдуллаев',
+          text: 'Жобаны жылдам әрі сапалы жүзеге асырғаны үшін EL ORDO компаниясына шын жүректен алғыс айтамын. Бригадалардың үйлесімді жұмысы мен кәсібилігі тәнті етті.',
+          role: '«Abu Dhabi» ТҮК үлескері',
+        },
+        {
+          author: 'Nusratullo Sangakov',
+          text: 'Өте тамаша құрылыс компаниясы! EL ORDO GROUP барлық кезеңде жоғары кәсібилік, ұқыптылық пен жауапкершілік танытты.',
+          role: 'Инвестор',
+        },
+      ],
     },
     officeSection: {
       badge: 'Қонаққа келіңіз',
@@ -943,7 +994,7 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
       roleMarketingHead: 'Маркетинг бөлімінің басшысы',
       roleDevelopment: 'Даму жөніндегі директор',
       officeBadge: 'Тікелей байланыс',
-      officeTitle: 'Сату және кеңес беру кеңсесі',
+      officeTitle: 'Сатуу және кеңес беру кеңсесі',
       officeAddressLabel: 'Компанияның бас кеңсесі:',
       btnRoute2Gis: '2GIS арқылы бағытты ашу',
       btnWhatsApp: 'WhatsApp-қа жазу',
@@ -1276,6 +1327,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: 'Реальні історії',
       title: 'Відгуки наших покупців',
+      items: [
+        {
+          author: 'Омурбек Нуржанов',
+          text: 'Придбали квартиру на об’єкті Мадіна. Хочу відзначити сервіс та умови розстрочки. Все виконано якісно та точно в строк.',
+          role: 'Резидент ЖК Madina Residence',
+        },
+        {
+          author: 'Жанибек Убайдуллаєв',
+          text: 'Щиро вдячний компанії EL ORDO за швидке та якісне втілення проєкту. Злагоджена робота будівельних бригад та високий професіоналізм.',
+          role: 'Пайовик ЖК Abu Dhabi',
+        },
+        {
+          author: 'Nusratullo Sangakov',
+          text: 'Чудова будівельна компанія! EL ORDO GROUP продемонстрували високий професіоналізм, пунктуальність та відповідальність на всіх етапах.',
+          role: 'Інвестор',
+        },
+      ],
     },
     officeSection: {
       badge: 'Чекаємо на вас',
@@ -1678,6 +1746,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: 'Real Stories',
       title: 'Reviews from Our Buyers',
+      items: [
+        {
+          author: 'Omurbek Nurzhanov',
+          text: 'We purchased an apartment at the Madina project. I would like to highlight the customer service and installment terms. Everything was completed with high quality and on schedule.',
+          role: 'Resident of Madina Residence',
+        },
+        {
+          author: 'Zhanybek Ubaidullaev',
+          text: 'Sincere thanks to EL ORDO for the prompt and high-quality implementation of the project. Seamless teamwork and outstanding professionalism.',
+          role: 'Shareholder of Abu Dhabi RC',
+        },
+        {
+          author: 'Nusratullo Sangakov',
+          text: 'Excellent construction company! EL ORDO GROUP demonstrated outstanding professionalism, punctuality, and accountability at every stage.',
+          role: 'Investor',
+        },
+      ],
     },
     officeSection: {
       badge: 'Welcome to Our Office',
@@ -2080,6 +2165,23 @@ export const TRANSLATIONS: Record<Locale, TranslationDictionary> = {
     reviewsSection: {
       badge: '真实客户见证',
       title: '业主的真实评价',
+      items: [
+        {
+          author: '奥穆尔别克·努尔扎诺夫 (Omurbek Nurzhanov)',
+          text: '我们在玛迪娜 (Madina) 项目购置了房产。销售服务和免息分期政策非常贴心周到，工程质量优异，如期交付。',
+          role: 'Madina Residence 社区业主',
+        },
+        {
+          author: '扎尼别克·乌拜杜拉耶夫 (Zhanybek Ubaidullaev)',
+          text: '由衷感谢 EL ORDO 公司高效优质地推进项目建设。施工团队配合默契，工程专业度极高。',
+          role: 'Abu Dhabi 住宅区业主',
+        },
+        {
+          author: '努斯拉图洛·桑加科夫 (Nusratullo Sangakov)',
+          text: '非常值得信赖的品牌开发商！EL ORDO GROUP 在工程各阶段均展现出了卓越的专业水准、严谨的工期把控与强烈的责任感。',
+          role: '项目投资人',
+        },
+      ],
     },
     officeSection: {
       badge: '欢迎莅临品鉴',
