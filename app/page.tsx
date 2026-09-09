@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { COMPANY_INFO } from '@/lib/data';
@@ -19,12 +20,13 @@ import {
   IconStar,
 } from '@/components/Icons';
 
-// Динамический импорт карты с отключенным SSR для предотвращения проблем с Leaflet
+// Динамический импорт карты с нейтральным скелетоном загрузки
 const BishkekMap = dynamic(() => import('@/components/BishkekMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] lg:h-[490px] rounded-3xl bg-gray-100 dark:bg-white/5 animate-pulse flex items-center justify-center text-xs font-bold text-gray-400">
-      Загрузка карты...
+    <div className="w-full h-[400px] lg:h-[490px] rounded-3xl bg-gray-100 dark:bg-white/5 animate-pulse flex flex-col items-center justify-center text-xs font-bold text-gray-400 gap-2">
+      <div className="w-8 h-8 rounded-full border-2 border-[#064734] dark:border-[#d4b26f] border-t-transparent animate-spin" />
+      <span>Map Loading...</span>
     </div>
   ),
 });
@@ -363,7 +365,7 @@ const CONTENT: Record<Locale, HomeContent> = {
     viewAllBtn: '查看全部楼盘',
     detailsBtn: '查看楼盘详情',
     fromPrice: '起',
-    sqm: '$/м²',
+    sqm: '$/m²',
     statusFinished: '已交付',
     mapBadge: '核心地理区位',
     mapTitle: 'EL ORDO 项目全景电子沙盘',
@@ -397,74 +399,108 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
 };
 
-const FEATURED_PROJECTS = [
+const RAW_FEATURED_PROJECTS = [
   {
     slug: 'abu-dhabi',
     name: 'ЖК Abu Dhabi',
-    category: 'active',
-    classType: 'Премиум-класс',
+    category: 'active' as const,
     image: '/projects/Abu-Dhabi.png',
-    address: 'ул. Сухомлинова, 29',
-    deadline: '2029 г. 3 кв.',
     price: '1 650',
-    floors: '25 этажей',
   },
   {
     slug: 'madina-residence',
     name: 'ЖК Madina Residence',
-    category: 'active',
-    classType: 'Бизнес-класс',
+    category: 'active' as const,
     image: '/projects/Madina-Residense.png',
-    address: 'ул. Огонбаева, 12',
-    deadline: '2027 г. 3 кв.',
     price: '1 400',
-    floors: '14 этажей',
   },
   {
     slug: 'ajkol-plus',
     name: 'ЖД Айкол +',
-    category: 'active',
-    classType: 'Комфорт+',
+    category: 'active' as const,
     image: '/projects/Aikolplus.png',
-    address: 'с. Кок-Жар, ул. Баялинова, 6',
-    deadline: '2028 г. 3 кв.',
     price: '1 100',
-    floors: '10 этажей',
   },
   {
     slug: 'ajkol',
     name: 'ЖД Айкол',
-    category: 'active',
-    classType: 'Комфорт',
+    category: 'active' as const,
     image: '/projects/ajkol.jpg',
-    address: 'ул. Арашан, 10',
-    deadline: '2026 г. 2 кв.',
     price: '950',
-    floors: '9 этажей',
   },
   {
-    slug: 'kele-chek',
+    slug: 'kelechek',
     name: 'ЖК Келечек',
-    category: 'finished',
-    classType: 'Комфорт',
+    category: 'finished' as const,
     image: '/projects/Kelechek.jpg',
-    address: 'ул. Космическая, 153',
-    deadline: 'Сдан',
     price: null,
-    floors: '9 этажей',
   },
   {
     slug: 'ordo',
     name: 'КД Ордо',
-    category: 'finished',
-    classType: 'Клубный дом',
+    category: 'finished' as const,
     image: '/projects/Ordo.jpg',
-    address: 'ул. Тверская, 20',
-    deadline: 'Сдан',
     price: null,
-    floors: '7 этажей',
   },
 ];
+
+const ADDRESSES: Record<string, Record<Locale, string>> = {
+  'abu-dhabi': {
+    ru: 'ул. Сухомлинова, 29',
+    kg: 'Сухомлинов көч., 29',
+    kz: 'Сухомлинов к-сі, 29',
+    uk: 'вул. Сухомлинова, 29',
+    en: '29 Sukhomlinov Street',
+    zh: '比什凯克市苏霍姆利诺夫街29号',
+  },
+  'madina-residence': {
+    ru: 'ул. Огонбаева, 12',
+    kg: 'Огонбаев көч., 12',
+    kz: 'Огонбаев к-сі, 12',
+    uk: 'вул. Огонбаєва, 12',
+    en: '12 Ogonbaev Street',
+    zh: '比什凯克市奥贡巴耶夫街12号',
+  },
+  'ajkol-plus': {
+    ru: 'с. Кок-Жар, ул. Баялинова, 6',
+    kg: 'Көк-Жар а., Баялинов көч., 6',
+    kz: 'Көк-Жар а., Баялинов к-сі, 6',
+    uk: 'с. Кок-Жар, вул. Баялінова, 6',
+    en: '6 Bayalinov Street, Kok-Jar',
+    zh: '比什凯克市Kok-Jar区巴亚利诺夫街6号',
+  },
+  'ajkol': {
+    ru: 'ул. Арашан, 10',
+    kg: 'Арашан көч., 10',
+    kz: 'Арашан к-сі, 10',
+    uk: 'вул. Арашан, 10',
+    en: '10 Arashan Street',
+    zh: '阿拉尚街10号',
+  },
+  'kelechek': {
+    ru: 'ул. Космическая, 153',
+    kg: 'Космическая көч., 153',
+    kz: 'Космическая к-сі, 153',
+    uk: 'вул. Космічна, 153',
+    en: '153 Kosmicheskaya Street',
+    zh: '比什凯克市太空街153号',
+  },
+  'ordo': {
+    ru: 'ул. Тверская, 20',
+    kg: 'Тверская көч., 20',
+    kz: 'Тверская к-сі, 20',
+    uk: 'вул. Тверська, 20',
+    en: '20 Tverskaya Street',
+    zh: '特维尔斯卡亚街20号',
+  },
+};
+
+function formatPrice(price: string, lang: Locale, c: HomeContent) {
+  if (lang === 'en') return `from $${price}/m²`;
+  if (lang === 'zh') return `${price} $/m² 起`;
+  if (lang === 'kg' || lang === 'kz') return `${price} $/м² ${c.fromPrice}`;
+  return `${c.fromPrice} ${price} ${c.sqm}`;
+}
 
 export default function HomePage() {
   const { locale } = useLanguage();
@@ -474,6 +510,58 @@ export default function HomePage() {
   const reviews = t.reviewsSection?.items || COMPANY_INFO.reviews;
 
   const waHeroLink = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(c.waHeroMsg)}`;
+
+  // Динамическая локализация карточек проектов
+  const featuredProjects = useMemo(() => {
+    const projPage = t.projectsPage;
+    return RAW_FEATURED_PROJECTS.map((item) => {
+      const address = ADDRESSES[item.slug]?.[currentLang] || ADDRESSES[item.slug]?.ru || '';
+      let classType = '';
+      let deadline = '';
+      let floors = '';
+
+      switch (item.slug) {
+        case 'abu-dhabi':
+          classType = projPage.abuDhabiClass;
+          deadline = projPage.abuDhabiDeadline;
+          floors = projPage.abuDhabiFloors;
+          break;
+        case 'madina-residence':
+          classType = projPage.madinaClass;
+          deadline = projPage.madinaDeadline;
+          floors = projPage.madinaFloors;
+          break;
+        case 'ajkol-plus':
+          classType = projPage.ajkolPlusClass;
+          deadline = projPage.ajkolPlusDeadline;
+          floors = projPage.ajkolPlusFloors;
+          break;
+        case 'ajkol':
+          classType = projPage.ajkolClass;
+          deadline = projPage.ajkolDeadline;
+          floors = projPage.ajkolFloors;
+          break;
+        case 'kelechek':
+          classType = projPage.kelechekClass;
+          deadline = projPage.statusFinishedFull;
+          floors = projPage.kelechekFloors;
+          break;
+        case 'ordo':
+          classType = projPage.ordoClass;
+          deadline = projPage.statusFinishedFull;
+          floors = projPage.ordoFloors;
+          break;
+      }
+
+      return {
+        ...item,
+        classType,
+        address,
+        deadline,
+        floors,
+      };
+    });
+  }, [currentLang, t.projectsPage]);
 
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200 pb-16">
@@ -567,7 +655,7 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {FEATURED_PROJECTS.map((p) => {
+          {featuredProjects.map((p) => {
             const isFinished = p.category === 'finished';
             return (
               <div
@@ -594,7 +682,7 @@ export default function HomePage() {
 
                     {p.price && (
                       <div className="absolute bottom-3 right-3 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl border border-white/10 shadow">
-                        {c.fromPrice} {p.price} {c.sqm}
+                        {formatPrice(p.price, currentLang, c)}
                       </div>
                     )}
                   </div>
