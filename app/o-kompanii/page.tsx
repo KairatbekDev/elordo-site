@@ -5,6 +5,7 @@ import Link from 'next/link';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconBuilding,
   IconShieldCheck,
@@ -18,8 +19,284 @@ import {
   IconCheck,
 } from '@/components/Icons';
 
+const DOCS_DATA: Record<Locale, {
+  sectionBadge: string;
+  sectionTitle: string;
+  sectionDesc: string;
+  counselTitle: string;
+  counselDesc: string;
+  counselBtn: string;
+  inspectBtn: string;
+  modalSerialLabel: string;
+  modalIssuerLabel: string;
+  modalBtnWa: string;
+  items: Array<{
+    badge: string;
+    title: string;
+    serial: string;
+    issuer: string;
+    desc: string;
+  }>;
+}> = {
+  ru: {
+    sectionBadge: '100% Юридическая чистота',
+    sectionTitle: 'Разрешительная документация и лицензии',
+    sectionDesc: 'Каждый наш объект строится в строгом соответствии с законами КР. Мы открыто предоставляем оригиналы документов для вашего юриста.',
+    counselTitle: 'Юридическая проверка перед покупкой',
+    counselDesc: 'Готовы предоставить оригиналы Красных книг, лицензии и ДДУ для проверки вашим независимым юристом в центральном офисе.',
+    counselBtn: 'Запросить PDF документов',
+    inspectBtn: 'Ознакомиться подробнее',
+    modalSerialLabel: 'Регистрационный номер:',
+    modalIssuerLabel: 'Орган выдачи:',
+    modalBtnWa: 'Получить скан в WhatsApp',
+    items: [
+      {
+        badge: 'Лицензия Госстроя КР',
+        title: 'Государственная строительная лицензия',
+        serial: 'Серия КРЦ-2 №08603',
+        issuer: 'Госстрой при Кабинете Министров КР',
+        desc: 'Подтверждает право на возведение капитальных монолитных высотных жилых комплексов и выполнение строительно-монтажных работ.',
+      },
+      {
+        badge: 'Красные книги участков',
+        title: 'Государственные акты на право частной собственности',
+        serial: 'Госрегистр КР',
+        issuer: 'ГУ «Кадастр» / Департамент кадастра КР',
+        desc: 'Все жилые комплексы возводятся на собственных земельных участках с Красными книгами без арендных рисков.',
+      },
+      {
+        badge: 'АПУ и техусловия ИТУ',
+        title: 'Архитектурно-планировочные условия и техусловия',
+        serial: '№ АПУ-2023 / ИТУ',
+        issuer: 'МП «Бишкекглавархитектура»',
+        desc: 'Утвержденные градостроительные параметры этажности и гарантированное подключение к центральным коммуникациям столицы.',
+      },
+      {
+        badge: 'Государственная экспертиза',
+        title: 'Положительное заключение Государственной экспертизы',
+        serial: 'СНиП КР 20-02:2018',
+        issuer: 'Департамент государственной экспертизы Госстроя КР',
+        desc: 'Официальное экспертное подтверждение сейсмостойкости 9 баллов и соответствия прочности монолитного железобетонного каркаса.',
+      },
+    ],
+  },
+  kg: {
+    sectionBadge: '100% Юридикалык тазалык',
+    sectionTitle: 'Мамлекеттик документтер жана уруксаттар',
+    sectionDesc: 'Биздин бардык объектилер Кызыл китептери бар жеке жерлерде курулат жана мамлекеттик каттоодон өтөт.',
+    counselTitle: 'Юристиңиз менен келип таанышыңыз',
+    counselDesc: 'Биз башкы сатуу кеңсесинде бардык түп нуска документтерди көрсөтүүгө даярбыз же PDF форматында юристиңизге жөнөтөбүз.',
+    counselBtn: 'Документтерди WhatsAppтан алуу',
+    inspectBtn: 'Чоо-жайын көрүү',
+    modalSerialLabel: 'Каттоо номери:',
+    modalIssuerLabel: 'Берген орган:',
+    modalBtnWa: 'WhatsApp аркылуу сканерди алуу',
+    items: [
+      {
+        badge: 'Мамкурулуш лицензиясы',
+        title: 'Курулуш-монтаждоо иштерине мамлекеттик лицензия',
+        serial: 'Серия КРЦ-2 №08603',
+        issuer: 'КР Министрлер Кабинетине караштуу Мамкурулуш',
+        desc: 'III деңгээлдеги жоопкерчиликтеги монолиттүү көп кабаттуу турак жайларды долбоорлоо жана куруу укугун тастыктайт.',
+      },
+      {
+        badge: 'Кызыл китептер',
+        title: 'Жеке менчик укугу жөнүндө мамлекеттик актылар',
+        serial: 'Мамкаттоо КР',
+        issuer: 'КР Кадастр мамлекеттик мекемеси',
+        desc: 'Бардык объектилер жеке менчик жеринде курулат. Аренда же жер тилкеси боюнча талаш-тартыштар жок.',
+      },
+      {
+        badge: 'АПУ жана ИТУ',
+        title: 'Архитектуралык-пландоо шарттары жана инженердик тармактар',
+        serial: '№ АПУ-2023 / ИТУ',
+        issuer: '«Бишкекбашкыархитектура» МИ',
+        desc: 'Шаар куруу талаптарына толук шайкештик жана бардык борбордук коммуникацияларга (жылуулук, суу, жарык) кошулуу кепилдиги.',
+      },
+      {
+        badge: 'Мамэкспертиза',
+        title: 'Мамлекеттик экспертизанын оң корутундусу',
+        serial: 'КР СНиП 20-02:2018',
+        issuer: 'Мамкурулуш алдындагы Мамэкспертиза департаменти',
+        desc: '9 баллдык сейсмотуруктуулуктун эсептөөлөрү так текшерилген жана конструкциялык коопсуздугу 100% тастыкталган.',
+      },
+    ],
+  },
+  kz: {
+    sectionBadge: '100% Заңдық тазалық',
+    sectionTitle: 'Рұқсат құжаттары мен лицензиялар',
+    sectionDesc: 'Әрбір нысанымыз ҚР заңдарына толық сәйкес салынуда. Құжаттардың түпнұсқасын заңгеріңіз үшін ашық ұсынамыз.',
+    counselTitle: 'Сатып алу алдындағы заңгерлік тексеру',
+    counselDesc: 'Бас кеңседе тәуелсіз заңгеріңіздің тексеруі үшін Қызыл кітаптар мен лицензия түпнұсқаларын ұсынуға дайынбыз.',
+    counselBtn: 'Құжаттардың PDF файлын алу',
+    inspectBtn: 'Толығырақ танысу',
+    modalSerialLabel: 'Тіркеу нөмірі:',
+    modalIssuerLabel: 'Берген орган:',
+    modalBtnWa: 'WhatsApp-та сканды алу',
+    items: [
+      {
+        badge: 'ҚР Мемқұрылыс лицензиясы',
+        title: 'Мемлекеттік құрылыс лицензиясы',
+        serial: 'Серия КРЦ-2 №08603',
+        issuer: 'ҚР Министрлер Кабинеті жанындағы Мемқұрылыс',
+        desc: 'Күрделі монолитті көпқабатты тұрғын үй кешендерін жобалау мен құрылыс-монтаждау жұмыстарын жүргізу құқығын растайды.',
+      },
+      {
+        badge: 'Жер телімдерінің Қызыл кітаптары',
+        title: 'Жеке меншік құқығы туралы мемлекеттік актілер',
+        serial: 'ҚР Мемтіркеуі',
+        issuer: '«Кадастр» ММ / Жер кадастры департаменті',
+        desc: 'Барлық тұрғын үй кешендері жалдау тәуекелдерінсіз Қызыл кітабы бар жеке жер телімдерінде салынады.',
+      },
+      {
+        badge: 'СЖТ және ТШ (АПУ / ИТУ)',
+        title: 'Сәулеттік-жоспарлау тапсырмасы мен инженерлік желілер',
+        serial: '№ АПУ-2023 / ИТУ',
+        issuer: '«Бішкекбассәулет» КМ',
+        desc: 'Қала құрылысы параметрлеріне сәйкестік және қаланың орталық коммуникацияларына кепілді қосылу.',
+      },
+      {
+        badge: 'Мемлекеттік сараптама',
+        title: 'Мемлекеттік сараптаманың оң қорытындысы',
+        serial: 'ҚР ҚНжЕ 20-02:2018',
+        issuer: 'Мемлекеттік сараптама департаменті',
+        desc: '9 балдық сейсмотөзімділік есептеулері мен монолитті темірбетон қаңқасының беріктігін ресми растау.',
+      },
+    ],
+  },
+  uk: {
+    sectionBadge: '100% Юридична чистота',
+    sectionTitle: 'Дозвільна документація та ліцензії',
+    sectionDesc: 'Кожен наш об’єкт будується у суворій відповідності до законів КР. Ми відкрито надаємо оригінали документів вашому юристу.',
+    counselTitle: 'Юридична перевірка перед купівлею',
+    counselDesc: 'Готові надати оригінали Червоних книг, ліцензії та ДДУ для перевірки вашим незалежним юристом.',
+    counselBtn: 'Запитати PDF документів',
+    inspectBtn: 'Ознайомитися докладніше',
+    modalSerialLabel: 'Реєстраційний номер:',
+    modalIssuerLabel: 'Орган видачі:',
+    modalBtnWa: 'Отримати скан у WhatsApp',
+    items: [
+      {
+        badge: 'Ліцензія Держбуду КР',
+        title: 'Державна будівельна ліцензія',
+        serial: 'Серія КРЦ-2 №08603',
+        issuer: 'Держбуд при Кабінеті Міністрів КР',
+        desc: 'Підтверджує право на зведення капітальних монолітних висотних житлових комплексів та будівельні роботи.',
+      },
+      {
+        badge: 'Червоні книги ділянок',
+        title: 'Державні акти на право приватної власності',
+        serial: 'Держреєстр КР',
+        issuer: 'ДУ «Кадастр» / Департамент кадастру КР',
+        desc: 'Усі житлові комплекси зводяться на власних ділянках із Червоними книгами без орендних ризиків.',
+      },
+      {
+        badge: 'АПУ та техумови ІТУ',
+        title: 'Архітектурно-планувальні умови та техумови',
+        serial: '№ АПУ-2023 / ІТУ',
+        issuer: 'МП «Бішкекголовбудархітектура»',
+        desc: 'Затверджені містобудівні параметри та гарантоване підключення до центральних комунікацій столиці.',
+      },
+      {
+        badge: 'Державна експертиза',
+        title: 'Позитивний висновок Державної експертизи',
+        serial: 'СНіП КР 20-02:2018',
+        issuer: 'Департамент державної експертизи Держбуду КР',
+        desc: 'Офіційне експертне підтвердження сейсмостійкості 9 балів та міцності монолітного залізобетонного каркаса.',
+      },
+    ],
+  },
+  en: {
+    sectionBadge: '100% Legal Guarantee',
+    sectionTitle: 'Official Permits & Construction Titles',
+    sectionDesc: 'Every development is built on privately-owned land with official Red Books and state-registered contracts.',
+    counselTitle: 'Independent Legal Due Diligence',
+    counselDesc: 'We welcome independent legal audits. We will provide all original title deeds and permits in person or send a PDF bundle.',
+    counselBtn: 'Request Legal PDF Bundle',
+    inspectBtn: 'Inspect Document',
+    modalSerialLabel: 'Registration Number:',
+    modalIssuerLabel: 'Issuing Authority:',
+    modalBtnWa: 'Receive Scan via WhatsApp',
+    items: [
+      {
+        badge: 'State License',
+        title: 'State Construction & Engineering License',
+        serial: 'Series KRC-2 No. 08603',
+        issuer: 'State Agency for Architecture & Construction of the KR',
+        desc: 'Authorizes capital multi-story reinforced concrete construction and high-rise structural engineering.',
+      },
+      {
+        badge: 'Private Land Title',
+        title: 'Private Land Ownership State Deeds (Red Books)',
+        serial: 'State Cadastre KR',
+        issuer: 'State Land Cadastre Department of the KR',
+        desc: 'All complexes are built exclusively on developer-owned land plots with clean titles, free of municipal lease risks.',
+      },
+      {
+        badge: 'Town Planning Approval',
+        title: 'Architectural Master Plan & Utility Approvals',
+        serial: 'No. APU-2023 / ITU',
+        issuer: 'Bishkek Master Architecture Municipal Enterprise',
+        desc: 'Full compliance with city master zoning codes and guaranteed direct connection to municipal central heating and utilities.',
+      },
+      {
+        badge: 'State Seismic Audit',
+        title: 'State Interdepartmental Expert Seismic Conclusion',
+        serial: 'KR Code 20-02:2018',
+        issuer: 'Department of State Expertise of the KR',
+        desc: 'Certified structural resilience rated for 9-magnitude seismic safety according to state codes.',
+      },
+    ],
+  },
+  zh: {
+    sectionBadge: '100% 法律合规保障',
+    sectionTitle: '官方工程许可资质与红本产权',
+    sectionDesc: '所有项目均严格恪守国家标准，在拥有正式红本产权的自有土地上开发建设。全套原件向置业法务公开查阅。',
+    counselTitle: '签约前置业法务独立查验',
+    counselDesc: '热忱欢迎您的独立法务顾问来访查验。总部营销中心提供土地红本、施工许可证及备案合同全套原件，亦可提供PDF电子版。',
+    counselBtn: '在 WhatsApp 中获取资质文件 PDF',
+    inspectBtn: '查看详情',
+    modalSerialLabel: '官方备案编号：',
+    modalIssuerLabel: '审批主管机关：',
+    modalBtnWa: '在 WhatsApp 中索取扫描件',
+    items: [
+      {
+        badge: '国家建设部施工资质',
+        title: '国家一级建筑工程施工许可证',
+        serial: 'Серия КРЦ-2 №08603',
+        issuer: '吉尔吉斯共和国内阁国家建设与建筑署',
+        desc: '依法核准承担高层现浇钢筋混凝土民用住宅工程的施工与总承包资质。',
+      },
+      {
+        badge: '国家土地红本',
+        title: '土地私有产权国家正式红本书证',
+        serial: '官方红本 (Gosregister)',
+        issuer: '吉尔吉斯国家不动产地籍局 (Cadastre)',
+        desc: '所有楼盘均建于拥有国家正式红本产权的永久自有土地上，产权明晰无租赁风险。',
+      },
+      {
+        badge: '规划条件与管网批文',
+        title: '建筑规划技术条件 (APU) 及管网配套批件',
+        serial: '№ АПУ-2023 / ИТУ',
+        issuer: '比什凯克市规划建筑总局',
+        desc: '严格符合首都总体规划，保障无缝接驳城市集中供暖、供水供电等市政主管网。',
+      },
+      {
+        badge: '国家工程质量与抗震审查',
+        title: '国家部际综合工程质检与抗震合格意见书',
+        serial: 'СНиП КР 20-02:2018',
+        issuer: '国家建设署工程质量审查局',
+        desc: '经严苛动力学计算，主体钢筋混凝土框架结构抗震烈度达9度，工程安全性获权威认证。',
+      },
+    ],
+  },
+};
+
 export default function AboutPage() {
   const { t, locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const docs = DOCS_DATA[currentLang] || DOCS_DATA.ru;
+
   const [selectedDoc, setSelectedDoc] = useState<null | {
     title: string;
     serial: string;
@@ -27,10 +304,6 @@ export default function AboutPage() {
     desc: string;
     badge: string;
   }>(null);
-
-  const isRu = locale === 'ru';
-  const isKg = locale === 'kg';
-  const isEn = locale === 'en';
 
   const waAboutText = encodeURIComponent(
     'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить презентацию объектов и юридический пакет разрешительных документов.'
@@ -74,53 +347,6 @@ export default function AboutPage() {
     { value: '6', label: t.aboutPage.stat2Label, sub: t.aboutPage.stat2Sub },
     { value: '100%', label: t.aboutPage.stat3Label, sub: t.aboutPage.stat3Sub },
     { value: t.aboutPage.stat4Value, label: t.aboutPage.stat4Label, sub: t.aboutPage.stat4Sub },
-  ];
-
-  const documents = [
-    {
-      badge: isKg ? 'Мамкурулуш лицензиясы' : isEn ? 'State License' : 'Лицензия Госстроя КР',
-      title: isKg ? 'Курулуш-монтаждоо иштерине мамлекеттик лицензия' : isEn ? 'State Construction & Engineering License' : 'Государственная строительная лицензия',
-      serial: 'Серия КРЦ-2 №08603',
-      issuer: isKg ? 'КР Министрлер Кабинетине караштуу Мамкурулуш' : isEn ? 'State Agency for Architecture & Construction of the KR' : 'Госстрой при Кабинете Министров КР',
-      desc: isKg
-        ? 'III деңгээлдеги жоопкерчиликтеги монолиттүү көп кабаттуу турак жайларды долбоорлоо жана куруу укугун тастыктайт.'
-        : isEn
-        ? 'Authorizes capital multi-story reinforced concrete construction and high-rise structural engineering.'
-        : 'Подтверждает право на возведение капитальных монолитных высотных жилых комплексов и выполнение строительно-монтажных работ.',
-    },
-    {
-      badge: isKg ? 'Кызыл китептер' : isEn ? 'Private Land Title' : 'Красные книги участков',
-      title: isKg ? 'Жеке менчик укугу жөнүндө мамлекеттик актылар' : isEn ? 'Private Land Ownership State Deeds (Red Books)' : 'Государственные акты на право частной собственности',
-      serial: isKg ? 'Мамкаттоо КР' : isEn ? 'State Cadastre KR' : 'Госрегистр КР',
-      issuer: isKg ? 'КР Кадастр мамлекеттик мекемеси' : isEn ? 'State Land Cadastre of the Kyrgyz Republic' : 'ГУ «Кадастр» / Департамент кадастра КР',
-      desc: isKg
-        ? 'Бардык объектилер жеке менчик жеринде курулат. Аренда же жер тилкеси боюнча талаш-тартыштар жок.'
-        : isEn
-        ? 'All complexes are built exclusively on developer-owned land plots with clean titles, free of municipal lease risks.'
-        : 'Все жилые комплексы возводятся на собственных земельных участках с Красными книгами без арендных рисков.',
-    },
-    {
-      badge: isKg ? 'АПУ жана ИТУ' : isEn ? 'Town Planning Approval' : 'АПУ и техусловия ИТУ',
-      title: isKg ? 'Архитектуралык-пландоо шарттары жана инженердик тармактар' : isEn ? 'Architectural Master Plan & Utility Approvals' : 'Архитектурно-планировочные условия и техусловия',
-      serial: '№ АПУ-2023 / ИТУ',
-      issuer: isKg ? '«Бишкекбашкыархитектура» МИ' : isEn ? 'Bishkek Master Architecture Agency' : 'МП «Бишкекглавархитектура»',
-      desc: isKg
-        ? 'Шаар куруу талаптарына толук шайкештик жана бардык борбордук коммуникацияларга (жылуулук, суу, жарык) кошулуу кепилдиги.'
-        : isEn
-        ? 'Full compliance with city master zoning codes and guaranteed direct connection to municipal central heating, water, and power.'
-        : 'Утвержденные градостроительные параметры этажности и гарантированное подключение к центральным коммуникациям столицы.',
-    },
-    {
-      badge: isKg ? 'Мамэкспертиза' : isEn ? 'State Seismic Audit' : 'Государственная экспертиза',
-      title: isKg ? 'Мамлекеттик ведомстволор аралык экспертизанын корутундусу' : isEn ? 'State Interdepartmental Expert Seismic Conclusion' : 'Положительное заключение Государственной экспертизы',
-      serial: 'СНиП КР 20-02:2018',
-      issuer: isKg ? 'Мамкурулуш алдындагы Мамэкспертиза департаменти' : isEn ? 'Department of State Expertise of the KR' : 'Департамент государственной экспертизы Госстроя КР',
-      desc: isKg
-        ? '9 баллдык сейсмотуруктуулуктун эсептөөлөрү так текшерилген жана конструкциялык коопсуздугу 100% тастыкталган.'
-        : isEn
-        ? 'Certified structural resilience rated for 9-magnitude seismic safety according to state codes.'
-        : 'Официальное экспертное подтверждение сейсмостойкости 9 баллов и соответствия прочности монолитного железобетонного каркаса.',
-    },
   ];
 
   const standards = [
@@ -352,26 +578,22 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 6. ОФИЦИАЛЬНЫЕ ДОКУМЕНТЫ И РАЗРЕШЕНИЯ (Юридический щит) */}
+      {/* 6. ОФИЦИАЛЬНЫЕ ДОКУМЕНТЫ И РАЗРЕШЕНИЯ (Все 6 языков) */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
-            {isKg ? 'Юридикалык тазалык' : isEn ? 'Legal Guarantee' : '100% Юридическая чистота'}
+            {docs.sectionBadge}
           </span>
           <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
-            {isKg ? 'Мамлекеттик документтер жана уруксаттар' : isEn ? 'Official Permits & Construction Titles' : 'Разрешительная документация и лицензии'}
+            {docs.sectionTitle}
           </h2>
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-            {isKg
-              ? 'Биздин бардык объектилер Кызыл китептери бар жеке жерлерде курулат жана мамлекеттик каттоодон өтөт.'
-              : isEn
-              ? 'Every development is built on privately-owned land with official Red Books and state-registered contracts.'
-              : 'Каждый наш объект строится в строгом соответствии с законами КР. Мы открыто предоставляем оригиналы документов для вашего юриста.'}
+            {docs.sectionDesc}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-          {documents.map((doc, idx) => (
+          {docs.items.map((doc, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#0b1b15] p-7 rounded-3xl border border-gray-200 dark:border-white/10 hover:border-[#d4b26f]/50 hover:shadow-xl dark:hover:border-[#d4b26f]/40 transition-all flex flex-col justify-between group"
@@ -404,7 +626,7 @@ export default function AboutPage() {
                 onClick={() => setSelectedDoc(doc)}
                 className="inline-flex items-center justify-between w-full pt-4 border-t border-gray-100 dark:border-white/10 text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f] hover:underline cursor-pointer"
               >
-                <span>{isKg ? 'Чоо-жайын көрүү' : isEn ? 'Inspect Document' : 'Ознакомиться подробнее'}</span>
+                <span>{docs.inspectBtn}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -415,14 +637,10 @@ export default function AboutPage() {
         <div className="rounded-3xl p-6 sm:p-8 bg-[#064734] text-white border border-[#d4b26f]/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="max-w-2xl text-center md:text-left">
             <h4 className="text-lg font-black uppercase tracking-tight text-[#d4b26f] mb-1">
-              {isKg ? 'Юристиңиз менен келип таанышыңыз' : isEn ? 'Bring Your Legal Counsel' : 'Юридическая проверка перед покупкой'}
+              {docs.counselTitle}
             </h4>
             <p className="text-xs sm:text-sm text-white/85 leading-relaxed">
-              {isKg
-                ? 'Биз башкы сатуу кеңсесинде бардык түп нуска документтерди көрсөтүүгө даярбыз же PDF форматында юристиңизге жөнөтөбүз.'
-                : isEn
-                ? 'We welcome independent legal audits. We will provide all original title deeds and permits in person or send a PDF bundle.'
-                : 'Готовы предоставить оригиналы Красных книг, лицензии и ДДУ для проверки вашим независимым юристом в центральном офисе.'}
+              {docs.counselDesc}
             </p>
           </div>
           <a
@@ -434,7 +652,7 @@ export default function AboutPage() {
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#064734]" />
-            <span>{isKg ? 'Документтерди WhatsAppтан алуу' : isEn ? 'Request Legal PDF Bundle' : 'Запросить PDF документов'}</span>
+            <span>{docs.counselBtn}</span>
           </a>
         </div>
       </section>
@@ -610,10 +828,10 @@ export default function AboutPage() {
 
             <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 text-xs space-y-1 mb-4">
               <p className="text-gray-500 dark:text-neutral-400">
-                Регистрационный номер: <strong className="text-gray-900 dark:text-white">{selectedDoc.serial}</strong>
+                {docs.modalSerialLabel} <strong className="text-gray-900 dark:text-white">{selectedDoc.serial}</strong>
               </p>
               <p className="text-gray-500 dark:text-neutral-400">
-                Орган выдачи: <strong className="text-gray-900 dark:text-white">{selectedDoc.issuer}</strong>
+                {docs.modalIssuerLabel} <strong className="text-gray-900 dark:text-white">{selectedDoc.issuer}</strong>
               </p>
             </div>
 
@@ -631,7 +849,7 @@ export default function AboutPage() {
                 className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow text-center flex items-center justify-center gap-2 cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4" />
-                <span>Получить скан в WhatsApp</span>
+                <span>{docs.modalBtnWa}</span>
               </a>
             </div>
           </div>
