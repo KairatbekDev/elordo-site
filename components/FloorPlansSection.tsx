@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconWhatsApp,
   IconArrowRight,
   IconDocument,
+  IconCheck,
 } from '@/components/Icons';
 
 export interface ApartmentPlan {
@@ -25,12 +28,214 @@ interface FloorPlansSectionProps {
   theme?: 'dark' | 'light';
 }
 
+const UI_TEXTS: Record<Locale, {
+  catalogBadge: string;
+  sectionTitle: string;
+  allPlans: string;
+  room1: string;
+  room2: string;
+  room3: string;
+  roomTag: (r: number) => string;
+  statusAvailable: string;
+  detailsBtn: string;
+  collapse: string;
+  fullscreen: string;
+  resetZoom: string;
+  zoomHint: string;
+  ceilings: string;
+  defaultCeiling: string;
+  finish: string;
+  defaultFinish: string;
+  seismic: string;
+  seismicVal: string;
+  installment: string;
+  installmentVal: string;
+  guarantee: string;
+  btnWa: string;
+  managerTime: string;
+  otherPlans: string;
+  waMessage: (title: string, area: string, proj: string) => string;
+}> = {
+  ru: {
+    catalogBadge: 'Каталог квартир',
+    sectionTitle: 'Планировочные решения',
+    allPlans: 'Все планировки',
+    room1: '1-комнатные',
+    room2: '2-комнатные',
+    room3: '3-комнатные',
+    roomTag: (r) => `${r}-КОМНАТНАЯ`,
+    statusAvailable: 'В наличии',
+    detailsBtn: 'Подробнее о квартире',
+    collapse: 'Свернуть',
+    fullscreen: 'На весь экран',
+    resetZoom: 'Сброс',
+    zoomHint: 'Нажмите на изображение для быстрого увеличения',
+    ceilings: 'Потолки',
+    defaultCeiling: '3.45 метра',
+    finish: 'Отделка',
+    defaultFinish: 'Под самоотделку (ПСО)',
+    seismic: 'Сейсмостойкость',
+    seismicVal: '9 баллов',
+    installment: 'Рассрочка',
+    installmentVal: 'до 40 мес. 0%',
+    guarantee: 'Прямой договор с застройщиком. Возможность оформления по программе Trade-in (бартер на авто или вторичную недвижимость).',
+    btnWa: 'Узнать цену и свободные этажи',
+    managerTime: 'Менеджер отдела продаж ответит в течение 2 минут',
+    otherPlans: 'Другие планировки в этом объекте:',
+    waMessage: (title, area, proj) => `Здравствуйте! Меня интересует планировка: ${title} (${area}) в ${proj}. Отправьте, пожалуйста, свободные этажи и расчет рассрочки.`,
+  },
+  kg: {
+    catalogBadge: 'Батирлер каталогу',
+    sectionTitle: 'Батирлердин пландары',
+    allPlans: 'Бардык пландар',
+    room1: '1 бөлмөлүү',
+    room2: '2 бөлмөлүү',
+    room3: '3 бөлмөлүү',
+    roomTag: (r) => `${r} БӨЛМӨЛҮҮ`,
+    statusAvailable: 'Сатыкта бар',
+    detailsBtn: 'Батир тууралуу толук',
+    collapse: 'Жыйноо',
+    fullscreen: 'Толук экранда',
+    resetZoom: 'Баштапкы',
+    zoomHint: 'Чоңойтуу үчүн сүрөттү басыңыз',
+    ceilings: 'Шыптын бийиктиги',
+    defaultCeiling: '3.45 метр',
+    finish: 'Бүткөрүү абалы',
+    defaultFinish: 'Өз алдынча оңдоого (ПСО)',
+    seismic: 'Сейсмотуруктуулук',
+    seismicVal: '9 балл',
+    installment: 'Бөлүп төлөө',
+    installmentVal: '40 айга чейин 0%',
+    guarantee: 'Куруучу менен түз келишим. Trade-in программасы боюнча тариздөө мүмкүнчүлүгү (унаа же эски батирге алмашуу).',
+    btnWa: 'Баасын жана бош кабаттарды билүү',
+    managerTime: 'Сатуу бөлүмүнүн менеджери 2 мүнөттө жооп берет',
+    otherPlans: 'Бул объекттеги башка пландар:',
+    waMessage: (title, area, proj) => `Саламатсызбы! Мени ${proj} комплексиндеги план кызыктырат: ${title} (${area}). Бош кабаттарды жана бөлүп төлөө эсебин жөнөтүңүзчү.`,
+  },
+  kz: {
+    catalogBadge: 'Пәтерлер каталогы',
+    sectionTitle: 'Жоспарлау шешімдері',
+    allPlans: 'Барлық жоспарлар',
+    room1: '1 бөлмелі',
+    room2: '2 бөлмелі',
+    room3: '3 бөлмелі',
+    roomTag: (r) => `${r} БӨЛМЕЛІ`,
+    statusAvailable: 'Қолжетімді',
+    detailsBtn: 'Пәтер туралы толық',
+    collapse: 'Жию',
+    fullscreen: 'Толық экранда',
+    resetZoom: 'Бастапқы',
+    zoomHint: 'Үлкейту үшін суретті басыңыз',
+    ceilings: 'Төбе биіктігі',
+    defaultCeiling: '3.45 метр',
+    finish: 'Әрлеу күйі',
+    defaultFinish: 'Өздігінен әрлеуге (ПСО)',
+    seismic: 'Сейсмотөзімділік',
+    seismicVal: '9 балл',
+    installment: 'Бөліп төлеу',
+    installmentVal: '40 айға дейін 0%',
+    guarantee: 'Құрылыс салушымен тікелей шарт. Trade-in бағдарламасы бойынша рәсімдеу мүмкіндігі (көлік немесе баспана айырбасы).',
+    btnWa: 'Бағасы мен бос қабаттарды білу',
+    managerTime: 'Сату бөлімінің менеджері 2 минутта жауап береді',
+    otherPlans: 'Осы нысандағы басқа жоспарлар:',
+    waMessage: (title, area, proj) => `Сәлеметсіз бе! Мені ${proj} кешеніндегі ${title} (${area}) жоспары қызықтырады. Бос қабаттар мен бөліп төлеу есебін жіберіңізші.`,
+  },
+  uk: {
+    catalogBadge: 'Каталог квартир',
+    sectionTitle: 'Планувальні рішення',
+    allPlans: 'Всі планування',
+    room1: '1-кімнатні',
+    room2: '2-кімнатні',
+    room3: '3-кімнатні',
+    roomTag: (r) => `${r}-КІМНАТНА`,
+    statusAvailable: 'В наявності',
+    detailsBtn: 'Детальніше про квартиру',
+    collapse: 'Згорнути',
+    fullscreen: 'На весь екран',
+    resetZoom: 'Скинути',
+    zoomHint: 'Натисніть на зображення для швидкого збільшення',
+    ceilings: 'Стеля',
+    defaultCeiling: '3.45 метра',
+    finish: 'Оздоблення',
+    defaultFinish: 'Під чистове оздоблення (ПСО)',
+    seismic: 'Сейсмостійкість',
+    seismicVal: '9 балів',
+    installment: 'Розстрочка',
+    installmentVal: 'до 40 міс. 0%',
+    guarantee: 'Прямий договір із забудовником. Можливість оформлення за програмою Trade-in (бартер на авто чи вторинне житло).',
+    btnWa: 'Дізнатися ціну та вільні поверхи',
+    managerTime: 'Менеджер відділу продажів відповість протягом 2 хвилин',
+    otherPlans: 'Інші планування в цьому об’єкті:',
+    waMessage: (title, area, proj) => `Доброго дня! Мене цікавить планування: ${title} (${area}) в ${proj}. Надішліть, будь ласка, вільні поверхи та розрахунок розстрочки.`,
+  },
+  en: {
+    catalogBadge: 'Apartment Catalog',
+    sectionTitle: 'Floor Plans & Layouts',
+    allPlans: 'All Layouts',
+    room1: '1-Bedroom',
+    room2: '2-Bedroom',
+    room3: '3-Bedroom',
+    roomTag: (r) => `${r}-BEDROOM`,
+    statusAvailable: 'Available',
+    detailsBtn: 'View Layout Details',
+    collapse: 'Exit Fullscreen',
+    fullscreen: 'Fullscreen',
+    resetZoom: 'Reset',
+    zoomHint: 'Click image to zoom in / out',
+    ceilings: 'Ceiling Height',
+    defaultCeiling: '3.45 meters',
+    finish: 'Handover State',
+    defaultFinish: 'Shell & Core (PSO)',
+    seismic: 'Seismic Safety',
+    seismicVal: '9 points',
+    installment: 'Installment',
+    installmentVal: 'up to 40 mos. 0%',
+    guarantee: 'Direct developer equity contract. Trade-in barter options available (vehicle or secondary property exchange).',
+    btnWa: 'Inquire Price & Floor Availability',
+    managerTime: 'Sales manager will reply within 2 minutes',
+    otherPlans: 'Other layouts in this development:',
+    waMessage: (title, area, proj) => `Hello! I am interested in layout: ${title} (${area}) at ${proj}. Please send floor availability and 0% installment calculations.`,
+  },
+  zh: {
+    catalogBadge: '精选户型图册',
+    sectionTitle: '空间规划格局',
+    allPlans: '全部户型',
+    room1: '一居室',
+    room2: '二居室',
+    room3: '三居室',
+    roomTag: (r) => `${r === 1 ? '一' : r === 2 ? '二' : '三'}居室户型`,
+    statusAvailable: '在售房源',
+    detailsBtn: '查看户型详情',
+    collapse: '退出全屏',
+    fullscreen: '全屏模式',
+    resetZoom: '重置',
+    zoomHint: '轻点图片快速缩放查看格局细节',
+    ceilings: '室内净高',
+    defaultCeiling: '3.45米',
+    finish: '交付标准',
+    defaultFinish: '毛坯自装 (PSO)',
+    seismic: '抗震设防',
+    seismicVal: '9度抗震',
+    installment: '免息分期',
+    installmentVal: '最长40个月 0%',
+    guarantee: '开发商直签正规购房合同。支持申请以旧换新 (Trade-in) 置换服务（现有车辆或房产折价冲抵房款）。',
+    btnWa: '查询底价与可选楼层',
+    managerTime: '专属置业顾问将在2分钟内在线回复',
+    otherPlans: '本楼盘其他热销户型：',
+    waMessage: (title, area, proj) => `您好！我对 ${proj} 项目中的户型非常感兴趣：${title} (${area})。请发送当前可选楼层及0%免息分期明细。`,
+  },
+};
+
 export default function FloorPlansSection({
   projectName,
   plans,
   whatsappNumber = COMPANY_INFO.whatsapp,
   theme = 'dark',
 }: FloorPlansSectionProps) {
+  const { locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const ui = UI_TEXTS[currentLang] || UI_TEXTS.ru;
+
   const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
 
@@ -41,8 +246,9 @@ export default function FloorPlansSection({
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const filteredPlans =
-    activeTab === 'all' ? plans : plans.filter((p) => p.rooms === activeTab);
+  const filteredPlans = useMemo(() => {
+    return activeTab === 'all' ? plans : plans.filter((p) => p.rooms === activeTab);
+  }, [activeTab, plans]);
 
   const openPlanModal = (plan: ApartmentPlan) => {
     setSelectedPlan(plan);
@@ -81,12 +287,14 @@ export default function FloorPlansSection({
     };
   }, [selectedPlan]);
 
-  const otherPlans = selectedPlan
-    ? plans.filter((p) => p.title !== selectedPlan.title || p.area !== selectedPlan.area)
-    : [];
+  const otherPlans = useMemo(() => {
+    return selectedPlan
+      ? plans.filter((p) => p.title !== selectedPlan.title || p.area !== selectedPlan.area)
+      : [];
+  }, [selectedPlan, plans]);
 
   const getWhatsAppLink = (plan: ApartmentPlan) => {
-    const message = `Здравствуйте! Меня интересует планировка: ${plan.title} (${plan.area}) в ${projectName}. Отправьте, пожалуйста, свободные этажи и расчет рассрочки.`;
+    const message = ui.waMessage(plan.title, plan.area, projectName);
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
 
@@ -98,20 +306,20 @@ export default function FloorPlansSection({
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b pb-8 border-gray-200 dark:border-white/10">
           <div>
             <span className="text-xs sm:text-sm uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-              Каталог квартир
+              {ui.catalogBadge}
             </span>
             <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-[#064734]'}`}>
-              Планировочные решения
+              {ui.sectionTitle}
             </h2>
           </div>
 
           {/* Фильтр по комнатам */}
           <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-black/10 dark:bg-black/40 backdrop-blur-md border border-gray-200 dark:border-white/10">
             {[
-              { id: 'all', label: 'Все планировки' },
-              { id: 1, label: '1-комнатные' },
-              { id: 2, label: '2-комнатные' },
-              { id: 3, label: '3-комнатные' },
+              { id: 'all', label: ui.allPlans },
+              { id: 1, label: ui.room1 },
+              { id: 2, label: ui.room2 },
+              { id: 3, label: ui.room3 },
             ].map((tab) => {
               const isActive = activeTab === tab.id;
               return (
@@ -119,7 +327,7 @@ export default function FloorPlansSection({
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 ${
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 cursor-pointer ${
                     isActive
                       ? 'bg-[#064734] text-white shadow-md scale-105'
                       : isDark
@@ -150,9 +358,15 @@ export default function FloorPlansSection({
                 {/* Белая подложка под чертеж */}
                 <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-white p-4 mb-5 flex items-center justify-center border border-gray-150 shadow-inner">
                   
-                  {/* Бедж комнатности */}
+                  {/* Бейдж комнатности */}
                   <span className="absolute top-3 left-3 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-lg bg-[#064734] text-white shadow-sm">
-                    {plan.rooms}-КОМНАТНАЯ
+                    {ui.roomTag(plan.rooms)}
+                  </span>
+
+                  {/* Бейдж статуса наличия */}
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-600/90 text-white shadow-sm">
+                    <IconCheck className="w-3 h-3" />
+                    <span>{ui.statusAvailable}</span>
                   </span>
 
                   {/* Иконка лупы */}
@@ -188,13 +402,13 @@ export default function FloorPlansSection({
               {/* Кнопка открытия */}
               <button
                 type="button"
-                className={`mt-2 w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
+                className={`mt-2 w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   isDark
                     ? 'bg-white/10 group-hover:bg-[#064734] text-white'
                     : 'bg-[#eef3f0] group-hover:bg-[#064734] text-[#064734] group-hover:text-white'
                 }`}
               >
-                <span>Подробнее о квартире</span>
+                <span>{ui.detailsBtn}</span>
                 <IconArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -229,16 +443,16 @@ export default function FloorPlansSection({
                 <button
                   type="button"
                   onClick={() => setIsFullscreen(!isFullscreen)}
-                  className="hidden sm:flex px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-200 transition-colors items-center gap-1.5"
+                  className="hidden sm:flex px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-gray-200 transition-colors items-center gap-1.5 cursor-pointer"
                 >
-                  <span>{isFullscreen ? 'Свернуть' : 'На весь экран'}</span>
+                  <span>{isFullscreen ? ui.collapse : ui.fullscreen}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={closeModal}
-                  aria-label="Закрыть окно"
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all border border-white/10"
+                  aria-label="Close modal"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center transition-all border border-white/10 cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -259,8 +473,8 @@ export default function FloorPlansSection({
                     type="button"
                     onClick={handleZoomOut}
                     disabled={zoomLevel <= 0.8}
-                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center text-lg font-bold transition-colors"
-                    title="Уменьшить"
+                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center text-lg font-bold transition-colors cursor-pointer"
+                    title="Zoom out"
                   >
                     −
                   </button>
@@ -271,17 +485,17 @@ export default function FloorPlansSection({
                     type="button"
                     onClick={handleZoomIn}
                     disabled={zoomLevel >= 2.5}
-                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center text-lg font-bold transition-colors"
-                    title="Приблизить"
+                    className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center text-lg font-bold transition-colors cursor-pointer"
+                    title="Zoom in"
                   >
                     +
                   </button>
                   <button
                     type="button"
                     onClick={handleResetZoom}
-                    className="px-3 py-1.5 text-xs font-extrabold uppercase rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 transition-colors ml-1"
+                    className="px-3 py-1.5 text-xs font-extrabold uppercase rounded-xl bg-white/10 hover:bg-white/20 text-gray-200 transition-colors ml-1 cursor-pointer"
                   >
-                    Сброс
+                    {ui.resetZoom}
                   </button>
                 </div>
 
@@ -304,16 +518,22 @@ export default function FloorPlansSection({
                     <line x1="12" y1="16" x2="12" y2="12" strokeWidth="2" />
                     <line x1="12" y1="8" x2="12.01" y2="8" strokeWidth="2" />
                   </svg>
-                  <span>Нажмите на изображение для быстрого увеличения</span>
+                  <span>{ui.zoomHint}</span>
                 </span>
               </div>
 
               {/* Правая часть: параметры */}
               <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between bg-[#1b211e]">
                 <div>
-                  <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-2">
-                    {selectedPlan.rooms}-КОМНАТНАЯ КВАРТИРА
-                  </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f]">
+                      {ui.roomTag(selectedPlan.rooms)}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-600 text-white">
+                      <IconCheck className="w-3 h-3" />
+                      <span>{ui.statusAvailable}</span>
+                    </span>
+                  </div>
 
                   <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
                     {selectedPlan.title}
@@ -326,30 +546,30 @@ export default function FloorPlansSection({
                   {/* Сетка характеристик */}
                   <div className="grid grid-cols-2 gap-3 mb-6">
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                      <span className="text-xs text-gray-400 font-semibold block mb-1">Потолки</span>
+                      <span className="text-xs text-gray-400 font-semibold block mb-1">{ui.ceilings}</span>
                       <strong className="text-base sm:text-lg font-black text-white">
-                        {selectedPlan.ceiling || '3.45 метра'}
+                        {selectedPlan.ceiling || ui.defaultCeiling}
                       </strong>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                      <span className="text-xs text-gray-400 font-semibold block mb-1">Отделка</span>
+                      <span className="text-xs text-gray-400 font-semibold block mb-1">{ui.finish}</span>
                       <strong className="text-base sm:text-lg font-black text-white">
-                        {selectedPlan.finish || 'ПСО'}
+                        {selectedPlan.finish || ui.defaultFinish}
                       </strong>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                      <span className="text-xs text-gray-400 font-semibold block mb-1">Сейсмостойкость</span>
+                      <span className="text-xs text-gray-400 font-semibold block mb-1">{ui.seismic}</span>
                       <strong className="text-base sm:text-lg font-black text-white">
-                        9 баллов
+                        {ui.seismicVal}
                       </strong>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
-                      <span className="text-xs text-gray-400 font-semibold block mb-1">Рассрочка</span>
+                      <span className="text-xs text-gray-400 font-semibold block mb-1">{ui.installment}</span>
                       <strong className="text-base sm:text-lg font-black text-[#d4b26f]">
-                        до 40 мес. 0%
+                        {ui.installmentVal}
                       </strong>
                     </div>
                   </div>
@@ -358,7 +578,7 @@ export default function FloorPlansSection({
                   <div className="p-4 rounded-2xl bg-[#064734]/30 border border-[#064734] flex items-start gap-3 mb-6">
                     <IconDocument className="w-5 h-5 text-[#d4b26f] shrink-0 mt-0.5" />
                     <p className="text-xs sm:text-sm text-emerald-100 font-medium leading-relaxed">
-                      Прямой договор с застройщиком. Возможность оформления по программе Trade-in (бартер на авто или вторичную недвижимость).
+                      {ui.guarantee}
                     </p>
                   </div>
                 </div>
@@ -369,13 +589,13 @@ export default function FloorPlansSection({
                     href={getWhatsAppLink(selectedPlan)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-sm sm:text-base uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-3 border border-emerald-500/30"
+                    className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-sm sm:text-base uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-3 border border-emerald-500/30 cursor-pointer"
                   >
                     <IconWhatsApp className="w-5 h-5 text-[#25D366]" />
-                    <span>Узнать цену и свободные этажи</span>
+                    <span>{ui.btnWa}</span>
                   </a>
                   <span className="text-xs text-gray-400 text-center block mt-3 font-medium">
-                    Менеджер отдела продаж ответит в течение 2 минут
+                    {ui.managerTime}
                   </span>
                 </div>
               </div>
@@ -386,7 +606,7 @@ export default function FloorPlansSection({
             {otherPlans.length > 0 && (
               <div className="px-6 py-4 bg-black/50 border-t border-white/10">
                 <span className="text-xs sm:text-sm font-bold uppercase tracking-wider text-gray-400 block mb-3">
-                  Другие планировки в этом объекте:
+                  {ui.otherPlans}
                 </span>
 
                 <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
