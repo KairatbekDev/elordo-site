@@ -63,6 +63,7 @@ function formatVideoSource(url: string) {
 
   return { isDirectVideo: false, src: embedUrl };
 }
+
 const REPORTS: ReportItem[] = [
   {
     id: 'rep-abu-dhabi-1',
@@ -86,8 +87,6 @@ const REPORTS: ReportItem[] = [
     },
     progress: 45,
     image: '/projects/Abu-Dhabi.png',
-    // Если используете файл MP4, укажите путь: '/videos/abu-dhabi.mp4'
-    // Если YouTube, вставьте ссылку на ролик: 'https://youtu.be/...'
     videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
     videoDuration: '02:45 • 4K Drone',
     workersOnSite: 54,
@@ -415,7 +414,9 @@ const UI = {
     filterAll: 'Все комплексы',
     watchDroneBtn: 'Смотреть видео с дрона',
     workersLabel: 'Строителей на смене:',
+    workersUnit: 'чел.',
     cranesLabel: 'Башенных кранов:',
+    cranesUnit: 'ед.',
     readiness: 'Общая готовность:',
     breakdownTitle: 'Прогресс по ключевым этапам:',
     pointsTitle: 'Выполненные работы за отчетный период:',
@@ -425,6 +426,7 @@ const UI = {
     tourDesc: 'Инженер отдела продаж проведет для вас индивидуальную экскурсию в каске по строящемуся объекту, покажет качество кладки и вид из будущей квартиры.',
     tourBtn: 'Записаться на экскурсию',
     tourWaText: 'Здравствуйте! Хочу записаться на персональную экскурсию на стройплощадку объекта ',
+    tourBannerWaText: 'Здравствуйте! Хочу записаться на индивидуальную экскурсию по объектам EL ORDO GROUP.',
     videoModalTitle: 'Аэросъемка с дрона 4K',
     closeModal: 'Закрыть',
   },
@@ -435,7 +437,9 @@ const UI = {
     filterAll: 'Бардык комплекстер',
     watchDroneBtn: 'Дрон видеосун көрүү',
     workersLabel: 'Сменадагы куруучулар:',
+    workersUnit: 'адам',
     cranesLabel: 'Башендик крандар:',
+    cranesUnit: 'даана',
     readiness: 'Жалпы даярдыгы:',
     breakdownTitle: 'Негизги этаптар боюнча прогресс:',
     pointsTitle: 'Мезгил ичинде аткарылган иштер:',
@@ -445,6 +449,7 @@ const UI = {
     tourDesc: 'Сатуу бөлүмүнүн инженери курулуп жаткан объект боюнча жеке экскурсия өткөрүп, кыштын сапатын жана болочоктогу батирдин көрүнүшүн көрсөтөт.',
     tourBtn: 'Экскурсияга жазылуу',
     tourWaText: 'Саламатсызбы! Мен курулуш аянтчасына жеке экскурсияга жазылгым келет: ',
+    tourBannerWaText: 'Саламатсызбы! Мен EL ORDO GROUP объектилерине жеке экскурсияга жазылгым келет.',
     videoModalTitle: 'Дрондон 4K аэросъемка',
     closeModal: 'Жабуу',
   },
@@ -455,7 +460,9 @@ const UI = {
     filterAll: 'Барлық кешендер',
     watchDroneBtn: 'Дрон бейнесін көру',
     workersLabel: 'Ауысымдағы құрылысшылар:',
+    workersUnit: 'адам',
     cranesLabel: 'Мұнаралы крандар:',
+    cranesUnit: 'дана',
     readiness: 'Жалпы дайындығы:',
     breakdownTitle: 'Негізгі кезеңдер бойынша прогресс:',
     pointsTitle: 'Кезең ішінде орындалған жұмыстар:',
@@ -465,6 +472,7 @@ const UI = {
     tourDesc: 'Сату бөлімінің инженері салынып жатқан нысан бойынша жеке экскурсия өткізіп, қалау сапасы мен болашақ пәтер көрінісін көрсетеді.',
     tourBtn: 'Экскурсияға жазылу',
     tourWaText: 'Сәлеметсіз бе! Мен құрылыс алаңына жеке экскурсияға жазылғым келеді: ',
+    tourBannerWaText: 'Сәлеметсіз бе! Мен EL ORDO GROUP нысандарына жеке экскурсияға жазылғым келеді.',
     videoModalTitle: 'Дроннан 4K аэротүсірілім',
     closeModal: 'Жабу',
   },
@@ -475,7 +483,9 @@ const UI = {
     filterAll: 'Всі комплекси',
     watchDroneBtn: 'Дивитися відео з дрона',
     workersLabel: 'Будівельників на зміні:',
+    workersUnit: 'осіб',
     cranesLabel: 'Баштових кранів:',
+    cranesUnit: 'од.',
     readiness: 'Загальна готовність:',
     breakdownTitle: 'Прогрес за ключовими етапами:',
     pointsTitle: 'Виконані роботи за звітний період:',
@@ -485,6 +495,7 @@ const UI = {
     tourDesc: 'Інженер відділу продажів проведе для вас індивідуальну екскурсію будівельним майданчиком та покаже якість робіт.',
     tourBtn: 'Записатися на екскурсію',
     tourWaText: 'Доброго дня! Хочу записатися на персональну екскурсію на будівельний майданчик об’єкта ',
+    tourBannerWaText: 'Доброго дня! Хочу записатися на індивідуальну екскурсію об’єктами EL ORDO GROUP.',
     videoModalTitle: 'Аерозйомка з дрона 4K',
     closeModal: 'Закрити',
   },
@@ -495,7 +506,9 @@ const UI = {
     filterAll: 'All Developments',
     watchDroneBtn: 'Watch 4K Drone Video',
     workersLabel: 'Craftsmen on Shift:',
+    workersUnit: 'pers.',
     cranesLabel: 'Tower Cranes Active:',
+    cranesUnit: 'units',
     readiness: 'Overall Completion:',
     breakdownTitle: 'Milestone Progress Breakdown:',
     pointsTitle: 'Accomplished during the current cycle:',
@@ -505,6 +518,7 @@ const UI = {
     tourDesc: 'Our project engineer will accompany you on an exclusive hard-hat site tour, showcasing brickwork craftsmanship and panoramic window vistas.',
     tourBtn: 'Book Personal Site Tour',
     tourWaText: 'Hello! I would like to book a private on-site inspection for development ',
+    tourBannerWaText: 'Hello! I would like to book an individual on-site tour across EL ORDO GROUP developments.',
     videoModalTitle: '4K Drone Aerial Survey',
     closeModal: 'Close',
   },
@@ -515,7 +529,9 @@ const UI = {
     filterAll: '全部开发楼盘',
     watchDroneBtn: '观看4K航拍视频',
     workersLabel: '当班精工匠人：',
+    workersUnit: '人',
     cranesLabel: '运行塔吊台数：',
+    cranesUnit: '台',
     readiness: '综合完成度：',
     breakdownTitle: '关键施工工序节点细分：',
     pointsTitle: '本周期重要施工节点完成情况：',
@@ -525,13 +541,14 @@ const UI = {
     tourDesc: '项目总工与置业顾问将为您安排专业安全护航的工地一对一实景探访，零距离见证用料与窗外视野。',
     tourBtn: '预约工地实地考察',
     tourWaText: '您好！我想预约前往施工现场进行一对一实地工程探访，目标楼盘：',
+    tourBannerWaText: '您好！我想预约前往 EL ORDO GROUP 旗下开发楼盘施工现场进行一对一实景探访。',
     videoModalTitle: '4K全景航拍漫游',
     closeModal: '关闭',
   },
 };
 
 export default function ConstructionProgressPage() {
-  const { locale } = useLanguage();
+  const { locale, t: globalT } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
   const t = UI[currentLang] || UI.ru;
 
@@ -576,7 +593,7 @@ export default function ConstructionProgressPage() {
       <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
         <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
-            Главная
+            {globalT.common?.home || 'Главная'}
           </Link>
           <span>/</span>
           <span className="text-[#064734] dark:text-[#d4b26f] font-semibold">
@@ -688,11 +705,11 @@ export default function ConstructionProgressPage() {
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-gray-400 text-[10px] block">{t.workersLabel}</span>
-                      <strong className="font-extrabold text-[#d4b26f]">{report.workersOnSite} чел.</strong>
+                      <strong className="font-extrabold text-[#d4b26f]">{report.workersOnSite} {t.workersUnit}</strong>
                     </div>
                     <div>
                       <span className="text-gray-400 text-[10px] block">{t.cranesLabel}</span>
-                      <strong className="font-extrabold text-white">{report.cranesOnSite} ед.</strong>
+                      <strong className="font-extrabold text-white">{report.cranesOnSite} {t.cranesUnit}</strong>
                     </div>
                   </div>
                 </div>
@@ -861,7 +878,7 @@ export default function ConstructionProgressPage() {
           </div>
 
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent('Здравствуйте! Хочу записаться на индивидуальную экскурсию по объектам EL ORDO GROUP.')}`}
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(t.tourBannerWaText)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#0a4d38] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"
