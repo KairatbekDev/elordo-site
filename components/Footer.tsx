@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
+import { TRANSLATIONS } from '@/lib/i18n/translations';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -11,7 +13,9 @@ import {
 } from '@/components/Icons';
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
