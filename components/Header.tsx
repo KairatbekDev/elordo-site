@@ -1,19 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { COMPANY_INFO } from '@/lib/data';
 import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconWhatsApp,
   IconInstagram,
   IconArrowRight,
 } from '@/components/Icons';
 
-const CONSTRUCTION_LABELS: Record<string, string> = {
+const CONSTRUCTION_LABELS: Record<Locale, string> = {
   ru: 'Ход строительства',
   kg: 'Курулуш жүрүшү',
   kz: 'Құрылыс барысы',
@@ -22,25 +23,87 @@ const CONSTRUCTION_LABELS: Record<string, string> = {
   zh: '工程进度',
 };
 
+const WA_CONSULTATION_TEXTS: Record<Locale, string> = {
+  ru: 'Здравствуйте! Хочу получить подробную консультацию по объектам компании EL ORDO GROUP и условиям рассрочки.',
+  kg: 'Саламатсызбы! EL ORDO GROUP компаниясынын объектилери жана бөлүп төлөө шарттары боюнча толук кеңеш алгым келет.',
+  kz: 'Сәлеметсіз бе! EL ORDO GROUP компаниясының нысандары және бөліп төлеу шарттары бойынша толық кеңес алғым келеді.',
+  uk: 'Доброго дня! Хочу отримати детальну консультацію щодо об’єктів компанії EL ORDO GROUP та умов розстрочки.',
+  en: 'Hello! I would like to get a detailed consultation on EL ORDO GROUP properties and installment plans.',
+  zh: '您好！我想详细咨询 EL ORDO GROUP 旗下的楼盘项目及免息分期方案。',
+};
+
+const QUICK_PROJECTS_INFO: Record<Locale, {
+  abuDhabi: string;
+  madina: string;
+  ajkolPlus: string;
+  closeMenuAria: string;
+  openMenuAria: string;
+}> = {
+  ru: {
+    abuDhabi: 'от 1 650 $/м² • Премиум',
+    madina: 'от 1 400 $/м² • Бизнес',
+    ajkolPlus: 'от 1 100 $/м² • Эко-зона',
+    closeMenuAria: 'Закрыть меню',
+    openMenuAria: 'Открыть меню',
+  },
+  kg: {
+    abuDhabi: '1 650 $/м² баштап • Премиум',
+    madina: '1 400 $/м² баштап • Бизнес',
+    ajkolPlus: '1 100 $/м² баштап • Эко-аймак',
+    closeMenuAria: 'Менюну жабуу',
+    openMenuAria: 'Менюну ачуу',
+  },
+  kz: {
+    abuDhabi: '1 650 $/м² бастап • Премиум',
+    madina: '1 400 $/м² бастап • Бизнес',
+    ajkolPlus: '1 100 $/м² бастап • Эко-аймақ',
+    closeMenuAria: 'Мәзірді жабу',
+    openMenuAria: 'Мәзірді ашу',
+  },
+  uk: {
+    abuDhabi: 'від 1 650 $/м² • Преміум',
+    madina: 'від 1 400 $/м² • Бізнес',
+    ajkolPlus: 'від 1 100 $/м² • Еко-зона',
+    closeMenuAria: 'Закрити меню',
+    openMenuAria: 'Відкрити меню',
+  },
+  en: {
+    abuDhabi: 'from $1,650/m² • Premium',
+    madina: 'from $1,400/m² • Business',
+    ajkolPlus: 'from $1,100/m² • Eco-zone',
+    closeMenuAria: 'Close menu',
+    openMenuAria: 'Open menu',
+  },
+  zh: {
+    abuDhabi: '1 650 $/m² 起 • 尊享级',
+    madina: '1 400 $/m² 起 • 商务级',
+    ajkolPlus: '1 100 $/m² 起 • 生态麓区',
+    closeMenuAria: '关闭菜单',
+    openMenuAria: '打开菜单',
+  },
+};
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const { locale, t } = useLanguage();
 
-  const currentLang = locale || 'ru';
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const quickInfo = QUICK_PROJECTS_INFO[currentLang] || QUICK_PROJECTS_INFO.ru;
+
   const constructionLabel =
     (t.header as Record<string, string>)?.construction ||
     CONSTRUCTION_LABELS[currentLang] ||
     CONSTRUCTION_LABELS.ru;
 
-  const navLinks = [
+  const navLinks = useMemo(() => [
     { href: '/projects', label: t.header.catalog },
     { href: '/hod-stroitelstva', label: constructionLabel },
     { href: '/usloviya', label: t.header.terms },
     { href: '/o-kompanii', label: t.header.about },
     { href: '/contacts', label: t.header.contacts },
-  ];
+  ], [t.header, constructionLabel]);
 
   // Отслеживание скролла для тени
   useEffect(() => {
@@ -60,7 +123,7 @@ export default function Header() {
   }, [isOpen]);
 
   const waConsultationText = encodeURIComponent(
-    'Здравствуйте! Хочу получить подробную консультацию по объектам компании EL ORDO GROUP и условиям рассрочки.'
+    WA_CONSULTATION_TEXTS[currentLang] || WA_CONSULTATION_TEXTS.ru
   );
 
   return (
@@ -158,7 +221,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
+              aria-label={isOpen ? quickInfo.closeMenuAria : quickInfo.openMenuAria}
               className="lg:hidden p-2 rounded-xl text-gray-700 dark:text-neutral-200 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors focus:outline-none cursor-pointer"
             >
               {isOpen ? (
@@ -180,7 +243,7 @@ export default function Header() {
       {/* 4. Полноэкранное мобильное меню (Drawer) */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden animate-fadeIn"
+          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-fadeIn"
           onClick={() => setIsOpen(false)}
         >
           <div
@@ -206,7 +269,7 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  aria-label="Закрыть меню"
+                  aria-label={quickInfo.closeMenuAria}
                   className="w-9 h-9 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-500 dark:text-neutral-300 hover:bg-gray-200 dark:hover:bg-white/20 transition-colors cursor-pointer"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -249,7 +312,7 @@ export default function Header() {
                     className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖК Abu Dhabi</div>
-                    <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 650 $/м² • Премиум</div>
+                    <div className="text-[11px] text-[#d4b26f] font-semibold">{quickInfo.abuDhabi}</div>
                   </Link>
 
                   <Link
@@ -258,7 +321,7 @@ export default function Header() {
                     className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖК Madina Residence</div>
-                    <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 400 $/м² • Бизнес</div>
+                    <div className="text-[11px] text-[#d4b26f] font-semibold">{quickInfo.madina}</div>
                   </Link>
 
                   <Link
@@ -267,7 +330,7 @@ export default function Header() {
                     className="block p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-[#064734]/10 dark:hover:bg-white/10 transition-colors"
                   >
                     <div className="text-xs font-bold text-gray-900 dark:text-neutral-100">ЖД Айкол +</div>
-                    <div className="text-[11px] text-[#d4b26f] font-semibold">от 1 100 $/м² • Эко-зона</div>
+                    <div className="text-[11px] text-[#d4b26f] font-semibold">{quickInfo.ajkolPlus}</div>
                   </Link>
                 </div>
               </div>
