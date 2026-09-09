@@ -28,6 +28,25 @@ export default function ContactsPage() {
     saturday: t.contactsPage.timeSaturday,
   };
 
+  const getProjectClassLabel = (slug: string) => {
+    switch (slug) {
+      case 'abu-dhabi':
+        return t.projectsPage.abuDhabiClass;
+      case 'madina-residence':
+        return t.projectsPage.madinaClass;
+      case 'ajkol-plus':
+        return t.projectsPage.ajkolPlusClass;
+      case 'ajkol':
+        return t.projectsPage.ajkolClass;
+      case 'kelechek':
+        return t.projectsPage.kelechekClass;
+      case 'ordo':
+        return t.projectsPage.ordoClass;
+      default:
+        return '';
+    }
+  };
+
   const handleBookVisit = (e: React.FormEvent) => {
     e.preventDefault();
     const text =
@@ -38,6 +57,10 @@ export default function ContactsPage() {
 
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
+
+  const waQuickConsultText = encodeURIComponent(
+    t.footer.waText || 'Здравствуйте! Хочу получить консультацию по объектам EL ORDO GROUP.'
+  );
 
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 pb-20 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
@@ -58,7 +81,7 @@ export default function ContactsPage() {
         <div className="absolute inset-0 z-0">
           <img
             src="/projects/Abu-Dhabi.png"
-            alt="EL ORDO GROUP Контакты"
+            alt="EL ORDO GROUP"
             className="w-full h-full object-cover object-center opacity-25 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#021c15] via-[#064734]/85 to-black/70" />
@@ -133,9 +156,7 @@ export default function ContactsPage() {
               </p>
             </div>
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-                'Здравствуйте! Хочу получить консультацию по объектам EL ORDO GROUP.'
-              )}`}
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waQuickConsultText}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline"
@@ -256,11 +277,15 @@ export default function ContactsPage() {
                   onChange={(e) => setSelectedProject(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] font-medium cursor-pointer"
                 >
-                  {PROJECTS_LIST.map((proj) => (
-                    <option key={proj.slug} value={`${proj.name} (${proj.classType})`} className="dark:bg-[#0b1b15]">
-                      {proj.name} ({proj.classType})
-                    </option>
-                  ))}
+                  {PROJECTS_LIST.map((proj) => {
+                    const classLabel = getProjectClassLabel(proj.slug);
+                    const displayLabel = classLabel ? `${proj.name} (${classLabel})` : proj.name;
+                    return (
+                      <option key={proj.slug} value={displayLabel} className="dark:bg-[#0b1b15]">
+                        {displayLabel}
+                      </option>
+                    );
+                  })}
                   <option value={t.contactsPage.formAllProjects} className="dark:bg-[#0b1b15]">
                     {t.contactsPage.formAllProjects}
                   </option>
