@@ -54,6 +54,8 @@ const UI_TEXTS: Record<Locale, {
   btnWa: string;
   managerTime: string;
   otherPlans: string;
+  blueprintTitle: string;
+  blueprintSub: string;
   waMessage: (title: string, area: string, proj: string) => string;
 }> = {
   ru: {
@@ -82,6 +84,8 @@ const UI_TEXTS: Record<Locale, {
     btnWa: 'Узнать цену и свободные этажи',
     managerTime: 'Менеджер отдела продаж ответит в течение 2 минут',
     otherPlans: 'Другие планировки в этом объекте:',
+    blueprintTitle: 'Архитектурный чертеж',
+    blueprintSub: 'Схема на согласовании',
     waMessage: (title, area, proj) => `Здравствуйте! Меня интересует планировка: ${title} (${area}) в ${proj}. Отправьте, пожалуйста, свободные этажи и расчет рассрочки.`,
   },
   kg: {
@@ -110,6 +114,8 @@ const UI_TEXTS: Record<Locale, {
     btnWa: 'Баасын жана бош кабаттарды билүү',
     managerTime: 'Сатуу бөлүмүнүн менеджери 2 мүнөттө жооп берет',
     otherPlans: 'Бул объекттеги башка пландар:',
+    blueprintTitle: 'Архитектуралык план',
+    blueprintSub: 'План такталууда',
     waMessage: (title, area, proj) => `Саламатсызбы! Мени ${proj} комплексиндеги план кызыктырат: ${title} (${area}). Бош кабаттарды жана бөлүп төлөө эсебин жөнөтүңүзчү.`,
   },
   kz: {
@@ -138,6 +144,8 @@ const UI_TEXTS: Record<Locale, {
     btnWa: 'Бағасы мен бос қабаттарды білу',
     managerTime: 'Сату бөлімінің менеджері 2 минутта жауап береді',
     otherPlans: 'Осы нысандағы басқа жоспарлар:',
+    blueprintTitle: 'Сәулет сызбасы',
+    blueprintSub: 'Сызба нақтылануда',
     waMessage: (title, area, proj) => `Сәлеметсіз бе! Мені ${proj} кешеніндегі ${title} (${area}) жоспары қызықтырады. Бос қабаттар мен бөліп төлеу есебін жіберіңізші.`,
   },
   uk: {
@@ -166,6 +174,8 @@ const UI_TEXTS: Record<Locale, {
     btnWa: 'Дізнатися ціну та вільні поверхи',
     managerTime: 'Менеджер відділу продажів відповість протягом 2 хвилин',
     otherPlans: 'Інші планування в цьому об’єкті:',
+    blueprintTitle: 'Архітектурне креслення',
+    blueprintSub: 'Схема на узгодженні',
     waMessage: (title, area, proj) => `Доброго дня! Мене цікавить планування: ${title} (${area}) в ${proj}. Надішліть, будь ласка, вільні поверхи та розрахунок розстрочки.`,
   },
   en: {
@@ -194,6 +204,8 @@ const UI_TEXTS: Record<Locale, {
     btnWa: 'Inquire Price & Floor Availability',
     managerTime: 'Sales manager will reply within 2 minutes',
     otherPlans: 'Other layouts in this development:',
+    blueprintTitle: 'Architectural Blueprint',
+    blueprintSub: 'Layout in preparation',
     waMessage: (title, area, proj) => `Hello! I am interested in layout: ${title} (${area}) at ${proj}. Please send floor availability and 0% installment calculations.`,
   },
   zh: {
@@ -222,9 +234,103 @@ const UI_TEXTS: Record<Locale, {
     btnWa: '查询底价与可选楼层',
     managerTime: '专属置业顾问将在2分钟内在线回复',
     otherPlans: '本楼盘其他热销户型：',
+    blueprintTitle: '建筑空间规划图',
+    blueprintSub: '户型图深化中',
     waMessage: (title, area, proj) => `您好！我对 ${proj} 项目中的户型非常感兴趣：${title} (${area})。请发送当前可选楼层及0%免息分期明细。`,
   },
 };
+
+/**
+ * Векторная Blueprint-заглушка архитектурного чертежа
+ */
+function BlueprintGraphic({
+  title,
+  sub,
+  compact = false,
+}: {
+  title?: string;
+  sub?: string;
+  compact?: boolean;
+}) {
+  if (compact) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-[#f0f4f2] text-[#064734]/50">
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+          <rect x="3" y="3" width="18" height="18" rx="2" strokeDasharray="2 2" />
+          <line x1="3" y1="11" x2="14" y2="11" />
+          <line x1="14" y1="3" x2="14" y2="17" />
+          <line x1="9" y1="11" x2="9" y2="21" />
+        </svg>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#f8faf9] to-[#edf3ef] border border-dashed border-[#064734]/20 rounded-xl p-4 text-center select-none">
+      <svg className="w-16 h-16 sm:w-20 sm:h-20 text-[#064734]/40 mb-2.5" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="8" y="8" width="48" height="48" rx="3" strokeDasharray="3 3" />
+        <line x1="8" y1="28" x2="38" y2="28" strokeWidth="2" />
+        <line x1="38" y1="8" x2="38" y2="44" strokeWidth="2" />
+        <line x1="24" y1="28" x2="24" y2="56" strokeWidth="2" />
+        {/* Дверная дуга */}
+        <path d="M 38 28 A 12 12 0 0 1 50 40" strokeDasharray="2 2" />
+        <line x1="38" y1="40" x2="50" y2="40" />
+        {/* Оконные акценты */}
+        <line x1="14" y1="8" x2="28" y2="8" strokeWidth="3" stroke="#d4b26f" strokeLinecap="round" />
+        <line x1="38" y1="56" x2="50" y2="56" strokeWidth="3" stroke="#d4b26f" strokeLinecap="round" />
+        <circle cx="32" cy="32" r="1.5" fill="#064734" />
+      </svg>
+      <span className="text-[11px] sm:text-xs font-black text-[#064734] uppercase tracking-wider">
+        {title}
+      </span>
+      {sub && (
+        <span className="text-[10px] text-gray-500 font-medium mt-0.5">
+          {sub}
+        </span>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Безопасный рендерер чертежа с автозаменой аварийных подстановок
+ */
+function PlanImage({
+  src,
+  alt,
+  className = '',
+  title,
+  sub,
+  compact = false,
+}: {
+  src?: string;
+  alt: string;
+  className?: string;
+  title?: string;
+  sub?: string;
+  compact?: boolean;
+}) {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [src]);
+
+  const isInvalid = !src || hasError || src.includes('Abu-Dhabi.png');
+
+  if (isInvalid) {
+    return <BlueprintGraphic title={title || alt} sub={sub} compact={compact} />;
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setHasError(true)}
+      className={className}
+    />
+  );
+}
 
 export default function FloorPlansSection({
   projectName,
@@ -239,10 +345,7 @@ export default function FloorPlansSection({
   const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
 
-  // Активная планировка для детального просмотра
   const [selectedPlan, setSelectedPlan] = useState<ApartmentPlan | null>(null);
-
-  // Управление масштабом (Zoom)
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
@@ -266,7 +369,6 @@ export default function FloorPlansSection({
   const handleZoomOut = () => setZoomLevel((prev) => Math.max(prev - 0.35, 0.8));
   const handleResetZoom = () => setZoomLevel(1);
 
-  // Навигация клавишами
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeModal();
@@ -275,7 +377,6 @@ export default function FloorPlansSection({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [closeModal]);
 
-  // Блокировка прокрутки фона при открытом окне
   useEffect(() => {
     if (selectedPlan) {
       document.body.style.overflow = 'hidden';
@@ -355,31 +456,33 @@ export default function FloorPlansSection({
               }`}
             >
               <div>
-                {/* Белая подложка под чертеж */}
+                {/* Подложка под чертеж */}
                 <div className="relative h-56 w-full rounded-2xl overflow-hidden bg-white p-4 mb-5 flex items-center justify-center border border-gray-150 shadow-inner">
                   
                   {/* Бейдж комнатности */}
-                  <span className="absolute top-3 left-3 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-lg bg-[#064734] text-white shadow-sm">
+                  <span className="absolute top-3 left-3 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-lg bg-[#064734] text-white shadow-sm z-20">
                     {ui.roomTag(plan.rooms)}
                   </span>
 
                   {/* Бейдж статуса наличия */}
-                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-600/90 text-white shadow-sm">
+                  <span className="absolute bottom-3 left-3 inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-md bg-emerald-600/90 text-white shadow-sm z-20">
                     <IconCheck className="w-3 h-3" />
                     <span>{ui.statusAvailable}</span>
                   </span>
 
                   {/* Иконка лупы */}
-                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#064734]/90 text-white flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all shadow-sm">
+                  <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#064734]/90 text-white flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all shadow-sm z-20">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
 
-                  {/* Чертеж */}
-                  <img
-                    src={plan.image || '/projects/Abu-Dhabi.png'}
+                  {/* Безопасный рендеринг чертежа */}
+                  <PlanImage
+                    src={plan.image}
                     alt={plan.title}
+                    title={ui.blueprintTitle}
+                    sub={ui.blueprintSub}
                     className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -505,9 +608,11 @@ export default function FloorPlansSection({
                   style={{ transform: `scale(${zoomLevel})` }}
                   onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.6 : 1))}
                 >
-                  <img
-                    src={selectedPlan.image || '/projects/Abu-Dhabi.png'}
+                  <PlanImage
+                    src={selectedPlan.image}
                     alt={selectedPlan.title}
+                    title={ui.blueprintTitle}
+                    sub={ui.blueprintSub}
                     className="max-h-[320px] sm:max-h-[420px] max-w-full object-contain"
                   />
                 </div>
@@ -616,10 +721,11 @@ export default function FloorPlansSection({
                       onClick={() => openPlanModal(item)}
                       className="flex-shrink-0 w-52 p-3 rounded-2xl bg-white/5 hover:bg-[#064734]/40 border border-white/10 hover:border-[#d4b26f] cursor-pointer transition-all flex items-center gap-3 group"
                     >
-                      <div className="w-14 h-14 rounded-xl bg-white p-1 flex items-center justify-center flex-shrink-0 border border-gray-200">
-                        <img
-                          src={item.image || '/projects/Abu-Dhabi.png'}
+                      <div className="w-14 h-14 rounded-xl bg-white p-1 flex items-center justify-center flex-shrink-0 border border-gray-200 overflow-hidden">
+                        <PlanImage
+                          src={item.image}
                           alt={item.title}
+                          compact={true}
                           className="max-h-full object-contain group-hover:scale-105 transition-transform"
                         />
                       </div>
