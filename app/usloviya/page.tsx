@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
+import { TRANSLATIONS } from '@/lib/i18n/translations';
 import {
   IconCheck,
   IconCar,
@@ -14,16 +16,34 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
-export default function PurchaseTermsPage() {
-  const { t, locale } = useLanguage();
+const RATE_DISCLAIMERS: Record<Locale, string> = {
+  ru: '* Расчет носит предварительный характер. В соответствии с законодательством КР оплата производится в национальной валюте (сом) по официальному учетному курсу НБКР на день фактической оплаты. Возможна индивидуальная фиксация курса в договоре.',
+  kg: '* Эсептөө болжолдуу мүнөзгө ээ. КР мыйзамдарына ылайык төлөмдөр төлөнгөн күндөгү КР Улуттук банкынын (УБ) расмий курсу боюнча улуттук валютада (сом) жүргүзүлөт. Келишимде курсту бекитүү мүмкүнчүлүгү каралган.',
+  kz: '* Есептеу алдын ала сипатқа ие. ҚР заңнамасына сәйкес төлем нақты төленген күнгі ҚР Ұлттық Банкінің ресми бағамы бойынша ұлттық валютада (сом) жүзеге асырылады. Келісімшартта бағамды бекіту мүмкіндігі бар.',
+  uk: '* Розрахунок має попередній характер. Відповідно до законодавства КР оплата здійснюється у національній валюті (сом) за офіційним курсом НБКР на день фактичної оплати. Можлива індивідуальна фіксація курсу в договорі.',
+  en: '* Calculations are preliminary estimates. Under Kyrgyz Republic law, payments are settled in the national currency (KGS) based on the official NBKR exchange rate on the payment date. Contractual exchange rate pegging is available.',
+  zh: '* 本测算结果仅供参考。根据吉尔吉斯共和国现行法规，所有房款均按实际付款当日吉尔吉斯国家银行 (NBKR) 官方挂牌基准汇率以国家法定货币（索姆）进行结算。合同中可约定专属汇率锁定保护机制。',
+};
 
-  const isKg = locale === 'kg';
-  const isEn = locale === 'en';
+const BANNER_WA_TEXTS: Record<Locale, string> = {
+  ru: 'Здравствуйте! Хочу получить консультацию по условиям покупки и рассрочки в EL ORDO GROUP.',
+  kg: 'Саламатсызбы! EL ORDO GROUP компаниясындагы сатып алуу жана бөлүп төлөө шарттары боюнча кеңеш алгым келет.',
+  kz: 'Сәлеметсіз бе! EL ORDO GROUP компаниясының сатып алу және бөліп төлеу шарттары бойынша кеңес алғым келеді.',
+  uk: 'Доброго дня! Хочу отримати консультацію щодо умов купівлі та розстрочки в EL ORDO GROUP.',
+  en: 'Hello! I would like to get a consultation on purchase conditions and installment plans at EL ORDO GROUP.',
+  zh: '您好！我想咨询 EL ORDO GROUP 旗下的置业购房政策及免息分期付款细则。',
+};
+
+export default function PurchaseTermsPage() {
+  const { locale } = useLanguage();
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
 
   // Состояние калькулятора рассрочки
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
   const [months, setMonths] = useState<number>(36);
+  const [currencyMode, setCurrencyMode] = useState<'USD' | 'KGS'>('USD');
 
   // Состояние Trade-in калькулятора
   const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
@@ -38,22 +58,18 @@ export default function PurchaseTermsPage() {
   const usdToKgs = 87.5;
   const downPaymentAmount = Math.round((apartmentPrice * downPaymentPercent) / 100);
   const remainingAmount = apartmentPrice - downPaymentAmount;
-  const monthlyPayment = months > 0 ? Math.round(remainingAmount / months) : 0;
-  const monthlyPaymentKgs = Math.round(monthlyPayment * usdToKgs);
+  const monthlyPaymentUsd = months > 0 ? Math.round(remainingAmount / months) : 0;
+  const monthlyPaymentKgs = Math.round(monthlyPaymentUsd * usdToKgs);
 
-  const rateDisclaimer = isKg
-    ? '* Эсептөө болжолдуу мүнөзгө ээ. Сом түрүндөгү суммалар келишим түзүлгөн жана төлөм жүргүзүлгөн күнү Улуттук банктын (УБ) расмий курсу боюнча такталат.'
-    : isEn
-    ? '* Calculations are indicative. Exact amounts in Kyrgyz Som (KGS) are determined based on the official NBKR exchange rate on the date of contract signing and payment.'
-    : '* Расчет носит предварительный характер. Точная сумма в национальной валюте (сом) фиксируется по учетному курсу НБКР на день заключения договора и внесения платежа.';
+  const rateDisclaimer = RATE_DISCLAIMERS[currentLang] || RATE_DISCLAIMERS.ru;
 
   const handleSendCalculation = () => {
     const text =
       `${t.termsPage.waCalcGreeting}\n\n` +
-      `• ${t.termsPage.waCalcPrice} $${apartmentPrice.toLocaleString()}\n` +
+      `• ${t.termsPage.waCalcPrice} $${apartmentPrice.toLocaleString()} (~${Math.round(apartmentPrice * usdToKgs).toLocaleString()} ${t.termsPage.somUnit})\n` +
       `• ${t.termsPage.waCalcDown} (${downPaymentPercent}%): $${downPaymentAmount.toLocaleString()} (~${Math.round(downPaymentAmount * usdToKgs).toLocaleString()} ${t.termsPage.somUnit})\n` +
       `• ${t.termsPage.waCalcTerm} ${months} ${t.termsPage.calcMonths}\n` +
-      `• ${t.termsPage.waCalcMonthly} $${monthlyPayment.toLocaleString()}${t.termsPage.calcPerMonth} (~${monthlyPaymentKgs.toLocaleString()} ${t.termsPage.calcSomPerMonth})\n\n` +
+      `• ${t.termsPage.waCalcMonthly} $${monthlyPaymentUsd.toLocaleString()}${t.termsPage.calcPerMonth} (~${monthlyPaymentKgs.toLocaleString()} ${t.termsPage.calcSomPerMonth})\n\n` +
       `${t.termsPage.waCalcQuestion}`;
 
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
@@ -73,24 +89,14 @@ export default function PurchaseTermsPage() {
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
-  const faqs = [
-    {
-      q: t.termsPage.faq1Q,
-      a: t.termsPage.faq1A,
-    },
-    {
-      q: t.termsPage.faq2Q,
-      a: t.termsPage.faq2A,
-    },
-    {
-      q: t.termsPage.faq3Q,
-      a: t.termsPage.faq3A,
-    },
-    {
-      q: t.termsPage.faq4Q,
-      a: t.termsPage.faq4A,
-    },
-  ];
+  const faqs = useMemo(() => [
+    { q: t.termsPage.faq1Q, a: t.termsPage.faq1A },
+    { q: t.termsPage.faq2Q, a: t.termsPage.faq2A },
+    { q: t.termsPage.faq3Q, a: t.termsPage.faq3A },
+    { q: t.termsPage.faq4Q, a: t.termsPage.faq4A },
+  ], [t.termsPage]);
+
+  const bannerWaMessage = BANNER_WA_TEXTS[currentLang] || BANNER_WA_TEXTS.ru;
 
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 pb-24 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
@@ -248,6 +254,7 @@ export default function PurchaseTermsPage() {
       {/* 4. Интерактивный калькулятор рассрочки */}
       <section id="calculator" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
+          
           <div className="text-center max-w-xl mx-auto mb-10">
             <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
               {t.termsPage.calcBadge}
@@ -261,6 +268,7 @@ export default function PurchaseTermsPage() {
           </div>
 
           <div className="space-y-8">
+            
             {/* Параметр 1: Стоимость квартиры */}
             <div>
               <div className="flex justify-between items-center mb-2">
@@ -382,24 +390,70 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Итоговая панель расчета с дисклеймером курса НБКР */}
+            {/* Итоговая панель расчета с переключателем валют и дисклеймером НБКР */}
             <div className="bg-[#f2f6f4] dark:bg-[#040c09] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
-              <div className="max-w-xl">
-                <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-1">
-                  {t.termsPage.calcMonthlyLabel}
-                </span>
-                <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
-                  ${monthlyPayment.toLocaleString()}
-                  <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">{t.termsPage.calcPerMonth}</span>
+              <div className="max-w-xl w-full">
+                
+                {/* Переключатель валюты расчета */}
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
+                    {t.termsPage.calcMonthlyLabel}
+                  </span>
+                  
+                  <div className="inline-flex p-1 rounded-xl bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-xs font-black">
+                    <button
+                      type="button"
+                      onClick={() => setCurrencyMode('USD')}
+                      className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                        currencyMode === 'USD'
+                          ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                          : 'text-gray-600 dark:text-gray-300'
+                      }`}
+                    >
+                      USD ($)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCurrencyMode('KGS')}
+                      className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                        currencyMode === 'KGS'
+                          ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                          : 'text-gray-600 dark:text-gray-300'
+                      }`}
+                    >
+                      KGS (сом)
+                    </button>
+                  </div>
                 </div>
-                <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
-                  ≈ {monthlyPaymentKgs.toLocaleString()} {t.termsPage.calcSomPerMonth}
-                </div>
+
+                {/* Основная цифра платежа */}
+                {currencyMode === 'USD' ? (
+                  <>
+                    <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
+                      ${monthlyPaymentUsd.toLocaleString()}
+                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">{t.termsPage.calcPerMonth}</span>
+                    </div>
+                    <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
+                      ≈ {monthlyPaymentKgs.toLocaleString()} {t.termsPage.calcSomPerMonth} (курс НБКР: {usdToKgs})
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
+                      {monthlyPaymentKgs.toLocaleString()}
+                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">{t.termsPage.calcSomPerMonth}</span>
+                    </div>
+                    <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
+                      ≈ ${monthlyPaymentUsd.toLocaleString()} {t.termsPage.calcPerMonth}
+                    </div>
+                  </>
+                )}
+
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2 font-medium">
                   {t.termsPage.calcRemaining} ${remainingAmount.toLocaleString()} • {t.termsPage.calcNoBankFee}
                 </p>
 
-                {/* Официальный дисклеймер НБКР */}
+                {/* Официальный дисклеймер НБКР под все 6 языков */}
                 <p className="text-[11px] text-gray-500 dark:text-neutral-400/90 mt-3 pt-3 border-t border-gray-200 dark:border-white/10 leading-relaxed italic">
                   {rateDisclaimer}
                 </p>
@@ -414,6 +468,7 @@ export default function PurchaseTermsPage() {
                 <span>{t.termsPage.calcWaBtn}</span>
               </button>
             </div>
+
           </div>
         </div>
       </section>
@@ -655,9 +710,7 @@ export default function PurchaseTermsPage() {
           </div>
 
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-              'Здравствуйте! Хочу получить консультацию по условиям покупки и рассрочки в EL ORDO GROUP.'
-            )}`}
+            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(bannerWaMessage)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
