@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
 import {
   IconCheck,
   IconWhatsApp,
@@ -10,53 +11,318 @@ import {
   IconPhone,
 } from '@/components/Icons';
 
-const PROJECTS_LIST = [
-  'Все объекты / Нужна консультация',
-  'ЖК Abu Dhabi (ул. Сухомлинова, 29)',
-  'ЖК Madina Residence (ул. Огонбаева, 12)',
-  'ЖД Айкол + (с. Кок-Жар, ул. Баялинова, 6)',
-  'ЖД Айкол (ул. Арашан, 10)',
-  'ЖК Келечек (ул. Космическая, 153)',
-  'КД Ордо (ул. Тверская, 20)',
-];
+interface FormTexts {
+  badge: string;
+  title: string;
+  desc: string;
+  goalLabel: string;
+  nameLabel: string;
+  namePh: string;
+  phoneLabel: string;
+  projectLabel: string;
+  btnCall: string;
+  btnSubmitting: string;
+  btnWhatsApp: string;
+  guarantee1: string;
+  guarantee2: string;
+  guarantee3: string;
+  privacy: string;
+  phoneError: string;
+  successTitle: string;
+  successDesc: (name: string, phone: string) => string;
+  successProjectLabel: string;
+  successGoalLabel: string;
+  successAgain: string;
+  defaultClient: string;
+  goals: string[];
+  projects: string[];
+  waTemplate: (name: string, proj: string, goal: string, phone: string) => string;
+}
 
-const GOAL_TAGS = [
-  'Рассрочка 0%',
-  'Trade-in (Обмен авто)',
-  'Подбор 1-комн.',
-  'Подбор 2-комн.',
-  'Шахматка цен',
-  'Визит в офис',
-];
+const UI_DATA: Record<Locale, FormTexts> = {
+  ru: {
+    badge: 'Персональный подбор квартиры',
+    title: 'Получить шахматку и расчет рассрочки',
+    desc: 'Оставьте номер телефона — менеджер отдела продаж свяжется с вами за 5 минут, пришлет доступные планировки и рассчитает график выплат 0%.',
+    goalLabel: 'Что вас больше всего интересует?',
+    nameLabel: 'Ваше имя:',
+    namePh: 'Например: Азамат',
+    phoneLabel: 'Номер телефона:',
+    projectLabel: 'Жилой комплекс:',
+    btnCall: 'Заказать звонок (за 5 мин)',
+    btnSubmitting: 'Отправка заявки...',
+    btnWhatsApp: 'Написать в WhatsApp',
+    guarantee1: 'Прямой расчет без скрытых переплат',
+    guarantee2: 'Консультация бесплатна',
+    guarantee3: 'Ответ за 5 минут',
+    privacy: 'Ваши данные надежно защищены и используются исключительно для связи менеджера с вами',
+    phoneError: 'Пожалуйста, введите полный номер телефона: +996 (XXX) XX-XX-XX',
+    successTitle: 'Заявка успешно принята!',
+    successDesc: (name, phone) => `Спасибо, ${name}! Менеджер отдела продаж свяжется с вами по номеру ${phone} в течение 5–10 минут.`,
+    successProjectLabel: 'Выбранный объект:',
+    successGoalLabel: 'Тема запроса:',
+    successAgain: 'Отправить ещё одну заявку',
+    defaultClient: 'Уважаемый клиент',
+    goals: [
+      'Рассрочка 0%',
+      'Trade-in (Обмен авто)',
+      'Подбор 1-комн.',
+      'Подбор 2-комн.',
+      'Шахматка цен',
+      'Визит в офис',
+    ],
+    projects: [
+      'Все объекты / Нужна консультация',
+      'ЖК Abu Dhabi (ул. Сухомлинова, 29)',
+      'ЖК Madina Residence (ул. Огонбаева, 12)',
+      'ЖД Айкол + (с. Кок-Жар, ул. Баялинова, 6)',
+      'ЖД Айкол (ул. Арашан, 10)',
+      'ЖК Келечек (ул. Космическая, 153)',
+      'КД Ордо (ул. Тверская, 20)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `Здравствуйте! Меня зовут ${name}.\nЗаявка на консультацию с сайта EL ORDO GROUP:\n\n• Объект: ${proj}\n• Цель обращения: ${goal}\n• Телефон для связи: ${phone}\n\nОтправьте, пожалуйста, актуальную шахматку, планировки и график платежей.`,
+  },
+  kg: {
+    badge: 'Батирлерди жекече тандоо',
+    title: 'Шахматка жана 0% эсебин алуу',
+    desc: 'Табыштама калтырыңыз — сатуу бөлүмү 5 мүнөттө байланышып, бош кабаттарды жана жеке төлөм графигин сунуштайт.',
+    goalLabel: 'Сизди эмне көбүрөөк кызыктырат?',
+    nameLabel: 'Атыңыз:',
+    namePh: 'Мисалы: Азамат',
+    phoneLabel: 'Телефон номериңиз:',
+    projectLabel: 'Турак жай комплекси:',
+    btnCall: 'Чалууга буйрутма берүү (5 мүн.)',
+    btnSubmitting: 'Жөнөтүлүүдө...',
+    btnWhatsApp: 'WhatsApp аркылуу жазуу',
+    guarantee1: 'Үстөк пайызы жок түз эсептөө',
+    guarantee2: 'Кеңеш берүү акысыз',
+    guarantee3: '5 мүнөттө жооп беребиз',
+    privacy: 'Сиздин маалыматтарыңыз корголгон жана байланыш үчүн гана колдонулат',
+    phoneError: 'Сураныч, толук телефон номериңизди жазыңыз: +996 (XXX) XX-XX-XX',
+    successTitle: 'Табыштамаңыз кабыл алынды!',
+    successDesc: (name, phone) => `Ыракмат, ${name}! Сатуу бөлүмүнүн менеджери ${phone} номери боюнча 5–10 мүнөттүн ичинде байланышат.`,
+    successProjectLabel: 'Кызыктырган объект:',
+    successGoalLabel: 'Суроо-талап:',
+    successAgain: 'Башка табыштама жөнөтүү',
+    defaultClient: 'Урматтуу кардар',
+    goals: [
+      '0% бөлүп төлөө',
+      'Trade-in (Унаа алмашуу)',
+      '1 бөлмөлүү тандоо',
+      '2 бөлмөлүү тандоо',
+      'Баалар шахматкасы',
+      'Офиске келүү',
+    ],
+    projects: [
+      'Бардык объекттер / Кеңеш керек',
+      'ЖК Abu Dhabi (Сухомлинов көч., 29)',
+      'ЖК Madina Residence (Огонбаев көч., 12)',
+      'ЖД Айкол + (Көк-Жар а., Баялинов көч., 6)',
+      'ЖД Айкол (Арашан көч., 10)',
+      'ЖК Келечек (Космическая көч., 153)',
+      'КД Ордо (Тверская көч., 20)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `Саламатсызбы! Менин атым ${name}.\nEL ORDO GROUP сайтынан табыштама:\n\n• Объект: ${proj}\n• Максаты: ${goal}\n• Байланыш номери: ${phone}\n\nСураныч, актуалдуу шахматканы жана бөлүп төлөө графигин жөнөтүңүзчү.`,
+  },
+  kz: {
+    badge: 'Пәтерлерді дербес таңдау',
+    title: 'Шахматка мен 0% есебін алу',
+    desc: 'Өтінім қалдырыңыз — сату бөлімі 5 минутта хабарласып, қолжетімді қабаттар мен төлем кестесін ұсынады.',
+    goalLabel: 'Сізді не көбірек қызықтырады?',
+    nameLabel: 'Атыңыз:',
+    namePh: 'Мысалы: Азамат',
+    phoneLabel: 'Телефон нөміріңіз:',
+    projectLabel: 'Тұрғын үй кешені:',
+    btnCall: 'Қоңырауға тапсырыс беру (5 мин)',
+    btnSubmitting: 'Жөнелтілуде...',
+    btnWhatsApp: 'WhatsApp-та жазу',
+    guarantee1: 'Артық төлемсіз тікелей есептеу',
+    guarantee2: 'Кеңес алу тегін',
+    guarantee3: '5 минут ішінде жауап',
+    privacy: 'Деректеріңіз қауіпсіз қорғалған және тек байланыс орнату үшін пайдаланылады',
+    phoneError: 'Толық телефон нөміріңізді енгізіңіз: +996 (XXX) XX-XX-XX',
+    successTitle: 'Өтініміңіз сәтті қабылданды!',
+    successDesc: (name, phone) => `Рақмет, ${name}! Сату бөлімінің менеджері ${phone} нөмірі бойынша 5–10 минутта хабарласады.`,
+    successProjectLabel: 'Таңдалған нысан:',
+    successGoalLabel: 'Сұраныс мақсаты:',
+    successAgain: 'Тағы бір өтінім жіберу',
+    defaultClient: 'Құрметті клиент',
+    goals: [
+      '0% бөліп төлеу',
+      'Trade-in (Көлік айырбасы)',
+      '1 бөлмелі таңдау',
+      '2 бөлмелі таңдау',
+      'Бағалар шахматкасы',
+      'Кеңсеге келу',
+    ],
+    projects: [
+      'Барлық нысандар / Кеңес қажет',
+      'ЖК Abu Dhabi (Сухомлинов к-сі, 29)',
+      'ЖК Madina Residence (Огонбаев к-сі, 12)',
+      'ЖД Айкол + (Көк-Жар а., Баялинов к-сі, 6)',
+      'ЖД Айкол (Арашан к-сі, 10)',
+      'ЖК Келечек (Космическая к-сі, 153)',
+      'КД Ордо (Тверская к-сі, 20)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `Сәлеметсіз бе! Менің атым ${name}.\nEL ORDO GROUP сайтынан өтінім:\n\n• Нысан: ${proj}\n• Мақсаты: ${goal}\n• Байланыс телефоны: ${phone}\n\nҚолжетімді шахматка мен бөліп төлеу кестесін жіберуіңізді сұраймын.`,
+  },
+  uk: {
+    badge: 'Персональний підбір квартири',
+    title: 'Отримати шахматку та розрахунок розстрочки',
+    desc: 'Залиште номер телефону — менеджер зв’яжеться з вами за 5 хвилин, надішле планування та розрахує виплати 0%.',
+    goalLabel: 'Що вас найбільше цікавить?',
+    nameLabel: 'Ваше ім’я:',
+    namePh: 'Наприклад: Олександр',
+    phoneLabel: 'Номер телефону:',
+    projectLabel: 'Житловий комплекс:',
+    btnCall: 'Замовити дзвінок (за 5 хв)',
+    btnSubmitting: 'Відправлення...',
+    btnWhatsApp: 'Написати у WhatsApp',
+    guarantee1: 'Прямий розрахунок без переплат',
+    guarantee2: 'Консультація безкоштовна',
+    guarantee3: 'Відповідь за 5 хвилин',
+    privacy: 'Ваші дані надійно захищені та використовуються виключно для зв’язку менеджера з вами',
+    phoneError: 'Будь ласка, введіть повний номер телефону: +996 (XXX) XX-XX-XX',
+    successTitle: 'Заявку успішно прийнято!',
+    successDesc: (name, phone) => `Дякуємо, ${name}! Менеджер зв’яжеться з вами за номером ${phone} протягом 5–10 хвилин.`,
+    successProjectLabel: 'Обраний об’єкт:',
+    successGoalLabel: 'Тема запиту:',
+    successAgain: 'Надіслати ще одну заявку',
+    defaultClient: 'Шановний клієнте',
+    goals: [
+      'Розстрочка 0%',
+      'Trade-in (Обмін авто)',
+      'Підбір 1-кімн.',
+      'Підбір 2-кімн.',
+      'Шахматка цін',
+      'Візит до офісу',
+    ],
+    projects: [
+      'Всі об’єкти / Потрібна консультація',
+      'ЖК Abu Dhabi (вул. Сухомлинова, 29)',
+      'ЖК Madina Residence (вул. Огонбаєва, 12)',
+      'ЖД Айкол + (с. Кок-Жар, вул. Баялінова, 6)',
+      'ЖД Айкол (вул. Арашан, 10)',
+      'ЖК Келечек (вул. Космічна, 153)',
+      'КД Ордо (вул. Тверська, 20)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `Доброго дня! Мене звати ${name}.\nЗаявка з сайту EL ORDO GROUP:\n\n• Об’єкт: ${proj}\n• Мета: ${goal}\n• Телефон для зв’язку: ${phone}\n\nНадішліть, будь ласка, актуальну шахматку та графік платежів.`,
+  },
+  en: {
+    badge: 'Bespoke Property Selection',
+    title: 'Request Floor Plans & 0% Installment',
+    desc: 'Leave your phone number — our sales specialist will call you within 5 minutes with floor availability and payment schedules.',
+    goalLabel: 'What are you most interested in?',
+    nameLabel: 'Your Name:',
+    namePh: 'e.g. Alex',
+    phoneLabel: 'Phone Number:',
+    projectLabel: 'Residential Development:',
+    btnCall: 'Request Callback (5 mins)',
+    btnSubmitting: 'Sending...',
+    btnWhatsApp: 'Inquire on WhatsApp',
+    guarantee1: 'Direct developer terms without markups',
+    guarantee2: 'Free advisory consultation',
+    guarantee3: 'Response within 5 minutes',
+    privacy: 'Your personal data is strictly protected and used exclusively to service your inquiry',
+    phoneError: 'Please enter your complete phone number: +996 (XXX) XX-XX-XX',
+    successTitle: 'Inquiry Successfully Received!',
+    successDesc: (name, phone) => `Thank you, ${name}! Our sales manager will contact you at ${phone} within 5–10 minutes.`,
+    successProjectLabel: 'Selected Project:',
+    successGoalLabel: 'Inquiry Topic:',
+    successAgain: 'Submit Another Inquiry',
+    defaultClient: 'Dear Guest',
+    goals: [
+      '0% Installment',
+      'Trade-in (Auto Barter)',
+      '1-Bedroom selection',
+      '2-Bedroom selection',
+      'Price & availability grid',
+      'Office tour',
+    ],
+    projects: [
+      'All Developments / Advisory',
+      'Abu Dhabi Residence (29 Sukhomlinov St.)',
+      'Madina Residence (12 Ogonbaev St.)',
+      'Aikol+ Club House (6 Bayalinov St., Kok-Jar)',
+      'Aikol House (10 Arashan St.)',
+      'Kelechek Complex (153 Kosmicheskaya St.)',
+      'Ordo Club House (20 Tverskaya St.)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `Hello! My name is ${name}.\nConsultation request from EL ORDO GROUP website:\n\n• Development: ${proj}\n• Topic: ${goal}\n• Phone: ${phone}\n\nPlease share floor availability, layouts, and installment options.`,
+  },
+  zh: {
+    badge: '一对一专属置业管家',
+    title: '索取最新在售销控与0%免息方案',
+    desc: '留下您的联系电话 — 专属置业顾问将在5分钟内致电，发送在售房源表与分期测算方案。',
+    goalLabel: '您当前最关注的置业需求：',
+    nameLabel: '您的姓名：',
+    namePh: '例如：李先生 / 王女士',
+    phoneLabel: '联系电话：',
+    projectLabel: '意向咨询楼盘：',
+    btnCall: '预约5分钟快速回电',
+    btnSubmitting: '正在提交中...',
+    btnWhatsApp: '在 WhatsApp 中咨询',
+    guarantee1: '开发商直签底价，无中介溢价',
+    guarantee2: '置业咨询全程免费',
+    guarantee3: '5分钟内快速响应',
+    privacy: '您的隐私信息受到严格加密保护，仅用于置业顾问向您提供专属服务',
+    phoneError: '请完整填写有效联系电话：+996 (XXX) XX-XX-XX',
+    successTitle: '置业申请已成功受理！',
+    successDesc: (name, phone) => `感谢您的垂询，${name}！专属置业经理将在5–10分钟内致电 ${phone} 为您服务。`,
+    successProjectLabel: '目标楼盘：',
+    successGoalLabel: '咨询主题：',
+    successAgain: '提交新的置业需求',
+    defaultClient: '尊贵客户',
+    goals: [
+      '0% 免息分期',
+      '以旧换新置换（汽车置换）',
+      '一居室户型推荐',
+      '二居室户型推荐',
+      '实时房源与销控底价',
+      '预约到店实地品鉴',
+    ],
+    projects: [
+      '全盘房源 / 综合置业咨询',
+      'Abu Dhabi 尊享天幕大宅 (苏霍姆利诺夫街29号)',
+      'Madina Residence 商务府邸 (奥贡巴耶夫街12号)',
+      'Айкол + 低密洋房 (Kok-Jar区巴亚利诺夫街6号)',
+      'Айкол 纯砖准现房 (阿拉尚街10号)',
+      'Келечек 成熟社区 (太空街153号)',
+      'Ордо 石材精工洋房 (特维尔斯卡亚街20号)',
+    ],
+    waTemplate: (name, proj, goal, phone) =>
+      `您好！我是 ${name}。\n在 EL ORDO GROUP 官网上提交了置业咨询：\n\n• 目标楼盘：${proj}\n• 意向需求：${goal}\n• 联系电话：${phone}\n\n请向我发送最新的在售房源销控表及免息分期明细。`,
+  },
+};
 
 export default function ConsultationForm() {
   const { locale } = useLanguage();
-  const isKg = locale === 'kg';
-  const isEn = locale === 'en';
+  const currentLang: Locale = (locale as Locale) || 'ru';
+  const ui = UI_DATA[currentLang] || UI_DATA.ru;
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+996 ');
-  const [selectedProject, setSelectedProject] = useState(PROJECTS_LIST[0]);
-  const [selectedGoal, setSelectedGoal] = useState(GOAL_TAGS[0]);
+  const [selectedProject, setSelectedProject] = useState(ui.projects[0]);
+  const [selectedGoal, setSelectedGoal] = useState(ui.goals[0]);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Умное форматирование кыргызского номера: +996 (XXX) XX-XX-XX
+  // Форматирование кыргызского номера: +996 (XXX) XX-XX-XX
   const formatKGPhone = (input: string) => {
     let raw = input.replace(/\D/g, '');
 
-    // Если начали ввод с 0 (например 0709...), убираем 0 и подставляем 996
     if (raw.startsWith('0')) {
       raw = '996' + raw.slice(1);
     }
-
-    // Если стёрли код 996, возвращаем его
     if (!raw.startsWith('996')) {
       raw = '996' + raw;
     }
-
-    // Ограничиваем длину (996 + 9 цифр = 12 цифр)
     raw = raw.slice(0, 12);
 
     const country = '+996';
@@ -84,78 +350,74 @@ export default function ConsultationForm() {
   const validatePhone = () => {
     const digitsOnly = phone.replace(/\D/g, '');
     if (digitsOnly.length < 12) {
-      setError(
-        isKg
-          ? 'Сураныч, толук телефон номериңизди жазыңыз: +996 (XXX) XX-XX-XX'
-          : isEn
-          ? 'Please enter your complete phone number: +996 (XXX) XX-XX-XX'
-          : 'Пожалуйста, введите полный номер телефона: +996 (XXX) XX-XX-XX'
-      );
+      setError(ui.phoneError);
       return false;
     }
     setError('');
     return true;
   };
 
-  // Вариант 1: Прямая заявка на сайте (для тех, кто с ноутбука/компьютера без WhatsApp Web)
-  const handleDirectCallback = (e: React.FormEvent) => {
+  // Отправка в реальный API /api/lead
+  const handleDirectCallback = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validatePhone()) return;
 
     setIsSubmitting(true);
 
-    // Имитация быстрой отправки в CRM / базу (или отправка через fetch на API)
-    setTimeout(() => {
+    try {
+      await fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim() || ui.defaultClient,
+          phone,
+          project: selectedProject,
+          goal: selectedGoal,
+          lang: currentLang,
+          source: 'ConsultationForm',
+          createdAt: new Date().toISOString(),
+        }),
+      });
+    } catch (err) {
+      console.error('Lead submission network error:', err);
+    } finally {
       setIsSubmitting(false);
       setIsSuccess(true);
-    }, 600);
+    }
   };
 
-  // Вариант 2: Переход в WhatsApp (для мобильных пользователей)
+  // Отправка через WhatsApp
   const handleWhatsAppSubmit = () => {
     if (!validatePhone()) return;
 
-    const clientName = name.trim() ? name.trim() : 'Посетитель сайта';
-    const message =
-      `Здравствуйте! Меня зовут ${clientName}.\n` +
-      `Заявка на консультацию с сайта EL ORDO GROUP:\n\n` +
-      `• Объект: ${selectedProject}\n` +
-      `• Цель обращения: ${selectedGoal}\n` +
-      `• Телефон для связи: ${phone}\n\n` +
-      `Отправьте, пожалуйста, актуальную шахматку, планировки и график платежей.`;
-
+    const clientName = name.trim() ? name.trim() : ui.defaultClient;
+    const message = ui.waTemplate(clientName, selectedProject, selectedGoal, phone);
     const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, '_blank');
   };
 
   return (
     <section id="contacts" className="relative py-16 sm:py-24 px-4 sm:px-6 overflow-hidden bg-[#064734] text-white">
-      {/* Мягкий геометрический паттерн на фоне */}
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#d4b26f_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
 
       <div className="relative z-10 max-w-4xl mx-auto bg-white/5 backdrop-blur-xl rounded-3xl border border-white/15 p-6 sm:p-12 shadow-2xl">
         {isSuccess ? (
-          /* Экран успешной отправки заявки */
-          <div className="text-center py-10 max-w-lg mx-auto">
+          <div className="text-center py-10 max-w-lg mx-auto animate-fadeIn">
             <div className="w-16 h-16 rounded-full bg-[#d4b26f]/20 text-[#d4b26f] flex items-center justify-center mx-auto mb-6 border border-[#d4b26f]/30 shadow-lg animate-bounce">
               <IconCheck className="w-8 h-8" />
             </div>
 
             <h3 className="text-2xl sm:text-3xl font-black uppercase text-white mb-3">
-              {isKg ? 'Табыштамаңыз кабыл алынды!' : isEn ? 'Request Received!' : 'Заявка успешно принята!'}
+              {ui.successTitle}
             </h3>
 
             <p className="text-sm text-white/90 leading-relaxed mb-6">
-              {isKg
-                ? `Ыракмат, ${name.trim() || 'урматтуу кардар'}! Сатуу бөлүмүнүн менеджери ${phone} номери боюнча 5–10 мүнөттүн ичинде байланышат.`
-                : isEn
-                ? `Thank you, ${name.trim() || 'dear guest'}! A sales specialist will contact you at ${phone} within 5–10 minutes.`
-                : `Спасибо, ${name.trim() || 'уважаемый клиент'}! Менеджер отдела продаж свяжется с вами по номеру ${phone} в течение 5–10 минут.`}
+              {ui.successDesc(name.trim() || ui.defaultClient, phone)}
             </p>
 
             <div className="p-4 rounded-2xl bg-black/30 border border-white/10 text-xs text-gray-300 mb-8 text-left space-y-1">
-              <p>• {isKg ? 'Кызыктырган объект:' : isEn ? 'Selected project:' : 'Выбранный объект:'} <strong className="text-white">{selectedProject}</strong></p>
-              <p>• {isKg ? 'Суроо-талап:' : isEn ? 'Inquiry topic:' : 'Тема запроса:'} <strong className="text-[#d4b26f]">{selectedGoal}</strong></p>
+              <p>• {ui.successProjectLabel} <strong className="text-white">{selectedProject}</strong></p>
+              <p>• {ui.successGoalLabel} <strong className="text-[#d4b26f]">{selectedGoal}</strong></p>
             </div>
 
             <button
@@ -167,36 +429,32 @@ export default function ConsultationForm() {
               }}
               className="text-xs uppercase font-bold text-[#d4b26f] hover:underline cursor-pointer"
             >
-              {isKg ? 'Башка табыштама жөнөтүү' : isEn ? 'Send another request' : 'Отправить ещё одну заявку'}
+              {ui.successAgain}
             </button>
           </div>
         ) : (
-          /* Стандартная форма */
           <>
             <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
               <span className="text-xs uppercase font-black tracking-widest text-[#d4b26f] block mb-2">
-                {isKg ? 'Батирлерди жекече тандоо' : isEn ? 'Personal Property Selection' : 'Персональный подбор квартиры'}
+                {ui.badge}
               </span>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight leading-tight mb-3">
-                {isKg ? 'Шахматка жана 0% эсебин алуу' : isEn ? 'Get Floor Plans & 0% Installment' : 'Получить шахматку и расчет рассрочки'}
+                {ui.title}
               </h2>
               <p className="text-xs sm:text-sm text-white/80 font-light leading-relaxed">
-                {isKg
-                  ? 'Табыштама калтырыңыз — сатуу бөлүмү 5 мүнөттө байланышып, бош кабаттарды жана жеке төлөм графигин сунуштайт.'
-                  : isEn
-                  ? 'Submit an inquiry — our sales team will connect with you within 5 minutes with floor availability and payment terms.'
-                  : 'Оставьте номер телефона — менеджер отдела продаж свяжется с вами за 5 минут, пришлет доступные планировки и рассчитает график выплат 0%.'}
+                {ui.desc}
               </p>
             </div>
 
             <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto">
-              {/* Быстрый выбор цели обращения (Чипы) */}
+              
+              {/* Чипы выбора темы */}
               <div>
                 <label className="block text-[11px] font-black uppercase tracking-wider text-gray-300 mb-2">
-                  {isKg ? 'Сизди эмне көбүрөөк кызыктырат?' : isEn ? 'What are you most interested in?' : 'Что вас больше всего интересует?'}
+                  {ui.goalLabel}
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {GOAL_TAGS.map((tag) => {
+                  {ui.goals.map((tag) => {
                     const isSelected = selectedGoal === tag;
                     return (
                       <button
@@ -216,16 +474,16 @@ export default function ConsultationForm() {
                 </div>
               </div>
 
-              {/* Имя и Телефон */}
+              {/* Поля Имя и Телефон */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[11px] font-bold text-gray-300 uppercase tracking-wider mb-1.5">
-                    {isKg ? 'Атыңыз:' : isEn ? 'Your Name:' : 'Ваше имя:'}
+                    {ui.nameLabel}
                   </label>
                   <input
                     type="text"
                     autoComplete="name"
-                    placeholder={isKg ? 'Мисалы: Азамат' : isEn ? 'e.g. Alex' : 'Например: Азамат'}
+                    placeholder={ui.namePh}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-white/10 border border-white/20 focus:border-[#d4b26f] focus:outline-none rounded-xl px-4 py-3.5 text-base sm:text-sm text-white placeholder-white/40 transition-colors shadow-inner"
@@ -234,7 +492,7 @@ export default function ConsultationForm() {
 
                 <div>
                   <label className="block text-[11px] font-bold text-gray-300 uppercase tracking-wider mb-1.5">
-                    {isKg ? 'Телефон номериңиз:' : isEn ? 'Phone Number:' : 'Номер телефона:'} <span className="text-[#d4b26f]">*</span>
+                    {ui.phoneLabel} <span className="text-[#d4b26f]">*</span>
                   </label>
                   <input
                     type="tel"
@@ -249,10 +507,10 @@ export default function ConsultationForm() {
                 </div>
               </div>
 
-              {/* Выбор жилого комплекса */}
+              {/* Выбор объекта */}
               <div>
                 <label className="block text-[11px] font-bold text-gray-300 uppercase tracking-wider mb-1.5">
-                  {isKg ? 'Турак жай комплекси:' : isEn ? 'Residential Complex:' : 'Жилой комплекс:'}
+                  {ui.projectLabel}
                 </label>
                 <div className="relative">
                   <select
@@ -260,7 +518,7 @@ export default function ConsultationForm() {
                     onChange={(e) => setSelectedProject(e.target.value)}
                     className="w-full bg-[#0b3b2c] border border-white/20 focus:border-[#d4b26f] focus:outline-none rounded-xl px-4 py-3.5 text-base sm:text-sm text-white appearance-none cursor-pointer pr-10 shadow-inner"
                   >
-                    {PROJECTS_LIST.map((proj, idx) => (
+                    {ui.projects.map((proj, idx) => (
                       <option key={idx} value={proj} className="bg-[#064734] text-white py-2">
                         {proj}
                       </option>
@@ -274,58 +532,54 @@ export default function ConsultationForm() {
                 </div>
               </div>
 
-              {/* Сообщение об ошибке */}
+              {/* Ошибка */}
               {error && (
                 <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center">
-                  <p className="text-xs text-rose-200 font-bold">
-                    {error}
-                  </p>
+                  <p className="text-xs text-rose-200 font-bold">{error}</p>
                 </div>
               )}
 
-              {/* Двойные кнопки отправки (Звонок + WhatsApp) */}
+              {/* Кнопки звонка и WhatsApp */}
               <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Кнопка 1: Прямой звонок без WhatsApp */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
                   className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconPhone className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Жөнөтүлүүдө...' : 'Заказать звонок (за 5 мин)'}</span>
+                  <span>{isSubmitting ? ui.btnSubmitting : ui.btnCall}</span>
                 </button>
 
-                {/* Кнопка 2: Переход в WhatsApp */}
                 <button
                   type="button"
                   onClick={handleWhatsAppSubmit}
                   className="w-full bg-white/10 hover:bg-white/20 active:scale-[0.99] text-white font-bold py-4 rounded-xl uppercase tracking-wider text-xs border border-white/25 transition-all backdrop-blur-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-                  <span>Написать в WhatsApp</span>
+                  <span>{ui.btnWhatsApp}</span>
                 </button>
               </div>
 
-              {/* Гарантии и защита данных */}
+              {/* Гарантии */}
               <div className="pt-3 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[11px] text-white/70">
                 <span className="flex items-center gap-1.5">
                   <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
-                  <span>Прямой расчет без скрытых переплат</span>
+                  <span>{ui.guarantee1}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
-                  <span>Консультация бесплатна</span>
+                  <span>{ui.guarantee2}</span>
                 </span>
                 <span className="flex items-center gap-1.5">
                   <IconCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
-                  <span>Ответ за 5 минут</span>
+                  <span>{ui.guarantee3}</span>
                 </span>
               </div>
 
               <div className="text-center pt-1">
                 <span className="text-[10px] text-white/50 inline-flex items-center gap-1.5 justify-center">
                   <IconShieldCheck className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
-                  <span>Ваши данные надежно защищены и используются исключительно для связи менеджера с вами</span>
+                  <span>{ui.privacy}</span>
                 </span>
               </div>
             </form>
