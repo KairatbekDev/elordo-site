@@ -14,6 +14,9 @@ const SITE_URL =
 
 type Lang = 'ru' | 'kg';
 
+// Хранилище выбранного языка по Chat ID
+const userLanguages = new Map<number | string, Lang>();
+
 // =============================================================================
 // МАТЕРИАЛЫ И БУКЛЕТЫ (RU / KG)
 // =============================================================================
@@ -110,7 +113,6 @@ function getKeyboard(lang: Lang) {
   };
 }
 
-// Инлайн-кнопки выбора языка
 const LANG_CHOICE_INLINE = {
   inline_keyboard: [
     [
@@ -121,7 +123,7 @@ const LANG_CHOICE_INLINE = {
 };
 
 // =============================================================================
-// ХЕЛПЕРЫ ДЛЯ РАБОТЫ С TELEGRAM API
+// ХЕЛПЕРЫ TELEGRAM API
 // =============================================================================
 async function callTelegram(method: string, payload: Record<string, any>) {
   if (!BOT_TOKEN) return null;
@@ -182,7 +184,7 @@ export async function POST(req: Request) {
     const update = await req.json();
 
     // -------------------------------------------------------------------------
-    // А. ОБРАБОТКА ИНЛАЙН-КЛИКОВ (ВЫБОР ЯЗЫКА)
+    // А. КЛИК ПО ИНЛАЙН-КНОПКАМ ВЫБОРА ЯЗЫКА
     // -------------------------------------------------------------------------
     if (update.callback_query) {
       const cq = update.callback_query;
@@ -191,6 +193,7 @@ export async function POST(req: Request) {
       const fullName = [cq.from?.first_name, cq.from?.last_name].filter(Boolean).join(' ') || 'Конок';
 
       if (data === 'set_lang_kg') {
+        userLanguages.set(chatId, 'kg');
         await answerCallbackQuery(cq.id, 'Кыргыз тили тандалды');
         await sendTelegramMessage(
           chatId,
@@ -203,6 +206,7 @@ export async function POST(req: Request) {
       }
 
       if (data === 'set_lang_ru') {
+        userLanguages.set(chatId, 'ru');
         await answerCallbackQuery(cq.id, 'Выбран русский язык');
         await sendTelegramMessage(
           chatId,
@@ -229,17 +233,17 @@ export async function POST(req: Request) {
     const fullName = [userFrom?.first_name, userFrom?.last_name].filter(Boolean).join(' ') || 'Клиент';
 
     // -------------------------------------------------------------------------
-    // Б. КЛИЕНТ ОТПРАВИЛ НОМЕР ТЕЛЕФОНА В 1 КЛИК
+    // Б. КЛИЕНТ ОТПРАВИЛ НОМЕР ТЕЛЕФОНА
     // -------------------------------------------------------------------------
     if (message.contact) {
       let phone = message.contact.phone_number;
       if (!phone.startsWith('+')) phone = `+${phone}`;
       const cleanPhone = phone.replace(/[^0-9]/g, '');
 
-      // Определяем язык по языковому коду Telegram клиента (fallback)
-      const userLang = userFrom?.language_code === 'ky' ? 'kg' : 'ru';
+      // Получаем сохраненный язык пользователя
+      const currentLang: Lang = userLanguages.get(chatId) || (userFrom?.language_code === 'ky' ? 'kg' : 'ru');
 
-      if (userLang === 'kg') {
+      if (currentLang === 'kg') {
         await sendTelegramMessage(
           chatId,
           `✅ <b>Ыраазычылык билдиребиз, ${fullName}!</b>\n\n` +
@@ -257,14 +261,14 @@ export async function POST(req: Request) {
         );
       }
 
-      // Отправляем карточку лида менеджерам в рабочий чат с пометкой языка
+      // Отправка карточки лида в чат менеджеров
       if (SALES_CHAT_ID) {
         const leadText =
           `🔥 <b>ГОРЯЧИЙ ЛИД (ПОДЕЛИЛСЯ НОМЕРОМ)</b>\n` +
           `━━━━━━━━━━━━━━━━━━\n` +
           `👤 <b>Имя:</b> ${fullName} (${username})\n` +
           `📱 <b>Телефон:</b> <code>${phone}</code>\n` +
-          `🌐 <b>Тил / Язык:</b> ${userLang === 'kg' ? 'Кыргызча 🇰🇬' : 'Русский 🇷🇺'}\n` +
+          `🌐 <b>Тил / Язык:</b> ${currentLang === 'kg' ? 'Кыргызча 🇰🇬' : 'Русский 🇷🇺'}\n` +
           `🆔 <b>ID пользователя:</b> <code>${userFrom?.id}</code>\n` +
           `⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Bishkek' })}\n` +
           `━━━━━━━━━━━━━━━━━━\n` +
@@ -292,8 +296,17 @@ export async function POST(req: Request) {
 
     const text = message.text.trim();
 
+    // Запоминаем язык по нажатию кнопок меню
+    if (text.includes('каталогу') || text.includes('бөлүп төлөө') || text.includes('алмашуу') || text.includes('кеңсеси')) {
+      userLanguages.set(chatId, 'kg');
+    } else if (text.includes('Каталог') || text.includes('Рассрочка') || text.includes('бартер') || text.includes('Офис')) {
+      userLanguages.set(chatId, 'ru');
+    }
+
+    const currentLang: Lang = userLanguages.get(chatId) || (userFrom?.language_code === 'ky' ? 'kg' : 'ru');
+
     // -------------------------------------------------------------------------
-    // В. ВЫБОР ЯЗЫКА ЧЕРЕЗ КНОПКУ ИЛИ КОМАНДУ /lang
+    // В. ВЫБОР ЯЗЫКА
     // -------------------------------------------------------------------------
     if (text === '/lang' || text.includes('Тилди алмаштыруу') || text.includes('Сменить язык')) {
       await sendTelegramMessage(
@@ -305,7 +318,7 @@ export async function POST(req: Request) {
     }
 
     // -------------------------------------------------------------------------
-    // Г. ОБРАБОТКА ДИПЛИНКОВ С САЙТА: /start <payload>
+    // Г. ОБРАБОТКА ДИПЛИНКОВ: /start <payload>
     // -------------------------------------------------------------------------
     if (text.startsWith('/start')) {
       const parts = text.split(' ');
@@ -313,8 +326,7 @@ export async function POST(req: Request) {
       const material = payload ? MATERIALS[payload] : null;
 
       if (material) {
-        // Проверяем, на каком языке слаг или система
-        const isKg = userFrom?.language_code === 'ky';
+        const isKg = currentLang === 'kg';
         const docCaption = isKg ? material.captionKg : material.captionRu;
 
         const docKeyboard = {
@@ -336,19 +348,16 @@ export async function POST(req: Request) {
           ],
         };
 
-        // 1. Отправляем PDF
         await sendTelegramDocument(chatId, material.fileUrl, docCaption, docKeyboard);
 
-        // 2. Предлагаем оставить контакт
         await sendTelegramMessage(
           chatId,
           isKg
             ? `💡 <b>0% бөлүп төлөө же бош кабаттардын тизмеси керекпи?</b>\nТөмөнкү <b>«📱 0% бөлүп төлөө эсеби үчүн номер жөнөтүү»</b> баскычын басыңыз 👇`
             : `💡 <b>Нужен персональный расчет рассрочки 0% или список свободных этажей?</b>\nНажмите кнопку <b>«📱 Отправить номер для расчета рассрочки 0%»</b> внизу экрана 👇`,
-          getKeyboard(isKg ? 'kg' : 'ru')
+          getKeyboard(currentLang)
         );
 
-        // 3. Уведомление в чат продаж
         if (SALES_CHAT_ID) {
           const leadNotification =
             `📥 <b>Скачивание презентации из Telegram-бота!</b>\n\n` +
@@ -368,8 +377,8 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: true });
       }
 
-      // Дефолтный старт: даем приветствие и выбор языка
-      const isKg = userFrom?.language_code === 'ky';
+      // Приветствие при старте
+      const isKg = currentLang === 'kg';
       const welcomeText = isKg
         ? `Саламатсызбы, <b>${fullName}</b>!\n\n` +
           `<b>EL ORDO GROUP</b> курулуш компаниясынын расмий ботуна кош келиңиз (Бишкек ш.).\n\n` +
@@ -379,183 +388,179 @@ export async function POST(req: Request) {
           `Выберите интересующий вас раздел или смените язык:`;
 
       await sendTelegramMessage(chatId, welcomeText, LANG_CHOICE_INLINE);
-      await sendTelegramMessage(chatId, isKg ? '👇 Төмөнкү менюну колдонуңуз:' : '👇 Используйте меню ниже:', getKeyboard(isKg ? 'kg' : 'ru'));
+      await sendTelegramMessage(chatId, isKg ? '👇 Төмөнкү менюну колдонуңуз:' : '👇 Используйте меню ниже:', getKeyboard(currentLang));
       return NextResponse.json({ ok: true });
     }
 
     // -------------------------------------------------------------------------
-    // Д. КАТАЛОГ ОБЪЕКТОВ (RU И KG)
+    // Д. КАТАЛОГ ОБЪЕКТОВ
     // -------------------------------------------------------------------------
-    if (text === '/catalog' || text === '🏢 Каталог объектов') {
-      await sendTelegramMessage(
-        chatId,
-        `🏢 <b>ОБЪЕКТЫ EL ORDO GROUP В БИШКЕКЕ</b>\n\n` +
-        `• <b>ЖК Abu Dhabi</b> — от 1 650 $/м²\n` +
-        `  ул. Сухомлинова, 29 (Премиум-класс, 25 этажей)\n\n` +
-        `• <b>ЖК Madina Residence</b> — от 1 400 $/м²\n` +
-        `  ул. Огонбаева, 12 (Бизнес-класс в центре)\n\n` +
-        `• <b>ЖД Айкол +</b> — от 1 100 $/м²\n` +
-        `  с. Кок-Жар, ул. Баялинова, 6 (Предгорье)\n\n` +
-        `• <b>ЖД Айкол</b> — от 950 $/м²\n` +
-        `  ул. Арашан, 10 (Сдача 2026 г.)\n\n` +
-        `<i>Все планировки доступны на сайте:</i>`,
-        {
-          inline_keyboard: [
-            [{ text: '🌐 Открыть интерактивный каталог', url: SITE_URL }],
-            [{ text: '💬 Уточнить цены в WhatsApp', url: 'https://wa.me/996709115115' }],
-          ],
-        }
-      );
-      return NextResponse.json({ ok: true });
-    }
-
-    if (text === '🏢 Объекттер каталогу') {
-      await sendTelegramMessage(
-        chatId,
-        `🏢 <b>EL ORDO GROUP КОМПАНИЯСЫНЫН БИШКЕКТЕГИ ОБЪЕКТТЕРИ</b>\n\n` +
-        `• <b>ЖК Abu Dhabi</b> — 1 650 $/м² баштап\n` +
-        `  Сухомлинов көч., 29 (Премиум-класс, 25 кабат)\n\n` +
-        `• <b>ЖК Madina Residence</b> — 1 400 $/м² баштап\n` +
-        `  Огонбаев көч., 12 (Борбордогу бизнес-класс)\n\n` +
-        `• <b>ЖД Айкол +</b> — 1 100 $/м² баштап\n` +
-        `  Көк-Жар а., Баялинов көч., 6 (Таза тоо абасы)\n\n` +
-        `• <b>ЖД Айкол</b> — 950 $/м² баштап\n` +
-        `  Арашан көч., 10 (2026-ж. бүткөрүлөт)\n\n` +
-        `<i>Бардык пландар сайтта жеткиликтүү:</i>`,
-        {
-          inline_keyboard: [
-            [{ text: '🌐 Сайттан толук көрүү', url: SITE_URL }],
-            [{ text: '💬 WhatsApp аркылуу баасын билүү', url: 'https://wa.me/996709115115' }],
-          ],
-        }
-      );
-      return NextResponse.json({ ok: true });
-    }
-
-    // -------------------------------------------------------------------------
-    // Е. РАССРОЧКА 0% (RU И KG)
-    // -------------------------------------------------------------------------
-    if (text === '/rassrochka' || text === '📊 Рассрочка 0%') {
-      await sendTelegramMessage(
-        chatId,
-        `📊 <b>БЕСПРОЦЕНТНАЯ РАССРОЧКА 0% БЕЗ БАНКА</b>\n\n` +
-        `• Срок: <b>до 40 месяцев</b>\n` +
-        `• Первоначальный взнос: <b>от 20% до 30%</b>\n` +
-        `• Без справок о доходах и поручителей\n` +
-        `• Переплата: <b>0%</b>\n\n` +
-        `Нажмите кнопку <b>«📱 Отправить номер»</b> ниже для расчета помесячного графика:`,
-        getKeyboard('ru')
-      );
-      return NextResponse.json({ ok: true });
-    }
-
-    if (text === '📊 0% бөлүп төлөө') {
-      await sendTelegramMessage(
-        chatId,
-        `📊 <b>БАНКСЫЗ 0% ПАЙЫЗСЫЗ БӨЛҮП ТӨЛӨӨ</b>\n\n` +
-        `• Мөөнөтү: <b>40 айга чейин</b>\n` +
-        `• Баштапкы төлөм: <b>20%дан 30%га чейин</b>\n` +
-        `• Киреше маалымкаты жана кепилдиксиз — паспорт менен гана\n` +
-        `• Ашыкча төлөм: <b>0%</b>\n\n` +
-        `Ай сайын төлөө эсебин алуу үчүн төмөнкү <b>«📱 Номерди жөнөтүү»</b> баскычын басыңыз:`,
-        getKeyboard('kg')
-      );
-      return NextResponse.json({ ok: true });
-    }
-
-    // -------------------------------------------------------------------------
-    // Ж. TRADE-IN / БАРТЕР (RU И KG)
-    // -------------------------------------------------------------------------
-    if (text === '/tradein' || text === '🚗 Trade-in (бартер)') {
-      await sendTelegramMessage(
-        chatId,
-        `🚗 <b>ПРОГРАММА TRADE-IN (БАРТЕР)</b>\n\n` +
-        `Обменяйте авто или вторичное жилье на новую квартиру:\n\n` +
-        `1. Экспресс-оценка за <b>24 часа</b> по рыночной стоимости\n` +
-        `2. Сумма засчитывается в качестве первого взноса\n` +
-        `3. Остаток — в рассрочку до 40 месяцев 0%`,
-        {
-          inline_keyboard: [
-            [
-              {
-                text: '🚗 Оценить авто в WhatsApp',
-                url: `https://wa.me/996709115115?text=${encodeURIComponent('Здравствуйте! Хочу оценить авто по программе Trade-in.')}`,
-              },
+    if (text === '/catalog' || text === '🏢 Каталог объектов' || text === '🏢 Объекттер каталогу') {
+      if (currentLang === 'kg') {
+        await sendTelegramMessage(
+          chatId,
+          `🏢 <b>EL ORDO GROUP КОМПАНИЯСЫНЫН БИШКЕКТЕГИ ОБЪЕКТТЕРИ</b>\n\n` +
+          `• <b>ЖК Abu Dhabi</b> — 1 650 $/м² баштап\n` +
+          `  Сухомлинов көч., 29 (Премиум-класс, 25 кабат)\n\n` +
+          `• <b>ЖК Madina Residence</b> — 1 400 $/м² баштап\n` +
+          `  Огонбаев көч., 12 (Борбордогу бизнес-класс)\n\n` +
+          `• <b>ЖД Айкол +</b> — 1 100 $/м² баштап\n` +
+          `  Көк-Жар а., Баялинов көч., 6 (Таза тоо абасы)\n\n` +
+          `• <b>ЖД Айкол</b> — 950 $/м² баштап\n` +
+          `  Арашан көч., 10 (2026-ж. бүткөрүлөт)\n\n` +
+          `<i>Бардык пландар сайтта жеткиликтүү:</i>`,
+          {
+            inline_keyboard: [
+              [{ text: '🌐 Сайттан толук көрүү', url: SITE_URL }],
+              [{ text: '💬 WhatsApp аркылуу баасын билүү', url: 'https://wa.me/996709115115' }],
             ],
-          ],
-        }
-      );
-      return NextResponse.json({ ok: true });
-    }
-
-    if (text === '🚗 Trade-in (алмашуу)') {
-      await sendTelegramMessage(
-        chatId,
-        `🚗 <b>TRADE-IN ПРОГРАММАСЫ (БАРТЕР)</b>\n\n` +
-        `Автоунааңызды же эски батириңизди жаңы батирге алмаштырыңыз:\n\n` +
-        `1. <b>24 сааттын ичинде</b> базар баасында экспресс-баалоо\n` +
-        `2. Макулдашылган сумма баштапкы төлөм катары эсептелет\n` +
-        `3. Калган бөлүгү 40 айга чейин 0% бөлүп төлөөгө берилет`,
-        {
-          inline_keyboard: [
-            [
-              {
-                text: '🚗 WhatsApp аркылуу баалоо',
-                url: `https://wa.me/996709115115?text=${encodeURIComponent('Саламатсызбы! Trade-in программасы боюнча автоунаамды баалатууну каалайм.')}`,
-              },
+          }
+        );
+      } else {
+        await sendTelegramMessage(
+          chatId,
+          `🏢 <b>ОБЪЕКТЫ EL ORDO GROUP В БИШКЕКЕ</b>\n\n` +
+          `• <b>ЖК Abu Dhabi</b> — от 1 650 $/м²\n` +
+          `  ул. Сухомлинова, 29 (Премиум-класс, 25 этажей)\n\n` +
+          `• <b>ЖК Madina Residence</b> — от 1 400 $/м²\n` +
+          `  ул. Огонбаева, 12 (Бизнес-класс в центре)\n\n` +
+          `• <b>ЖД Айкол +</b> — от 1 100 $/м²\n` +
+          `  с. Кок-Жар, ул. Баялинова, 6 (Предгорье)\n\n` +
+          `• <b>ЖД Айкол</b> — от 950 $/м²\n` +
+          `  ул. Арашан, 10 (Сдача 2026 г.)\n\n` +
+          `<i>Все планировки доступны на сайте:</i>`,
+          {
+            inline_keyboard: [
+              [{ text: '🌐 Открыть интерактивный каталог', url: SITE_URL }],
+              [{ text: '💬 Уточнить цены в WhatsApp', url: 'https://wa.me/996709115115' }],
             ],
-          ],
-        }
-      );
+          }
+        );
+      }
       return NextResponse.json({ ok: true });
     }
 
     // -------------------------------------------------------------------------
-    // З. ОФИС И КОНТАКТЫ (RU И KG)
+    // Е. РАССРОЧКА 0%
     // -------------------------------------------------------------------------
-    if (text === '/office' || text === '📍 Офис продаж' || text === '/manager') {
-      await sendTelegramMessage(
-        chatId,
-        `📍 <b>ОФИС ПРОДАЖ EL ORDO GROUP</b>\n\n` +
-        `г. Бишкек, ул. Исы Ахунбаева, 137/1 (пер. ул. Тыныстанова)\n` +
-        `📞 +996 709 115 115\n` +
-        `📞 +996 990 115 115\n\n` +
-        `⏰ Пн–Сб с 09:00 до 19:00`,
-        {
-          inline_keyboard: [
-            [
-              {
-                text: '🗺 Открыть в 2GIS',
-                url: 'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
-              },
-            ],
-            [{ text: '💬 WhatsApp', url: 'https://wa.me/996709115115' }],
-          ],
-        }
-      );
+    if (text === '/rassrochka' || text === '📊 Рассрочка 0%' || text === '📊 0% бөлүп төлөө') {
+      if (currentLang === 'kg') {
+        await sendTelegramMessage(
+          chatId,
+          `📊 <b>БАНКСЫЗ 0% ПАЙЫЗСЫЗ БӨЛҮП ТӨЛӨӨ</b>\n\n` +
+          `• Мөөнөтү: <b>40 айга чейин</b>\n` +
+          `• Баштапкы төлөм: <b>20%дан 30%га чейин</b>\n` +
+          `• Киреше маалымкаты жана кепилдиксиз — паспорт менен гана\n` +
+          `• Ашыкча төлөм: <b>0%</b>\n\n` +
+          `Ай сайын төлөө эсебин алуу үчүн төмөнкү <b>«📱 Номерди жөнөтүү»</b> баскычын басыңыз:`,
+          getKeyboard('kg')
+        );
+      } else {
+        await sendTelegramMessage(
+          chatId,
+          `📊 <b>БЕСПРОЦЕНТНАЯ РАССРОЧКА 0% БЕЗ БАНКА</b>\n\n` +
+          `• Срок: <b>до 40 месяцев</b>\n` +
+          `• Первоначальный взнос: <b>от 20% до 30%</b>\n` +
+          `• Без справок о доходах и поручителей\n` +
+          `• Переплата: <b>0%</b>\n\n` +
+          `Нажмите кнопку <b>«📱 Отправить номер»</b> ниже для расчета помесячного графика:`,
+          getKeyboard('ru')
+        );
+      }
       return NextResponse.json({ ok: true });
     }
 
-    if (text === '📍 Сатуу кеңсеси') {
-      await sendTelegramMessage(
-        chatId,
-        `📍 <b>EL ORDO GROUP САТУУ КЕНСЕСИ</b>\n\n` +
-        `Бишкек ш., Иса Ахунбаев көч., 137/1 (Тыныстанов көч. кесилиши)\n` +
-        `📞 +996 709 115 115\n` +
-        `📞 +996 990 115 115\n\n` +
-        `⏰ Дш–Иш 09:00дөн 19:00гө чейин`,
-        {
-          inline_keyboard: [
-            [
-              {
-                text: '🗺 2GIS аркылуу ачуу',
-                url: 'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
-              },
+    // -------------------------------------------------------------------------
+    // Ж. TRADE-IN / БАРТЕР
+    // -------------------------------------------------------------------------
+    if (text === '/tradein' || text === '🚗 Trade-in (бартер)' || text === '🚗 Trade-in (алмашуу)') {
+      if (currentLang === 'kg') {
+        await sendTelegramMessage(
+          chatId,
+          `🚗 <b>TRADE-IN ПРОГРАММАСЫ (БАРТЕР)</b>\n\n` +
+          `Автоунааңызды же эски батириңизди жаңы батирге алмаштырыңыз:\n\n` +
+          `1. <b>24 сааттын ичинде</b> базар баасында экспресс-баалоо\n` +
+          `2. Макулдашылган сумма баштапкы төлөм катары эсептелет\n` +
+          `3. Калган бөлүгү 40 айга чейин 0% бөлүп төлөөгө берилет`,
+          {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚗 WhatsApp аркылуу баалоо',
+                  url: `https://wa.me/996709115115?text=${encodeURIComponent('Саламатсызбы! Trade-in программасы боюнча автоунаамды баалатууну каалайм.')}`,
+                },
+              ],
             ],
-            [{ text: '💬 WhatsApp', url: 'https://wa.me/996709115115' }],
-          ],
-        }
-      );
+          }
+        );
+      } else {
+        await sendTelegramMessage(
+          chatId,
+          `🚗 <b>ПРОГРАММА TRADE-IN (БАРТЕР)</b>\n\n` +
+          `Обменяйте авто или вторичное жилье на новую квартиру:\n\n` +
+          `1. Экспресс-оценка за <b>24 часа</b> по рыночной стоимости\n` +
+          `2. Сумма засчитывается в качестве первого взноса\n` +
+          `3. Остаток — в рассрочку до 40 месяцев 0%`,
+          {
+            inline_keyboard: [
+              [
+                {
+                  text: '🚗 Оценить авто в WhatsApp',
+                  url: `https://wa.me/996709115115?text=${encodeURIComponent('Здравствуйте! Хочу оценить авто по программе Trade-in.')}`,
+                },
+              ],
+            ],
+          }
+        );
+      }
+      return NextResponse.json({ ok: true });
+    }
+
+    // -------------------------------------------------------------------------
+    // З. ОФИС И КОНТАКТЫ
+    // -------------------------------------------------------------------------
+    if (text === '/office' || text === '📍 Офис продаж' || text === '📍 Сатуу кеңсеси' || text === '/manager') {
+      if (currentLang === 'kg') {
+        await sendTelegramMessage(
+          chatId,
+          `📍 <b>EL ORDO GROUP САТУУ КЕНСЕСИ</b>\n\n` +
+          `Бишкек ш., Иса Ахунбаев көч., 137/1 (Тыныстанов көч. кесилиши)\n` +
+          `📞 +996 709 115 115\n` +
+          `📞 +996 990 115 115\n\n` +
+          `⏰ Дш–Иш 09:00дөн 19:00гө чейин`,
+          {
+            inline_keyboard: [
+              [
+                {
+                  text: '🗺 2GIS аркылуу ачуу',
+                  url: 'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
+                },
+              ],
+              [{ text: '💬 WhatsApp', url: 'https://wa.me/996709115115' }],
+            ],
+          }
+        );
+      } else {
+        await sendTelegramMessage(
+          chatId,
+          `📍 <b>ОФИС ПРОДАЖ EL ORDO GROUP</b>\n\n` +
+          `г. Бишкек, ул. Исы Ахунбаева, 137/1 (пер. ул. Тыныстанова)\n` +
+          `📞 +996 709 115 115\n` +
+          `📞 +996 990 115 115\n\n` +
+          `⏰ Пн–Сб с 09:00 до 19:00`,
+          {
+            inline_keyboard: [
+              [
+                {
+                  text: '🗺 Открыть в 2GIS',
+                  url: 'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
+                },
+              ],
+              [{ text: '💬 WhatsApp', url: 'https://wa.me/996709115115' }],
+            ],
+          }
+        );
+      }
       return NextResponse.json({ ok: true });
     }
 
