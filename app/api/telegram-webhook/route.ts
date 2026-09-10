@@ -16,7 +16,6 @@ const SITE_URL =
 interface MaterialInfo {
   title: string;
   caption: string;
-  // URL к файлу на сайте (в public/docs/...) или прямой file_id в Telegram
   fileUrl: string;
   fileName: string;
 }
@@ -31,7 +30,7 @@ const MATERIALS: Record<string, MaterialInfo> = {
       '• Рассрочка: 0% до 40 месяцев без участия банка\n' +
       '• Trade-in: зачет авто и недвижимости\n\n' +
       'В прикрепленном файле: полная шахматка площадей, инженерные спецификации и рендеры холлов.',
-    fileUrl: `${SITE_URL}/projects/Abu-Dhabi.png`, // Замените на прямой путь к PDF в public/docs/
+    fileUrl: `${SITE_URL}/projects/Abu-Dhabi.png`,
     fileName: 'Abu-Dhabi-Presentation.pdf',
   },
   madina_pdf: {
@@ -82,7 +81,17 @@ const MATERIALS: Record<string, MaterialInfo> = {
   },
 };
 
-// Отправка текстового сообщения через Telegram Bot API
+// Нижняя клавиатура с кнопкой запроса номера в 1 клик
+const CONTACT_KEYBOARD = {
+  keyboard: [
+    [{ text: '📱 Отправить номер для расчета рассрочки 0%', request_contact: true }],
+    [{ text: '🏢 Каталог объектов' }, { text: '📊 Рассрочка 0%' }],
+    [{ text: '🚗 Trade-in (бартер)' }, { text: '📍 Офис продаж' }],
+  ],
+  resize_keyboard: true,
+  is_persistent: true,
+};
+
 async function sendTelegramMessage(chatId: number | string, text: string, replyMarkup?: object) {
   if (!BOT_TOKEN) return;
   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -98,7 +107,6 @@ async function sendTelegramMessage(chatId: number | string, text: string, replyM
   }).catch((e) => console.error('Telegram sendMessage error:', e));
 }
 
-// Отправка документа (PDF) пользователю
 async function sendTelegramDocument(
   chatId: number | string,
   documentUrl: string,
@@ -126,29 +134,79 @@ export async function POST(req: Request) {
     }
 
     const update = await req.json();
+    const message = update?.message;
 
-    // Обрабатываем только текстовые входящие сообщения
-    if (!update?.message?.text) {
+    if (!message) {
       return NextResponse.json({ ok: true });
     }
 
-    const message = update.message;
     const chatId = message.chat.id;
-    const text = message.text.trim();
     const userFrom = message.from;
     const username = userFrom?.username ? `@${userFrom.username}` : 'Без username';
     const fullName = [userFrom?.first_name, userFrom?.last_name].filter(Boolean).join(' ') || 'Клиент';
 
-    // 1. ОБРАБОТКА ДИПЛИНКОВ: /start <payload>
+    // =========================================================================
+    // 1. КЛИЕНТ НАЖАЛ «ОТПРАВИТЬ НОМЕР» (ПОДЕЛИЛСЯ КОНТАКТОМ В 1 КЛИК)
+    // =========================================================================
+    if (message.contact) {
+      let phone = message.contact.phone_number;
+      if (!phone.startsWith('+')) phone = `+${phone}`;
+      const cleanPhone = phone.replace(/[^0-9]/g, '');
+
+      // Подтверждение клиенту
+      await sendTelegramMessage(
+        chatId,
+        `✅ <b>Спасибо, ${fullName}!</b>\n\n` +
+        `Ваш номер <b>${phone}</b> передан старшему менеджеру отдела продаж <b>EL ORDO GROUP</b>.\n\n` +
+        `Мы подготовим индивидуальный расчет рассрочки 0% и свяжемся с вами в течение 2–5 минут в WhatsApp или по телефону.`,
+        CONTACT_KEYBOARD
+      );
+
+      // Карточка горячего лида в чат отдела продаж
+      if (SALES_CHAT_ID) {
+        const leadText =
+          `🔥 <b>ГОРЯЧИЙ ЛИД (ПОДЕЛИЛСЯ НОМЕРОМ)</b>\n` +
+          `━━━━━━━━━━━━━━━━━━\n` +
+          `👤 <b>Имя:</b> ${fullName} (${username})\n` +
+          `📱 <b>Телефон:</b> <code>${phone}</code>\n` +
+          `🆔 <b>ID пользователя:</b> <code>${userFrom?.id}</code>\n` +
+          `⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Bishkek' })}\n` +
+          `━━━━━━━━━━━━━━━━━━\n` +
+          `<i>Клиент ожидает персональный расчет рассрочки 0%!</i>`;
+
+        await sendTelegramMessage(SALES_CHAT_ID, leadText, {
+          inline_keyboard: [
+            [
+              { text: '💬 Открыть диалог в WhatsApp', url: `https://wa.me/${cleanPhone}` },
+              {
+                text: '✈️ Профиль Telegram',
+                url: userFrom?.username ? `https://t.me/${userFrom.username}` : `tg://user?id=${userFrom?.id}`,
+              },
+            ],
+          ],
+        });
+      }
+
+      return NextResponse.json({ ok: true });
+    }
+
+    // Если это не контакт и нет текста — выходим
+    if (!message.text) {
+      return NextResponse.json({ ok: true });
+    }
+
+    const text = message.text.trim();
+
+    // =========================================================================
+    // 2. ОБРАБОТКА ДИПЛИНКОВ И СТАРТА: /start <payload>
+    // =========================================================================
     if (text.startsWith('/start')) {
       const parts = text.split(' ');
       const payload = parts[1]?.toLowerCase().trim();
-
       const material = payload ? MATERIALS[payload] : null;
 
       if (material) {
-        // Кнопки под выданным документом
-        const replyMarkup = {
+        const docKeyboard = {
           inline_keyboard: [
             [
               {
@@ -159,30 +217,32 @@ export async function POST(req: Request) {
               },
             ],
             [
-              {
-                text: '🌐 Открыть сайт EL ORDO',
-                url: SITE_URL,
-              },
-              {
-                text: '📞 Позвонить в офис',
-                url: 'https://t.me/elordo_crm_bot?start=call_request',
-              },
+              { text: '🌐 Открыть сайт EL ORDO', url: SITE_URL },
+              { text: '📞 Консультация по телефону', url: 'tel:+996709115115' },
             ],
           ],
         };
 
-        // Отправляем запрошенный PDF пользователю
-        await sendTelegramDocument(chatId, material.fileUrl, material.caption, replyMarkup);
+        // 1. Отправляем PDF
+        await sendTelegramDocument(chatId, material.fileUrl, material.caption, docKeyboard);
 
-        // Уведомляем отдел продаж о скачивании презентации целевым клиентом
+        // 2. Предлагаем оставить номер для расчета
+        await sendTelegramMessage(
+          chatId,
+          `💡 <b>Нужен персональный расчет рассрочки 0% или список свободных видовых этажей?</b>\n\n` +
+          `Нажмите кнопку <b>«📱 Отправить номер для расчета рассрочки 0%»</b> внизу экрана 👇`,
+          CONTACT_KEYBOARD
+        );
+
+        // 3. Уведомляем отдел продаж о скачивании
         if (SALES_CHAT_ID) {
           const leadNotification =
-            `🔥 <b>Скачивание презентации из Telegram-бота!</b>\n\n` +
+            `📥 <b>Скачивание презентации из Telegram-бота!</b>\n\n` +
             `👤 <b>Клиент:</b> ${fullName} (${username})\n` +
             `🆔 <b>ID пользователя:</b> <code>${userFrom?.id}</code>\n` +
             `📄 <b>Материал:</b> ${material.title}\n` +
             `⏰ <b>Время:</b> ${new Date().toLocaleString('ru-RU', { timeZone: 'Asia/Bishkek' })}\n\n` +
-            `<i>Клиент проявил интерес к объекту, напишите ему в Telegram при наличии диалога.</i>`;
+            `<i>Клиент просматривает буклет. Бот предложил отправить номер для расчета.</i>`;
 
           await sendTelegramMessage(SALES_CHAT_ID, leadNotification, {
             inline_keyboard: userFrom?.username
@@ -194,47 +254,112 @@ export async function POST(req: Request) {
         return NextResponse.json({ ok: true });
       }
 
-      // 2. ДЕФОЛТНОЕ ПРИВЕТСТВИЕ (если пользователь зашел без параметров)
+      // Дефолтный приветственный экран
       const welcomeText =
         `Здравствуйте, <b>${fullName}</b>!\n\n` +
         `Добро пожаловать в официальный бот строительной компании <b>EL ORDO GROUP</b> (г. Бишкек).\n\n` +
-        `Выберите интересующий вас раздел или скачайте официальные материалы по нашим объектам:`;
+        `Выберите интересующий вас раздел или нажмите кнопку внизу, чтобы получить расчет рассрочки 0%:`;
 
-      const defaultKeyboard = {
+      const defaultInline = {
         inline_keyboard: [
-          [
-            { text: '🏢 Каталог ЖК Abu Dhabi (Премиум)', url: `${SITE_URL}/abu-dhabi` },
-          ],
-          [
-            { text: '🏛 Каталог ЖК Madina Residence', url: `${SITE_URL}/madina-residence` },
-          ],
-          [
-            { text: '🌲 Эко-дома Айкол и Айкол+', url: `${SITE_URL}/ajkol-plus` },
-          ],
-          [
-            {
-              text: '📑 Скачать инвест-меморандум',
-              callback_data: 'get_invest',
-            },
-            {
-              text: '⚖️ Разрешительные документы',
-              callback_data: 'get_legal',
-            },
-          ],
-          [
-            {
-              text: '💬 Менеджер в WhatsApp (онлайн)',
-              url: 'https://wa.me/996709115115',
-            },
-          ],
+          [{ text: '🏢 Каталог ЖК Abu Dhabi (Премиум)', url: `${SITE_URL}/abu-dhabi` }],
+          [{ text: '🏛 Каталог ЖК Madina Residence', url: `${SITE_URL}/madina-residence` }],
+          [{ text: '🌲 Эко-дома Айкол и Айкол+', url: `${SITE_URL}/ajkol-plus` }],
+          [{ text: '💬 Менеджер в WhatsApp (онлайн)', url: 'https://wa.me/996709115115' }],
         ],
       };
 
-      await sendTelegramMessage(chatId, welcomeText, defaultKeyboard);
+      await sendTelegramMessage(chatId, welcomeText, defaultInline);
+      await sendTelegramMessage(chatId, '👇 Выберите действие в меню или отправьте контакт:', CONTACT_KEYBOARD);
       return NextResponse.json({ ok: true });
     }
 
-    // Всегда возвращаем HTTP 200, чтобы Telegram не повторял запросы бесконечно
+    // =========================================================================
+    // 3. КНОПКИ МЕНЮ И КОМАНДЫ
+    // =========================================================================
+    if (text === '/catalog' || text === '🏢 Каталог объектов') {
+      await sendTelegramMessage(
+        chatId,
+        `🏢 <b>ОБЪЕКТЫ EL ORDO GROUP В БИШКЕКЕ</b>\n\n` +
+        `• <b>ЖК Abu Dhabi</b> — от 1 650 $/м²\n` +
+        `  ул. Сухомлинова, 29 (Премиум-класс, 25 этажей)\n\n` +
+        `• <b>ЖК Madina Residence</b> — от 1 400 $/м²\n` +
+        `  ул. Огонбаева, 12 (Бизнес-класс в центре)\n\n` +
+        `• <b>ЖД Айкол +</b> — от 1 100 $/м²\n` +
+        `  с. Кок-Жар, ул. Баялинова, 6 (Предгорье)\n\n` +
+        `• <b>ЖД Айкол</b> — от 950 $/м²\n` +
+        `  ул. Арашан, 10 (Сдача 2026 г.)\n\n` +
+        `<i>Все планировки и интерактивная шахматка доступны на сайте:</i>`,
+        {
+          inline_keyboard: [
+            [{ text: '🌐 Открыть интерактивный каталог', url: SITE_URL }],
+            [{ text: '💬 Уточнить цены в WhatsApp', url: 'https://wa.me/996709115115' }],
+          ],
+        }
+      );
+      return NextResponse.json({ ok: true });
+    }
+
+    if (text === '/rassrochka' || text === '📊 Рассрочка 0%') {
+      await sendTelegramMessage(
+        chatId,
+        `📊 <b>БЕСПРОЦЕНТНАЯ РАССРОЧКА 0% БЕЗ БАНКА</b>\n\n` +
+        `• Срок: <b>до 40 месяцев</b>\n` +
+        `• Первоначальный взнос: <b>от 20% до 30%</b>\n` +
+        `• Без справок о доходах и поручителей — оформление по паспорту\n` +
+        `• Переплата: <b>0%</b>\n\n` +
+        `Нажмите кнопку <b>«📱 Отправить номер»</b> ниже, чтобы получить индивидуальный расчет помесячного графика 👇`,
+        CONTACT_KEYBOARD
+      );
+      return NextResponse.json({ ok: true });
+    }
+
+    if (text === '/tradein' || text === '🚗 Trade-in (бартер)') {
+      await sendTelegramMessage(
+        chatId,
+        `🚗 <b>ПРОГРАММА TRADE-IN (БАРТЕР)</b>\n\n` +
+        `Обменяйте ваш автомобиль или вторичное жилье на новую квартиру в EL ORDO GROUP:\n\n` +
+        `1. Экспресс-оценка авто/недвижимости за <b>24 часа</b>\n` +
+        `2. Согласованная сумма засчитывается в качестве первого взноса\n` +
+        `3. Остаток оформляется в беспроцентную рассрочку до 40 месяцев`,
+        {
+          inline_keyboard: [
+            [
+              {
+                text: '🚗 Оценить авто в WhatsApp',
+                url: `https://wa.me/996709115115?text=${encodeURIComponent('Здравствуйте! Хочу оценить авто по программе Trade-in.')}`,
+              },
+            ],
+          ],
+        }
+      );
+      return NextResponse.json({ ok: true });
+    }
+
+    if (text === '/office' || text === '📍 Офис продаж' || text === '/manager') {
+      await sendTelegramMessage(
+        chatId,
+        `📍 <b>ОФИС ПРОДАЖ EL ORDO GROUP</b>\n\n` +
+        `г. Бишкек, ул. Исы Ахунбаева, 137/1\n` +
+        `📞 +996 709 115 115\n` +
+        `📞 +996 990 115 115\n\n` +
+        `⏰ Пн–Сб с 09:00 до 19:00\n\n` +
+        `<i>Ждем вас на кофе для подбора планировки!</i>`,
+        {
+          inline_keyboard: [
+            [
+              {
+                text: '🗺 Открыть адрес в 2GIS',
+                url: 'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
+              },
+            ],
+            [{ text: '💬 Написать в WhatsApp', url: 'https://wa.me/996709115115' }],
+          ],
+        }
+      );
+      return NextResponse.json({ ok: true });
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('Telegram webhook runtime error:', error);
