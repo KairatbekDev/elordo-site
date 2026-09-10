@@ -343,7 +343,7 @@ export default function FloorPlansSection({
   plans,
   whatsappNumber = COMPANY_INFO.whatsapp,
   theme = 'dark',
-  botUsername = 'elordo_group_bot',
+  botUsername = COMPANY_INFO.telegramBot || 'elordo_crm_bot',
 }: FloorPlansSectionProps) {
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
