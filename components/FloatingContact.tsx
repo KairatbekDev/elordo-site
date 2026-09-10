@@ -132,7 +132,7 @@ export default function FloatingContact() {
 
   return (
     <>
-      {/* 1. Фоновый полупрозрачный оверлей при открытом меню */}
+      {/* 1. Фоновый оверлей при открытом меню */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -141,12 +141,15 @@ export default function FloatingContact() {
         />
       )}
 
-      {/* 2. Плавающий контейнер с учетом safe-area на смартфонах */}
-      <div className="fixed bottom-5 sm:bottom-6 right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 font-sans select-none">
+      {/* 2. Плавающий контейнер с безопасным отступом для iPhone (safe-area) */}
+      <div 
+        style={{ bottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
+        className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 font-sans select-none"
+      >
         
-        {/* Интерактивное всплывающее меню каналов связи */}
+        {/* Всплывающее меню каналов связи */}
         {isOpen && (
-          <div className="flex flex-col gap-2.5 bg-white/95 dark:bg-[#0b1b15]/95 backdrop-blur-xl p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border border-gray-100 dark:border-white/10 w-[290px] max-w-[calc(100vw-2rem)] animate-slideInRight text-gray-900 dark:text-gray-100">
+          <div className="flex flex-col gap-2.5 bg-white/95 dark:bg-[#0b1b15]/95 backdrop-blur-xl p-4 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.35)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border border-gray-100 dark:border-white/10 w-[290px] max-w-[calc(100vw-2rem)] animate-fadeIn text-gray-900 dark:text-gray-100">
             
             {/* Статус-панель отдела продаж */}
             <div className="flex items-center justify-between px-1 pb-2 border-b border-gray-100 dark:border-white/10">
@@ -176,9 +179,9 @@ export default function FloatingContact() {
               </div>
             </a>
 
-            {/* Прямые звонки в отдел продаж */}
-            <div className="p-2.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10">
-              <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400 block mb-1">{c.callManager}</span>
+            {/* Прямые звонки в отдел продаж (с возможностью выделения номера) */}
+            <div className="p-2.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 select-text">
+              <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400 block mb-1 select-none">{c.callManager}</span>
               
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
@@ -186,10 +189,10 @@ export default function FloatingContact() {
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
                 <div className="flex items-center gap-1.5">
-                  <IconPhone className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f]" />
+                  <IconPhone className="w-3.5 h-3.5 text-[#064734] dark:text-[#d4b26f] shrink-0" />
                   <span>{COMPANY_INFO.phones[0] || '+996 709 115 115'}</span>
                 </div>
-                <span className="text-[10px] font-bold text-[#d4b26f]">{c.mainPhone}</span>
+                <span className="text-[10px] font-bold text-[#d4b26f] select-none">{c.mainPhone}</span>
               </a>
 
               <a
@@ -198,10 +201,10 @@ export default function FloatingContact() {
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors border-t border-gray-200/50 dark:border-white/10 mt-1 pt-1"
               >
                 <div className="flex items-center gap-1.5">
-                  <IconPhone className="w-3.5 h-3.5 text-gray-400 dark:text-neutral-400" />
+                  <IconPhone className="w-3.5 h-3.5 text-gray-400 dark:text-neutral-400 shrink-0" />
                   <span>{COMPANY_INFO.phones[1] || '+996 990 115 115'}</span>
                 </div>
-                <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400">{c.secondaryPhone}</span>
+                <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400 select-none">{c.secondaryPhone}</span>
               </a>
             </div>
 
@@ -257,7 +260,7 @@ export default function FloatingContact() {
             )}
 
             {isOpen ? (
-              <svg className="w-6 h-6 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-6 h-6 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>

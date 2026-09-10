@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
@@ -413,13 +414,16 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* 2. Hero-блок */}
+      {/* 2. Hero-блок с оптимизированным фоном */}
       <section className="relative min-h-[500px] sm:min-h-[560px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/projects/Abu-Dhabi.png"
             alt="EL ORDO GROUP"
-            className="w-full h-full object-cover object-center opacity-30 scale-105"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#021c15] via-[#064734]/80 to-black/70" />
         </div>
@@ -514,12 +518,14 @@ export default function AboutPage() {
 
           <div className="lg:col-span-6">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-gray-200 dark:border-white/10 bg-neutral-900 aspect-[4/3] group">
-              <img
+              <Image
                 src="/projects/Abu-Dhabi.png"
                 alt="Проекты EL ORDO GROUP"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/30 to-transparent flex items-end p-8">
                 <div className="text-white">
                   <span className="text-xs font-black uppercase text-[#d4b26f] block mb-1">
                     {t.aboutPage.cardBadge}
@@ -692,7 +698,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 8. Руководство и команда компании */}
+      {/* 8. Руководство и команда компании с оптимизированными фото */}
       <section className="bg-[#f0f4f1] dark:bg-[#040c09] py-20 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -714,17 +720,19 @@ export default function AboutPage() {
                 className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none hover:shadow-xl transition-all duration-300 flex flex-col group"
               >
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100 dark:bg-neutral-800">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
-                    className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
                 <div className="p-6 flex-1 flex flex-col justify-between bg-white dark:bg-[#0b1b15] transition-colors">
                   <div>
-                    <h3 className="text-base sm:text-lg font-black text-gray-900 dark:text-white mb-1 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
+                    <h3 className="text-base sm:text-lg font-black text-gray-950 dark:text-white mb-1 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
                       {member.name}
                     </h3>
                     <p className="text-xs font-bold text-[#8c6b23] dark:text-[#d4b26f] uppercase tracking-wider">

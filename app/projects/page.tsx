@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
@@ -450,16 +451,18 @@ export default function ProjectsCatalogPage() {
                   className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl dark:hover:border-[#d4b26f]/30 transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Изображение проекта */}
+                    {/* Изображение проекта через next/image */}
                     <div className="relative h-64 w-full overflow-hidden bg-neutral-900">
-                      <img
+                      <Image
                         src={project.image}
                         alt={project.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
 
                       {/* Бейдж статуса */}
-                      <div className="absolute top-4 left-4">
+                      <div className="absolute top-4 left-4 z-10">
                         <span
                           className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow-md ${
                             isFinished
@@ -474,7 +477,7 @@ export default function ProjectsCatalogPage() {
 
                       {/* Бейдж цены */}
                       {project.price && (
-                        <div className="absolute bottom-4 right-4 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 shadow">
+                        <div className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 shadow">
                           {project.price}
                         </div>
                       )}

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
@@ -1005,10 +1006,12 @@ export default function ConstructionProgressPage() {
             >
               {/* Медиа-блок */}
               <div className="lg:col-span-6 relative min-h-[340px] lg:min-h-[500px] bg-neutral-900 overflow-hidden group">
-                <img
+                <Image
                   src={report.image}
                   alt={report.projectName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Бейджи вверху */}
@@ -1092,7 +1095,7 @@ export default function ConstructionProgressPage() {
                       className="text-xs font-bold text-[#064734] dark:text-[#d4b26f] hover:underline flex items-center gap-1 shrink-0"
                     >
                       <span>{t.detailsBtn}</span>
-                      <IconArrowRight className="w-3 h-3" />
+                      <IconArrowRight className="w-3 primary-icon" />
                     </Link>
                   </div>
 

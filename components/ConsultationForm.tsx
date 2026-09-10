@@ -57,7 +57,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Консультация бесплатна',
     guarantee3: 'Ответ за 5 минут',
     privacy: 'Ваши данные надежно защищены и используются исключительно для связи менеджера с вами',
-    phoneError: 'Пожалуйста, введите полный номер телефона: +996 (XXX) XX-XX-XX',
+    phoneError: 'Пожалуйста, введите корректный номер телефона (от 9 до 15 цифр)',
     serverError: 'Не удалось отправить заявку. Пожалуйста, напишите нам в WhatsApp.',
     successTitle: 'Заявка успешно принята!',
     successDesc: (name, phone) => `Спасибо, ${name}! Менеджер отдела продаж свяжется с вами по номеру ${phone} в течение 5–10 минут.`,
@@ -101,7 +101,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Кеңеш берүү акысыз',
     guarantee3: '5 мүнөттө жооп беребиз',
     privacy: 'Сиздин маалыматтарыңыз корголгон жана байланыш үчүн гана колдонулат',
-    phoneError: 'Сураныч, толук телефон номериңизди жазыңыз: +996 (XXX) XX-XX-XX',
+    phoneError: 'Сураныч, туура телефон номериңизди жазыңыз (9дан 15 цифрага чейин)',
     serverError: 'Табыштама жөнөтүлбөй калды. WhatsApp аркылуу жазыңыз.',
     successTitle: 'Табыштамаңыз кабыл алынды!',
     successDesc: (name, phone) => `Ыракмат, ${name}! Сатуу бөлүмүнүн менеджери ${phone} номери боюнча 5–10 мүнөттүн ичинде байланышат.`,
@@ -145,7 +145,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Кеңес алу тегін',
     guarantee3: '5 минут ішінде жауап',
     privacy: 'Деректеріңіз қауіпсіз қорғалған және тек байланыс орнату үшін пайдаланылады',
-    phoneError: 'Толық телефон нөміріңізді енгізіңіз: +996 (XXX) XX-XX-XX',
+    phoneError: 'Толық әрі дұрыс телефон нөміріңізді енгізіңіз (9–15 сан)',
     serverError: 'Өтінімді жөнелту мүмкін болмады. WhatsApp арқылы жазыңыз.',
     successTitle: 'Өтініміңіз сәтті қабылданды!',
     successDesc: (name, phone) => `Рақмет, ${name}! Сату бөлімінің менеджері ${phone} нөмірі бойынша 5–10 минутта хабарласады.`,
@@ -189,7 +189,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Консультація безкоштовна',
     guarantee3: 'Відповідь за 5 хвилин',
     privacy: 'Ваші дані надійно захищені та використовуються виключно для зв’язку менеджера з вами',
-    phoneError: 'Будь ласка, введіть повний номер телефону: +996 (XXX) XX-XX-XX',
+    phoneError: 'Будь ласка, введіть коректний номер телефону (від 9 до 15 цифр)',
     serverError: 'Не вдалося надіслати заявку. Напишіть нам у WhatsApp.',
     successTitle: 'Заявку успішно прийнято!',
     successDesc: (name, phone) => `Дякуємо, ${name}! Менеджер зв’яжеться з вами за номером ${phone} протягом 5–10 хвилин.`,
@@ -233,7 +233,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Free advisory consultation',
     guarantee3: 'Response within 5 minutes',
     privacy: 'Your personal data is strictly protected and used exclusively to service your inquiry',
-    phoneError: 'Please enter your complete phone number: +996 (XXX) XX-XX-XX',
+    phoneError: 'Please enter a valid phone number (9 to 15 digits)',
     serverError: 'Failed to send inquiry. Please reach out to us on WhatsApp.',
     successTitle: 'Inquiry Successfully Received!',
     successDesc: (name, phone) => `Thank you, ${name}! Our sales manager will contact you at ${phone} within 5–10 minutes.`,
@@ -277,7 +277,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: '置业咨询全程免费',
     guarantee3: '5分钟内快速响应',
     privacy: '您的隐私信息受到严格加密保护，仅用于置业顾问向您提供专属服务',
-    phoneError: '请完整填写有效联系电话：+996 (XXX) XX-XX-XX',
+    phoneError: '请填写正确的联系电话（9至15位数字）',
     serverError: '提交失败，请直接通过 WhatsApp 与我们取得联系。',
     successTitle: '置业申请已成功受理！',
     successDesc: (name, phone) => `感谢您的垂询，${name}！专属置业经理将在5–10分钟内致电 ${phone} 为您服务。`,
@@ -314,24 +314,36 @@ export default function ConsultationForm() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+996 ');
-  const [selectedProject, setSelectedProject] = useState(ui.projects[0]);
-  const [selectedGoal, setSelectedGoal] = useState(ui.goals[0]);
-  const [honeypot, setHoneypot] = useState(''); // Скрытая ловушка для ботов
+  // Индексный выбор для реактивной мультиязычности
+  const [goalIndex, setGoalIndex] = useState(0);
+  const [projectIndex, setProjectIndex] = useState(0);
+  const [honeypot, setHoneypot] = useState('');
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Форматирование кыргызского номера: +996 (XXX) XX-XX-XX
-  const formatKGPhone = (input: string) => {
+  const selectedGoal = ui.goals[goalIndex] || ui.goals[0];
+  const selectedProject = ui.projects[projectIndex] || ui.projects[0];
+
+  // Универсальное форматирование номера: маска для КР + поддержка международных номеров
+  const formatPhoneInput = (input: string) => {
+    const trimmed = input.trim();
+
+    // Если пользователь вводит международный номер не с +996 (например, +7, +86, +1)
+    if (trimmed.startsWith('+') && !trimmed.startsWith('+996')) {
+      return '+' + input.slice(1).replace(/[^\d\s()-]/g, '').slice(0, 20);
+    }
+
     let raw = input.replace(/\D/g, '');
 
     if (raw.startsWith('0')) {
       raw = '996' + raw.slice(1);
-    }
-    if (!raw.startsWith('996')) {
+    } else if (!raw.startsWith('996') && raw.length > 0) {
       raw = '996' + raw;
     }
     raw = raw.slice(0, 12);
+
+    if (raw.length === 0) return '+996 ';
 
     const country = '+996';
     const operator = raw.slice(3, 6);
@@ -350,14 +362,14 @@ export default function ConsultationForm() {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatKGPhone(e.target.value);
+    const formatted = formatPhoneInput(e.target.value);
     setPhone(formatted);
     if (error) setError('');
   };
 
   const validatePhone = () => {
     const digitsOnly = phone.replace(/\D/g, '');
-    if (digitsOnly.length < 12) {
+    if (digitsOnly.length < 9 || digitsOnly.length > 15) {
       setError(ui.phoneError);
       return false;
     }
@@ -365,9 +377,9 @@ export default function ConsultationForm() {
     return true;
   };
 
-  // Отправка в реальный API /api/lead с защитой
   const handleDirectCallback = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validatePhone()) return;
 
     setIsSubmitting(true);
@@ -383,7 +395,7 @@ export default function ConsultationForm() {
           project: selectedProject,
           goal: selectedGoal,
           lang: currentLang,
-          website: honeypot, // Отправляем значение honeypot
+          website: honeypot,
           source: 'ConsultationForm',
           createdAt: new Date().toISOString(),
         }),
@@ -405,7 +417,6 @@ export default function ConsultationForm() {
     }
   };
 
-  // Отправка через WhatsApp
   const handleWhatsAppSubmit = () => {
     if (!validatePhone()) return;
 
@@ -422,7 +433,7 @@ export default function ConsultationForm() {
       <div className="relative z-10 max-w-4xl mx-auto bg-white/5 backdrop-blur-xl rounded-3xl border border-white/15 p-6 sm:p-12 shadow-2xl">
         {isSuccess ? (
           <div className="text-center py-10 max-w-lg mx-auto animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-[#d4b26f]/20 text-[#d4b26f] flex items-center justify-center mx-auto mb-6 border border-[#d4b26f]/30 shadow-lg animate-bounce">
+            <div className="w-16 h-16 rounded-full bg-[#d4b26f]/20 text-[#d4b26f] flex items-center justify-center mx-auto mb-6 border border-[#d4b26f]/30 shadow-lg">
               <IconCheck className="w-8 h-8" />
             </div>
 
@@ -468,8 +479,19 @@ export default function ConsultationForm() {
 
             <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto relative">
               
-              {/* Скрытая honeypot-ловушка для спам-ботов */}
-              <div className="hidden opacity-0 pointer-events-none absolute -left-[9999px]" aria-hidden="true">
+              {/* Скрытая ловушка для ботов (надежно скрыта от людей, но доступна для краулеров) */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  zIndex: -1,
+                  width: 0,
+                  height: 0,
+                  pointerEvents: 'none',
+                  overflow: 'hidden',
+                }}
+              >
                 <label htmlFor="company_website_input">Leave blank</label>
                 <input
                   id="company_website_input"
@@ -488,13 +510,13 @@ export default function ConsultationForm() {
                   {ui.goalLabel}
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {ui.goals.map((tag) => {
-                    const isSelected = selectedGoal === tag;
+                  {ui.goals.map((tag, idx) => {
+                    const isSelected = goalIndex === idx;
                     return (
                       <button
-                        key={tag}
+                        key={idx}
                         type="button"
-                        onClick={() => setSelectedGoal(tag)}
+                        onClick={() => setGoalIndex(idx)}
                         className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-[#d4b26f] text-[#064734] shadow-md scale-105'
@@ -548,12 +570,12 @@ export default function ConsultationForm() {
                 </label>
                 <div className="relative">
                   <select
-                    value={selectedProject}
-                    onChange={(e) => setSelectedProject(e.target.value)}
+                    value={projectIndex}
+                    onChange={(e) => setProjectIndex(Number(e.target.value))}
                     className="w-full bg-[#0b3b2c] border border-white/20 focus:border-[#d4b26f] focus:outline-none rounded-xl px-4 py-3.5 text-base sm:text-sm text-white appearance-none cursor-pointer pr-10 shadow-inner"
                   >
                     {ui.projects.map((proj, idx) => (
-                      <option key={idx} value={proj} className="bg-[#064734] text-white py-2">
+                      <option key={idx} value={idx} className="bg-[#064734] text-white py-2">
                         {proj}
                       </option>
                     ))}
@@ -566,28 +588,33 @@ export default function ConsultationForm() {
                 </div>
               </div>
 
-              {/* Ошибка */}
+              {/* Блок ошибок */}
               {error && (
                 <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-center animate-fadeIn">
                   <p className="text-xs text-rose-200 font-bold">{error}</p>
                 </div>
               )}
 
-              {/* Кнопки звонка и WhatsApp */}
+              {/* Кнопки действий */}
               <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
-                  <IconPhone className="w-4 h-4" />
+                  {isSubmitting ? (
+                    <div className="w-4 h-4 border-2 border-[#064734] border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <IconPhone className="w-4 h-4" />
+                  )}
                   <span>{isSubmitting ? ui.btnSubmitting : ui.btnCall}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleWhatsAppSubmit}
-                  className="w-full bg-white/10 hover:bg-white/20 active:scale-[0.99] text-white font-bold py-4 rounded-xl uppercase tracking-wider text-xs border border-white/25 transition-all backdrop-blur-md flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={isSubmitting}
+                  className="w-full bg-white/10 hover:bg-white/20 active:scale-[0.99] disabled:opacity-60 text-white font-bold py-4 rounded-xl uppercase tracking-wider text-xs border border-white/25 transition-all backdrop-blur-md flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                   <span>{ui.btnWhatsApp}</span>

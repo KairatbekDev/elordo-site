@@ -50,6 +50,16 @@ const SEO_LOCALES: Record<Locale, SeoItem> = {
   },
 };
 
+function updateMetaTag(selector: string, attr: string, key: string, value: string) {
+  let element = document.querySelector(selector);
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attr, key);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', value);
+}
+
 export default function DynamicSeo() {
   const { locale } = useLanguage();
   const currentLocale = (locale as Locale) || 'ru';
@@ -57,32 +67,25 @@ export default function DynamicSeo() {
   useEffect(() => {
     const seo = SEO_LOCALES[currentLocale] || SEO_LOCALES.ru;
 
-    // Обновляем lang в теге <html>
+    // 1. Атрибут языка страницы
     document.documentElement.lang = seo.langCode;
 
     if (typeof window !== 'undefined') {
-      // Обновляем заголовок страницы во вкладке браузера
+      // 2. Title во вкладке браузера
       if (window.location.pathname === '/' || !document.title.includes('|')) {
         document.title = seo.title;
       }
 
-      // Обновляем мета-тег description
-      let metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) {
-        metaDesc.setAttribute('content', seo.description);
-      } else {
-        metaDesc = document.createElement('meta');
-        metaDesc.setAttribute('name', 'description');
-        metaDesc.setAttribute('content', seo.description);
-        document.head.appendChild(metaDesc);
-      }
+      // 3. Meta description
+      updateMetaTag('meta[name="description"]', 'name', 'description', seo.description);
 
-      // Обновляем теги OpenGraph
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', seo.title);
+      // 4. OpenGraph (Facebook, WhatsApp)
+      updateMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
+      updateMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
 
-      const ogDesc = document.querySelector('meta[property="og:description"]');
-      if (ogDesc) ogDesc.setAttribute('content', seo.description);
+      // 5. Twitter Card
+      updateMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', seo.title);
+      updateMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', seo.description);
     }
   }, [currentLocale]);
 
