@@ -26,6 +26,7 @@ interface FloorPlansSectionProps {
   plans: ApartmentPlan[];
   whatsappNumber?: string;
   theme?: 'dark' | 'light';
+  botUsername?: string;
 }
 
 const UI_TEXTS: Record<Locale, {
@@ -52,6 +53,7 @@ const UI_TEXTS: Record<Locale, {
   installmentVal: string;
   guarantee: string;
   btnWa: string;
+  btnDownloadPdf: string;
   managerTime: string;
   otherPlans: string;
   blueprintTitle: string;
@@ -82,6 +84,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: 'до 40 мес. 0%',
     guarantee: 'Прямой договор с застройщиком. Возможность оформления по программе Trade-in (бартер на авто или вторичную недвижимость).',
     btnWa: 'Узнать цену и свободные этажи',
+    btnDownloadPdf: 'Получить PDF планировки в Telegram',
     managerTime: 'Менеджер отдела продаж ответит в течение 2 минут',
     otherPlans: 'Другие планировки в этом объекте:',
     blueprintTitle: 'Архитектурный чертеж',
@@ -112,6 +115,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: '40 айга чейин 0%',
     guarantee: 'Куруучу менен түз келишим. Trade-in программасы боюнча тариздөө мүмкүнчүлүгү (унаа же эски батирге алмашуу).',
     btnWa: 'Баасын жана бош кабаттарды билүү',
+    btnDownloadPdf: 'Telegram аркылуу PDF алуу',
     managerTime: 'Сатуу бөлүмүнүн менеджери 2 мүнөттө жооп берет',
     otherPlans: 'Бул объекттеги башка пландар:',
     blueprintTitle: 'Архитектуралык план',
@@ -142,6 +146,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: '40 айға дейін 0%',
     guarantee: 'Құрылыс салушымен тікелей шарт. Trade-in бағдарламасы бойынша рәсімдеу мүмкіндігі (көлік немесе баспана айырбасы).',
     btnWa: 'Бағасы мен бос қабаттарды білу',
+    btnDownloadPdf: 'Telegram-да PDF жүктеу',
     managerTime: 'Сату бөлімінің менеджері 2 минутта жауап береді',
     otherPlans: 'Осы нысандағы басқа жоспарлар:',
     blueprintTitle: 'Сәулет сызбасы',
@@ -172,6 +177,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: 'до 40 міс. 0%',
     guarantee: 'Прямий договір із забудовником. Можливість оформлення за програмою Trade-in (бартер на авто чи вторинне житло).',
     btnWa: 'Дізнатися ціну та вільні поверхи',
+    btnDownloadPdf: 'Отримати PDF планування в Telegram',
     managerTime: 'Менеджер відділу продажів відповість протягом 2 хвилин',
     otherPlans: 'Інші планування в цьому об’єкті:',
     blueprintTitle: 'Архітектурне креслення',
@@ -202,6 +208,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: 'up to 40 mos. 0%',
     guarantee: 'Direct developer equity contract. Trade-in barter options available (vehicle or secondary property exchange).',
     btnWa: 'Inquire Price & Floor Availability',
+    btnDownloadPdf: 'Download Blueprint PDF in Telegram',
     managerTime: 'Sales manager will reply within 2 minutes',
     otherPlans: 'Other layouts in this development:',
     blueprintTitle: 'Architectural Blueprint',
@@ -232,6 +239,7 @@ const UI_TEXTS: Record<Locale, {
     installmentVal: '最长40个月 0%',
     guarantee: '开发商直签正规购房合同。支持申请以旧换新 (Trade-in) 置换服务（现有车辆或房产折价冲抵房款）。',
     btnWa: '查询底价与可选楼层',
+    btnDownloadPdf: '在 Telegram 中索取户型图册 (PDF)',
     managerTime: '专属置业顾问将在2分钟内在线回复',
     otherPlans: '本楼盘其他热销户型：',
     blueprintTitle: '建筑空间规划图',
@@ -272,10 +280,8 @@ function BlueprintGraphic({
         <line x1="8" y1="28" x2="38" y2="28" strokeWidth="2" />
         <line x1="38" y1="8" x2="38" y2="44" strokeWidth="2" />
         <line x1="24" y1="28" x2="24" y2="56" strokeWidth="2" />
-        {/* Дверная дуга */}
         <path d="M 38 28 A 12 12 0 0 1 50 40" strokeDasharray="2 2" />
         <line x1="38" y1="40" x2="50" y2="40" />
-        {/* Оконные акценты */}
         <line x1="14" y1="8" x2="28" y2="8" strokeWidth="3" stroke="#d4b26f" strokeLinecap="round" />
         <line x1="38" y1="56" x2="50" y2="56" strokeWidth="3" stroke="#d4b26f" strokeLinecap="round" />
         <circle cx="32" cy="32" r="1.5" fill="#064734" />
@@ -337,6 +343,7 @@ export default function FloorPlansSection({
   plans,
   whatsappNumber = COMPANY_INFO.whatsapp,
   theme = 'dark',
+  botUsername = 'elordo_group_bot',
 }: FloorPlansSectionProps) {
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
@@ -397,6 +404,13 @@ export default function FloorPlansSection({
   const getWhatsAppLink = (plan: ApartmentPlan) => {
     const message = ui.waMessage(plan.title, plan.area, projectName);
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  };
+
+  const getTelegramPlanLink = (plan: ApartmentPlan) => {
+    const cleanProject = projectName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const cleanArea = plan.area.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const payload = `plan_${cleanProject}_${cleanArea}`.slice(0, 60);
+    return `https://t.me/${botUsername}?start=${payload}`;
   };
 
   return (
@@ -473,7 +487,7 @@ export default function FloorPlansSection({
                   {/* Иконка лупы */}
                   <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#064734]/90 text-white flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all shadow-sm z-20">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
 
@@ -688,18 +702,31 @@ export default function FloorPlansSection({
                   </div>
                 </div>
 
-                {/* Кнопка WhatsApp */}
-                <div>
+                {/* Блок действий: WhatsApp и Telegram PDF */}
+                <div className="space-y-2.5">
                   <a
                     href={getWhatsAppLink(selectedPlan)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-sm sm:text-base uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-3 border border-emerald-500/30 cursor-pointer"
+                    className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-2.5 border border-emerald-500/30 cursor-pointer"
                   >
-                    <IconWhatsApp className="w-5 h-5 text-[#25D366]" />
+                    <IconWhatsApp className="w-5 h-5 text-[#25D366] shrink-0" />
                     <span>{ui.btnWa}</span>
                   </a>
-                  <span className="text-xs text-gray-400 text-center block mt-3 font-medium">
+
+                  <a
+                    href={getTelegramPlanLink(selectedPlan)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 px-6 rounded-2xl bg-[#229ED9] hover:bg-[#1e8ec3] active:scale-[0.98] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-md flex items-center justify-center gap-2.5 cursor-pointer"
+                  >
+                    <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
+                    </svg>
+                    <span>{ui.btnDownloadPdf}</span>
+                  </a>
+
+                  <span className="text-xs text-gray-400 text-center block pt-1 font-medium">
                     {ui.managerTime}
                   </span>
                 </div>

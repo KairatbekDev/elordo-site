@@ -2,9 +2,11 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import FloorPlansSection, { ApartmentPlan } from '@/components/FloorPlansSection';
 import TypicalFloorsSection, { TypicalFloorItem } from '@/components/TypicalFloorsSection';
+import DownloadBrochureModal from '@/components/DownloadBrochureModal';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
@@ -1748,13 +1750,16 @@ export default function ComplexView({ slug }: { slug: string }) {
         </div>
       </div>
 
-      {/* 2. Hero-секция */}
+      {/* 2. Hero-секция с оптимизированным фоном и модальным окном скачивания */}
       <section className="relative min-h-[580px] sm:min-h-[640px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src={project.hero.image}
             alt={project.name}
-            className="w-full h-full object-cover object-center opacity-30 scale-105"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/70" />
         </div>
@@ -1795,7 +1800,8 @@ export default function ComplexView({ slug }: { slug: string }) {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-3">
+          {/* Кнопки действий: WhatsApp, Скачать презентацию (Telegram/WA) и Каталог */}
+          <div className="flex flex-wrap justify-center items-center gap-3">
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
               target="_blank"
@@ -1805,6 +1811,14 @@ export default function ComplexView({ slug }: { slug: string }) {
               <IconWhatsApp className="w-4 h-4 text-[#064734]" />
               <span>{isSold ? ui.btnSecondary : ui.btnWhatsappCalc}</span>
             </a>
+
+            {!isSold && (
+              <DownloadBrochureModal
+                projectSlug={lookupKey}
+                projectName={project.name}
+              />
+            )}
+
             <Link
               href="/projects"
               className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-xs sm:text-sm border border-white/25 transition-all backdrop-blur-md cursor-pointer"
