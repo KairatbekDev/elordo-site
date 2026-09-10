@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
@@ -569,10 +570,13 @@ export default function HomePage() {
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[640px] sm:min-h-[720px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/projects/Abu-Dhabi.png"
             alt="EL ORDO GROUP"
-            className="w-full h-full object-cover object-center opacity-35 scale-105"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-35 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#064734] via-[#064734]/70 to-black/70" />
         </div>
@@ -664,12 +668,14 @@ export default function HomePage() {
               >
                 <div>
                   <div className="relative h-60 w-full overflow-hidden bg-neutral-900">
-                    <img
+                    <Image
                       src={p.image}
                       alt={p.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 left-4 z-10">
                       <span
                         className={`inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow ${
                           isFinished ? 'bg-[#2b2b2b] text-white' : 'bg-[#d4b26f] text-[#064734]'
@@ -681,7 +687,7 @@ export default function HomePage() {
                     </div>
 
                     {p.price && (
-                      <div className="absolute bottom-3 right-3 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl border border-white/10 shadow">
+                      <div className="absolute bottom-3 right-3 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl border border-white/10 shadow">
                         {formatPrice(p.price, currentLang, c)}
                       </div>
                     )}
@@ -872,10 +878,12 @@ export default function HomePage() {
       {/* 6. ОТЗЫВЫ РЕЗИДЕНТОВ (МУЛЬТИЯЗЫЧНЫЕ) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white my-16">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/projects/Abu-Dhabi.png"
             alt="Отзывы"
-            className="w-full h-full object-cover opacity-15"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-15"
           />
           <div className="absolute inset-0 bg-[#032b20]/90" />
         </div>

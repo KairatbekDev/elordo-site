@@ -1,10 +1,20 @@
 import { NextResponse } from 'next/server';
 
-// Защита от частых запросов с одного IP (до 4 заявок за 5 минут)
+// Хранилище лимитов с автоматической очисткой памяти (до 4 заявок за 5 минут)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Периодическая очистка устаревших записей (предотвращение утечки памяти)
+  if (rateLimitMap.size > 500) {
+    for (const [key, value] of rateLimitMap.entries()) {
+      if (now > value.resetAt) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+
   const record = rateLimitMap.get(ip);
 
   if (!record || now > record.resetAt) {
@@ -20,7 +30,7 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-// Экранирование спецсимволов для безопасности Telegram HTML
+// Надежное экранирование спецсимволов для Telegram HTML
 function escapeHtml(str: string = ''): string {
   return str
     .replace(/&/g, '&amp;')
@@ -31,11 +41,10 @@ function escapeHtml(str: string = ''): string {
 
 export async function POST(req: Request) {
   try {
-    // Получаем реальный IP клиента
     const forwardedFor = req.headers.get('x-forwarded-for');
     const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
 
-    // 1. Проверка на частоту запросов (Anti-flood)
+    // 1. Защита от спама и флуда
     if (isRateLimited(clientIp)) {
       return NextResponse.json(
         { success: false, error: 'Слишком много запросов. Подождите 5 минут.' },
@@ -46,14 +55,14 @@ export async function POST(req: Request) {
     const data = await req.json();
     const { name, phone, project, goal, lang, website } = data;
 
-    // 2. Honeypot-ловушка: если скрытое поле заполнено ботом, делаем вид, что всё ок
-    if (website && website.trim().length > 0) {
+    // 2. Honeypot-ловушка для спам-ботов
+    if (website && String(website).trim().length > 0) {
       console.warn(`[SPAM BLOCKED] Honeypot сработал для IP ${clientIp}`);
       return NextResponse.json({ success: true });
     }
 
     // 3. Валидация номера телефона
-    const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
+    const cleanPhone = phone ? String(phone).replace(/\D/g, '') : '';
     if (!cleanPhone || cleanPhone.length < 9 || cleanPhone.length > 15) {
       return NextResponse.json(
         { success: false, error: 'Некорректный формат номера телефона' },
@@ -61,59 +70,77 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. Валидация имени (не длиннее 80 символов)
-    const safeName = escapeHtml((name || '').trim().slice(0, 80)) || 'Не указано';
-    const safeProject = escapeHtml(project || 'Не выбран');
-    const safeGoal = escapeHtml(goal || 'Консультация');
-    const safeLang = escapeHtml(lang?.toUpperCase() || 'RU');
+    // 4. Полная санитизация всех полей (включая отображаемый телефон)
+    const safeName = escapeHtml(String(name || '').trim().slice(0, 80)) || 'Не указано';
+    const safePhone = escapeHtml(String(phone || '').trim().slice(0, 30));
+    const safeProject = escapeHtml(String(project || 'Не выбран').slice(0, 80));
+    const safeGoal = escapeHtml(String(goal || 'Консультация').slice(0, 80));
+    const safeLang = escapeHtml(String(lang || 'RU').toUpperCase().slice(0, 10));
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
-    if (token && chatId) {
-      const clientWaUrl = `https://wa.me/${cleanPhone}`;
+    if (!token || !chatId) {
+      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены в переменных окружения!');
+      return NextResponse.json(
+        { success: false, error: 'Ошибка конфигурации сервера' },
+        { status: 500 }
+      );
+    }
 
-      // Время по Бишкеку (UTC+6)
-      const bishkekTime = new Date().toLocaleTimeString('ru-RU', {
-        timeZone: 'Asia/Bishkek',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
+    const clientWaUrl = `https://wa.me/${cleanPhone}`;
 
-      const messageHtml =
-        `🏛 <b>НОВАЯ ЗАЯВКА С САЙТА EL ORDO GROUP</b>\n` +
-        `━━━━━━━━━━━━━━━━━━\n` +
-        `👤 <b>Клиент:</b> ${safeName}\n` +
-        `📞 <b>Телефон:</b> <code>${phone}</code>\n` +
-        `🏢 <b>Интересует:</b> ${safeProject}\n` +
-        `🎯 <b>Цель:</b> ${safeGoal}\n` +
-        `🌐 <b>Язык интерфейса:</b> ${safeLang}\n` +
-        `⏰ <b>Время (Бишкек):</b> ${bishkekTime}\n` +
-        `━━━━━━━━━━━━━━━━━━`;
+    // Время по Бишкеку (UTC+6)
+    const bishkekTime = new Date().toLocaleTimeString('ru-RU', {
+      timeZone: 'Asia/Bishkek',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
 
-      const replyMarkup = {
-        inline_keyboard: [
-          [
-            { text: '💬 Открыть диалог в WhatsApp', url: clientWaUrl },
-          ],
+    const messageHtml =
+      `🏛 <b>НОВАЯ ЗАЯВКА С САЙТА EL ORDO GROUP</b>\n` +
+      `━━━━━━━━━━━━━━━━━━\n` +
+      `👤 <b>Клиент:</b> ${safeName}\n` +
+      `📞 <b>Телефон:</b> <code>${safePhone}</code>\n` +
+      `🏢 <b>Интересует:</b> ${safeProject}\n` +
+      `🎯 <b>Цель:</b> ${safeGoal}\n` +
+      `🌐 <b>Язык интерфейса:</b> ${safeLang}\n` +
+      `⏰ <b>Время (Бишкек):</b> ${bishkekTime}\n` +
+      `━━━━━━━━━━━━━━━━━━`;
+
+    const replyMarkup = {
+      inline_keyboard: [
+        [
+          { text: '💬 Открыть диалог в WhatsApp', url: clientWaUrl },
         ],
-      };
+      ],
+    };
 
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: messageHtml,
-          parse_mode: 'HTML',
-          reply_markup: replyMarkup,
-        }),
-      });
+    // Отправка в Telegram с таймаутом 7 секунд
+    const tgResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: messageHtml,
+        parse_mode: 'HTML',
+        reply_markup: replyMarkup,
+      }),
+      signal: AbortSignal.timeout(7000),
+    });
+
+    if (!tgResponse.ok) {
+      const errorText = await tgResponse.text();
+      console.error(`[TELEGRAM API ERROR ${tgResponse.status}]:`, errorText);
+      return NextResponse.json(
+        { success: false, error: 'Ошибка отправки в Telegram' },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('API lead error:', error);
-    return NextResponse.json({ success: false }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Внутренняя ошибка сервера' }, { status: 500 });
   }
 }
