@@ -165,7 +165,7 @@ export async function POST(req: Request) {
               },
               {
                 text: '📞 Позвонить в офис',
-                url: 'https://t.me/elordo_group_bot?start=call_request',
+                url: 'https://t.me/elordo_crm_bot?start=call_request',
               },
             ],
           ],

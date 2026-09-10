@@ -24,6 +24,7 @@ export interface CompanyInfo {
   phones: string[];
   whatsapp: string;
   instagram: string;
+  telegramBot: string; // <-- 1. Добавлено поле в интерфейс
   gisUrl: string;
   hero: {
     title: string;
@@ -115,6 +116,7 @@ export const COMPANY_INFO: CompanyInfo = {
   phones: ['+996 709 115 115', '+996 990 115 115'],
   whatsapp: '996709115115',
   instagram: 'https://instagram.com/elordo.group',
+  telegramBot: 'elordo_crm_bot', // <-- 2. Реальный username бота
   gisUrl:
     'https://2gis.kg/bishkek/search/%D0%98.%20%D0%90%D1%85%D1%83%D0%BD%D0%B1%D0%B0%D0%B5%D0%B2%D0%B0%20137%2F1',
   hero: {

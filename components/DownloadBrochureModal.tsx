@@ -7,18 +7,25 @@ import { IconWhatsApp } from '@/components/Icons';
 interface DownloadBrochureModalProps {
   projectSlug: string;
   projectName: string;
-  botUsername?: string; // Например 'elordo_group_bot'
+  botUsername?: string;
 }
 
 export default function DownloadBrochureModal({
   projectSlug,
   projectName,
-  botUsername = 'elordo_group_bot',
+  botUsername = COMPANY_INFO.telegramBot || 'elordo_crm_bot',
 }: DownloadBrochureModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Формируем диплинк для Telegram
-  const tgPayload = `${projectSlug.replace(/-/g, '_')}_pdf`;
+  // Точное сопоставление со slug в Telegram-вебхуке
+  const slugMapping: Record<string, string> = {
+    'abu-dhabi': 'abudhabi_pdf',
+    'madina-residence': 'madina_pdf',
+    'ajkol-plus': 'ajkol_plus_pdf',
+    'ajkol': 'ajkol_plus_pdf',
+  };
+
+  const tgPayload = slugMapping[projectSlug] || `${projectSlug.replace(/-/g, '_')}_pdf`;
   const tgUrl = `https://t.me/${botUsername}?start=${tgPayload}`;
 
   // Ссылка для WhatsApp
