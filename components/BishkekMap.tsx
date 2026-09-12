@@ -391,12 +391,12 @@ export default function BishkekMap() {
         dragging: !isMobile,
         touchZoom: !isMobile,
         tap: !isMobile,
+        attributionControl: false, // Отключает плашку копирайта OpenStreetMap / Leaflet снизу справа
       });
 
       mapRef.current = map;
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
         maxZoom: 18,
       }).addTo(map);
 
@@ -523,7 +523,6 @@ export default function BishkekMap() {
     };
   }, []);
 
-  // Динамическое включение/выключение жестов на карте при взаимодействии
   useEffect(() => {
     if (!mapRef.current) return;
     const isMobile = window.innerWidth < 1024;
@@ -597,7 +596,7 @@ export default function BishkekMap() {
     filter === 'all' ? points : points.filter((p) => p.category === filter);
 
   return (
-    <div className="w-full bg-white dark:bg-[#0b1b15] rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm transition-colors duration-200">
+    <div className="w-full bg-white dark:bg-[#0b1b15] rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm transition-colors duration-200 relative z-0 isolate">
       
       {/* Шапка с фильтрами */}
       <div className="p-3 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-[#f9faf9] dark:bg-[#07130e] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors">
@@ -670,7 +669,7 @@ export default function BishkekMap() {
         <div className="lg:col-span-8 h-[290px] sm:h-[400px] lg:h-[490px] relative bg-[#eef2ef] dark:bg-[#040c09] overflow-hidden">
           <div ref={mapContainerRef} className="w-full h-full" />
 
-          {/* Мобильный оверлей: свободный скролл страницы */}
+          {/* Мобильный оверлей */}
           {!isMapActive && (
             <div
               onClick={() => setIsMapActive(true)}
@@ -739,7 +738,7 @@ export default function BishkekMap() {
                   {point.name}
                 </h4>
                 <div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-neutral-400 mt-1">
-                  <IconMapPin className="w-3 h-3 text-[#d4b26f] shrink-0" />
+                  <IconMapPin className="w-3.5 h-3.5 text-[#d4b26f] shrink-0" />
                   <span className="truncate">{point.address}</span>
                 </div>
 

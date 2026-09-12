@@ -130,7 +130,7 @@ export default function Header() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 bg-white/95 dark:bg-[#07130e]/95 backdrop-blur-md transition-all duration-200 border-b ${
+        className={`sticky top-0 z-[1001] bg-white/95 dark:bg-[#07130e]/95 backdrop-blur-md transition-all duration-200 border-b ${
           isScrolled
             ? 'border-gray-200 dark:border-white/10 shadow-md'
             : 'border-gray-100 dark:border-white/5'
@@ -246,7 +246,7 @@ export default function Header() {
       {/* 4. Полноэкранное мобильное меню (Drawer) */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm lg:hidden animate-fadeIn"
+          className="fixed inset-0 z-[1100] bg-black/60 backdrop-blur-sm lg:hidden animate-fadeIn"
           onClick={() => setIsOpen(false)}
         >
           <div
