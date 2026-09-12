@@ -1800,7 +1800,7 @@ export default function ComplexView({ slug }: { slug: string }) {
             </div>
           </div>
 
-          {/* Кнопки действий: WhatsApp, Скачать презентацию (Telegram/WA) и Каталог */}
+          {/* Кнопки действий */}
           <div className="flex flex-wrap justify-center items-center gap-3">
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
@@ -1829,7 +1829,7 @@ export default function ComplexView({ slug }: { slug: string }) {
         </div>
       </section>
 
-      {/* 3. Технические спецификации объекта (СНиП) */}
+      {/* 3. Технические спецификации объекта */}
       <section className="bg-white dark:bg-[#0b1b15] border-b border-gray-200 dark:border-white/10 py-8 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <div className="p-3 rounded-2xl bg-black/5 dark:bg-white/5">
@@ -1867,7 +1867,7 @@ export default function ComplexView({ slug }: { slug: string }) {
               key={idx}
               className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/40 transition-all flex flex-col items-center text-center"
             >
-              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 dark:bg-[#d4b26f]/15 flex items-center justify-center text-[#d4b26f] mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 dark:bg-[#d4b26f]/15 flex items-center justify-center text-[#064734] dark:text-[#d4b26f] mb-6">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -1928,7 +1928,6 @@ export default function ComplexView({ slug }: { slug: string }) {
         <FloorPlansSection
           projectName={project.name}
           plans={project.plans}
-          theme={project.theme}
         />
       ) : isSold ? (
         <section className="py-16 px-4 sm:px-6 max-w-4xl mx-auto text-center">
@@ -1944,7 +1943,7 @@ export default function ComplexView({ slug }: { slug: string }) {
         </section>
       ) : (
         <section className="py-16 px-4 sm:px-6 max-w-4xl mx-auto text-center">
-          <div className="p-8 rounded-3xl border shadow-sm bg-[#eef2ef] dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors">
+          <div className="p-8 rounded-3xl border shadow-sm bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors">
             <span className="text-xs uppercase font-black tracking-widest text-[#d4b26f] block mb-2">
               {t.header.catalog}
             </span>
@@ -2044,7 +2043,7 @@ export default function ComplexView({ slug }: { slug: string }) {
         </div>
       </section>
 
-      {/* 9. Отзывы резидентов (Мультиязычные) с динамическим фоном */}
+      {/* 9. Отзывы резидентов */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
         <div className="absolute inset-0 z-0">
           <img

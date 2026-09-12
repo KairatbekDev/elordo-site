@@ -248,9 +248,6 @@ const UI_TEXTS: Record<Locale, {
   },
 };
 
-/**
- * Векторная Blueprint-заглушка архитектурного чертежа
- */
 function BlueprintGraphic({
   title,
   sub,
@@ -262,7 +259,7 @@ function BlueprintGraphic({
 }) {
   if (compact) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-[#f0f4f2] text-[#064734]/50">
+      <div className="w-full h-full flex items-center justify-center bg-[#f0f4f2] dark:bg-[#07130e] text-[#064734]/50 dark:text-[#d4b26f]/50">
         <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
           <rect x="3" y="3" width="18" height="18" rx="2" strokeDasharray="2 2" />
           <line x1="3" y1="11" x2="14" y2="11" />
@@ -274,8 +271,8 @@ function BlueprintGraphic({
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#f8faf9] to-[#edf3ef] border border-dashed border-[#064734]/20 rounded-xl p-4 text-center select-none">
-      <svg className="w-16 h-16 sm:w-20 sm:h-20 text-[#064734]/40 mb-2.5" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#f8faf9] to-[#edf3ef] dark:from-[#07130e] dark:to-[#0b1b15] border border-dashed border-[#064734]/20 dark:border-white/15 rounded-xl p-4 text-center select-none">
+      <svg className="w-16 h-16 sm:w-20 sm:h-20 text-[#064734]/40 dark:text-[#d4b26f]/40 mb-2.5" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5">
         <rect x="8" y="8" width="48" height="48" rx="3" strokeDasharray="3 3" />
         <line x1="8" y1="28" x2="38" y2="28" strokeWidth="2" />
         <line x1="38" y1="8" x2="38" y2="44" strokeWidth="2" />
@@ -286,11 +283,11 @@ function BlueprintGraphic({
         <line x1="38" y1="56" x2="50" y2="56" strokeWidth="3" stroke="#d4b26f" strokeLinecap="round" />
         <circle cx="32" cy="32" r="1.5" fill="#064734" />
       </svg>
-      <span className="text-[11px] sm:text-xs font-black text-[#064734] uppercase tracking-wider">
+      <span className="text-[11px] sm:text-xs font-black text-[#064734] dark:text-[#d4b26f] uppercase tracking-wider">
         {title}
       </span>
       {sub && (
-        <span className="text-[10px] text-gray-500 font-medium mt-0.5">
+        <span className="text-[10px] text-gray-500 dark:text-neutral-400 font-medium mt-0.5">
           {sub}
         </span>
       )}
@@ -298,9 +295,6 @@ function BlueprintGraphic({
   );
 }
 
-/**
- * Безопасный рендерер чертежа с автозаменой аварийных подстановок
- */
 function PlanImage({
   src,
   alt,
@@ -342,16 +336,13 @@ export default function FloorPlansSection({
   projectName,
   plans,
   whatsappNumber = COMPANY_INFO.whatsapp,
-  theme = 'dark',
   botUsername = COMPANY_INFO.telegramBot || 'elordo_crm_bot',
 }: FloorPlansSectionProps) {
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
   const ui = UI_TEXTS[currentLang] || UI_TEXTS.ru;
 
-  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
-
   const [selectedPlan, setSelectedPlan] = useState<ApartmentPlan | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
@@ -414,7 +405,7 @@ export default function FloorPlansSection({
   };
 
   return (
-    <section className={`py-20 px-4 sm:px-6 relative ${isDark ? 'bg-[#141816] text-white' : 'bg-[#f4f7f5] text-gray-900'}`}>
+    <section className="py-20 px-4 sm:px-6 relative transition-colors duration-200 bg-[#f4f7f5] dark:bg-[#141816] text-gray-900 dark:text-white">
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Шапка каталога */}
@@ -423,13 +414,13 @@ export default function FloorPlansSection({
             <span className="text-xs sm:text-sm uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
               {ui.catalogBadge}
             </span>
-            <h2 className={`text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight ${isDark ? 'text-white' : 'text-[#064734]'}`}>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#064734] dark:text-white">
               {ui.sectionTitle}
             </h2>
           </div>
 
           {/* Фильтр по комнатам */}
-          <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-black/10 dark:bg-black/40 backdrop-blur-md border border-gray-200 dark:border-white/10">
+          <div className="flex flex-wrap items-center gap-2 p-1.5 rounded-2xl bg-black/5 dark:bg-black/40 backdrop-blur-md border border-gray-200 dark:border-white/10">
             {[
               { id: 'all', label: ui.allPlans },
               { id: 1, label: ui.room1 },
@@ -444,10 +435,8 @@ export default function FloorPlansSection({
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
                   className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-black transition-all duration-200 cursor-pointer ${
                     isActive
-                      ? 'bg-[#064734] text-white shadow-md scale-105'
-                      : isDark
-                      ? 'text-gray-300 hover:text-white hover:bg-white/10'
-                      : 'text-gray-700 hover:text-gray-950 hover:bg-white'
+                      ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md scale-105'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-gray-950 dark:hover:text-white hover:bg-white dark:hover:bg-white/10'
                   }`}
                 >
                   {tab.label}
@@ -463,11 +452,7 @@ export default function FloorPlansSection({
             <div
               key={idx}
               onClick={() => openPlanModal(plan)}
-              className={`group cursor-pointer rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between border ${
-                isDark
-                  ? 'bg-[#1e2421] hover:bg-[#252d29] border-white/10 hover:border-[#d4b26f] shadow-lg hover:shadow-2xl hover:shadow-black/50'
-                  : 'bg-white hover:bg-[#fbfcfb] border-gray-200 hover:border-[#064734] shadow-md hover:shadow-xl'
-              }`}
+              className="group cursor-pointer rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 flex flex-col justify-between border bg-white dark:bg-[#1e2421] hover:bg-[#fbfcfb] dark:hover:bg-[#252d29] border-gray-200 dark:border-white/10 hover:border-[#064734] dark:hover:border-[#d4b26f] shadow-md hover:shadow-xl dark:shadow-lg dark:hover:shadow-2xl dark:hover:shadow-black/50"
             >
               <div>
                 {/* Подложка под чертеж */}
@@ -502,11 +487,7 @@ export default function FloorPlansSection({
                 </div>
 
                 {/* Название квартиры */}
-                <h3 className={`text-sm sm:text-base font-bold leading-snug line-clamp-2 mb-3 transition-colors ${
-                  isDark
-                    ? 'text-white group-hover:text-[#d4b26f]'
-                    : 'text-gray-900 group-hover:text-[#064734]'
-                }`}>
+                <h3 className="text-sm sm:text-base font-bold leading-snug line-clamp-2 mb-3 transition-colors text-gray-900 dark:text-white group-hover:text-[#064734] dark:group-hover:text-[#d4b26f]">
                   {plan.title}
                 </h3>
 
@@ -519,11 +500,7 @@ export default function FloorPlansSection({
               {/* Кнопка открытия */}
               <button
                 type="button"
-                className={`mt-2 w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                  isDark
-                    ? 'bg-white/10 group-hover:bg-[#064734] text-white'
-                    : 'bg-[#eef3f0] group-hover:bg-[#064734] text-[#064734] group-hover:text-white'
-                }`}
+                className="mt-2 w-full py-3.5 rounded-xl font-black text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer bg-[#eef3f0] dark:bg-white/10 hover:bg-[#064734] dark:hover:bg-[#d4b26f] text-[#064734] dark:text-white hover:text-white dark:hover:text-[#064734]"
               >
                 <span>{ui.detailsBtn}</span>
                 <IconArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

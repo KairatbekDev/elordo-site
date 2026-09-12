@@ -368,7 +368,7 @@ export default function TypicalFloorsSection({
 
           {/* Интерактивное полотно чертежа */}
           <div
-            className="relative w-full h-[420px] sm:h-[560px] bg-[#f7f9f8] dark:bg-[#06120d] rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-inner cursor-zoom-in transition-colors"
+            className="relative w-full h-[420px] sm:h-[560px] bg-white p-4 sm:p-6 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200 dark:border-white/10 shadow-inner cursor-zoom-in transition-colors"
             onClick={() => setZoomLevel((prev) => (prev === 1 ? 1.6 : 1))}
           >
             <img

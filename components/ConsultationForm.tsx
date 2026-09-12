@@ -58,7 +58,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Консультация бесплатна',
     guarantee3: 'Ответ за 5 минут',
     privacy: 'Ваши данные надежно защищены и используются исключительно для связи менеджера с вами',
-    phoneError: 'Пожалуйста, введите корректный номер телефона (от 9 до 15 цифр)',
+    phoneError: 'Пожалуйста, введите полный номер телефона (9 цифр после кода)',
     serverError: 'Не удалось отправить заявку. Пожалуйста, напишите нам в WhatsApp.',
     successTitle: 'Заявка успешно принята!',
     successDesc: (name, phone) => `Спасибо, ${name}! Менеджер отдела продаж свяжется с вами по номеру ${phone} в течение 5–10 минут.`,
@@ -102,7 +102,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Кеңеш берүү акысыз',
     guarantee3: '5 мүнөттө жооп беребиз',
     privacy: 'Сиздин маалыматтарыңыз корголгон жана байланыш үчүн гана колдонулат',
-    phoneError: 'Сураныч, туура телефон номериңизди жазыңыз (9дан 15 цифрага чейин)',
+    phoneError: 'Сураныч, толук телефон номериңизди жазыңыз',
     serverError: 'Табыштама жөнөтүлбөй калды. WhatsApp аркылуу жазыңыз.',
     successTitle: 'Табыштамаңыз кабыл алынды!',
     successDesc: (name, phone) => `Ыракмат, ${name}! Сатуу бөлүмүнүн менеджери ${phone} номери боюнча 5–10 мүнөттүн ичинде байланышат.`,
@@ -146,7 +146,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Кеңес алу тегін',
     guarantee3: '5 минут ішінде жауап',
     privacy: 'Деректеріңіз қауіпсіз қорғалған және тек байланыс орнату үшін пайдаланылады',
-    phoneError: 'Толық әрі дұрыс телефон нөміріңізді енгізіңіз (9–15 сан)',
+    phoneError: 'Толық телефон нөміріңізді енгізіңіз',
     serverError: 'Өтінімді жөнелту мүмкін болмады. WhatsApp арқылы жазыңыз.',
     successTitle: 'Өтініміңіз сәтті қабылданды!',
     successDesc: (name, phone) => `Рақмет, ${name}! Сату бөлімінің менеджері ${phone} нөмірі бойынша 5–10 минутта хабарласады.`,
@@ -190,7 +190,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Консультація безкоштовна',
     guarantee3: 'Відповідь за 5 хвилин',
     privacy: 'Ваші дані надійно захищені та використовуються виключно для зв’язку менеджера з вами',
-    phoneError: 'Будь ласка, введіть коректний номер телефону (від 9 до 15 цифр)',
+    phoneError: 'Будь ласка, введіть повний номер телефону',
     serverError: 'Не вдалося надіслати заявку. Напишіть нам у WhatsApp.',
     successTitle: 'Заявку успішно прийнято!',
     successDesc: (name, phone) => `Дякуємо, ${name}! Менеджер зв’яжеться з вами за номером ${phone} протягом 5–10 хвилин.`,
@@ -234,7 +234,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: 'Free advisory consultation',
     guarantee3: 'Response within 5 minutes',
     privacy: 'Your personal data is strictly protected and used exclusively to service your inquiry',
-    phoneError: 'Please enter a valid phone number (9 to 15 digits)',
+    phoneError: 'Please enter a complete phone number',
     serverError: 'Failed to send inquiry. Please reach out to us on WhatsApp.',
     successTitle: 'Inquiry Successfully Received!',
     successDesc: (name, phone) => `Thank you, ${name}! Our sales manager will contact you at ${phone} within 5–10 minutes.`,
@@ -278,7 +278,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
     guarantee2: '置业咨询全程免费',
     guarantee3: '5分钟内快速响应',
     privacy: '您的隐私信息受到严格加密保护，仅用于置业顾问向您提供专属服务',
-    phoneError: '请填写正确的联系电话（9至15位数字）',
+    phoneError: '请填写完整的联系电话',
     serverError: '提交失败，请直接通过 WhatsApp 与我们取得联系。',
     successTitle: '置业申请已成功受理！',
     successDesc: (name, phone) => `感谢您的垂询，${name}！专属置业经理将在5–10分钟内致电 ${phone} 为您服务。`,
@@ -315,7 +315,6 @@ export default function ConsultationForm() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('+996 ');
-  // Индексный выбор для реактивной мультиязычности
   const [goalIndex, setGoalIndex] = useState(0);
   const [projectIndex, setProjectIndex] = useState(0);
   const [honeypot, setHoneypot] = useState('');
@@ -326,24 +325,34 @@ export default function ConsultationForm() {
   const selectedGoal = ui.goals[goalIndex] || ui.goals[0];
   const selectedProject = ui.projects[projectIndex] || ui.projects[0];
 
-  // Универсальное форматирование номера: маска для КР + поддержка международных номеров
+  // Корректное форматирование без зацикливания при Backspace
   const formatPhoneInput = (input: string) => {
+    if (!input || input.trim() === '' || input.trim() === '+') {
+      return '+996 ';
+    }
+
     const trimmed = input.trim();
 
+    // Международный формат (+7, +971, +1 и т.д.)
     if (trimmed.startsWith('+') && !trimmed.startsWith('+996')) {
       return '+' + input.slice(1).replace(/[^\d\s()-]/g, '').slice(0, 20);
     }
 
     let raw = input.replace(/\D/g, '');
 
+    // Если пользователь стёр цифры до кода страны
+    if (raw === '9' || raw === '99' || raw === '996') {
+      return '+996 ';
+    }
+
+    // Если вставили номер начиная с 0 (например: 0709...)
     if (raw.startsWith('0')) {
       raw = '996' + raw.slice(1);
-    } else if (!raw.startsWith('996') && raw.length > 0) {
+    } else if (!raw.startsWith('996')) {
       raw = '996' + raw;
     }
-    raw = raw.slice(0, 12);
 
-    if (raw.length === 0) return '+996 ';
+    raw = raw.slice(0, 12);
 
     const country = '+996';
     const operator = raw.slice(3, 6);
@@ -369,10 +378,21 @@ export default function ConsultationForm() {
 
   const validatePhone = () => {
     const digitsOnly = phone.replace(/\D/g, '');
-    if (digitsOnly.length < 9 || digitsOnly.length > 15) {
-      setError(ui.phoneError);
-      return false;
+
+    // Если номер кыргызский (+996) — обязательно 12 цифр
+    if (phone.trim().startsWith('+996') || digitsOnly.startsWith('996')) {
+      if (digitsOnly.length !== 12) {
+        setError(ui.phoneError);
+        return false;
+      }
+    } else {
+      // Международный номер — от 10 до 15 цифр
+      if (digitsOnly.length < 10 || digitsOnly.length > 15) {
+        setError(ui.phoneError);
+        return false;
+      }
     }
+
     setError('');
     return true;
   };
@@ -408,7 +428,6 @@ export default function ConsultationForm() {
         return;
       }
 
-      // Фиксируем конверсию отправки формы в Яндекс.Метрику
       reachGoal('lead_submit');
       setIsSuccess(true);
     } catch (err) {
@@ -422,7 +441,6 @@ export default function ConsultationForm() {
   const handleWhatsAppSubmit = () => {
     if (!validatePhone()) return;
 
-    // Фиксируем конверсию перехода в WhatsApp из формы
     reachGoal('wa_click');
 
     const clientName = name.trim() ? name.trim() : ui.defaultClient;
@@ -563,7 +581,12 @@ export default function ConsultationForm() {
                     value={phone}
                     onChange={handlePhoneChange}
                     placeholder="+996 (700) 00-00-00"
-                    className="w-full bg-white/10 border border-white/20 focus:border-[#d4b26f] focus:outline-none rounded-xl px-4 py-3.5 text-base sm:text-sm text-white placeholder-white/40 transition-colors font-medium tracking-wide shadow-inner"
+                    aria-invalid={!!error}
+                    className={`w-full bg-white/10 border ${
+                      error
+                        ? 'border-rose-400 ring-2 ring-rose-400/30'
+                        : 'border-white/20 focus:border-[#d4b26f]'
+                    } focus:outline-none rounded-xl px-4 py-3.5 text-base sm:text-sm text-white placeholder-white/40 transition-all font-medium tracking-wide shadow-inner`}
                   />
                 </div>
               </div>
@@ -605,7 +628,7 @@ export default function ConsultationForm() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-75 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                  className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.99] disabled:opacity-70 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <div className="w-4 h-4 border-2 border-[#064734] border-t-transparent rounded-full animate-spin" />
@@ -619,7 +642,7 @@ export default function ConsultationForm() {
                   type="button"
                   onClick={handleWhatsAppSubmit}
                   disabled={isSubmitting}
-                  className="w-full bg-white/10 hover:bg-white/20 active:scale-[0.99] disabled:opacity-60 text-white font-bold py-4 rounded-xl uppercase tracking-wider text-xs border border-white/25 transition-all backdrop-blur-md flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full bg-white/10 hover:bg-white/20 active:scale-[0.99] disabled:opacity-50 text-white font-bold py-4 rounded-xl uppercase tracking-wider text-xs border border-white/25 transition-all backdrop-blur-md flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                   <span>{ui.btnWhatsApp}</span>

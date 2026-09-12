@@ -22,13 +22,24 @@ import {
   IconStar,
 } from '@/components/Icons';
 
-// Динамический импорт карты с нейтральным скелетоном загрузки
+// Динамический импорт карты с бесшовным скелетоном (предотвращает CLS)
 const BishkekMap = dynamic(() => import('@/components/BishkekMap'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] lg:h-[490px] rounded-3xl bg-gray-100 dark:bg-white/5 animate-pulse flex flex-col items-center justify-center text-xs font-bold text-gray-400 gap-2">
-      <div className="w-8 h-8 rounded-full border-2 border-[#064734] dark:border-[#d4b26f] border-t-transparent animate-spin" />
-      <span>Map Loading...</span>
+    <div className="w-full bg-white dark:bg-[#0b1b15] rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+      {/* Имитация шапки с фильтрами */}
+      <div className="p-3 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-[#f9faf9] dark:bg-[#07130e] flex items-center gap-2">
+        <div className="h-8 w-20 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
+        <div className="h-8 w-24 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
+        <div className="h-8 w-28 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
+      </div>
+      {/* Имитация поля карты */}
+      <div className="h-[290px] sm:h-[400px] lg:h-[490px] bg-[#eef2ef] dark:bg-[#040c09] flex flex-col items-center justify-center gap-3 animate-pulse">
+        <div className="w-9 h-9 rounded-full border-3 border-[#064734] dark:border-[#d4b26f] border-t-transparent animate-spin" />
+        <span className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">
+          Загрузка карты объектов...
+        </span>
+      </div>
     </div>
   ),
 });

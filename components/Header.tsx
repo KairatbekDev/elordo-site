@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { COMPANY_INFO } from '@/lib/data';
 import ThemeToggle from '@/components/ThemeToggle';
@@ -141,9 +142,12 @@ export default function Header() {
           {/* 1. Логотип компании */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#032b20] group-hover:scale-105 transition-all shrink-0">
-              <img
+              <Image
                 src="/logo-icon.png"
                 alt="EL ORDO GROUP"
+                width={40}
+                height={40}
+                priority
                 className="w-full h-full object-contain"
               />
             </div>
@@ -258,9 +262,11 @@ export default function Header() {
               <div className="flex items-center justify-between pb-5 border-b border-gray-100 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1 shadow-sm shrink-0">
-                    <img
+                    <Image
                       src="/logo-icon.png"
                       alt="EL ORDO GROUP"
+                      width={32}
+                      height={32}
                       className="w-full h-full object-contain"
                     />
                   </div>
