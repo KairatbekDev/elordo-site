@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { reachGoal } from '@/components/YandexMetrika';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -194,6 +195,7 @@ export default function Header() {
               </div>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
+                onClick={() => reachGoal('call_click')}
                 className="text-xs sm:text-sm font-black text-gray-900 dark:text-neutral-100 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
                 {COMPANY_INFO.phones[0] || '+996 709 115 115'}
@@ -209,6 +211,7 @@ export default function Header() {
             {/* Кнопка WhatsApp */}
             <a
               href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
+              onClick={() => reachGoal('wa_click')}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0"
@@ -342,12 +345,14 @@ export default function Header() {
                 <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">{t.header.hotline}</span>
                 <a
                   href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
+                  onClick={() => reachGoal('call_click')}
                   className="text-base font-black text-[#064734] dark:text-[#d4b26f] block"
                 >
                   {COMPANY_INFO.phones[0] || '+996 709 115 115'}
                 </a>
                 <a
                   href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
+                  onClick={() => reachGoal('call_click')}
                   className="text-xs text-gray-600 dark:text-neutral-300 block mt-0.5"
                 >
                   {COMPANY_INFO.phones[1] || '+996 990 115 115'}
@@ -357,6 +362,7 @@ export default function Header() {
               <div className="grid grid-cols-2 gap-2">
                 <a
                   href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
+                  onClick={() => reachGoal('wa_click')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="py-3 px-2 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow cursor-pointer"

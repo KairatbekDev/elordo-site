@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { IconWhatsApp } from '@/components/Icons';
+import { reachGoal } from '@/components/YandexMetrika';
 
 interface DownloadBrochureModalProps {
   projectSlug: string;
@@ -101,7 +102,10 @@ export default function DownloadBrochureModal({
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  reachGoal('wa_click');
+                  setIsOpen(false);
+                }}
                 className="w-full py-4 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer"
               >
                 <IconWhatsApp className="w-5 h-5 text-white" />

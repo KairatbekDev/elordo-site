@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { reachGoal } from '@/components/YandexMetrika';
 import {
   IconCheck,
   IconWhatsApp,
@@ -329,7 +330,6 @@ export default function ConsultationForm() {
   const formatPhoneInput = (input: string) => {
     const trimmed = input.trim();
 
-    // Если пользователь вводит международный номер не с +996 (например, +7, +86, +1)
     if (trimmed.startsWith('+') && !trimmed.startsWith('+996')) {
       return '+' + input.slice(1).replace(/[^\d\s()-]/g, '').slice(0, 20);
     }
@@ -408,6 +408,8 @@ export default function ConsultationForm() {
         return;
       }
 
+      // Фиксируем конверсию отправки формы в Яндекс.Метрику
+      reachGoal('lead_submit');
       setIsSuccess(true);
     } catch (err) {
       console.error('Lead submission network error:', err);
@@ -419,6 +421,9 @@ export default function ConsultationForm() {
 
   const handleWhatsAppSubmit = () => {
     if (!validatePhone()) return;
+
+    // Фиксируем конверсию перехода в WhatsApp из формы
+    reachGoal('wa_click');
 
     const clientName = name.trim() ? name.trim() : ui.defaultClient;
     const message = ui.waTemplate(clientName, selectedProject, selectedGoal, phone);
@@ -479,7 +484,7 @@ export default function ConsultationForm() {
 
             <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto relative">
               
-              {/* Скрытая ловушка для ботов (надежно скрыта от людей, но доступна для краулеров) */}
+              {/* Скрытая ловушка для ботов */}
               <div
                 aria-hidden="true"
                 style={{

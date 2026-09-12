@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { reachGoal } from '@/components/YandexMetrika';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -55,7 +56,7 @@ const CONTENT: Record<Locale, FloatingContactContent> = {
   kz: {
     badge: 'Кеңес алу 0%',
     ariaLabel: 'Сату бөлімімен байланысу',
-    salesDept: 'EL ORDO сату бөлімі',
+    salesDept: 'EL ORDO сатуу бөлімі',
     online: 'Онлайн',
     chatWhatsapp: 'WhatsApp-та жазуу',
     replyTime: '2 минутта жауап береміз',
@@ -167,7 +168,10 @@ export default function FloatingContact() {
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                reachGoal('wa_click');
+                setIsOpen(false);
+              }}
               className="flex items-center gap-3 px-3.5 py-3 rounded-2xl bg-[#25D366]/10 dark:bg-[#25D366]/15 hover:bg-[#25D366]/20 active:scale-[0.98] text-[#128C7E] dark:text-[#25D366] font-extrabold text-xs sm:text-sm transition-all border border-[#25D366]/25 shadow-sm"
             >
               <div className="w-8 h-8 rounded-xl bg-[#25D366] text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -179,13 +183,16 @@ export default function FloatingContact() {
               </div>
             </a>
 
-            {/* Прямые звонки в отдел продаж (с возможностью выделения номера) */}
+            {/* Прямые звонки в отдел продаж */}
             <div className="p-2.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 select-text">
               <span className="text-[10px] font-bold text-gray-400 dark:text-neutral-400 block mb-1 select-none">{c.callManager}</span>
               
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  reachGoal('call_click');
+                  setIsOpen(false);
+                }}
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
                 <div className="flex items-center gap-1.5">
@@ -197,7 +204,10 @@ export default function FloatingContact() {
 
               <a
                 href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  reachGoal('call_click');
+                  setIsOpen(false);
+                }}
                 className="flex items-center justify-between py-1 text-xs font-black text-gray-900 dark:text-white hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors border-t border-gray-200/50 dark:border-white/10 mt-1 pt-1"
               >
                 <div className="flex items-center gap-1.5">

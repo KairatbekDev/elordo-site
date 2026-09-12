@@ -1,99 +1,39 @@
 import { MetadataRoute } from 'next';
-import { PROJECTS_LIST } from '@/lib/data';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elordo.group';
+const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+  'https://elordo-site.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const routes = [
+    // Главная и каталог
+    { path: '', priority: 1.0, changeFrequency: 'daily' as const },
+    { path: '/projects', priority: 0.9, changeFrequency: 'daily' as const },
 
-  // Хелпер генерации языковых альтернатив (hreflang) для поисковых ботов
-  const getAlternates = (path: string) => ({
-    languages: {
-      'ru': `${BASE_URL}${path}`,
-      'ky-KG': `${BASE_URL}${path}?lang=kg`,
-      'kk-KZ': `${BASE_URL}${path}?lang=kz`,
-      'uk-UA': `${BASE_URL}${path}?lang=uk`,
-      'en': `${BASE_URL}${path}?lang=en`,
-      'zh-CN': `${BASE_URL}${path}?lang=zh`,
-      'x-default': `${BASE_URL}${path}`,
-    },
-  });
+    // Флагманские и строящиеся объекты
+    { path: '/abu-dhabi', priority: 0.9, changeFrequency: 'weekly' as const },
+    { path: '/madina-residence', priority: 0.9, changeFrequency: 'weekly' as const },
+    { path: '/ajkol-plus', priority: 0.8, changeFrequency: 'weekly' as const },
+    { path: '/ajkol', priority: 0.8, changeFrequency: 'weekly' as const },
+    { path: '/kelechek', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/ordo', priority: 0.7, changeFrequency: 'monthly' as const },
 
-  // 1. Ключевые статические страницы сайта
-  const staticRoutes: MetadataRoute.Sitemap = [
-    {
-      url: `${BASE_URL}`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 1.0,
-      alternates: getAlternates(''),
-    },
-    {
-      url: `${BASE_URL}/projects`,
-      lastModified: now,
-      changeFrequency: 'daily',
-      priority: 0.95,
-      alternates: getAlternates('/projects'),
-    },
-    {
-      url: `${BASE_URL}/hod-stroitelstva`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: getAlternates('/hod-stroitelstva'),
-    },
-    {
-      url: `${BASE_URL}/rassrochka`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: getAlternates('/rassrochka'),
-    },
-    {
-      url: `${BASE_URL}/trade-in`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.9,
-      alternates: getAlternates('/trade-in'),
-    },
-    {
-      url: `${BASE_URL}/polniy-raschet`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-      alternates: getAlternates('/polniy-raschet'),
-    },
-    {
-      url: `${BASE_URL}/usloviya`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-      alternates: getAlternates('/usloviya'),
-    },
-    {
-      url: `${BASE_URL}/o-kompanii`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: getAlternates('/o-kompanii'),
-    },
-    {
-      url: `${BASE_URL}/contacts`,
-      lastModified: now,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-      alternates: getAlternates('/contacts'),
-    },
+    // Информационные разделы и ход строительства
+    { path: '/hod-stroitelstva', priority: 0.8, changeFrequency: 'weekly' as const },
+    { path: '/usloviya', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/rassrochka', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/trade-in', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/polniy-raschet', priority: 0.7, changeFrequency: 'monthly' as const },
+    { path: '/o-kompanii', priority: 0.6, changeFrequency: 'monthly' as const },
+    { path: '/contacts', priority: 0.7, changeFrequency: 'monthly' as const },
   ];
 
-  // 2. Страницы объектов из центральной базы lib/data.ts
-  const projectRoutes: MetadataRoute.Sitemap = PROJECTS_LIST.map((project) => ({
-    url: `${BASE_URL}/${project.slug}`,
-    lastModified: now,
-    changeFrequency: project.isFinished ? 'monthly' : 'weekly',
-    priority: project.isFinished ? 0.7 : 0.9,
-    alternates: getAlternates(`/${project.slug}`),
+  return routes.map((route) => ({
+    url: `${BASE_URL}${route.path}`,
+    lastModified: new Date(),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
   }));
-
-  return [...staticRoutes, ...projectRoutes];
 }

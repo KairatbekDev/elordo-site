@@ -5,6 +5,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
+import { reachGoal } from '@/components/YandexMetrika';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -175,12 +176,14 @@ export default function Footer() {
               <span className="text-[11px] text-gray-400 block mb-0.5">{t.footer.hotline}</span>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
+                onClick={() => reachGoal('call_click')}
                 className="text-sm font-black text-white hover:text-[#d4b26f] transition-colors block"
               >
                 {COMPANY_INFO.phones[0] || '+996 709 115 115'}
               </a>
               <a
                 href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
+                onClick={() => reachGoal('call_click')}
                 className="text-xs text-gray-300 hover:text-[#d4b26f] transition-colors block mt-0.5"
               >
                 {COMPANY_INFO.phones[1] || '+996 990 115 115'}
@@ -206,6 +209,7 @@ export default function Footer() {
             <div className="pt-2 flex flex-col gap-2">
               <a
                 href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waFooterText}`}
+                onClick={() => reachGoal('wa_click')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white text-xs font-black uppercase tracking-wider transition-all shadow border border-emerald-500/30 cursor-pointer"

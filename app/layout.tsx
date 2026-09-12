@@ -8,6 +8,7 @@ import DynamicSeo from "@/components/DynamicSeo";
 import { COMPANY_INFO } from "@/lib/data";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
+import YandexMetrika from '@/components/YandexMetrika';
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -230,6 +231,7 @@ export default function RootLayout({
             <FloatingContact />
           </LanguageProvider>
         </ThemeProvider>
+        <YandexMetrika />
       </body>
     </html>
   );
