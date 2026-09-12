@@ -8,6 +8,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
+import ConsultationForm from '@/components/ConsultationForm';
 import {
   IconBuilding,
   IconCrane,
@@ -930,8 +931,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. БАННЕР КОНСУЛЬТАЦИИ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6">
+      {/* 7. ФОРМА ЗАЯВКИ И ПОДБОРА КВАРТИРЫ */}
+      <ConsultationForm />
+
+      {/* 8. БАННЕР КОНСУЛЬТАЦИИ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="bg-[#064734] text-white rounded-3xl p-8 sm:p-12 border border-[#d4b26f]/30 flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
           <div className="max-w-xl text-center md:text-left">
             <span className="text-xs uppercase font-bold tracking-wider text-[#d4b26f] block mb-2">

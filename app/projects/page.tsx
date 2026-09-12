@@ -193,7 +193,8 @@ export default function ProjectsCatalogPage() {
       if (isFinished) {
         priceStr = p.soldOut;
       } else {
-        const num = item.priceNum.toLocaleString();
+        // Надежное форматирование без зависимости от локали браузера
+        const num = item.priceNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         if (currentLang === 'en') priceStr = `from $${num}/m²`;
         else if (currentLang === 'zh') priceStr = `${num} $/m² 起`;
         else if (currentLang === 'kg' || currentLang === 'kz') priceStr = `${num} $/м² ${t.common.fromPrice}`;
@@ -477,7 +478,10 @@ export default function ProjectsCatalogPage() {
 
                       {/* Бейдж цены */}
                       {project.price && (
-                        <div className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 shadow">
+                        <div 
+                          suppressHydrationWarning
+                          className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 shadow"
+                        >
                           {project.price}
                         </div>
                       )}
