@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
@@ -905,6 +906,16 @@ export default function InstallmentPage() {
   const lang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[lang] || CONTENT.ru;
 
+  // Очистка номера WhatsApp от пробелов и спецсимволов
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+
+  // Синхронизация заголовка вкладки браузера при смене языка
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = `${c.pageTitle} | EL ORDO GROUP`;
+    }
+  }, [c.pageTitle]);
+
   return (
     <PaymentLayout
       pageTitle={c.pageTitle}
@@ -984,7 +995,7 @@ export default function InstallmentPage() {
 
               <div className="mt-6 pt-3 space-y-2">
                 <a
-                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
+                  href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
@@ -1035,7 +1046,7 @@ export default function InstallmentPage() {
             <tbody className="divide-y divide-gray-100 dark:divide-white/10 text-gray-700 dark:text-gray-300">
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row1Criteria}</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/30">
                   {c.row1ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-rose-600 dark:text-rose-400 font-bold">
@@ -1044,7 +1055,7 @@ export default function InstallmentPage() {
               </tr>
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row2Criteria}</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/30">
                   {c.row2ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-rose-600 dark:text-rose-400 font-bold">
@@ -1053,7 +1064,7 @@ export default function InstallmentPage() {
               </tr>
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row3Criteria}</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/30">
                   {c.row3ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
@@ -1062,7 +1073,7 @@ export default function InstallmentPage() {
               </tr>
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row4Criteria}</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/30">
                   {c.row4ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
@@ -1071,7 +1082,7 @@ export default function InstallmentPage() {
               </tr>
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row5Criteria}</td>
-                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/20">
+                <td className="py-3.5 px-3 font-semibold text-gray-900 dark:text-gray-200 bg-emerald-50/40 dark:bg-emerald-950/30">
                   {c.row5ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">
@@ -1080,7 +1091,7 @@ export default function InstallmentPage() {
               </tr>
               <tr>
                 <td className="py-3.5 px-3 font-bold text-gray-900 dark:text-white">{c.row6Criteria}</td>
-                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-b-xl">
+                <td className="py-3.5 px-3 font-black text-emerald-700 dark:text-emerald-400 bg-emerald-50/40 dark:bg-emerald-950/30 rounded-b-xl">
                   {c.row6ElOrdo}
                 </td>
                 <td className="py-3.5 px-3 text-gray-500 dark:text-neutral-400">

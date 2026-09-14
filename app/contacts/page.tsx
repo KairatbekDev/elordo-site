@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO, PROJECTS_LIST } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
@@ -21,6 +22,15 @@ export default function ContactsPage() {
   const { t } = useLanguage();
   const [selectedProject, setSelectedProject] = useState<string>('ЖК Abu Dhabi');
   const [visitTime, setVisitTime] = useState<string>('today');
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+
+  // Синхронизация заголовка страницы во вкладке браузера
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = `${t.header.contacts} | EL ORDO GROUP`;
+    }
+  }, [t.header.contacts]);
 
   const visitTimeLabels: Record<string, string> = {
     today: t.contactsPage.timeToday,
@@ -55,7 +65,7 @@ export default function ContactsPage() {
       `• ${t.contactsPage.waTime} ${visitTimeLabels[visitTime] || visitTime}\n\n` +
       `${t.contactsPage.waConfirm}`;
 
-    window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const waQuickConsultText = encodeURIComponent(
@@ -76,13 +86,16 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      {/* 2. Заголовок */}
+      {/* 2. Заголовок Hero */}
       <section className="relative min-h-[380px] sm:min-h-[420px] flex items-center justify-center bg-[#064734] text-white py-16 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="/projects/Abu-Dhabi.png"
             alt="EL ORDO GROUP"
-            className="w-full h-full object-cover object-center opacity-25 scale-105"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-25 scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#021c15] via-[#064734]/85 to-black/70" />
         </div>
@@ -156,10 +169,10 @@ export default function ContactsPage() {
               </p>
             </div>
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waQuickConsultText}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${waQuickConsultText}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline"
+              className="mt-6 inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
               <span>{t.contactsPage.phoneCardAction}</span>
@@ -201,7 +214,7 @@ export default function ContactsPage() {
               href={COMPANY_INFO.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center gap-1.5 text-xs font-black text-pink-700 dark:text-pink-400 hover:underline"
+              className="mt-6 inline-flex items-center gap-1.5 text-xs font-black text-pink-700 dark:text-pink-400 hover:underline cursor-pointer"
             >
               <span>{t.contactsPage.hoursVideoAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
@@ -211,11 +224,11 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      {/* 4. Запись на визит в офис + Преимущества посещения */}
+      {/* 4. Запись на визит в офис */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
           
-          {/* Левая колонка */}
+          {/* Преимущества визита */}
           <div className="lg:col-span-6 space-y-4">
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block">
               {t.contactsPage.bookingBadge}
@@ -261,7 +274,7 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          {/* Правая колонка: Форма брони */}
+          {/* Форма бронирования */}
           <div className="lg:col-span-6 bg-[#f5f8f6] dark:bg-[#040c09] p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 transition-colors">
             <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white mb-4">
               {t.contactsPage.formTitle}
@@ -320,9 +333,9 @@ export default function ContactsPage() {
 
               <button
                 type="submit"
-                className="w-full mt-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-[#d4b26f] hover:text-white font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"
+                className="w-full mt-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 border border-transparent cursor-pointer"
               >
-                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                 <span>{t.contactsPage.btnSubmit}</span>
               </button>
               <p className="text-[11px] text-gray-500 dark:text-neutral-400 text-center font-medium">
