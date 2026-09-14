@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 
 type Locale = 'ru' | 'kg' | 'kz' | 'uk' | 'en' | 'zh';
@@ -50,6 +51,58 @@ const SEO_LOCALES: Record<Locale, SeoItem> = {
   },
 };
 
+// Названия проектов для динамических заголовков вкладок
+const PROJECT_NAMES: Record<string, Record<Locale, string>> = {
+  'abu-dhabi': {
+    ru: 'ЖК Abu Dhabi • Премиум-класс',
+    kg: 'Abu Dhabi ТЖК • Премиум-класс',
+    kz: 'Abu Dhabi ТҮК • Премиум-класс',
+    uk: 'ЖК Abu Dhabi • Преміум-клас',
+    en: 'Abu Dhabi RC • Premium Class',
+    zh: '阿布扎比住宅区 • 尊享级',
+  },
+  'madina-residence': {
+    ru: 'ЖК Madina Residence • Бизнес-класс',
+    kg: 'Madina Residence ТЖК • Бизнес-класс',
+    kz: 'Madina Residence ТҮК • Бизнес-класс',
+    uk: 'ЖК Madina Residence • Бізнес-клас',
+    en: 'Madina Residence • Business Class',
+    zh: '麦地那公馆 • 商务级',
+  },
+  'ajkol-plus': {
+    ru: 'ЖД Айкол+ • Клубный дом в предгорье',
+    kg: 'Айкол+ Клубдук үйү • Тоо этегинде',
+    kz: 'Айкол+ Клубтық үйі • Тау бөктерінде',
+    uk: 'ЖБ Айкол+ • Клубний будинок',
+    en: 'Aikol+ Club House • Foothills',
+    zh: '艾科尔+ 精品洋房 • 山麓宜居',
+  },
+  'ajkol': {
+    ru: 'ЖД Айкол • Сдача 2026',
+    kg: 'Айкол турак үйү • 2026 тапшыруу',
+    kz: 'Айкол тұрғын үйі • 2026 тапсыру',
+    uk: 'ЖБ Айкол • Здача 2026',
+    en: 'Aikol Residential Building • 2026',
+    zh: '艾科尔住宅 • 2026交付',
+  },
+  'kelechek': {
+    ru: 'ЖК Келечек • Сдан в эксплуатацию',
+    kg: 'Келечек ТЖК • Пайдаланууга берилген',
+    kz: 'Келечек ТҮК • Пайдалануға берілген',
+    uk: 'ЖК Келечек • Зданий в експлуатацію',
+    en: 'Kelechek RC • Fully Commissioned',
+    zh: '凯莱切克住宅区 • 已交付入住',
+  },
+  'ordo': {
+    ru: 'КД Ордо • Сдан в эксплуатацию',
+    kg: 'Ордо Клубдук үйү • Пайдаланууга берилген',
+    kz: 'Ордо Клубтық үйі • Пайдалануға берілген',
+    uk: 'КБ Ордо • Зданий в експлуатацію',
+    en: 'Ordo Club House • Fully Commissioned',
+    zh: '奥尔多精品洋房 • 已交付入住',
+  },
+};
+
 function updateMetaTag(selector: string, attr: string, key: string, value: string) {
   let element = document.querySelector(selector);
   if (!element) {
@@ -62,32 +115,41 @@ function updateMetaTag(selector: string, attr: string, key: string, value: strin
 
 export default function DynamicSeo() {
   const { locale } = useLanguage();
+  const pathname = usePathname();
   const currentLocale = (locale as Locale) || 'ru';
 
   useEffect(() => {
     const seo = SEO_LOCALES[currentLocale] || SEO_LOCALES.ru;
 
-    // 1. Атрибут языка страницы
+    // 1. Атрибут языка в теге <html>
     document.documentElement.lang = seo.langCode;
 
-    if (typeof window !== 'undefined') {
-      // 2. Title во вкладке браузера
-      if (window.location.pathname === '/' || !document.title.includes('|')) {
-        document.title = seo.title;
-      }
+    if (typeof window === 'undefined') return;
 
-      // 3. Meta description
+    // Очищаем slug от слешей
+    const slug = pathname.replace(/^\/|\/$/g, '');
+    const isHome = pathname === '/';
+    const projectInfo = PROJECT_NAMES[slug];
+
+    // 2. Логика для страниц отдельных ЖК
+    if (projectInfo) {
+      const complexTitle = `${projectInfo[currentLocale] || projectInfo.ru} | EL ORDO GROUP`;
+      document.title = complexTitle;
+      updateMetaTag('meta[property="og:title"]', 'property', 'og:title', complexTitle);
+      updateMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', complexTitle);
+      return; // Не перезаписываем описание ЖК общим текстом главной страницы!
+    }
+
+    // 3. Логика для главной страницы
+    if (isHome) {
+      document.title = seo.title;
       updateMetaTag('meta[name="description"]', 'name', 'description', seo.description);
-
-      // 4. OpenGraph (Facebook, WhatsApp)
       updateMetaTag('meta[property="og:title"]', 'property', 'og:title', seo.title);
       updateMetaTag('meta[property="og:description"]', 'property', 'og:description', seo.description);
-
-      // 5. Twitter Card
       updateMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', seo.title);
       updateMetaTag('meta[name="twitter:description"]', 'name', 'twitter:description', seo.description);
     }
-  }, [currentLocale]);
+  }, [currentLocale, pathname]);
 
   return null;
 }

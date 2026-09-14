@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { COMPANY_INFO } from '@/lib/data';
@@ -139,6 +139,13 @@ export default function ProjectsCatalogPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
 
+  // Динамический заголовок вкладки браузера для каталога
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = `${p.heroTitle} | EL ORDO GROUP`;
+    }
+  }, [p.heroTitle]);
+
   // Локализация карточек объектов
   const localizedProjects = useMemo(() => {
     return RAW_PROJECTS.map((item) => {
@@ -193,7 +200,6 @@ export default function ProjectsCatalogPage() {
       if (isFinished) {
         priceStr = p.soldOut;
       } else {
-        // Надежное форматирование без зависимости от локали браузера
         const num = item.priceNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         if (currentLang === 'en') priceStr = `from $${num}/m²`;
         else if (currentLang === 'zh') priceStr = `${num} $/m² 起`;
@@ -440,7 +446,7 @@ export default function ProjectsCatalogPage() {
         {/* 4. Сетка карточек проектов */}
         {filteredProjects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-            {filteredProjects.map((project) => {
+            {filteredProjects.map((project, index) => {
               const isFinished = project.category === 'finished';
               const waProjectText = encodeURIComponent(
                 p.waProjectText.replace('{name}', project.name)
@@ -458,6 +464,7 @@ export default function ProjectsCatalogPage() {
                         src={project.image}
                         alt={project.name}
                         fill
+                        priority={index < 2}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -480,7 +487,7 @@ export default function ProjectsCatalogPage() {
                       {project.price && (
                         <div 
                           suppressHydrationWarning
-                          className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/10 shadow"
+                          className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 dark:bg-black/75 backdrop-blur-md text-[#d4b26f] text-xs font-black px-3 py-1.5 rounded-xl border border-white/10 shadow"
                         >
                           {project.price}
                         </div>
@@ -518,7 +525,7 @@ export default function ProjectsCatalogPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/${project.slug}`}
-                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>{p.detailsBtn}</span>
                       <IconArrowRight className="w-4 h-4" />
@@ -529,7 +536,7 @@ export default function ProjectsCatalogPage() {
                         href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5"
+                        className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <IconWhatsApp className="w-3.5 h-3.5 text-[#25D366]" />
                         <span>{p.askAvailabilityBtn}</span>
@@ -581,9 +588,9 @@ export default function ProjectsCatalogPage() {
             href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(p.waCatalogText)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#0a4d38] text-white font-bold px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent dark:border-white/10"
+            className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-white dark:text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent cursor-pointer"
           >
-            <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+            <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
             <span>{p.ctaBtn}</span>
           </a>
         </div>

@@ -6,10 +6,21 @@ import Script from 'next/script';
 
 const COUNTER_ID = process.env.NEXT_PUBLIC_YM_ID || '112524603';
 
+declare global {
+  interface Window {
+    ym?: (id: number, method: string, ...args: any[]) => void;
+  }
+}
+
 // Функция фиксации целевых действий (WhatsApp, звонки, заявки)
 export const reachGoal = (target: string, params?: Record<string, any>) => {
-  if (typeof window !== 'undefined' && (window as any).ym) {
-    (window as any).ym(Number(COUNTER_ID), 'reachGoal', target, params);
+  if (typeof window !== 'undefined') {
+    if (window.ym) {
+      window.ym(Number(COUNTER_ID), 'reachGoal', target, params);
+    }
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎯 [YM reachGoal]: "${target}"`, params || '');
+    }
   }
 };
 
@@ -19,9 +30,9 @@ function MetrikaTracking() {
 
   // Отслеживаем переходы между страницами внутри Next.js (SPA)
   useEffect(() => {
-    if (typeof window !== 'undefined' && (window as any).ym) {
+    if (typeof window !== 'undefined' && window.ym) {
       const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-      (window as any).ym(Number(COUNTER_ID), 'hit', url);
+      window.ym(Number(COUNTER_ID), 'hit', url);
     }
   }, [pathname, searchParams]);
 
@@ -45,11 +56,11 @@ export default function YandexMetrika() {
             (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
             ym(${COUNTER_ID}, "init", {
-              ssr: true,
-              webvisor: true,
+              defer: true,
               clickmap: true,
               trackLinks: true,
               accurateTrackBounce: true,
+              webvisor: true,
               ecommerce: "dataLayer"
             });
           `,
