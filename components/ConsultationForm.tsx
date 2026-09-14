@@ -5,6 +5,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { reachGoal } from '@/components/YandexMetrika';
+import { getStoredUtm } from '@/lib/utm';
 import {
   IconCheck,
   IconWhatsApp,
@@ -417,6 +418,7 @@ export default function ConsultationForm() {
           lang: currentLang,
           website: honeypot,
           source: 'ConsultationForm',
+          utm: getStoredUtm(),
           createdAt: new Date().toISOString(),
         }),
       });

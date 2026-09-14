@@ -29,7 +29,6 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-// Надежное экранирование спецсимволов для Telegram HTML
 function escapeHtml(str: string = ''): string {
   return str
     .replace(/&/g, '&amp;')
@@ -38,17 +37,13 @@ function escapeHtml(str: string = ''): string {
     .replace(/"/g, '&quot;');
 }
 
-// Приведение номера к валидному международному формату WhatsApp (КР и СНГ)
 function normalizePhoneForWhatsApp(rawDigits: string): string {
-  // Если ввели 0XXX XXXXXX (10 цифр по КР) -> меняем 0 на 996
   if (rawDigits.startsWith('0') && rawDigits.length === 10) {
     return `996${rawDigits.slice(1)}`;
   }
-  // Если ввели 9 цифр (709115115) -> добавляем 996
   if (rawDigits.length === 9) {
     return `996${rawDigits}`;
   }
-  // Если ввели с 8 в Казахстане/РФ (87XXXXXXXXX - 11 цифр) -> меняем на 7
   if (rawDigits.startsWith('8') && rawDigits.length === 11) {
     return `7${rawDigits.slice(1)}`;
   }
@@ -70,7 +65,7 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
-    const { name, phone, project, goal, lang, website } = data;
+    const { name, phone, project, goal, lang, website, utm } = data;
 
     // 2. Honeypot-ловушка для спам-ботов
     if (website && String(website).trim().length > 0) {
@@ -87,16 +82,34 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. Нормализация под прямую ссылку WhatsApp
     const waPhone = normalizePhoneForWhatsApp(cleanPhone);
     const clientWaUrl = `https://wa.me/${waPhone}`;
 
-    // 5. Санитизация данных для Telegram HTML
+    // 4. Санитизация полей
     const safeName = escapeHtml(String(name || '').trim().slice(0, 80)) || 'Не указано';
     const safePhone = escapeHtml(String(phone || '').trim().slice(0, 30));
     const safeProject = escapeHtml(String(project || 'Не выбран').slice(0, 80));
     const safeGoal = escapeHtml(String(goal || 'Консультация').slice(0, 80));
     const safeLang = escapeHtml(String(lang || 'RU').toUpperCase().slice(0, 10));
+
+    // 5. Формирование строки рекламного источника (UTM)
+    let marketingInfo = 'Прямой заход / Органический поиск';
+    if (utm && typeof utm === 'object') {
+      const source = escapeHtml(utm.utm_source || '');
+      const medium = escapeHtml(utm.utm_medium || '');
+      const campaign = escapeHtml(utm.utm_campaign || '');
+      const content = escapeHtml(utm.utm_content || '');
+
+      const parts = [];
+      if (source) parts.push(`Источник: <b>${source}</b>`);
+      if (medium) parts.push(`Тип: <i>${medium}</i>`);
+      if (campaign) parts.push(`Кампания: <code>${campaign}</code>`);
+      if (content) parts.push(`Креатив: ${content}`);
+
+      if (parts.length > 0) {
+        marketingInfo = parts.join(' | ');
+      }
+    }
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -109,7 +122,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Дата и время по Бишкеку (Asia/Bishkek)
+    // Время по Бишкеку
     const bishkekDateTime = new Intl.DateTimeFormat('ru-RU', {
       timeZone: 'Asia/Bishkek',
       day: '2-digit',
@@ -125,6 +138,7 @@ export async function POST(req: Request) {
       `📞 <b>Телефон:</b> <code>${safePhone}</code>\n` +
       `🏢 <b>Объект:</b> ${safeProject}\n` +
       `🎯 <b>Цель:</b> ${safeGoal}\n` +
+      `📢 <b>Реклама:</b> ${marketingInfo}\n` +
       `🌐 <b>Язык:</b> ${safeLang}\n` +
       `⏰ <b>Время (Бишкек):</b> ${bishkekDateTime}\n` +
       `━━━━━━━━━━━━━━━━━━`;
@@ -137,7 +151,6 @@ export async function POST(req: Request) {
       ],
     };
 
-    // Отправка в Telegram с таймаутом 7 секунд
     const tgResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

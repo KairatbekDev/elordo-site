@@ -7,6 +7,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
+import ApartmentSelector from '@/components/ApartmentSelector';
 import {
   IconBuilding,
   IconCrane,
@@ -138,6 +139,8 @@ export default function ProjectsCatalogPage() {
   const [classFilter, setClassFilter] = useState<'all' | 'premium' | 'business' | 'comfort'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'default' | 'price-asc' | 'price-desc'>('default');
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   // Динамический заголовок вкладки браузера для каталога
   useEffect(() => {
@@ -533,7 +536,7 @@ export default function ProjectsCatalogPage() {
 
                     {!isFinished && (
                       <a
-                        href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waProjectText}`}
+                        href={`https://wa.me/${cleanWaNumber}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
@@ -569,9 +572,16 @@ export default function ProjectsCatalogPage() {
             </button>
           </div>
         )}
+      </div>
 
-        {/* 5. Баннер консультации внизу каталога */}
-        <div className="mt-16 bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
+      {/* 5. ИНТЕРАКТИВНЫЙ ОНЛАЙН-КАЛЬКУЛЯТОР КВАРТИР */}
+      <div className="mt-16 border-t border-gray-200 dark:border-white/10">
+        <ApartmentSelector />
+      </div>
+
+      {/* 6. Баннер консультации внизу каталога */}
+      <div className="max-w-6xl mx-auto px-6 mt-8">
+        <div className="bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
           <div className="max-w-xl text-center md:text-left">
             <span className="text-xs uppercase font-bold tracking-wider text-[#064734] dark:text-[#d4b26f] block mb-1">
               {p.ctaBadge}
@@ -585,7 +595,7 @@ export default function ProjectsCatalogPage() {
           </div>
 
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(p.waCatalogText)}`}
+            href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(p.waCatalogText)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-white dark:text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent cursor-pointer"

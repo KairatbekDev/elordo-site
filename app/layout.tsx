@@ -9,6 +9,7 @@ import { COMPANY_INFO } from "@/lib/data";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
 import YandexMetrika from '@/components/YandexMetrika';
+import UtmTracker from '@/components/UtmTracker';
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -17,15 +18,18 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
 });
 
-// Автоматическое определение актуального адреса (Production домен -> Vercel preview -> локалка)
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ||
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-  'https://elordo-site.vercel.app';
+  'https://elordogroup.kg';
 
+// Адаптивный статус-бар смартфона (Изумрудный днем, глубокий графитовый ночью)
 export const viewport: Viewport = {
-  themeColor: '#064734',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#064734' },
+    { media: '(prefers-color-scheme: dark)', color: '#07130e' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -40,7 +44,6 @@ export const metadata: Metadata = {
   description:
     'Строительная компания EL ORDO GROUP в Бишкеке. Продажа квартир премиум, бизнес и комфорт-класса напрямую от надежного застройщика. Беспроцентная рассрочка 0% до 40 месяцев без банка, программа Trade-in. ЖК Abu Dhabi, Madina Residence, Айкол+.',
   keywords: [
-    // RU
     'EL ORDO',
     'EL ORDO GROUP',
     'Эл Ордо',
@@ -52,22 +55,18 @@ export const metadata: Metadata = {
     'Madina Residence',
     'ЖД Айкол',
     'недвижимость Кыргызстан',
-    // KG
     'Бишкекте батир сатып алуу',
     'жаңы курулуштар Бишкек',
     'пайызсыз бөлүп төлөө',
     'Эл Ордо курулуш компаниясы',
-    // KZ
     'Бішкектен пәтер сатып алу',
     'жаңа құрылыстар Бішкек',
     'пайызсыз бөліп төлеу',
-    // EN
     'buy apartment in Bishkek',
     'property in Kyrgyzstan',
     'real estate Bishkek developer',
     'apartments installment 0%',
     'EL ORDO development',
-    // ZH
     '比什凯克买房',
     '比什凯克公寓',
     '吉尔吉斯斯坦房地产',
@@ -82,7 +81,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'EL ORDO',
   },
   alternates: {
@@ -155,7 +154,7 @@ export default function RootLayout({
     name: 'EL ORDO GROUP',
     legalName: 'ОсОО Строительная компания EL ORDO GROUP',
     image: `${SITE_URL}/projects/Abu-Dhabi.png`,
-    '@id': SITE_URL,
+    '@id': `${SITE_URL}/#organization`,
     url: SITE_URL,
     telephone: COMPANY_INFO.phones.map((phone) => phone.replace(/\s+/g, '')),
     priceRange: '$$$',
@@ -232,6 +231,7 @@ export default function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         <YandexMetrika />
+        <UtmTracker />
       </body>
     </html>
   );
