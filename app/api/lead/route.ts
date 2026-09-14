@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
 
-// Хранилище лимитов с автоматической очисткой памяти (до 4 заявок за 5 минут)
+// Хранилище лимитов с автоматической очисткой памяти (до 4 заявок за 5 минут на IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
 
-  // Периодическая очистка устаревших записей (предотвращение утечки памяти)
   if (rateLimitMap.size > 500) {
     for (const [key, value] of rateLimitMap.entries()) {
       if (now > value.resetAt) {
@@ -39,10 +38,28 @@ function escapeHtml(str: string = ''): string {
     .replace(/"/g, '&quot;');
 }
 
+// Приведение номера к валидному международному формату WhatsApp (КР и СНГ)
+function normalizePhoneForWhatsApp(rawDigits: string): string {
+  // Если ввели 0XXX XXXXXX (10 цифр по КР) -> меняем 0 на 996
+  if (rawDigits.startsWith('0') && rawDigits.length === 10) {
+    return `996${rawDigits.slice(1)}`;
+  }
+  // Если ввели 9 цифр (709115115) -> добавляем 996
+  if (rawDigits.length === 9) {
+    return `996${rawDigits}`;
+  }
+  // Если ввели с 8 в Казахстане/РФ (87XXXXXXXXX - 11 цифр) -> меняем на 7
+  if (rawDigits.startsWith('8') && rawDigits.length === 11) {
+    return `7${rawDigits.slice(1)}`;
+  }
+  return rawDigits;
+}
+
 export async function POST(req: Request) {
   try {
     const forwardedFor = req.headers.get('x-forwarded-for');
-    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
+    const realIp = req.headers.get('x-real-ip');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : (realIp || '127.0.0.1');
 
     // 1. Защита от спама и флуда
     if (isRateLimited(clientIp)) {
@@ -70,7 +87,11 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4. Полная санитизация всех полей (включая отображаемый телефон)
+    // 4. Нормализация под прямую ссылку WhatsApp
+    const waPhone = normalizePhoneForWhatsApp(cleanPhone);
+    const clientWaUrl = `https://wa.me/${waPhone}`;
+
+    // 5. Санитизация данных для Telegram HTML
     const safeName = escapeHtml(String(name || '').trim().slice(0, 80)) || 'Не указано';
     const safePhone = escapeHtml(String(phone || '').trim().slice(0, 30));
     const safeProject = escapeHtml(String(project || 'Не выбран').slice(0, 80));
@@ -81,31 +102,31 @@ export async function POST(req: Request) {
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!token || !chatId) {
-      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены в переменных окружения!');
+      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены!');
       return NextResponse.json(
         { success: false, error: 'Ошибка конфигурации сервера' },
         { status: 500 }
       );
     }
 
-    const clientWaUrl = `https://wa.me/${cleanPhone}`;
-
-    // Время по Бишкеку (UTC+6)
-    const bishkekTime = new Date().toLocaleTimeString('ru-RU', {
+    // Дата и время по Бишкеку (Asia/Bishkek)
+    const bishkekDateTime = new Intl.DateTimeFormat('ru-RU', {
       timeZone: 'Asia/Bishkek',
+      day: '2-digit',
+      month: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    }).format(new Date());
 
     const messageHtml =
-      `🏛 <b>НОВАЯ ЗАЯВКА С САЙТА EL ORDO GROUP</b>\n` +
+      `🏛 <b>НОВАЯ ЗАЯВКА • EL ORDO GROUP</b>\n` +
       `━━━━━━━━━━━━━━━━━━\n` +
       `👤 <b>Клиент:</b> ${safeName}\n` +
       `📞 <b>Телефон:</b> <code>${safePhone}</code>\n` +
-      `🏢 <b>Интересует:</b> ${safeProject}\n` +
+      `🏢 <b>Объект:</b> ${safeProject}\n` +
       `🎯 <b>Цель:</b> ${safeGoal}\n` +
-      `🌐 <b>Язык интерфейса:</b> ${safeLang}\n` +
-      `⏰ <b>Время (Бишкек):</b> ${bishkekTime}\n` +
+      `🌐 <b>Язык:</b> ${safeLang}\n` +
+      `⏰ <b>Время (Бишкек):</b> ${bishkekDateTime}\n` +
       `━━━━━━━━━━━━━━━━━━`;
 
     const replyMarkup = {
