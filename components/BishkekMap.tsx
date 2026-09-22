@@ -113,12 +113,12 @@ const RAW_POINTS: MapPointRaw[] = [
       zh: '2027年第3季度',
     },
     price: {
-      ru: 'от 1 400 $/м²',
-      kg: '1 400 $/м² баштап',
-      kz: '1 400 $/м² бастап',
-      uk: 'від 1 400 $/м²',
-      en: 'from $1,400/m²',
-      zh: '1 400 $/m² 起',
+      ru: 'от 1 500 $/м²',
+      kg: '1 500 $/м² баштап',
+      kz: '1 500 $/м² бастап',
+      uk: 'від 1 500 $/м²',
+      en: 'from $1,500/m²',
+      zh: '1 500 $/m² 起',
     },
     desc: {
       ru: 'Символ статуса в центральной части Бишкека.',
@@ -153,12 +153,12 @@ const RAW_POINTS: MapPointRaw[] = [
       zh: '2028年第3季度',
     },
     price: {
-      ru: 'от 1 100 $/м²',
-      kg: '1 100 $/м² баштап',
-      kz: '1 100 $/м² бастап',
-      uk: 'від 1 100 $/м²',
-      en: 'from $1,100/m²',
-      zh: '1 100 $/m² 起',
+      ru: 'от 1 200 $/м²',
+      kg: '1 200 $/м² баштап',
+      kz: '1 200 $/м² бастап',
+      uk: 'від 1 200 $/м²',
+      en: 'from $1,200/m²',
+      zh: '1 200 $/m² 起',
     },
     desc: {
       ru: 'Экологический клубный дом в предгорье с чистым воздухом.',
@@ -173,40 +173,24 @@ const RAW_POINTS: MapPointRaw[] = [
   {
     id: 'ajkol',
     name: 'ЖД Айкол',
-    category: 'active',
+    category: 'finished',
     categoryLabel: {
-      ru: 'Комфорт',
-      kg: 'Комфорт',
-      kz: 'Комфорт',
-      uk: 'Комфорт',
-      en: 'Comfort',
-      zh: '舒适级 (Comfort)',
+      ru: 'Сдан',
+      kg: 'Бүткөн',
+      kz: 'Берілген',
+      uk: 'Зданий',
+      en: 'Completed',
+      zh: '已交付',
     },
     address: 'ул. Арашан, 10',
     coords: [42.8171, 74.64892],
-    deadline: {
-      ru: '2026 г. 2 кв.',
-      kg: '2026-ж. 2-кв.',
-      kz: '2026 ж. 2 т.',
-      uk: '2 кв. 2026 р.',
-      en: 'Q2 2026',
-      zh: '2026年第2季度',
-    },
-    price: {
-      ru: 'от 950 $/м²',
-      kg: '950 $/м² баштап',
-      kz: '950 $/м² бастап',
-      uk: 'від 950 $/м²',
-      en: 'from $950/m²',
-      zh: '950 $/m² 起',
-    },
     desc: {
-      ru: 'Завершение монолитно-кирпичной коробки, скорая сдача.',
-      kg: 'Монолит-кыш курулушунун аякташы, жакында тапшырылат.',
-      kz: 'Монолитті-кірпіш қаңқасының аяқталуы, жуырда тапсырылады.',
-      uk: 'Завершення монолітно-цегляного каркаса, швидка здача.',
-      en: 'Monolithic brick frame completed, nearing handover.',
-      zh: '现浇主体与红砖砌体高进度封顶，即将竣工验收。',
+      ru: 'Полностью построенный, введенный в эксплуатацию дом.',
+      kg: 'Толук курулуп, пайдаланууга берилген үй.',
+      kz: 'Толық салынып, пайдалануға берілген тұрғын үй.',
+      uk: 'Повністю збудований, введений в експлуатацію будинок.',
+      en: 'Fully built, commissioned, and resident-occupied development.',
+      zh: '全盘竣工交付并顺利入住的宜居社区。',
     },
     gisUrl: 'https://2gis.kg/bishkek/search/%D0%90%D1%80%D0%B0%D1%88%D0%B0%D0%BD%2010',
   },
@@ -391,7 +375,7 @@ export default function BishkekMap() {
         dragging: !isMobile,
         touchZoom: !isMobile,
         tap: !isMobile,
-        attributionControl: false, // Отключает плашку копирайта OpenStreetMap / Leaflet снизу справа
+        attributionControl: false,
       });
 
       mapRef.current = map;
@@ -722,7 +706,7 @@ export default function BishkekMap() {
                         ? 'bg-[#d4b26f]/20 text-[#8c6b23] dark:text-[#d4b26f]'
                         : point.category === 'finished'
                         ? 'bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-neutral-300'
-                        : 'bg-[#064734]/10 dark:bg-[#064734]/40 text-[#064734] dark:text-emerald-400'
+                        : 'bg-[#064734]/10 dark:bg-[#064734]/30 text-[#064734] dark:text-emerald-400'
                     }`}
                   >
                     {point.categoryLabel}

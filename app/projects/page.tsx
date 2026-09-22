@@ -42,7 +42,7 @@ const RAW_PROJECTS: ProjectRaw[] = [
     category: 'active',
     classCategory: 'business',
     image: '/projects/Madina-Residense.png',
-    priceNum: 1400,
+    priceNum: 1500,
   },
   {
     slug: 'ajkol-plus',
@@ -50,15 +50,15 @@ const RAW_PROJECTS: ProjectRaw[] = [
     category: 'active',
     classCategory: 'comfort',
     image: '/projects/Aikolplus.png',
-    priceNum: 1100,
+    priceNum: 1200,
   },
   {
     slug: 'ajkol',
     name: 'ЖД Айкол',
-    category: 'active',
+    category: 'finished',
     classCategory: 'comfort',
     image: '/projects/ajkol.jpg',
-    priceNum: 950,
+    priceNum: 0,
   },
   {
     slug: 'kelechek',
@@ -170,7 +170,19 @@ export default function ProjectsCatalogPage() {
         case 'madina-residence':
           classType = p.madinaClass;
           deadline = p.madinaDeadline;
-          floors = p.madinaFloors;
+          // Фиксируем «14 этажей • 3 блока» под все языки
+          floors =
+            currentLang === 'en'
+              ? '14 floors • 3 blocks'
+              : currentLang === 'kg'
+              ? '14 кабат • 3 блок'
+              : currentLang === 'kz'
+              ? '14 қабат • 3 блок'
+              : currentLang === 'zh'
+              ? '14层 • 3栋'
+              : currentLang === 'uk'
+              ? '14 поверхів • 3 блоки'
+              : '14 этажей • 3 блока';
           desc = p.madinaDesc;
           break;
         case 'ajkol-plus':
@@ -181,7 +193,7 @@ export default function ProjectsCatalogPage() {
           break;
         case 'ajkol':
           classType = p.ajkolClass;
-          deadline = p.ajkolDeadline;
+          deadline = p.statusFinishedFull || p.statusFinished;
           floors = p.ajkolFloors;
           desc = p.ajkolDesc;
           break;
@@ -201,7 +213,7 @@ export default function ProjectsCatalogPage() {
 
       let priceStr = '';
       if (isFinished) {
-        priceStr = p.soldOut;
+        priceStr = p.soldOut || p.statusFinished;
       } else {
         const num = item.priceNum.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         if (currentLang === 'en') priceStr = `from $${num}/m²`;

@@ -28,7 +28,7 @@ interface FloatingContactContent {
 
 const CONTENT: Record<Locale, FloatingContactContent> = {
   ru: {
-    badge: 'Консультация 0%',
+    badge: 'Подробнее',
     ariaLabel: 'Связаться с отделом продаж',
     salesDept: 'Отдел продаж EL ORDO',
     online: 'Онлайн',

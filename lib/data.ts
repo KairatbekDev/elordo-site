@@ -167,9 +167,9 @@ export const COMPANY_INFO: CompanyInfo = {
       role: 'Резидент ЖК Madina Residence',
     },
     {
-      author: 'Жаныбек Убайдуллаев',
-      text: 'Искренне благодарен компании EL ORDO за быстрое и качественное воплощение проекта. Слаженная работа бригад и профессионализм.',
-      role: 'Дольщик ЖК Abu Dhabi',
+      author: '',
+      text: '.',
+      role: '',
     },
     {
       author: 'Nusratullo Sangakov',

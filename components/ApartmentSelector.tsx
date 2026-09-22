@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
-import { IconWhatsApp, IconArrowRight, IconBuilding } from '@/components/Icons';
+import { IconWhatsApp, IconArrowRight } from '@/components/Icons';
 
 interface ApartmentUnit {
   id: string;
@@ -45,7 +45,7 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     rooms: 1,
     area: 43.59,
     floor: '3–12 этажи',
-    priceM2: 1400,
+    priceM2: 1500,
     badge: 'Хит продаж',
   },
   {
@@ -55,7 +55,7 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     rooms: 2,
     area: 68.2,
     floor: '2–14 этажи',
-    priceM2: 1400,
+    priceM2: 1500,
     badge: 'Бизнес в центре',
   },
   {
@@ -64,8 +64,8 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     complexSlug: 'madina-residence',
     rooms: 3,
     area: 92.4,
-    floor: '6–15 этажи',
-    priceM2: 1400,
+    floor: '6–14 этажи',
+    priceM2: 1500,
     badge: 'Для семьи',
   },
   {
@@ -75,7 +75,7 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     rooms: 1,
     area: 42.0,
     floor: '2–9 этажи',
-    priceM2: 1100,
+    priceM2: 1200,
     badge: 'Эко-предгорье',
   },
   {
@@ -85,7 +85,7 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     rooms: 2,
     area: 74.3,
     floor: '3–8 этажи',
-    priceM2: 1100,
+    priceM2: 1200,
     badge: 'Чистый воздух',
   },
 ];
@@ -100,7 +100,7 @@ export default function ApartmentSelector() {
   const [selectedComplex, setSelectedComplex] = useState<string>('all');
   const [selectedRooms, setSelectedRooms] = useState<number | 'all'>('all');
 
-  // Параметры калькулятора рассрочки
+  // Параметры калькулятора рассрочки (макс 36 месяцев)
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
   const [installmentTerm, setInstallmentTerm] = useState<number>(36);
 
@@ -216,7 +216,7 @@ export default function ApartmentSelector() {
             </div>
           </div>
 
-          {/* Ползунок срока */}
+          {/* Ползунок срока (до 36 месяцев максимум) */}
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">
@@ -229,16 +229,16 @@ export default function ApartmentSelector() {
             <input
               type="range"
               min="12"
-              max="40"
+              max="36"
               step="6"
               value={installmentTerm}
               onChange={(e) => setInstallmentTerm(Number(e.target.value))}
               className="w-full accent-[#064734] dark:accent-[#d4b26f] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-gray-400 dark:text-neutral-400 mt-1 font-semibold">
-              <span>12 мес.</span>
-              <span>24 мес.</span>
-              <span>40 мес. (макс.)</span>
+              <span>12 {isKg ? 'ай' : 'мес.'}</span>
+              <span>24 {isKg ? 'ай' : 'мес.'}</span>
+              <span>36 {isKg ? 'ай (макс.)' : 'мес. (макс.)'}</span>
             </div>
           </div>
         </div>

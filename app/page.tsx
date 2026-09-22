@@ -28,13 +28,11 @@ const BishkekMap = dynamic(() => import('@/components/BishkekMap'), {
   ssr: false,
   loading: () => (
     <div className="w-full bg-white dark:bg-[#0b1b15] rounded-2xl sm:rounded-3xl border border-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
-      {/* Имитация шапки с фильтрами */}
       <div className="p-3 sm:p-5 border-b border-gray-100 dark:border-white/10 bg-[#f9faf9] dark:bg-[#07130e] flex items-center gap-2">
         <div className="h-8 w-20 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
         <div className="h-8 w-24 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
         <div className="h-8 w-28 bg-gray-200 dark:bg-white/10 rounded-lg animate-pulse" />
       </div>
-      {/* Имитация поля карты */}
       <div className="h-[290px] sm:h-[400px] lg:h-[490px] bg-[#eef2ef] dark:bg-[#040c09] flex flex-col items-center justify-center gap-3 animate-pulse">
         <div className="w-9 h-9 rounded-full border-3 border-[#064734] dark:border-[#d4b26f] border-t-transparent animate-spin" />
         <span className="text-xs font-bold text-gray-400 dark:text-neutral-500 uppercase tracking-wider">
@@ -101,16 +99,16 @@ interface HomeContent {
 const CONTENT: Record<Locale, HomeContent> = {
   ru: {
     heroTag: 'EL ORDO GROUP • НАДЕЖНЫЙ ЗАСТРОЙЩИК',
-    heroTitle: 'СОВРЕМЕННЫЕ ЖИЛЫЕ КОМПЛЕКСЫ В БИШКЕКЕ',
-    heroDesc: 'Строительство статусных жилых комплексов и уютных клубных домов в лучших локациях Бишкека. Беспроцентная рассрочка 0% до 40 месяцев без банка и выгодный обмен по Trade-in.',
+    heroTitle: 'Правильный выбор для вашего будущего',
+    heroDesc: 'Строительство статусных жилых комплексов в лучших локациях Бишкека. Беспроцентная рассрочка 0% до 36 месяцев без банка и выгодный Trade-in.',
     heroBtnCatalog: 'Смотреть объекты',
     heroBtnWa: 'Консультация в WhatsApp',
     statTotalLabel: 'Объектов в портфолио:',
     statTotalVal: '6 комплексов',
     statPriceLabel: 'Стоимость метра:',
-    statPriceVal: 'от 950 $/м²',
+    statPriceVal: 'от 1200 $/м²',
     statInstallmentLabel: 'Рассрочка без банка:',
-    statInstallmentVal: 'до 40 месяцев 0%',
+    statInstallmentVal: 'до 36 месяцев 0%',
     statHandoverLabel: 'Надежность:',
     statHandoverVal: '100% сдача в срок',
     projectsBadge: 'Наши проекты',
@@ -128,13 +126,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: 'Программы приобретения недвижимости',
     p1Title: '100% ОПЛАТА СО СКИДКОЙ',
     p1Desc: 'Максимальная персональная скидка от руководства компании за квадратный метр и приоритетный выбор лучших этажей.',
-    p1Action: 'Узнать размер скидки',
-    p2Title: 'РАССРОЧКА 0% ДО 40 МЕСЯЦЕВ',
+    p1Action: 'Подробнее',
+    p2Title: 'РАССРОЧКА 0% ДО 36 МЕСЯЦЕВ',
     p2Desc: 'Внутренняя беспроцентная рассрочка напрямую от застройщика. Без справок о доходах, поручителей и банковских процентов.',
-    p2Action: 'Калькулятор рассрочки',
-    p3Title: 'TRADE-IN (ОБМЕН АВТО И ЖИЛЬЯ)',
+    p2Action: 'Подробнее',
+    p3Title: 'TRADE-IN',
     p3Desc: 'Быстрый зачет вашего автомобиля или вторичной квартиры по честной рыночной оценке в счет первого взноса за 24 часа.',
-    p3Action: 'Оценить свое имущество',
+    p3Action: 'Подробнее',
     advBadge: 'Стандарты качества',
     advTitle: 'Почему выбирают EL ORDO GROUP',
     adv1Title: 'Сейсмостойкость 9 баллов',
@@ -154,15 +152,15 @@ const CONTENT: Record<Locale, HomeContent> = {
   kg: {
     heroTag: 'EL ORDO GROUP • ИШЕНИМДҮҮ КУРУУЧУ',
     heroTitle: 'БИШКЕКТЕГИ ЗАМАНБАП ТУРАК ЖАЙ КОМПЛЕКСТЕРИ',
-    heroDesc: 'Бишкектин мыкты аймактарында премиум-класстагы турак жайларды жана клубдук үйлөрдү куруу. Банксыз 40 айга чейин 0% пайызсыз бөлүп төлөө жана Trade-in алмашуу.',
+    heroDesc: 'Келечегиңиз үчүн туура тандоо. Бишкектин мыкты аймактарында премиум-класстагы турак жайлар. Банксыз 36 айга чейин 0% пайызсыз бөлүп төлөө жана Trade-in.',
     heroBtnCatalog: 'Объекттерди көрүү',
     heroBtnWa: 'WhatsApp аркылуу байланышуу',
     statTotalLabel: 'Портфолиодогу объекттер:',
     statTotalVal: '6 комплекс',
     statPriceLabel: 'Чарчы метр баасы:',
-    statPriceVal: '950 $/м² баштап',
+    statPriceVal: '1200 $/м² баштап',
     statInstallmentLabel: 'Бөлүп төлөө:',
-    statInstallmentVal: '40 айга чейин 0%',
+    statInstallmentVal: '36 айга чейин 0%',
     statHandoverLabel: 'Ишенимдүүлүк:',
     statHandoverVal: '100% өз убагында',
     projectsBadge: 'Биздин долбоорлор',
@@ -180,13 +178,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: 'Турак жай сатып алуу программалары',
     p1Title: 'АРЗАНДАТУУ МЕНЕН 100% ТӨЛӨМ',
     p1Desc: 'Жетекчиликтен чарчы метрге максималдуу жеке арзандатуу жана мыкты кабаттарды артыкчылыктуу тандоо.',
-    p1Action: 'Арзандатуу өлчөмүн билүү',
-    p2Title: '40 АЙГА ЧЕЙИН 0% БӨЛҮП ТӨЛӨӨ',
+    p1Action: 'Толук маалымат',
+    p2Title: '36 АЙГА ЧЕЙИН 0% БӨЛҮП ТӨЛӨӨ',
     p2Desc: 'Куруучудан банксыз түздөн-түз пайызсыз бөлүп төлөө. Киреше маалымкатысыз жана ашыкча пайыздарсыз.',
-    p2Action: 'Төлөмдөрдү эсептөө',
-    p3Title: 'TRADE-IN (УНАА ЖАНА ҮЙ АЛМАШУУ)',
+    p2Action: 'Толук маалымат',
+    p3Title: 'TRADE-IN',
     p3Desc: 'Баштапкы төлөм катары унааңызды же эски батириңизди 24 сааттын ичинде базар баасында эсепке алуу.',
-    p3Action: 'Мүлктү баалоо',
+    p3Action: 'Толук маалымат',
     advBadge: 'Сапат стандарттары',
     advTitle: 'Эмне үчүн EL ORDO GROUP тандашат',
     adv1Title: '9 баллдык сейсмотуруктуулук',
@@ -206,15 +204,15 @@ const CONTENT: Record<Locale, HomeContent> = {
   kz: {
     heroTag: 'EL ORDO GROUP • СЕНІМДІ ҚҰРЫЛЫС САЛУШЫ',
     heroTitle: 'БІШКЕКТЕГІ ЗАМАНАУИ ТҰРҒЫН ҮЙ КЕШЕНДЕРІ',
-    heroDesc: 'Бішкектің ең жақсы аудандарында премиум-санаттағы кешендер мен клубтық үйлер салу. Банксіз 40 айға дейін 0% бөліп төлеу және тиімді Trade-in айырбасы.',
+    heroDesc: 'Сіздің болашағыңыз үшін дұрыс таңдау. Бішкектің үздік аудандарындағы тұрғын үйлер. Банксіз 36 айға дейін 0% бөліп төлеу және Trade-in.',
     heroBtnCatalog: 'Нысандарды көру',
     heroBtnWa: 'WhatsApp-та кеңес алу',
     statTotalLabel: 'Портфолиодағы нысандар:',
     statTotalVal: '6 кешен',
     statPriceLabel: 'Шаршы метр құны:',
-    statPriceVal: '950 $/м² бастап',
+    statPriceVal: '1200 $/м² бастап',
     statInstallmentLabel: 'Банксіз бөліп төлеу:',
-    statInstallmentVal: '40 айға дейін 0%',
+    statInstallmentVal: '36 айға дейін 0%',
     statHandoverLabel: 'Сенімділік:',
     statHandoverVal: '100% уақытында',
     projectsBadge: 'Біздің жобалар',
@@ -232,13 +230,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: 'Баспана сатып алу бағдарламалары',
     p1Title: 'ЖЕҢІЛДІКПЕН 100% ТӨЛЕМ',
     p1Desc: 'Шаршы метрге ең жоғары дербес жеңілдік және жақсы қабаттарды басымдықпен таңдау құқығы.',
-    p1Action: 'Жеңілдік көлемін білу',
-    p2Title: '40 АЙҒА ДЕЙІН 0% БӨЛІП ТӨЛЕУ',
+    p1Action: 'Толығырақ',
+    p2Title: '36 АЙҒА ДЕЙІН 0% БӨЛІП ТӨЛЕУ',
     p2Desc: 'Құрылыс салушыдан тікелей пайызсыз бөліп төлеу. Кіріс туралы анықтамасыз және банктік үстемесіз.',
-    p2Action: 'Төлем калькуляторы',
-    p3Title: 'TRADE-IN (КӨЛІК ПЕН БАСПАНА АЙЫРБАСЫ)',
+    p2Action: 'Толығырақ',
+    p3Title: 'TRADE-IN',
     p3Desc: 'Бастапқы жарна ретінде көлігіңізді немесе ескі пәтеріңізді нарықтық бағамен 24 сағатта есепке алу.',
-    p3Action: 'Мүлікті бағалау',
+    p3Action: 'Толығырақ',
     advBadge: 'Сапа стандарттары',
     advTitle: 'Неліктен EL ORDO GROUP таңдайды',
     adv1Title: '9 балдық сейсмотөзімділік',
@@ -258,15 +256,15 @@ const CONTENT: Record<Locale, HomeContent> = {
   uk: {
     heroTag: 'EL ORDO GROUP • НАДІЙНИЙ ДЕВЕЛОПЕР',
     heroTitle: 'СУЧАСНІ ЖИТЛОВІ КОМПЛЕКСИ В БІШКЕКУ',
-    heroDesc: 'Будівництво статусних житлових комплексів та затишних клубних будинків у найкращих районах Бішкека. Безвідсоткова розстрочка 0% до 40 місяців без банку та обмін за Trade-in.',
+    heroDesc: 'Правильний вибір для вашого майбутнього. Будівництво статусних житлових комплексів у найкращих районах Бішкека. Безвідсоткова розстрочка 0% до 36 місяців без банку та обмін за Trade-in.',
     heroBtnCatalog: 'Дивитися об’єкти',
     heroBtnWa: 'Консультація у WhatsApp',
     statTotalLabel: 'Об’єктів у портфоліо:',
     statTotalVal: '6 комплексів',
     statPriceLabel: 'Вартість метра:',
-    statPriceVal: 'від 950 $/м²',
+    statPriceVal: 'від 1200 $/м²',
     statInstallmentLabel: 'Розстрочка без банку:',
-    statInstallmentVal: 'до 40 місяців 0%',
+    statInstallmentVal: 'до 36 місяців 0%',
     statHandoverLabel: 'Надійність:',
     statHandoverVal: '100% здача в строк',
     projectsBadge: 'Наші проєкти',
@@ -284,13 +282,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: 'Програми придбання нерухомості',
     p1Title: '100% ОПЛАТА ЗІ ЗНИЖКОЮ',
     p1Desc: 'Максимальна персональна знижка за квадратний метр та пріоритетний вибір кращих поверхів.',
-    p1Action: 'Дізнатися розмір знижки',
-    p2Title: 'РОЗСТРОЧКА 0% ДО 40 МІСЯЦІВ',
+    p1Action: 'Детальніше',
+    p2Title: 'РОЗСТРОЧКА 0% ДО 36 МІСЯЦІВ',
     p2Desc: 'Внутрішня безвідсоткова розстрочка від забудовника. Без довідок про доходи та банківських відсотків.',
-    p2Action: 'Калькулятор розстрочки',
-    p3Title: 'TRADE-IN (ОБМІН АВТО ТА ЖИТЛА)',
+    p2Action: 'Детальніше',
+    p3Title: 'TRADE-IN',
     p3Desc: 'Швидкий залік авто або вторинної квартири за справедливою ринковою оцінкою у перший внесок за 24 години.',
-    p3Action: 'Оцінити своє майно',
+    p3Action: 'Детальніше',
     advBadge: 'Стандарти якості',
     advTitle: 'Чому обирають EL ORDO GROUP',
     adv1Title: 'Сейсмостійкість 9 балів',
@@ -310,15 +308,15 @@ const CONTENT: Record<Locale, HomeContent> = {
   en: {
     heroTag: 'EL ORDO GROUP • TRUSTED DEVELOPER',
     heroTitle: 'MODERN RESIDENTIAL PROPERTIES IN BISHKEK',
-    heroDesc: 'Constructing prestigious residential high-rises and boutique club residences across prime Bishkek districts. 0% interest-free developer installment plans up to 40 months and seamless Trade-in exchange.',
+    heroDesc: 'The right choice for your future. Constructing prestigious residential high-rises in prime Bishkek districts. 0% interest-free developer installment plans up to 36 months and seamless Trade-in exchange.',
     heroBtnCatalog: 'Explore Projects',
     heroBtnWa: 'WhatsApp Consultation',
     statTotalLabel: 'Portfolio Projects:',
     statTotalVal: '6 Complexes',
     statPriceLabel: 'Price per Sq.m:',
-    statPriceVal: 'from $950/m²',
+    statPriceVal: 'from $1200/m²',
     statInstallmentLabel: 'No-Bank Installment:',
-    statInstallmentVal: 'up to 40 mo. 0%',
+    statInstallmentVal: 'up to 36 mo. 0%',
     statHandoverLabel: 'Reliability Track:',
     statHandoverVal: '100% On-Time',
     projectsBadge: 'Our Developments',
@@ -327,7 +325,7 @@ const CONTENT: Record<Locale, HomeContent> = {
     viewAllBtn: 'Browse All Projects',
     detailsBtn: 'Project Details',
     fromPrice: 'from',
-    sqm: '$/m²',
+    sqm: '$/м²',
     statusFinished: 'Delivered',
     mapBadge: 'Interactive Map',
     mapTitle: 'EL ORDO Developments Across Bishkek',
@@ -336,13 +334,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: 'Flexible Property Acquisition Options',
     p1Title: '100% PAYMENT WITH TOP DISCOUNT',
     p1Desc: 'Secure the lowest price per square meter directly from leadership with priority access to top panoramic floors.',
-    p1Action: 'View Discount Terms',
-    p2Title: '0% INSTALLMENT UP TO 40 MONTHS',
+    p1Action: 'Learn More',
+    p2Title: '0% INSTALLMENT UP TO 36 MONTHS',
     p2Desc: 'Internal developer financing with zero interest. No bank approval, proof of income, or hidden fees required.',
-    p2Action: 'Payment Calculator',
-    p3Title: 'TRADE-IN (CAR & PROPERTY BARTER)',
+    p2Action: 'Learn More',
+    p3Title: 'TRADE-IN',
     p3Desc: 'Fair market appraisal of your vehicle or secondary property within 24 hours credited toward your down payment.',
-    p3Action: 'Get Asset Valuation',
+    p3Action: 'Learn More',
     advBadge: 'Engineering Standards',
     advTitle: 'Why Discerning Buyers Choose EL ORDO',
     adv1Title: '9-Point Seismic Safety',
@@ -362,15 +360,15 @@ const CONTENT: Record<Locale, HomeContent> = {
   zh: {
     heroTag: 'EL ORDO GROUP • 值得信赖的品牌开发商',
     heroTitle: '比什凯克现代高品质人居标杆楼盘',
-    heroDesc: '深耕比什凯克核心政商及生态宜居腹地，精工筑造高端住宅区与静谧洋房。提供最长40个月开发商直营0%免息分期，尊享以旧换新置换服务。',
+    heroDesc: '开启未来的明智之选。深耕比什凯克核心政商及生态宜居腹地，精工筑造高端住宅区。提供最长36个月开发商直营0%免息分期与以旧换新服务。',
     heroBtnCatalog: '浏览热销楼盘',
     heroBtnWa: '在 WhatsApp 中咨询',
     statTotalLabel: '旗下开发项目：',
     statTotalVal: '6 大品质园区',
     statPriceLabel: '每平米起售价：',
-    statPriceVal: '950 $/m² 起',
+    statPriceVal: '1200 $/m² 起',
     statInstallmentLabel: '免息分期周期：',
-    statInstallmentVal: '最长40个月 0%利息',
+    statInstallmentVal: '最长36个月 0%利息',
     statHandoverLabel: '交付履约保障：',
     statHandoverVal: '100% 官方综合验收',
     projectsBadge: '精选项目',
@@ -379,7 +377,7 @@ const CONTENT: Record<Locale, HomeContent> = {
     viewAllBtn: '查看全部楼盘',
     detailsBtn: '查看楼盘详情',
     fromPrice: '起',
-    sqm: '$/m²',
+    sqm: '$/м²',
     statusFinished: '已交付',
     mapBadge: '核心地理区位',
     mapTitle: 'EL ORDO 项目全景电子沙盘',
@@ -388,13 +386,13 @@ const CONTENT: Record<Locale, HomeContent> = {
     purchaseTitle: '全维置业付款与置换通道',
     p1Title: '100% 一次性全款特惠',
     p1Desc: '直享高管特批底价直减，优先选定高区南北通透及开阔全景天幕房源。',
-    p1Action: '查看全款优惠',
-    p2Title: '0% 最长40个月免息分期',
+    p1Action: '了解详情',
+    p2Title: '0% 最长36个月免息分期',
     p2Desc: '开发商自营零利息分期方案，无需银行信贷审核与工作流水证明。',
-    p2Action: '测算还款计划',
-    p3Title: '以旧换新 (汽车与房产置换)',
+    p2Action: '了解详情',
+    p3Title: 'TRADE-IN',
     p3Desc: '专业评估团队24小时公允估值现有车辆或二手房产，全额冲抵新房首期房款。',
-    p3Action: '申请资产估值',
+    p3Action: '了解详情',
     advBadge: '精工品质准则',
     advTitle: '为何选择 EL ORDO GROUP',
     adv1Title: '9度抗震结构保障',
@@ -426,21 +424,21 @@ const RAW_FEATURED_PROJECTS = [
     name: 'ЖК Madina Residence',
     category: 'active' as const,
     image: '/projects/Madina-Residense.png',
-    price: '1 400',
+    price: '1 500',
   },
   {
     slug: 'ajkol-plus',
     name: 'ЖД Айкол +',
     category: 'active' as const,
     image: '/projects/Aikolplus.png',
-    price: '1 100',
+    price: '1 200',
   },
   {
     slug: 'ajkol',
     name: 'ЖД Айкол',
-    category: 'active' as const,
+    category: 'finished' as const,
     image: '/projects/ajkol.jpg',
-    price: '950',
+    price: null,
   },
   {
     slug: 'kelechek',
@@ -543,7 +541,18 @@ export default function HomePage() {
         case 'madina-residence':
           classType = projPage.madinaClass;
           deadline = projPage.madinaDeadline;
-          floors = projPage.madinaFloors;
+          floors =
+            currentLang === 'en'
+              ? '14 floors • 3 blocks'
+              : currentLang === 'kg'
+              ? '14 кабат • 3 блок'
+              : currentLang === 'kz'
+              ? '14 қабат • 3 блок'
+              : currentLang === 'zh'
+              ? '14层 • 3栋'
+              : currentLang === 'uk'
+              ? '14 поверхів • 3 блоки'
+              : '14 этажей • 3 блока';
           break;
         case 'ajkol-plus':
           classType = projPage.ajkolPlusClass;
@@ -552,7 +561,7 @@ export default function HomePage() {
           break;
         case 'ajkol':
           classType = projPage.ajkolClass;
-          deadline = projPage.ajkolDeadline;
+          deadline = projPage.statusFinishedFull || projPage.statusFinished;
           floors = projPage.ajkolFloors;
           break;
         case 'kelechek':
@@ -595,8 +604,14 @@ export default function HomePage() {
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow">
-            <span>{c.heroTag}</span>
+          
+          {/* Фирменный крупный горизонтальный логотип logo-2.jpeg */}
+          <div className="mb-6 inline-flex items-center justify-center">
+            <img
+              src="/logo-2.png"
+              alt="EL ORDO GROUP"
+              className="h-40 sm:h-28 md:h-52 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
+            />
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-tight mb-6 drop-shadow-xl max-w-4xl">

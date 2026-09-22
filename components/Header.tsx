@@ -28,10 +28,19 @@ const CONSTRUCTION_LABELS: Record<Locale, string> = {
 const WA_CONSULTATION_TEXTS: Record<Locale, string> = {
   ru: 'Здравствуйте! Хочу получить подробную консультацию по объектам компании EL ORDO GROUP и условиям рассрочки.',
   kg: 'Саламатсызбы! EL ORDO GROUP компаниясынын объектилери жана бөлүп төлөө шарттары боюнча толук кеңеш алгым келет.',
-  kz: 'Сәлеметсіз бе! EL ORDO GROUP компаниясының нысандары және бөліп төлеу шарттары бойынша толық кеңес алғым келеді.',
+  kz: 'Сәлеметсіз бе! EL ORDO GROUP компаниясының нысандары және бөліп төлеу шарттары бойынша толық кеңес алгым келеді.',
   uk: 'Доброго дня! Хочу отримати детальну консультацію щодо об’єктів компанії EL ORDO GROUP та умов розстрочки.',
   en: 'Hello! I would like to get a detailed consultation on EL ORDO GROUP properties and installment plans.',
   zh: '您好！我想详细咨询 EL ORDO GROUP 旗下的楼盘项目及免息分期方案。',
+};
+
+const OFFLINE_LABELS: Record<Locale, string> = {
+  ru: 'Отдел продаж офлайн',
+  kg: 'Сатуу бөлүмү жабык',
+  kz: 'Сату бөлімі жабық',
+  uk: 'Відділ продажів офлайн',
+  en: 'Sales Office Offline',
+  zh: '销售部休息中',
 };
 
 const QUICK_PROJECTS_INFO: Record<Locale, {
@@ -88,11 +97,62 @@ const QUICK_PROJECTS_INFO: Record<Locale, {
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
+  
   const pathname = usePathname();
   const { locale, t } = useLanguage();
 
   const currentLang: Locale = (locale as Locale) || 'ru';
   const quickInfo = QUICK_PROJECTS_INFO[currentLang] || QUICK_PROJECTS_INFO.ru;
+
+  // Автоматическая проверка рабочего времени по Бишкеку (кроссбраузерно)
+  useEffect(() => {
+    const checkWorkingHours = () => {
+      try {
+        const formatter = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Bishkek',
+          weekday: 'short',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: false,
+        });
+
+        const parts = formatter.formatToParts(new Date());
+        let dayStr = 'Sun';
+        let hours = 0;
+        let minutes = 0;
+
+        parts.forEach((p) => {
+          if (p.type === 'weekday') dayStr = p.value;
+          if (p.type === 'hour') hours = parseInt(p.value, 10) || 0;
+          if (p.type === 'minute') minutes = parseInt(p.value, 10) || 0;
+        });
+
+        const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+        const day = dayMap[dayStr] ?? 0;
+        const timeInMinutes = hours * 60 + minutes;
+
+        let open = false;
+        if (day >= 1 && day <= 5) {
+          // Пн–Пт: 09:00 (540 мин) – 18:00 (1080 мин)
+          open = timeInMinutes >= 540 && timeInMinutes < 1080;
+        } else if (day === 6) {
+          // Суббота: 10:00 (600 мин) – 16:00 (960 мин)
+          open = timeInMinutes >= 600 && timeInMinutes < 960;
+        } else {
+          // Воскресенье: выходной
+          open = false;
+        }
+        setIsOnline(open);
+      } catch (e) {
+        setIsOnline(true);
+      }
+    };
+
+    checkWorkingHours();
+    const interval = setInterval(checkWorkingHours, 60000); // Проверка каждую минуту
+    return () => clearInterval(interval);
+  }, []);
 
   const constructionLabel =
     (t.header as Record<string, string>)?.construction ||
@@ -189,12 +249,12 @@ export default function Header() {
           {/* 3. Правый блок: телефон + язык + тема + консультация */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
-            {/* Прямой телефон и статус */}
+            {/* Прямой телефон и динамический статус работы */}
             <div className="hidden xl:flex flex-col items-end text-right mr-1">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
                 <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 tracking-wider">
-                  {t.header.salesOnline}
+                  {isOnline ? t.header.salesOnline : (OFFLINE_LABELS[currentLang] || OFFLINE_LABELS.ru)}
                 </span>
               </div>
               <a

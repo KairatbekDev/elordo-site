@@ -414,7 +414,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* 2. Hero-блок с оптимизированным фоном */}
+      {/* 2. Hero-блок с горизонтальным логотипом logo-2.jpeg сверху */}
       <section className="relative min-h-[500px] sm:min-h-[560px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
@@ -429,6 +429,17 @@ export default function AboutPage() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
+          
+          {/* Фирменный логотип (увеличенный) */}
+          <div className="mb-6 inline-flex items-center justify-center">
+            <img
+              src="/logo-2.png"
+              alt="EL ORDO GROUP"
+              className="h-40 sm:h-28 md:h-52 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
+            />
+          </div>
+
+          {/* Единственная аккуратная плашка-бейджик */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>{t.aboutPage.heroBadge}</span>
@@ -698,7 +709,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 8. Руководство и команда компании с оптимизированными фото */}
+      {/* 8. Руководство и команда компании */}
       <section className="bg-[#f0f4f1] dark:bg-[#040c09] py-20 px-4 sm:px-6 transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">

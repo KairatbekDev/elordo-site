@@ -39,7 +39,7 @@ export default function PurchaseTermsPage() {
   const currentLang: Locale = (locale as Locale) || 'ru';
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
 
-  // Состояние калькулятора рассрочки
+  // Состояние калькулятора рассрочки (по умолчанию 36 месяцев)
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
   const [months, setMonths] = useState<number>(36);
@@ -353,7 +353,7 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Параметр 3: Срок рассрочки */}
+            {/* Параметр 3: Срок рассрочки (до 36 месяцев максимум) */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
@@ -366,14 +366,14 @@ export default function PurchaseTermsPage() {
               <input
                 type="range"
                 min="12"
-                max="40"
+                max="36"
                 step="1"
                 value={months}
                 onChange={(e) => setMonths(Number(e.target.value))}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
               <div className="flex gap-2 mt-3">
-                {[12, 24, 36, 40].map((m) => (
+                {[12, 18, 24, 36].map((m) => (
                   <button
                     key={m}
                     type="button"
@@ -384,7 +384,7 @@ export default function PurchaseTermsPage() {
                         : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    {m} {t.termsPage.calcMonths} {m === 40 ? t.termsPage.calcMaxBadge : ''}
+                    {m} {t.termsPage.calcMonths} {m === 36 ? t.termsPage.calcMaxBadge : ''}
                   </button>
                 ))}
               </div>
