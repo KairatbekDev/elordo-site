@@ -39,6 +39,16 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     badge: 'Премиум',
   },
   {
+    id: 'ad-3k-119',
+    complex: 'ЖК Abu Dhabi',
+    complexSlug: 'abu-dhabi',
+    rooms: 3,
+    area: 119.32,
+    floor: 'блок Б',
+    priceM2: 1650,
+    badge: 'Премиум • Блок Б',
+  },
+  {
     id: 'mr-1k-43',
     complex: 'ЖК Madina Residence',
     complexSlug: 'madina-residence',
@@ -87,6 +97,16 @@ const APARTMENTS_DATA: ApartmentUnit[] = [
     floor: '3–8 этажи',
     priceM2: 1200,
     badge: 'Чистый воздух',
+  },
+  {
+    id: 'aik-3k-88',
+    complex: 'ЖД Айкол +',
+    complexSlug: 'ajkol-plus',
+    rooms: 3,
+    area: 88.5,
+    floor: '3–7 этажи',
+    priceM2: 1200,
+    badge: 'Просторная',
   },
 ];
 
