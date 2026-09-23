@@ -8,6 +8,7 @@ import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import MortgageComparison from '@/components/MortgageComparison';
 import PurchaseRoadmap from '@/components/PurchaseRoadmap';
+import { exportPdfQuote } from '@/lib/exportPdfQuote';
 import {
   IconCheck,
   IconCar,
@@ -56,6 +57,7 @@ const CALC_STRINGS: Record<Locale, {
   savingsDesc: string;
   btnSchedule: string;
   btnScheduleHide: string;
+  btnDownloadPdf: string;
   colNum: string;
   colPeriod: string;
   colPayment: string;
@@ -80,6 +82,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Экономия до $15 000+ по сравнению со стандартной банковской ипотекой (18–22% годовых).',
     btnSchedule: 'Посмотреть детальный график выплат',
     btnScheduleHide: 'Скрыть график выплат',
+    btnDownloadPdf: 'Скачать расчет в PDF (А4)',
     colNum: '№',
     colPeriod: 'Период',
     colPayment: 'Платеж',
@@ -104,6 +107,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Банктык ипотекага (18–22%) салыштырмалуу $15 000+ чейин үнөмдөө.',
     btnSchedule: 'Төлөм графигин толук көрүү',
     btnScheduleHide: 'Графикти жашыруу',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
     colNum: '№',
     colPeriod: 'Мөөнөтү',
     colPayment: 'Төлөм',
@@ -128,6 +132,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Банк ипотекасына (18–22%) қарағанда $15 000+ дейін үнемдеу.',
     btnSchedule: 'Төлем кестесін толық қарау',
     btnScheduleHide: 'Күктені жасыру',
+    btnDownloadPdf: 'PDF есебін жүктеп алу (А4)',
     colNum: '№',
     colPeriod: 'Кезең',
     colPayment: 'Төлем',
@@ -152,6 +157,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Економія до $15 000+ порівняно зі звичайною іпотекою банку.',
     btnSchedule: 'Переглянути графік платежів',
     btnScheduleHide: 'Сховати графік платежів',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
     colNum: '№',
     colPeriod: 'Період',
     colPayment: 'Платіж',
@@ -176,6 +182,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Save up to $15,000+ compared to commercial mortgage interest rates.',
     btnSchedule: 'View Full Payment Schedule',
     btnScheduleHide: 'Hide Schedule',
+    btnDownloadPdf: 'Download PDF Quote (A4)',
     colNum: '#',
     colPeriod: 'Period',
     colPayment: 'Payment',
@@ -200,6 +207,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: '相较商业银行 18%–22% 高息按揭贷款，全周期立省 $15,000+。',
     btnSchedule: '展开还款明细测算表',
     btnScheduleHide: '收起还款明细',
+    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
     colNum: '序号',
     colPeriod: '期数',
     colPayment: '还款金额',
@@ -572,7 +580,7 @@ export default function PurchaseTermsPage() {
     setEstimatedInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
   };
 
-  // График платежей
+  // Детальный график платежей
   const paymentSchedule = useMemo(() => {
     const items = [];
     let currentBalance = remainingAmount;
@@ -591,6 +599,22 @@ export default function PurchaseTermsPage() {
     }
     return items;
   }, [numberOfPayments, remainingAmount, paymentPerPeriodUsd, frequency, usdRate]);
+
+  // Обработчик скачивания PDF
+  const handleDownloadPdfQuote = () => {
+    exportPdfQuote({
+      apartmentPrice,
+      downPaymentAmount,
+      downPaymentPercent,
+      months,
+      frequency,
+      paymentPerPeriodUsd,
+      usdRate,
+      rateDate,
+      selectedApartment,
+      paymentSchedule,
+    });
+  };
 
   const handleSendCalculation = () => {
     const freqLabel = frequency === 'monthly' ? s.monthly : s.quarterly;
@@ -888,7 +912,6 @@ export default function PurchaseTermsPage() {
                 <div className="mt-4 p-5 sm:p-6 rounded-3xl bg-[#f7faf8] dark:bg-[#040c09] border border-[#064734]/20 dark:border-white/15 animate-fadeIn space-y-4">
                   {/* Панель фильтров каталога */}
                   <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-white/10">
-                    {/* Фильтр ЖК */}
                     <div className="flex flex-wrap gap-1.5 text-xs font-bold">
                       {[
                         { id: 'all', label: s.filterComplexAll },
@@ -911,7 +934,6 @@ export default function PurchaseTermsPage() {
                       ))}
                     </div>
 
-                    {/* Фильтр комнатности */}
                     <div className="flex gap-1.5 text-xs font-bold">
                       {[
                         { id: 'all', label: s.filterRoomsAll },
@@ -983,7 +1005,7 @@ export default function PurchaseTermsPage() {
               )}
             </div>
 
-            {/* Параметр 1: Стоимость квартиры (с мягким редактированием) */}
+            {/* Параметр 1: Стоимость квартиры */}
             <div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
                 <div>
@@ -1028,7 +1050,7 @@ export default function PurchaseTermsPage() {
               />
             </div>
 
-            {/* Параметр 2: Первоначальный взнос (с мягким вводом любой суммы) */}
+            {/* Параметр 2: Первоначальный взнос */}
             <div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
                 <div>
@@ -1216,7 +1238,7 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Итоговая панель расчета */}
+            {/* Итоговая панель расчета с кнопками WhatsApp, Графика и PDF */}
             <div className="bg-[#f2f6f4] dark:bg-[#040c09] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
               <div className="max-w-xl w-full">
                 
@@ -1287,19 +1309,33 @@ export default function PurchaseTermsPage() {
               </div>
 
               <div className="w-full md:w-auto flex flex-col gap-2 shrink-0">
+                {/* 1. Бронь в WhatsApp */}
                 <button
                   type="button"
                   onClick={handleSendCalculation}
-                  className="w-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black px-8 py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
+                  className="w-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black px-8 py-3.5 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
                   <span>{t.termsPage.calcWaBtn}</span>
                 </button>
 
+                {/* 2. Скачать PDF-расчет */}
+                <button
+                  type="button"
+                  onClick={handleDownloadPdfQuote}
+                  className="w-full bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <span>{s.btnDownloadPdf}</span>
+                </button>
+
+                {/* 3. Показать/скрыть график */}
                 <button
                   type="button"
                   onClick={() => setShowSchedule(!showSchedule)}
-                  className="w-full bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/15 text-gray-800 dark:text-gray-200 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors border border-gray-200 dark:border-white/10 cursor-pointer text-center"
+                  className="w-full bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/15 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-xl text-xs transition-colors border border-gray-200 dark:border-white/10 cursor-pointer text-center"
                 >
                   {showSchedule ? s.btnScheduleHide : s.btnSchedule}
                 </button>
@@ -1639,8 +1675,8 @@ export default function PurchaseTermsPage() {
 
       {/* 7. ИНТЕРАКТИВНОЕ СРАВНЕНИЕ С БАНКОВСКОЙ ИПОТЕКОЙ */}
       <MortgageComparison usdRate={usdRate} />
-      
-{/* 8. ДОРОЖНАЯ КАРТА СДЕЛКИ: 5 ШАГОВ ОТ БРОНИ ДО КЛЮЧЕЙ */}
+
+      {/* 8. ДОРОЖНАЯ КАРТА СДЕЛКИ: 5 ШАГОВ ОТ БРОНИ ДО КЛЮЧЕЙ */}
       <PurchaseRoadmap />
 
       {/* 9. Вопросы и ответы (FAQ Accordion) */}
@@ -1692,7 +1728,7 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 9. Консультация юриста и менеджера */}
+      {/* 10. Консультация юриста и менеджера */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
         <div className="bg-[#032b20] rounded-3xl p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
           <div className="max-w-xl">
