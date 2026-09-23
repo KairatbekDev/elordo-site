@@ -205,7 +205,106 @@ const CALC_STRINGS: Record<Locale, {
   },
 };
 
-// Все реальные планировки девелопера
+const TRADE_IN_STRINGS: Record<Locale, {
+  step1Title: string;
+  step1Desc: string;
+  step2Title: string;
+  step2Desc: string;
+  step3Title: string;
+  step3Desc: string;
+  targetComplexLabel: string;
+  targetComplexAll: string;
+  photoTip: string;
+  previewTitle: string;
+  previewDownCovered: string;
+  previewRemaining: string;
+}> = {
+  ru: {
+    step1Title: 'Оценка за 24 часа',
+    step1Desc: 'Онлайн по фото и техпаспорту или с бесплатным выездом эксперта.',
+    step2Title: '100% рыночная цена',
+    step2Desc: 'Честный зачет стоимости напрямую в счет первоначального взноса.',
+    step3Title: 'Юридическая чистота',
+    step3Desc: 'Безопасное снятие с учета и официальная регистрация ДДУ в Госрегистре.',
+    targetComplexLabel: 'В счет какого ЖК зачесть:',
+    targetComplexAll: 'Любой объект компании',
+    photoTip: '📸 Фотографии авто или техпаспорта можно прикрепить прямо в диалог WhatsApp',
+    previewTitle: 'Предварительный результат зачета:',
+    previewDownCovered: '✓ Полностью закрывает 30% взнос (наличными = $0)!',
+    previewRemaining: 'Остаток к доплате в рассрочку 0%:',
+  },
+  kg: {
+    step1Title: '24 саатта баалоо',
+    step1Desc: 'Сүрөт жана техпаспорт боюнча онлайн же эксперттин акысыз келиши менен.',
+    step2Title: '100% базар баасы',
+    step2Desc: 'Бааны түшүрбөстөн, баштапкы төлөм катары адилеттүү эсепке алуу.',
+    step3Title: 'Юридикалык тазалык',
+    step3Desc: 'Коопсуз бүтүм, тариздөөгө жардам жана Мамкаттоодо катталган ДДУ.',
+    targetComplexLabel: 'Кайсы ЖК эсебине алуу:',
+    targetComplexAll: 'Компаниянын каалаган объектиси',
+    photoTip: '📸 Унаанын же техпаспорттун сүрөттөрүн түз эле WhatsApp чатына жиберсеңиз болот',
+    previewTitle: 'Алдын ала эсептөө натыйжасы:',
+    previewDownCovered: '✓ Баштапкы 30% төлөмдү толук жабат (накталай = $0)!',
+    previewRemaining: '0% бөлүп төлөөгө калган сумма:',
+  },
+  kz: {
+    step1Title: '24 сағатта бағалау',
+    step1Desc: 'Фото мен техпаспорт бойынша онлайн немесе сарапшының тегін келуімен.',
+    step2Title: '100% нарықтық құны',
+    step2Desc: 'Бағаны төмендетпей, бастапқы жарна ретінде әділ есепке алу.',
+    step3Title: 'Заңдық тазалық',
+    step3Desc: 'Қауіпсіз мәміле, ресімдеуге көмек және Мемтіркеуде тіркелген ДДУ.',
+    targetComplexLabel: 'Қайсы ТҮК есебіне жазу:',
+    targetComplexAll: 'Компанияның кез келген нысаны',
+    photoTip: '📸 Көліктің немесе техпаспорттың суреттерін WhatsApp чатына тікелей жібере аласыз',
+    previewTitle: 'Алдын ала есептеу нәтижесі:',
+    previewDownCovered: '✓ Бастапқы 30% жарнаны толық жабады (қолма-қол = $0)!',
+    previewRemaining: '0% бөліп төлеуге қалған сома:',
+  },
+  uk: {
+    step1Title: 'Оцінка за 24 години',
+    step1Desc: 'Онлайн за фото та техпаспортом або з безкоштовним виїздом експерта.',
+    step2Title: '100% ринкова вартість',
+    step2Desc: 'Чесний залік без заниження вартості прямо в рахунок першого внеску.',
+    step3Title: 'Юридична чистота',
+    step3Desc: 'Безпечна угода, допомога в оформленні та ДДУ з реєстрацією у Держреєстрі.',
+    targetComplexLabel: 'В рахунок якого ЖК зарахувати:',
+    targetComplexAll: 'Будь-який об’єкт компанії',
+    photoTip: '📸 Фотографії авто або техпаспорта можна надіслати безпосередньо у WhatsApp',
+    previewTitle: 'Попередній результат заліку:',
+    previewDownCovered: '✓ Повністю закриває 30% внесок (готівкою = $0)!',
+    previewRemaining: 'Залишок до доплати в розстрочку 0%:',
+  },
+  en: {
+    step1Title: 'Valuation within 24 Hours',
+    step1Desc: 'Online appraisal via photos/documents or free on-site expert inspection.',
+    step2Title: '100% Fair Market Value',
+    step2Desc: 'Honest credit toward your down payment without undervaluation discounts.',
+    step3Title: 'Guaranteed Legal Title',
+    step3Desc: 'Safe transaction, official deregistration assistance, and registered state contracts.',
+    targetComplexLabel: 'Select target complex:',
+    targetComplexAll: 'Any Company Development',
+    photoTip: '📸 You can attach photos of your car or property documents directly in WhatsApp',
+    previewTitle: 'Preliminary Trade-In Coverage:',
+    previewDownCovered: '✓ Fully covers the 30% down payment ($0 cash required)!',
+    previewRemaining: 'Remaining balance in 0% installment:',
+  },
+  zh: {
+    step1Title: '24小时极速估值',
+    step1Desc: '通过车辆照片及权属证明在线评估，或由专业评估师上门查验。',
+    step2Title: '100%公允市场价折算',
+    step2Desc: '按真实市场行情公允作价，全额直接冲抵新房首期款项。',
+    step3Title: '法务全程规范保障',
+    step3Desc: '合规过户，开发商直接签订国家官方备案购房合同，产权安全清晰。',
+    targetComplexLabel: '意向抵扣的目标楼盘：',
+    targetComplexAll: '旗下全线在售楼盘均可',
+    photoTip: '📸 可在打开的 WhatsApp 聊天中直接发送爱车照片或产证资料',
+    previewTitle: '资产置换测算概览：',
+    previewDownCovered: '✓ 完全冲抵30%首付款（现金首付款 = $0）！',
+    previewRemaining: '剩余款项可享受0%免息分期：',
+  },
+};
+
 interface ApartmentUnit {
   id: string;
   complex: string;
@@ -242,14 +341,26 @@ export default function PurchaseTermsPage() {
   const currentLang: Locale = (locale as Locale) || 'ru';
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
   const s = CALC_STRINGS[currentLang] || CALC_STRINGS.ru;
+  const tr = TRADE_IN_STRINGS[currentLang] || TRADE_IN_STRINGS.ru;
 
-  // Состояние калькулятора рассрочки
+  // 1. Стоимость квартиры
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
+  const [priceInput, setPriceInput] = useState<string>('65 000');
+
+  // 2. Первоначальный взнос (число + строка)
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
+  const [downPaymentAmount, setDownPaymentAmount] = useState<number>(19500);
+  const [downPaymentInput, setDownPaymentInput] = useState<string>('19 500');
+
+  // 3. Срок рассрочки
   const [months, setMonths] = useState<number>(36);
+  const [monthsInput, setMonthsInput] = useState<string>('36');
+
+  // 4. Периодичность и валюта
   const [frequency, setFrequency] = useState<'monthly' | 'quarterly'>('monthly');
   const [currencyMode, setCurrencyMode] = useState<'USD' | 'KGS'>('USD');
   const [usdRate, setUsdRate] = useState<number>(87.45);
+  const [rateInput, setRateInput] = useState<string>('87.45');
   const [rateDate, setRateDate] = useState<string>('');
   const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
@@ -259,6 +370,17 @@ export default function PurchaseTermsPage() {
   const [selectedRoomsFilter, setSelectedRoomsFilter] = useState<number | 'all'>('all');
   const [selectedApartment, setSelectedApartment] = useState<ApartmentUnit | null>(null);
 
+  // Trade-in калькулятор
+  const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
+  const [tradeInTargetComplex, setTradeInTargetComplex] = useState<string>('all');
+  const [assetName, setAssetName] = useState<string>('');
+  const [assetYear, setAssetYear] = useState<string>('');
+  const [estimatedValue, setEstimatedValue] = useState<string>('25000');
+  const [estimatedInput, setEstimatedInput] = useState<string>('25 000');
+
+  // FAQ
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   // Автоматическая загрузка официального курса из API
   useEffect(() => {
     let isMounted = true;
@@ -267,6 +389,7 @@ export default function PurchaseTermsPage() {
       .then((data) => {
         if (isMounted && data?.rate && typeof data.rate === 'number') {
           setUsdRate(data.rate);
+          setRateInput(String(data.rate));
           if (data.date) setRateDate(data.date);
         }
       })
@@ -275,15 +398,6 @@ export default function PurchaseTermsPage() {
       isMounted = false;
     };
   }, []);
-
-  // Состояние Trade-in калькулятора
-  const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
-  const [assetName, setAssetName] = useState<string>('');
-  const [assetYear, setAssetYear] = useState<string>('');
-  const [estimatedValue, setEstimatedValue] = useState<string>('');
-
-  // Состояние FAQ
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   // Фильтрация планировок в каталоге
   const filteredCatalog = useMemo(() => {
@@ -294,58 +408,169 @@ export default function PurchaseTermsPage() {
     });
   }, [selectedComplexFilter, selectedRoomsFilter]);
 
-  // Расчеты рассрочки
-  const downPaymentAmount = Math.round((apartmentPrice * downPaymentPercent) / 100);
+  // Расчет остатка и ежемесячных выплат
   const remainingAmount = Math.max(0, apartmentPrice - downPaymentAmount);
-
   const numberOfPayments = frequency === 'monthly' ? months : Math.max(1, Math.ceil(months / 3));
   const paymentPerPeriodUsd = numberOfPayments > 0 ? Math.round(remainingAmount / numberOfPayments) : 0;
   const paymentPerPeriodKgs = Math.round(paymentPerPeriodUsd * usdRate);
 
   const rateDisclaimer = RATE_DISCLAIMERS[currentLang] || RATE_DISCLAIMERS.ru;
 
-  // Клик по планировке из каталога
+  // Расчеты Trade-in
+  const parsedEstimatedValue = useMemo(() => {
+    const raw = estimatedValue.replace(/\D/g, '');
+    return raw ? parseInt(raw, 10) : 0;
+  }, [estimatedValue]);
+
+  const targetApartmentPrice = useMemo(() => {
+    if (tradeInTargetComplex === 'abu-dhabi') return 81642;
+    if (tradeInTargetComplex === 'madina-residence') return 65385;
+    if (tradeInTargetComplex === 'ajkol-plus') return 50400;
+    return apartmentPrice;
+  }, [tradeInTargetComplex, apartmentPrice]);
+
+  const tradeInCoveragePercent = useMemo(() => {
+    if (targetApartmentPrice <= 0 || parsedEstimatedValue <= 0) return 0;
+    return Math.min(100, Math.round((parsedEstimatedValue / targetApartmentPrice) * 100));
+  }, [parsedEstimatedValue, targetApartmentPrice]);
+
+  const tradeInRemainingToPay = useMemo(() => {
+    return Math.max(0, targetApartmentPrice - parsedEstimatedValue);
+  }, [targetApartmentPrice, parsedEstimatedValue]);
+
+  // Выбор планировки из каталога
   const handleSelectApartment = (apt: ApartmentUnit) => {
     setApartmentPrice(apt.totalPrice);
+    setPriceInput(apt.totalPrice.toLocaleString('ru-RU'));
     setSelectedApartment(apt);
+
+    const newDown = Math.round((apt.totalPrice * downPaymentPercent) / 100);
+    setDownPaymentAmount(newDown);
+    setDownPaymentInput(newDown.toLocaleString('ru-RU'));
   };
 
   const handleResetApartment = () => {
     setSelectedApartment(null);
   };
 
-  // Ручной ввод стоимости
-  const handlePriceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '');
+  // 1. Изменение стоимости квартиры
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
     const num = raw ? parseInt(raw, 10) : 0;
-    setApartmentPrice(Math.min(1000000, num));
+    setPriceInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
+    setApartmentPrice(num);
     setSelectedApartment(null);
+
+    const newDown = Math.round((num * downPaymentPercent) / 100);
+    setDownPaymentAmount(newDown);
+    setDownPaymentInput(newDown > 0 ? newDown.toLocaleString('ru-RU') : '');
   };
 
-  // Ручной ввод первоначального взноса
-  const handleDownAmountInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '');
+  const handlePriceBlur = () => {
+    let valid = apartmentPrice;
+    if (!valid || valid < 10000) valid = 30000;
+    if (valid > 500000) valid = 500000;
+    setApartmentPrice(valid);
+    setPriceInput(valid.toLocaleString('ru-RU'));
+
+    const newDown = Math.round((valid * downPaymentPercent) / 100);
+    setDownPaymentAmount(newDown);
+    setDownPaymentInput(newDown.toLocaleString('ru-RU'));
+  };
+
+  const handlePriceSlider = (val: number) => {
+    setApartmentPrice(val);
+    setPriceInput(val.toLocaleString('ru-RU'));
+    setSelectedApartment(null);
+
+    const newDown = Math.round((val * downPaymentPercent) / 100);
+    setDownPaymentAmount(newDown);
+    setDownPaymentInput(newDown.toLocaleString('ru-RU'));
+  };
+
+  // 2. Изменение первоначального взноса
+  const handleDownPaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 7);
     const num = raw ? parseInt(raw, 10) : 0;
+    setDownPaymentInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
+    setDownPaymentAmount(num);
+
     if (apartmentPrice > 0) {
-      const pct = Math.min(90, Math.max(10, Number(((num / apartmentPrice) * 100).toFixed(1))));
-      setDownPaymentPercent(pct);
+      const pct = Number(((num / apartmentPrice) * 100).toFixed(1));
+      setDownPaymentPercent(Math.min(100, Math.max(0, pct)));
     }
   };
 
-  const handleMonthsInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.replace(/\D/g, '');
-    const num = raw ? parseInt(raw, 10) : 1;
-    setMonths(Math.min(36, Math.max(1, num)));
-  };
+  const handleDownPaymentBlur = () => {
+    let valid = downPaymentAmount;
+    const minDown = Math.round(apartmentPrice * 0.1);
+    if (valid < minDown) valid = Math.round(apartmentPrice * 0.2);
+    if (valid > apartmentPrice) valid = apartmentPrice;
 
-  const handleRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value.replace(',', '.'));
-    if (!isNaN(val) && val > 0) {
-      setUsdRate(val);
+    setDownPaymentAmount(valid);
+    setDownPaymentInput(valid.toLocaleString('ru-RU'));
+    if (apartmentPrice > 0) {
+      setDownPaymentPercent(Number(((valid / apartmentPrice) * 100).toFixed(1)));
     }
   };
 
-  // Детальный график выплат
+  const handleDownPercentChange = (pct: number) => {
+    setDownPaymentPercent(pct);
+    const newDown = Math.round((apartmentPrice * pct) / 100);
+    setDownPaymentAmount(newDown);
+    setDownPaymentInput(newDown.toLocaleString('ru-RU'));
+  };
+
+  // 3. Изменение срока выплат
+  const handleMonthsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 2);
+    setMonthsInput(raw);
+    const num = raw ? parseInt(raw, 10) : 0;
+    setMonths(num);
+  };
+
+  const handleMonthsBlur = () => {
+    let valid = months;
+    if (!valid || valid < 12) valid = 12;
+    if (valid > 36) valid = 36;
+    setMonths(valid);
+    setMonthsInput(String(valid));
+  };
+
+  const handleMonthsSelect = (m: number) => {
+    setMonths(m);
+    setMonthsInput(String(m));
+  };
+
+  // 4. Изменение курса НБКР
+  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRateInput(e.target.value);
+    const parsed = parseFloat(e.target.value.replace(',', '.'));
+    if (!isNaN(parsed) && parsed > 0) {
+      setUsdRate(parsed);
+    }
+  };
+
+  const handleRateBlur = () => {
+    const parsed = parseFloat(rateInput.replace(',', '.'));
+    if (isNaN(parsed) || parsed < 50 || parsed > 200) {
+      setUsdRate(87.45);
+      setRateInput('87.45');
+    } else {
+      const clean = Number(parsed.toFixed(2));
+      setUsdRate(clean);
+      setRateInput(String(clean));
+    }
+  };
+
+  // 5. Изменение суммы Trade-in
+  const handleTradeInEstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
+    setEstimatedValue(raw);
+    setEstimatedInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
+  };
+
+  // График платежей
   const paymentSchedule = useMemo(() => {
     const items = [];
     let currentBalance = remainingAmount;
@@ -387,13 +612,25 @@ export default function PurchaseTermsPage() {
   const handleSendTradeIn = (e: React.FormEvent) => {
     e.preventDefault();
     const typeLabel = tradeInType === 'auto' ? t.termsPage.waTradeAutoLabel : t.termsPage.waTradeRealtyLabel;
+    const numEst = parsedEstimatedValue;
+    const kgsEst = numEst > 0 ? Math.round(numEst * usdRate) : 0;
+    const targetLabel =
+      tradeInTargetComplex === 'abu-dhabi'
+        ? 'ЖК Abu Dhabi'
+        : tradeInTargetComplex === 'madina-residence'
+        ? 'ЖК Madina Residence'
+        : tradeInTargetComplex === 'ajkol-plus'
+        ? 'ЖД Айкол +'
+        : 'Все объекты компании';
+
     const text =
       `${t.termsPage.waTradeGreeting}\n\n` +
       `• ${t.termsPage.waTradeType} ${typeLabel}\n` +
       `• ${t.termsPage.waTradeDesc} ${assetName || '—'}\n` +
-      (tradeInType === 'auto' && assetYear ? `• ${t.termsPage.waTradeYear} ${assetYear}\n` : '') +
-      `• ${t.termsPage.waTradeValue} $${estimatedValue || '—'}\n\n` +
-      `${t.termsPage.waTradeQuestion}`;
+      (tradeInType === 'auto' && assetYear ? `• ${t.termsPage.labelYear} ${assetYear}\n` : '') +
+      `• В счет объекта: ${targetLabel}\n` +
+      `• ${t.termsPage.waTradeValue} $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${t.termsPage.somUnit})\n\n` +
+      `Готов отправить фотографии и документы актива для экспресс-оценки. ${t.termsPage.waTradeQuestion}`;
 
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -587,11 +824,15 @@ export default function PurchaseTermsPage() {
                 </span>
                 <div className="inline-flex items-center gap-1 bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/20 px-2.5 py-1 rounded-lg">
                   <input
-                    type="number"
-                    step="0.01"
-                    value={usdRate}
-                    onChange={handleRateInput}
-                    className="w-16 text-center font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none"
+                    type="text"
+                    inputMode="decimal"
+                    value={rateInput}
+                    onChange={handleRateChange}
+                    onBlur={handleRateBlur}
+                    onFocus={(e) => e.target.select()}
+                    autoComplete="off"
+                    spellCheck="false"
+                    className="w-16 text-center font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none cursor-pointer"
                   />
                   <span className="text-[10px] text-gray-400">сом/$</span>
                 </div>
@@ -740,7 +981,7 @@ export default function PurchaseTermsPage() {
               )}
             </div>
 
-            {/* Параметр 1: Стоимость квартиры */}
+            {/* Параметр 1: Стоимость квартиры (с мягким редактированием) */}
             <div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
                 <div>
@@ -758,10 +999,14 @@ export default function PurchaseTermsPage() {
                     <input
                       type="text"
                       inputMode="numeric"
-                      value={apartmentPrice > 0 ? apartmentPrice.toLocaleString('ru-RU') : ''}
-                      onChange={handlePriceInput}
+                      value={priceInput}
+                      onChange={handlePriceChange}
+                      onBlur={handlePriceBlur}
+                      onFocus={(e) => e.target.select()}
+                      autoComplete="off"
+                      spellCheck="false"
                       placeholder="0"
-                      className="w-28 sm:w-36 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none"
+                      className="w-28 sm:w-36 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none cursor-pointer"
                     />
                   </div>
                   <span className="text-xs text-gray-400 dark:text-neutral-500 hidden sm:inline whitespace-nowrap">
@@ -775,16 +1020,13 @@ export default function PurchaseTermsPage() {
                 min="30000"
                 max="250000"
                 step="1000"
-                value={apartmentPrice}
-                onChange={(e) => {
-                  setApartmentPrice(Number(e.target.value));
-                  setSelectedApartment(null);
-                }}
+                value={apartmentPrice || 30000}
+                onChange={(e) => handlePriceSlider(Number(e.target.value))}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
             </div>
 
-            {/* Параметр 2: Первоначальный взнос */}
+            {/* Параметр 2: Первоначальный взнос (с мягким вводом любой суммы) */}
             <div>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
                 <div>
@@ -802,10 +1044,14 @@ export default function PurchaseTermsPage() {
                     <input
                       type="text"
                       inputMode="numeric"
-                      value={downPaymentAmount > 0 ? downPaymentAmount.toLocaleString('ru-RU') : ''}
-                      onChange={handleDownAmountInput}
+                      value={downPaymentInput}
+                      onChange={handleDownPaymentChange}
+                      onBlur={handleDownPaymentBlur}
+                      onFocus={(e) => e.target.select()}
+                      autoComplete="off"
+                      spellCheck="false"
                       placeholder="0"
-                      className="w-24 sm:w-32 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none"
+                      className="w-24 sm:w-32 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none cursor-pointer"
                     />
                   </div>
                   <span className="text-xs text-gray-400 dark:text-neutral-500 hidden sm:inline whitespace-nowrap">
@@ -820,7 +1066,7 @@ export default function PurchaseTermsPage() {
                 max="60"
                 step="5"
                 value={downPaymentPercent}
-                onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
+                onChange={(e) => handleDownPercentChange(Number(e.target.value))}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
 
@@ -829,9 +1075,9 @@ export default function PurchaseTermsPage() {
                   <button
                     key={pct}
                     type="button"
-                    onClick={() => setDownPaymentPercent(pct)}
+                    onClick={() => handleDownPercentChange(pct)}
                     className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      downPaymentPercent === pct
+                      Math.round(downPaymentPercent) === pct
                         ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
                         : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                     }`}
@@ -853,9 +1099,13 @@ export default function PurchaseTermsPage() {
                     <input
                       type="text"
                       inputMode="numeric"
-                      value={months}
-                      onChange={handleMonthsInput}
-                      className="w-8 text-center text-sm font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none"
+                      value={monthsInput}
+                      onChange={handleMonthsChange}
+                      onBlur={handleMonthsBlur}
+                      onFocus={(e) => e.target.select()}
+                      autoComplete="off"
+                      spellCheck="false"
+                      className="w-8 text-center text-sm font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none cursor-pointer"
                     />
                     <span className="text-[11px] font-bold text-gray-500 dark:text-neutral-400">
                       {t.termsPage.calcMonths}
@@ -868,8 +1118,8 @@ export default function PurchaseTermsPage() {
                   min="12"
                   max="36"
                   step="1"
-                  value={months}
-                  onChange={(e) => setMonths(Number(e.target.value))}
+                  value={months || 12}
+                  onChange={(e) => handleMonthsSelect(Number(e.target.value))}
                   className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
                 />
 
@@ -878,7 +1128,7 @@ export default function PurchaseTermsPage() {
                     <button
                       key={m}
                       type="button"
-                      onClick={() => setMonths(m)}
+                      onClick={() => handleMonthsSelect(m)}
                       className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
                         months === m
                           ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
@@ -939,11 +1189,11 @@ export default function PurchaseTermsPage() {
               </div>
               <div className="h-3.5 w-full bg-gray-100 dark:bg-neutral-800 rounded-full overflow-hidden flex p-0.5 border border-gray-200 dark:border-white/10 shadow-inner">
                 <div
-                  style={{ width: `${downPaymentPercent}%` }}
+                  style={{ width: `${Math.min(100, Math.max(0, downPaymentPercent))}%` }}
                   className="h-full bg-[#d4b26f] rounded-full transition-all duration-300"
                 />
                 <div
-                  style={{ width: `${100 - downPaymentPercent}%` }}
+                  style={{ width: `${Math.max(0, 100 - downPaymentPercent)}%` }}
                   className="h-full bg-[#064734] dark:bg-emerald-600 rounded-full transition-all duration-300"
                 />
               </div>
@@ -1093,62 +1343,131 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 5. Trade-in / Экспресс-оценка */}
+      {/* 5. УЛУЧШЕННЫЙ ИНТЕРАКТИВНЫЙ TRADE-IN */}
       <section id="trade-in" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
-        <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
+        <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-10 items-start transition-colors">
           
-          <div className="lg:col-span-6">
-            <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
-              {t.termsPage.tradeInBadge}
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f] mb-4">
-              {t.termsPage.tradeInTitle}
-            </h2>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-              {t.termsPage.tradeInDesc}
-            </p>
+          <div className="lg:col-span-6 space-y-6">
+            <div>
+              <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
+                {t.termsPage.tradeInBadge}
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f] mb-4">
+                {t.termsPage.tradeInTitle}
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-light">
+                {t.termsPage.tradeInDesc}
+              </p>
+            </div>
 
-            <div className="space-y-3 text-xs font-semibold text-gray-700 dark:text-gray-300">
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">1</span>
-                <span>{t.termsPage.step1}</span>
+            {/* Карточки 3 ключевых преимуществ */}
+            <div className="space-y-3">
+              <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
+                  <IconCalendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                    {tr.step1Title}
+                  </h4>
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
+                    {tr.step1Desc}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">2</span>
-                <span>{t.termsPage.step2}</span>
+
+              <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
+                  <IconDiamond className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                    {tr.step2Title}
+                  </h4>
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
+                    {tr.step2Desc}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center text-[10px] font-bold">3</span>
-                <span>{t.termsPage.step3}</span>
+
+              <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-start gap-3.5">
+                <div className="w-8 h-8 rounded-xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center shrink-0">
+                  <IconShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                    {tr.step3Title}
+                  </h4>
+                  <p className="text-[11px] text-gray-500 dark:text-neutral-400 mt-0.5 leading-relaxed">
+                    {tr.step3Desc}
+                  </p>
+                </div>
               </div>
             </div>
+
+            {/* Интерактивный расчет покрытия актива */}
+            {parsedEstimatedValue > 0 && (
+              <div className="p-4 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/30 space-y-2 animate-fadeIn">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="text-[#064734] dark:text-[#d4b26f] uppercase tracking-wider">
+                    {tr.previewTitle}
+                  </span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                    {tradeInCoveragePercent}% квартиры
+                  </span>
+                </div>
+
+                <div className="h-2.5 w-full bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden p-0.5">
+                  <div
+                    style={{ width: `${tradeInCoveragePercent}%` }}
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                  />
+                </div>
+
+                <div className="text-[11px] text-gray-700 dark:text-neutral-300 space-y-1 pt-1">
+                  <p className="text-emerald-800 dark:text-emerald-400 font-bold">
+                    {tr.previewDownCovered}
+                  </p>
+                  <p className="text-gray-500 dark:text-neutral-400">
+                    {tr.previewRemaining} <strong className="text-gray-900 dark:text-white font-black">${tradeInRemainingToPay.toLocaleString('ru-RU')}</strong> (~${Math.round(tradeInRemainingToPay / 36).toLocaleString('ru-RU')}/мес на 36 мес)
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Форма быстрой оценки */}
-          <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 transition-colors">
-            <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white mb-4">
+          {/* Правая колонка: Форма быстрой оценки */}
+          <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-inner transition-colors space-y-4">
+            <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white">
               {t.termsPage.formTitle}
             </h3>
 
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setTradeInType('auto')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                onClick={() => {
+                  setTradeInType('auto');
+                  setAssetName('');
+                }}
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   tradeInType === 'auto'
-                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md'
                     : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
                 }`}
               >
                 <IconCar className="w-4 h-4" />
                 <span>{t.termsPage.tabAuto}</span>
               </button>
+
               <button
                 type="button"
-                onClick={() => setTradeInType('realty')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                onClick={() => {
+                  setTradeInType('realty');
+                  setAssetName('');
+                }}
+                className={`flex-1 py-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   tradeInType === 'realty'
-                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                    ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-md'
                     : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
                 }`}
               >
@@ -1157,9 +1476,25 @@ export default function PurchaseTermsPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSendTradeIn} className="space-y-3 text-xs">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 mb-1.5">
+                {tr.targetComplexLabel}
+              </label>
+              <select
+                value={tradeInTargetComplex}
+                onChange={(e) => setTradeInTargetComplex(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-xs font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] cursor-pointer"
+              >
+                <option value="all">{tr.targetComplexAll}</option>
+                <option value="abu-dhabi">ЖК Abu Dhabi (ул. Сухомлинова, 29)</option>
+                <option value="madina-residence">ЖК Madina Residence (ул. Огонбаева, 12)</option>
+                <option value="ajkol-plus">ЖД Айкол + (с. Кок-Жар)</option>
+              </select>
+            </div>
+
+            <form onSubmit={handleSendTradeIn} className="space-y-3.5 text-xs">
               <div>
-                <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">
+                <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
                   {tradeInType === 'auto' ? t.termsPage.labelAutoModel : t.termsPage.labelRealtyAddress}
                 </label>
                 <input
@@ -1168,13 +1503,29 @@ export default function PurchaseTermsPage() {
                   placeholder={tradeInType === 'auto' ? t.termsPage.phAutoModel : t.termsPage.phRealtyAddress}
                   value={assetName}
                   onChange={(e) => setAssetName(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
+                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
                 />
+
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {(tradeInType === 'auto'
+                    ? ['Toyota Camry', 'Lexus RX / GX', 'Kia K5', 'Hyundai', 'Кроссовер']
+                    : ['1-комн. вторичка', '2-комн. вторичка', '3-комн. вторичка', 'Участок / Дом']
+                  ).map((tag) => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setAssetName(tag)}
+                      className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/20 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 transition-colors cursor-pointer"
+                    >
+                      + {tag}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {tradeInType === 'auto' && (
                 <div>
-                  <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">
+                  <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
                     {t.termsPage.labelYear}
                   </label>
                   <input
@@ -1182,28 +1533,47 @@ export default function PurchaseTermsPage() {
                     placeholder={t.termsPage.phYear}
                     value={assetYear}
                     onChange={(e) => setAssetYear(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
+                    className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-gray-600 dark:text-gray-300 font-medium mb-1">
-                  {t.termsPage.labelEstimated}
-                </label>
-                <input
-                  type="text"
-                  placeholder={t.termsPage.phEstimated}
-                  value={estimatedValue}
-                  onChange={(e) => setEstimatedValue(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-neutral-500 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
-                />
+                <div className="flex justify-between items-center mb-1">
+                  <label className="block text-gray-600 dark:text-gray-300 font-semibold">
+                    {t.termsPage.labelEstimated}
+                  </label>
+                  {parsedEstimatedValue > 0 && (
+                    <span className="text-[11px] text-gray-400 dark:text-neutral-500 font-medium">
+                      ≈ {Math.round(parsedEstimatedValue * usdRate).toLocaleString('ru-RU')} {t.termsPage.somUnit}
+                    </span>
+                  )}
+                </div>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-[#064734] dark:text-[#d4b26f]">$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="25 000"
+                    value={estimatedInput}
+                    onChange={handleTradeInEstChange}
+                    onFocus={(e) => e.target.select()}
+                    autoComplete="off"
+                    spellCheck="false"
+                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 font-black text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] cursor-pointer"
+                  />
+                </div>
               </div>
+
+              <p className="text-[10px] text-gray-400 dark:text-neutral-400 italic">
+                {tr.photoTip}
+              </p>
 
               <button
                 type="submit"
-                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider transition-all shadow text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider transition-all shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer"
               >
+                <IconWhatsApp className="w-4 h-4 text-[#064734]" />
                 <span>{t.termsPage.btnTradeInSubmit}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </button>
