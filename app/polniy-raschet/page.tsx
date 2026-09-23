@@ -1,15 +1,18 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { exportPdfQuote } from '@/lib/exportPdfQuote';
 import {
   IconCheck,
   IconDiamond,
   IconWhatsApp,
   IconArrowRight,
+  IconShieldCheck,
 } from '@/components/Icons';
 
 interface DiscountCase {
@@ -71,6 +74,11 @@ interface FullPaymentContent {
   stepsBadge: string;
   stepsTitle: string;
   steps: StepItem[];
+  calcBadge: string;
+  calcTitle: string;
+  calcDesc: string;
+  btnDownloadPdf: string;
+  netSavingsLabel: string;
 }
 
 const CONTENT: Record<Locale, FullPaymentContent> = {
@@ -214,6 +222,11 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Вносите оплату через кассу компании или безналичным банковским переводом с выдачей всех финансовых чеков.',
       },
     ],
+    calcBadge: 'Интерактивный расчет 100% оплаты',
+    calcTitle: 'Рассчитайте вашу экономию онлайн',
+    calcDesc: 'Двигайте ползунок, чтобы мгновенно увидеть размер скидки и спеццену при единовременном расчете.',
+    btnDownloadPdf: 'Скачать расчет 100% оплаты в PDF (А4)',
+    netSavingsLabel: 'Ваша чистая экономия (дисконт 6%):',
   },
   kg: {
     pageTitle: '100% төлөм',
@@ -222,7 +235,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     noticeText: 'Батирдин баасын толук бир жолу төлөгөндө EL ORDO GROUP компаниясы максималдуу жеке арзандатууну сунуштайт. Сиз олуттуу сумманы үнөмдөп, карыздык милдеттенмелерсиз мүлктүн толук ээси болосуз жана каражатыңызды инфляциядан коргойсуз.',
     blockTitle: 'ТОЛУК ЭСЕПТЕШҮҮНҮН ШАРТТАРЫ ЖАНА АРТЫКЧЫЛЫКТАРЫ',
     descriptionText: 'Үлүштүк катышуу келишимине (ДДУ) кол койгондон кийин батирдин наркын бир жолку толук төлөө. Төлөмдү компаниянын расмий кассасы аркылуу накталай же банктык эсепке которуу менен жүргүзүүгө болот. Сатып алуучуга панорамалык кабаттарды артыкчылыктуу брондоо мүмкүнчүлүгү берилет жана кийинки кайра эсептөөлөрсүз баа кепилденет.',
-    documentsText: 'Кыргыз Республикасынын жаранынын паспорту (ID-карта же жалпы жарандык паспорт). Чет элдик жарандар үчүн — нотариалдык жактан күбөлөндүрүлгөн котормосу бар паспорт. Киреше маалымкаты талап кылынбайт.',
+    documentsText: 'Кыргыз Республикасынын жаранынын паспорты (ID-карта же жалпы жарандык паспорт). Чет элдик жарандар үчүн — нотариалдык жактан күбөлөндүрүлгөн котормосу бар паспорт. Киреше маалымкаты талап кылынбайт.',
     faqList: [
       {
         q: '100% төлөмдө кандай өлчөмдө арзандатуу алууга болот?',
@@ -355,18 +368,23 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Касса аркылуу же банктык которуу менен төлөп, бардык каржылык чектерди аласыз.',
       },
     ],
+    calcBadge: 'Интерактивдүү 100% калькулятор',
+    calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
+    calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
+    netSavingsLabel: 'Сиздин таза үнөмдөөңүз (дисконт 6%):',
   },
   kz: {
     pageTitle: '100% төлем',
     heroTitle: '100% ТӨЛЕМ КЕЗІНДЕГІ МАКСИМАЛДЫ ПАЙДА МЕН ЖЕҢІЛДІКТЕР',
     heroSubtitle: 'EL ORDO GROUP құрылыс салушысынан жылжымайтын мүлікті сатып алудың ең тиімді тәсілі. Шаршы метрдің ең төмен бағасын бекітіңіз, үздік жоспарларды таңдап, 24 сағатта ДДУ рәсімдеңіз.',
     noticeText: 'Пәтердің толық құнын бірден төлеген кезде EL ORDO GROUP максималды жеке жеңілдік ұсынады. Сіз қомақты қаражатты үнемдеп, қарызсыз баспана иесі боласыз және инфляциядан қорғанасыз.',
-    blockTitle: 'ТОЛЫҚ ЕСЕП АЙЫРЫСУДЫҢ ШАРТТАРЫ МЕН АРТЫҚШЫЛЫҚТАРЫ',
-    descriptionText: 'Үлестік қатысу шартына (ДДУ) қол қойылғаннан кейін пәтердің толық құнын біржолғы төлеу. Төлемді компанияның ресми кассасы арқылы қолма-қол немесе банктік аударыммен жүргізуге болады. Сатып алушыға видовой қабаттарды басымдықпен брондау мүмкіндігі беріледі.',
-    documentsText: 'Қырғыз Республикасы азаматының төлқұжаты. Шетелдіктер үшін — нотариалды куәландырылған аудармасы бар төлқұжат. Кіріс туралы анықтама қажет емес.',
+    blockTitle: 'ТОЛЫҚ ЕСЕП АЙЫРЫСУДЫҢ ШАРТТАРЫ МЕН АРТЫҚШЫЛЫКТАРЫ',
+    descriptionText: 'Үлестік қатысу шартына (ДДУ) қол қойылғаннан кейін пәтердің толық құнын біржолғы төлеу. Төлемді компанияның ресми кассасы арқылы қолма-қол немесе банктік аударыммен жүргізуге болады. Сатып алушыға видовой қабаттарды басымдықпен брондоо мүмкіндігі беріледі.',
+    documentsText: 'Қырғыз Республикасы азаматының төлқұжаты (ID-карта или загранпаспорт). Шетелдіктер үшін — нотариалды куәландырылған аудармасы бар төлқұжат. Кіріс туралы анықтама қажет емес.',
     faqList: [
       {
-        q: '100% төлемде қандай жеңілдік алуға болады?',
+        q: '100% төлемде қандай мөлшерде жеңілдік алуға болады?',
         a: 'Жеке дисконт көлемі таңдалған кешенге, пәтер көлеміне және құрылыс кезеңіне байланысты. Орташа үнемдеу $2 500-ден $10 000+ дейін жетеді.',
       },
       {
@@ -382,7 +400,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         a: 'Міндетті түрде. Банктік төлем тапсырмасы немесе кассалық ордер және 100% жабылғаны туралы анықтама беріледі.',
       },
       {
-        q: 'Үй тапсырылғанға дейін пәтерді қайта сатуға бола ма?',
+        q: 'Үй тапсырылғанға дейін пәтерді қайта сатуға (цессия) бола ма?',
         a: 'Иә. Толық төленген пәтер жоғары өтімділікке ие. Оны сату бөлімі арқылы цессия шартымен тиімді сатуға болады.',
       },
       {
@@ -445,57 +463,62 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
       {
         iconType: 'diamond',
         title: 'Басшылықтан максималды дисконт',
-        desc: 'Шаршы метрге ең төменгі бағаны аласыз. Үнемделген қаржыны жөндеуге немесе жиһазға жұмсауға болады.',
+        desc: 'Шаршы метрге ең төменгі бағаны аласыз. Үнөмделген қаржыны жөндеуге немесе жиһазға жұмсауға болады.',
       },
       {
         iconType: 'crown',
-        title: 'Көріністі қабаттарды басымдықпен таңдау',
-        desc: 'Үздік жоспарларға, жоғарғы қабаттарға және Ала-Тоо тауларына қарайтын панорамаға ерте қолжетімділік.',
+        title: 'Панорамалық қабаттарды алгачкы тандоо',
+        desc: 'Мыкты пландарга, жогорку кабаттарга жана Ала-Тоо тоолоруна караган панорамалык көрүнүшкө эрте жеткилик ачылат.',
       },
       {
         iconType: 'flash',
-        title: '24 сағатта ДДУ-ны жедел тіркеу',
-        desc: 'Құрылыс салушының заңгерлері тарапынан толық заңгерлік сүйемелдеу. Мемлекеттік органдарда кезексіз тіркеу.',
+        title: '24 саатта ДДУну ыкчам каттоо',
+        desc: 'Компаниянын юристтери тарабынан толук укуктук коштоо. Мамлекеттік органдарда кезексиз тез каттоо.',
       },
       {
         iconType: 'trending',
-        title: 'Жоғары инвестициялық табыстылық (ROI)',
-        desc: 'Құрылыс кезеңінде толық бағасына сатып алу үй тапсырылғанға дейін 25–35% көлемінде капитал өсімін қамтамасыз етеді.',
+        title: 'Жоғары инвестициялық кирешелүүлүк (ROI)',
+        desc: 'Курулуш этабында толук баасына сатып алуу үй пайдаланууга берилгенге чейин 25–35%га чейин капиталдын өсүшүн камсыздайт.',
       },
     ],
-    investBadge: 'Бішкек жылжымайтын мүлкіне инвестиция',
-    investTitle: 'Нысан тапсырылғанға дейін капиталдың 25%-дан 35%-ға дейін өсуі',
-    investDesc: 'Бастапқы кезеңде пәтерді 100% төлеммен сатып алу — Қырғызстандағы ең табысты әрі қауіпсіз инвестициялық құрал.',
+    investBadge: 'Бішкектің жылжымайтын мүлкіне инвестиция',
+    investTitle: 'Объект тапшырылганга чейин капиталдын 25%дан 35%га чейин өсүшү',
+    investDesc: 'Курулуштун баштапкы баскычтарында батирди 100% төлөм менен сатып алуу — Кыргызстандагы эң кирешелүү жана коопсуз инвестициялык курал. Чарчы метрдин наркынын өсүшү монолиттин даярдыгы менен кепилденет.',
     investStat1Val: '+25–35%',
-    investStat1Label: 'Құрылыс кезіндегі капиталдандыру',
+    investStat1Label: 'Курулуш мезгилиндеги капиталдаштыруу',
     investStat2Val: '8–11%',
-    investStat2Label: 'Жалға беруден жылдық табыс',
+    investStat2Label: 'Ижарага берүүдөгү жылдык киреше',
     investStat3Val: 'Цессия',
-    investStat3Label: 'Үй тапсырылғанға дейін оңай сату',
-    stepsBadge: 'Жылдам және заңды',
-    stepsTitle: 'Баспанаға қол жеткізудің 4 қадамы',
+    investStat3Label: 'Үй тапшырылганга чейин оңой кайра сатуу',
+    stepsBadge: 'Тез жана юридикалык жактан таза',
+    stepsTitle: 'Батирге ээ болуунун 4 кадамы',
     steps: [
       {
         num: '01',
-        title: 'Видовой пәтерді таңдау',
-        desc: 'Сайттан жоспарларды көресіз немесе 3D-макеттен таңдау үшін сату кеңсесіне келесіз.',
+        title: 'Панорамалуу батирди тандоо',
+        desc: 'Сайттан пландарды көресіз же сатуу кеңсесине келип 3D-макеттен кабатты тандайсыз.',
       },
       {
         num: '02',
-        title: 'Арнайы бағаны бекіту',
-        desc: 'Басшылықпен жеңілдікті келісіп, таңдалған пәтерді брондаймыз.',
+        title: 'Арнайы бааны бекитүү',
+        desc: 'Компаниянын жетекчилиги менен арзандатууну макулдашып, тандалган батирди брондойбуз.',
       },
       {
         num: '03',
         title: 'ДДУ-ға қол қою',
-        desc: 'Барлық тармақтарды түсіндіре отырып, 30 минут ішінде ресми ДДУ жасаймыз.',
+        desc: 'Бардык пункттарды юридикалык түшүндүрүү менен 30 мүнөттө расмий ДДУ түзөбүз.',
       },
       {
         num: '04',
-        title: 'Төлем және құжаттарды алу',
-        desc: 'Касса арқылы немесе аударыммен төлеп, барлық қаржылық чектерді аласыз.',
+        title: 'Төлөм жана документтерди алуу',
+        desc: 'Касса аркылуу же банктык которуу менен төлөп, бардык каржылык чектерди аласыз.',
       },
     ],
+    calcBadge: 'Интерактивдүү 100% калькулятор',
+    calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
+    calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
+    netSavingsLabel: 'Сиздин таза үнөмдөөңүз (дисконт 6%):',
   },
   uk: {
     pageTitle: '100% розрахунок',
@@ -503,24 +526,24 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     heroSubtitle: 'Найвигідніший спосіб придбання нерухомості від забудовника EL ORDO GROUP. Зафіксуйте мінімальну ціну за квадратний метр, отримайте пріоритет у виборі планувань та оформіть ДДУ за 24 години.',
     noticeText: 'При одноразовій повній оплаті квартири компанія EL ORDO GROUP надає максимальний індивідуальний дисконт. Ви заощаджуєте значну суму, стаєте повноправним власником без боргових зобов\'язань та захищаєте капітал від інфляції.',
     blockTitle: 'УМОВИ ТА ПЕРЕВАГИ ПОВНОГО РОЗРАХУНКУ',
-    descriptionText: 'Одноразовий розрахунок вартості квартири одразу після підписання Договору пайової участі (ДДУ). Оплата готівкою через касу компанії або безготівковим банківським переказом. Пріоритетне бронювання видових поверхів та фіксована ціна метра.',
-    documentsText: 'Паспорт громадянина. Для іноземців — паспорт із нотаріальним перекладом. Довідки про доходи не потрібні.',
+    descriptionText: 'Одноразовий розрахунок вартості квартири одразу після підписання Договору пайової участі (ДДУ). Оплата готівкою через касу компанії або безготівковим банківським переказом. Пріоритетне бронювання видових поверхів та фіксована ціна метра без подальших перерахунків.',
+    documentsText: 'Паспорт громадянина Киргизької Республіки (ID-карта або закордонний паспорт). Для іноземців — паспорт із нотаріальним перекладом. Довідки про доходи не потрібні.',
     faqList: [
       {
         q: 'Який розмір знижки можна отримати при 100% оплаті?',
-        a: 'Розмір знижки залежить від обраного ЖК, площі та стадії будівництва. Економія становить від $2 500 до $10 000+ порівняно з базовою ціною.',
+        a: 'Розмір індивідуального дисконту залежить від обраного ЖК, площі та стадії будівництва. Економія становить від $2 500 до $10 000+ порівняно з базовою вартістю.',
       },
       {
         q: 'В якій валюті здійснюються розрахунки?',
-        a: 'Усі офіційні розрахунки здійснюються в національній валюті (сом) за узгодженим курсом або через банк.',
+        a: 'Відповідно до законодавства КР усі офіційні розрахунки здійснюються в національній валюті (сом) за узгодженим курсом у договорі або через банк.',
       },
       {
-        q: 'Як оплатити покупцям з-за кордону?',
-        a: 'Надаємо банківські реквізити для SWIFT-переказу, або угоду може провести довірена особа за довіреністю.',
+        q: 'Як можуть оплатити співвітчизники за кордоном?',
+        a: 'Надаємо банківські реквізити для SWIFT-переказу, або угоду може провести довірена особа за довіреністю в Бішкеку.',
       },
       {
         q: 'Чи видаються офіційні фінансові документи?',
-        a: 'Обов\'язково. Банківське платіжне доручення або касовий ордер та довідка про 100% закриття зобов\'язань.',
+        a: 'Обов\'язково. При безготівковій оплаті залишається банківське платіжне доручення, через касу — прибутковий касовий ордер та довідка.',
       },
       {
         q: 'Чи можна перепродати квартиру до здачі будинку?',
@@ -551,7 +574,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         benefit: 'Вистачить на преміальну сантехніку та техніку',
         badge: 'Флагман столиці',
         slug: 'abu-dhabi',
-        waText: 'Доброго дня! Цікавить розмір знижки при 100% оплаті в ЖК Abu Dhabi.',
+        waText: 'Доброго дня! Цікавить розмір персональної знижки при 100% оплаті 1-кімнатної квартири в ЖК Abu Dhabi.',
       },
       {
         complex: 'ЖК Madina Residence',
@@ -564,7 +587,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         benefit: 'Покриває вартість повного дизайн-проєкту',
         badge: 'Центр Бішкека',
         slug: 'madina-residence',
-        waText: 'Доброго дня! Хочу дізнатися розмір знижки при 100% оплаті в ЖК Madina Residence.',
+        waText: 'Доброго дня! Хочу дізнатися розмір знижки при одноразовій 100% оплаті в ЖК Madina Residence.',
       },
       {
         complex: 'ЖД Айкол +',
@@ -574,7 +597,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         cashPrice: 'от $47 000',
         saving: 'Економія до $3 400',
         savingKgs: '≈ 297 000 сом вигоди',
-        benefit: 'Чиста економія бюджету сім\'ї',
+        benefit: 'Чиста економія бюджету молодої сім\'ї',
         badge: 'Еко-передгір\'я',
         slug: 'ajkol-plus',
         waText: 'Доброго дня! Цікавить спецціна при 100% розрахунку в ЖД Айкол+.',
@@ -637,6 +660,11 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Вносите оплату через банк або касу з видачею чеків.',
       },
     ],
+    calcBadge: 'Інтерактивний розрахунок 100% оплати',
+    calcTitle: 'Розрахуйте вашу економію онлайн',
+    calcDesc: 'Налаштуйте вартість для отримання розрахунку.',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
+    netSavingsLabel: 'Ваша чиста економія (дисконт 6%):',
   },
   en: {
     pageTitle: '100% Payment',
@@ -751,9 +779,9 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     investStat1Val: '+25–35%',
     investStat1Label: 'Capital gain during construction',
     investStat2Val: '8–11%',
-    investStat2Label: 'Annual rental yields',
+    investStat2Label: 'Rental yield',
     investStat3Val: 'Assignment',
-    investStat3Label: 'Seamless resale before handover',
+    investStat3Label: 'Resale before handover',
     stepsBadge: 'Fast & Legally Secure',
     stepsTitle: '4 Steps to Home Ownership',
     steps: [
@@ -778,6 +806,11 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Transfer funds via wire or company cashier and receive official payment documentation.',
       },
     ],
+    calcBadge: 'Interactive Calculator',
+    calcTitle: 'Calculate Your Savings Online',
+    calcDesc: 'Adjust price to see instant cash discount.',
+    btnDownloadPdf: 'Download PDF Quote (A4)',
+    netSavingsLabel: 'Your Net Savings (6% Discount):',
   },
   zh: {
     pageTitle: '100% 一次性全款',
@@ -919,6 +952,11 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: '通过银行电汇或财务室缴费，当场领取完税凭据及100%全款结清公函。',
       },
     ],
+    calcBadge: '交互式全款计算器',
+    calcTitle: '在线测算全款购房优惠',
+    calcDesc: '调整总价，即刻测算现金全款折扣。',
+    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
+    netSavingsLabel: '您的净节省额（6%折扣）：',
   },
 };
 
@@ -926,6 +964,66 @@ export default function FullPaymentPage() {
   const { locale } = useLanguage();
   const lang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[lang] || CONTENT.ru;
+
+  const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
+  const [usdRate, setUsdRate] = useState<number>(87.45);
+  const [rateDate, setRateDate] = useState<string>('');
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/currency')
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.rate && typeof data.rate === 'number') {
+          setUsdRate(data.rate);
+          if (data.date) setRateDate(data.date);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = `${c.pageTitle} | EL ORDO GROUP`;
+    }
+  }, [c.pageTitle]);
+
+  const discountPercent = 6;
+  const cashPrice = Math.round(apartmentPrice * (1 - discountPercent / 100));
+  const savingsUsd = apartmentPrice - cashPrice;
+  const savingsKgs = Math.round(savingsUsd * usdRate);
+
+  const handleDownloadPdf = () => {
+    exportPdfQuote({
+      apartmentPrice: cashPrice,
+      downPaymentAmount: cashPrice,
+      downPaymentPercent: 100,
+      months: 0,
+      frequency: 'monthly',
+      paymentPerPeriodUsd: 0,
+      usdRate,
+      rateDate,
+      selectedApartment: {
+        complex: 'Спецпредложение 100% Оплата',
+        rooms: 1,
+        area: Math.round(apartmentPrice / 1600),
+        floor: 'Все этажи',
+        priceM2: 1500,
+      },
+      paymentSchedule: [
+        {
+          num: 1,
+          period: 'Единоразово (100% расчет со скидкой 6%)',
+          paymentUsd: cashPrice,
+          paymentKgs: Math.round(cashPrice * usdRate),
+          balanceUsd: 0,
+        },
+      ],
+    });
+  };
 
   return (
     <PaymentLayout
@@ -939,7 +1037,80 @@ export default function FullPaymentPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
-      {/* 1. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ */}
+      
+      {/* 1. ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР 100% ОПЛАТЫ */}
+      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
+        <div className="text-center max-w-xl mx-auto mb-8">
+          <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+            {c.calcBadge}
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
+            {c.calcTitle}
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
+            {c.calcDesc}
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          <div className="p-3.5 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-gray-700 dark:text-gray-200">
+                Курс НБКР онлайн: <strong>{usdRate} сом/$</strong> {rateDate ? `(${rateDate})` : ''}
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
+              <IconShieldCheck className="w-3.5 h-3.5" />
+              <span>Максимальный дисконт</span>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5 text-xs font-bold uppercase">
+              <span className="text-gray-600 dark:text-gray-300">Базовая стоимость квартиры:</span>
+              <span className="text-[#064734] dark:text-[#d4b26f] font-black text-sm">${apartmentPrice.toLocaleString('ru-RU')}</span>
+            </div>
+            <input
+              type="range"
+              min="35000"
+              max="200000"
+              step="1000"
+              value={apartmentPrice}
+              onChange={(e) => setApartmentPrice(Number(e.target.value))}
+              className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
+            />
+          </div>
+
+          <div className="p-6 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-gray-500 uppercase">Спеццена при 100% оплате (скидка {discountPercent}%):</span>
+              <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f] mt-1">
+                ${cashPrice.toLocaleString('ru-RU')}
+              </div>
+              <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5">
+                <IconCheck className="w-4 h-4 shrink-0" />
+                <span>{c.netSavingsLabel} <strong>${savingsUsd.toLocaleString('ru-RU')}</strong> (~{savingsKgs.toLocaleString('ru-RU')} сом)</span>
+              </div>
+            </div>
+
+            <div className="w-full md:w-auto flex flex-col gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="w-full bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>{c.btnDownloadPdf}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1024,7 +1195,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 2. ПРИВИЛЕГИИ 100% ПОКУПАТЕЛЯ */}
+      {/* 3. ПРИВИЛЕГИИ 100% ПОКУПАТЕЛЯ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1073,7 +1244,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 3. ИНВЕСТИЦИОННЫЙ ПОТЕНЦИАЛ */}
+      {/* 4. ИНВЕСТИЦИОННЫЙ ПОТЕНЦИАЛ */}
       <div className="my-16 bg-[#032b20] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-white/10">
         <div className="relative z-10 max-w-3xl">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-2">
@@ -1103,7 +1274,7 @@ export default function FullPaymentPage() {
         </div>
       </div>
 
-      {/* 4. ПОШАГОВЫЙ ПРОЦЕСС ОФОРМЛЕНИЯ */}
+      {/* 5. ПОШАГОВЫЙ ПРОЦЕСС ОФОРМЛЕНИЯ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">

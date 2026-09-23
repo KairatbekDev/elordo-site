@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
-import { IconWhatsApp, IconArrowRight } from '@/components/Icons';
+import { exportPdfQuote } from '@/lib/exportPdfQuote';
+import { IconWhatsApp, IconArrowRight, IconShieldCheck } from '@/components/Icons';
 
 interface InstallmentContent {
   pageTitle: string;
@@ -68,6 +69,18 @@ interface InstallmentContent {
   stepsBadge: string;
   stepsTitle: string;
   steps: { step: string; title: string; desc: string }[];
+  calcBadge: string;
+  calcTitle: string;
+  calcDesc: string;
+  btnDownloadPdf: string;
+}
+
+interface ScheduleItem {
+  num: number;
+  period: string;
+  paymentUsd: number;
+  paymentKgs: number;
+  balanceUsd: number;
 }
 
 const CONTENT: Record<Locale, InstallmentContent> = {
@@ -208,6 +221,10 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: 'Договор регистрируется в госорганах КР. После сдачи дома вы получаете ключи и техпаспорт на ваше имя.',
       },
     ],
+    calcBadge: 'Интерактивный калькулятор',
+    calcTitle: 'Рассчитайте свой платеж онлайн',
+    calcDesc: 'Настройте стоимость и срок для получения готового расчета с графиком.',
+    btnDownloadPdf: 'Скачать расчет в PDF (А4)',
   },
   kg: {
     pageTitle: '0% Бөлүп төлөө',
@@ -236,7 +253,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
       },
       {
         q: 'Сатып алуучу юридикалык жактан кантип корголгон?',
-        a: 'Ар бир үлүшчү менен Кыргыз Республикасынын мыйзамдарына ылайык милдеттүү мамлекеттик каттоодон өтүүчү расмий ДДУ түзүлөт. Бардык объектилерде Кызыл китептери жана лицензиялары бар.',
+        a: 'Ар бир үлүшчү менен Кыргыз Республикасынын мыйзамдарына ылайык милдеттүү мамлекеттик каттоодон өтүүчү расмий ДДУ түзүлөт. Бардык объектилерде Кызыл китептери бар.',
       },
       {
         q: 'Минималдуу баштапкы төлөм канча?',
@@ -296,7 +313,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     downPaymentLabel: 'Баштапкы төлөм:',
     monthlyLabel: 'Ай сайын төлөм (0% ашыкча төлөмсүз):',
     perMonthSuffix: '/ айына',
-    bookBtn: 'WhatsApp аркылуу брондоо',
+    bookBtn: 'WhatsApp аркылы брондоо',
     aboutBtn: 'Комплекс тууралуу',
     tableBadge: 'Каржылык пайда',
     tableTitle: 'EL ORDO бөлүп төлөөсү же Банк ипотекасыбы?',
@@ -346,11 +363,15 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: 'Келишим КР мамлекеттик органдарында катталат. Үй тапшырылгандан кийин ачкычтарды жана техпаспортту аласыз.',
       },
     ],
+    calcBadge: 'Интерактивдүү калькулятор',
+    calcTitle: 'Төлөмүңүздү онлайн эсептеңиз',
+    calcDesc: 'График менен даяр эсептөөнү алуу үчүн наркты жана мөөнөттү тууралаңыз.',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
   },
   kz: {
     pageTitle: '0% Бөліп төлеу',
     heroTitle: 'БАНК ҚАТЫСУЫНСЫЗ 0% БӨЛІП ТӨЛЕУ ПӘТЕРЛЕРІ',
-    heroSubtitle: 'EL ORDO GROUP құрылыс салушысынан тікелей мәмілеге ыңғайлы кіру. 36 айға дейін пайыздарсыз, жасырын комиссияларсыз және кіріс туралы анықтамасыз дербес төлем кестесі.',
+    heroSubtitle: 'EL ORDO GROUP құрылыс салушысынан тікелей мәмілеге ыңғайлы кіру. 36 айға дейін пайыздарсыз, жашыруун комиссияларсыз және кіріс туралы анықтамасыз дербес төлем кестесі.',
     noticeText: 'Құрылыс салушының ішкі бөліп төлеуі пәтерді банктік артық төлемдерсіз және несиелік тексерусіз сатып алуға мүмкіндік береді. Сіз құрылыс барысында жылжымайтын мүліктің нақты құнын ғана тең бөліктермен төлейсіз.',
     blockTitle: 'БӨЛІП ТӨЛЕУДІҢ МӘН-ЖАЙЫ ЖӘНЕ АРТЫҚШЫЛЫҚТАРЫ',
     descriptionText: 'Бастапқы жарна пәтердің жалпы құнының 20%-дан 30%-ға дейінгі мөлшерін құрайды. Қалдық сома 36 айға дейін тең үлестермен бөлінеді. Төлем кестесі жеке келісіледі: ай сайын, тоқсан сайын немесе бизнесіңіздің маусымдық түсіміне қарай. Артық төлем 0%.',
@@ -397,7 +418,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         monthlyKgs: '≈ 138 800 сом',
         term: '36 ай',
         slug: 'abu-dhabi',
-        waText: 'Сәлеметсіз бе! ЖК Abu Dhabi кешеніндегі 1 бөлмелі пәтердің бөліп төлеу есебі бойынша бос қабаттар бар ма?',
+        waText: 'Сәлеметсіз бе! ЖК Abu Dhabi кешеніндегі 1 бөлмелі пәтердің бөлүп төлеу есеби бойынша бос қабаттар бар ма?',
       },
       {
         complex: 'ЖК Madina Residence',
@@ -412,7 +433,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         term: '36 ай',
         slug: 'madina-residence',
         badge: 'Хит сатылым',
-        waText: 'Сәлеметсіз бе! ЖК Madina Residence кешеніндегі 1 бөлмелі пәтердің бөліп төлеу есебі бойынша ($1271/айына) жоспарын жібересіз бе?',
+        waText: 'Сәлеметсіз бе! ЖК Madina Residence кешеніндегі 1 бөлмелі пәтердің бөлүп төлеу есеби бойынша ($1271/айына) жоспарын жібересіз бе?',
       },
       {
         complex: 'ЖД Айкол +',
@@ -427,7 +448,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         term: '36 ай',
         slug: 'ajkol-plus',
         badge: 'Эко-бөктер',
-        waText: 'Сәлеметсіз бе! ЖД Айкол+ бойынша 1 бөлмелі пәтердің бөліп төлеу есебі бойынша ($980/айына) мәлімет алғым келеді.',
+        waText: 'Сәлеметсіз бе! ЖД Айкол+ бойынша 1 бөлмелі пәтердің бөлүп төлеу есеби бойынша ($980/айына) мәлімет алғым келеді.',
       },
     ],
     totalPriceLabel: 'Жалпы құны:',
@@ -437,18 +458,18 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     bookBtn: 'WhatsApp арқылы брондау',
     aboutBtn: 'Кешен туралы',
     tableBadge: 'Қаржылық пайда',
-    tableTitle: 'EL ORDO бөліп төлеуі немесе Банк ипотекасы?',
-    tableSubtitle: 'Тікелей құрылыс салушыдан және банк арқылы баспана сатып алу шарттарын салыстыру',
+    tableTitle: 'EL ORDO бөлүп төлеуі немесе Банк ипотекасыбы?',
+    tableSubtitle: 'Тікелей құрылыс салушыдан және банк арқылы баспана сатып алу шарттарын салыштыру',
     colCriteria: 'Критерий',
-    colElOrdo: 'EL ORDO бөліп төлеу',
+    colElOrdo: 'EL ORDO бөлүп төлеу',
     colBank: 'Банк ипотекасы',
     row1Criteria: 'Пайыздық артық төлем',
-    row1ElOrdo: '0% (Артық төлем жоқ)',
+    row1ElOrdo: '0% (Артық төлем жок)',
     row1Bank: 'жылдық 14%-дан 18%-ға дейін',
     row2Criteria: '3 жылдағы артық сома',
     row2ElOrdo: '$0 сом',
     row2Bank: '$18 000-нан $35 000+ дейін',
-    row3Criteria: 'Кіріс туралы анықтама',
+    row3Criteria: 'Киреше туралы анықтама',
     row3ElOrdo: 'Талап етілмейді',
     row3Bank: 'Ресми жұмыс орнынан міндетті',
     row4Criteria: 'Қосымша сақтандыру',
@@ -460,8 +481,8 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     row6Criteria: 'Ресімдеу мерзімі',
     row6ElOrdo: 'Өтініш берген күні (30 минут)',
     row6Bank: '2-ден 4 аптаға дейін қарау',
-    stepsBadge: 'Ашық мәміле',
-    stepsTitle: 'Баспанаңызға апаратын 4 қарапайым қадам',
+    stepsBadge: 'Ачык мәміле',
+    stepsTitle: 'Батириңизге жетүүчү 4 жөнөкөй кадам',
     steps: [
       {
         step: '01',
@@ -484,6 +505,10 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: 'Шарт ҚР мемлекеттік органдарында тіркеледі. Үй тапсырылған соң кілттер мен техпаспортты аласыз.',
       },
     ],
+    calcBadge: 'Интерактивті калькулятор',
+    calcTitle: 'Төлемді онлайн есептеңіз',
+    calcDesc: 'Графикпен дайын есептеуді алу үшін құн мен мерзімді реттеңіз.',
+    btnDownloadPdf: 'PDF есебін жүктеп алу (А4)',
   },
   uk: {
     pageTitle: 'Розстрочка 0%',
@@ -622,6 +647,10 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: 'Договір реєструється в держорганах КР. Після здачі будинку ви отримуєте ключі та техпаспорт.',
       },
     ],
+    calcBadge: 'Інтерактивний калькулятор',
+    calcTitle: 'Розрахуйте свій платіж онлайн',
+    calcDesc: 'Налаштуйте вартість та термін для отримання готового розрахунку з графіком.',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
   },
   en: {
     pageTitle: '0% Installment',
@@ -708,7 +737,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     ],
     totalPriceLabel: 'Total Price:',
     downPaymentLabel: 'Down Payment:',
-    monthlyLabel: 'Monthly Payment (0% Extra):',
+    monthlyLabel: 'Monthly Payment (0% Interest):',
     perMonthSuffix: '/ mo.',
     bookBtn: 'Book via WhatsApp',
     aboutBtn: 'About Complex',
@@ -760,6 +789,10 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: 'Agreement is registered with state authorities. Upon handover, you receive property deeds and keys.',
       },
     ],
+    calcBadge: 'Interactive Calculator',
+    calcTitle: 'Calculate Your Payment Online',
+    calcDesc: 'Customize price and term to get an instant calculation with a payment schedule.',
+    btnDownloadPdf: 'Download PDF Quote (A4)',
   },
   zh: {
     pageTitle: '0% 免息分期',
@@ -898,6 +931,10 @@ const CONTENT: Record<Locale, InstallmentContent> = {
         desc: '购房合同在国家不动产机构完成备案。房屋验收交付后直接领取钥匙与不动产红本。',
       },
     ],
+    calcBadge: '交互式计算器',
+    calcTitle: '在线测算您的分期月供',
+    calcDesc: '调整总价与期数，立即生成专属的还款明细测算表。',
+    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
   },
 };
 
@@ -906,13 +943,75 @@ export default function InstallmentPage() {
   const lang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[lang] || CONTENT.ru;
 
-  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+  const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
+  const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
+  const [downPaymentAmount, setDownPaymentAmount] = useState<number>(19500);
+  const [months, setMonths] = useState<number>(36);
+  const [frequency, setFrequency] = useState<'monthly' | 'quarterly'>('monthly');
+  const [usdRate, setUsdRate] = useState<number>(87.45);
+  const [rateDate, setRateDate] = useState<string>('');
+  const [showSchedule, setShowSchedule] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/currency')
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.rate && typeof data.rate === 'number') {
+          setUsdRate(data.rate);
+          if (data.date) setRateDate(data.date);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.title = `${c.pageTitle} | EL ORDO GROUP`;
     }
   }, [c.pageTitle]);
+
+  const remainingAmount = Math.max(0, apartmentPrice - downPaymentAmount);
+  const numberOfPayments = frequency === 'monthly' ? months : Math.max(1, Math.ceil(months / 3));
+  const paymentPerPeriodUsd = numberOfPayments > 0 ? Math.round(remainingAmount / numberOfPayments) : 0;
+
+  const paymentSchedule = useMemo<ScheduleItem[]>(() => {
+    const items: ScheduleItem[] = [];
+    let currentBalance = remainingAmount;
+    for (let i = 1; i <= numberOfPayments; i++) {
+      const isLast = i === numberOfPayments;
+      const currentPay = isLast ? currentBalance : paymentPerPeriodUsd;
+      currentBalance = Math.max(0, currentBalance - currentPay);
+      items.push({
+        num: i,
+        period: frequency === 'monthly' ? `${i} мес.` : `${i * 3} мес. (${i} кв.)`,
+        paymentUsd: currentPay,
+        paymentKgs: Math.round(currentPay * usdRate),
+        balanceUsd: currentBalance,
+      });
+    }
+    return items;
+  }, [numberOfPayments, remainingAmount, paymentPerPeriodUsd, frequency, usdRate]);
+
+  const handleDownloadPdf = () => {
+    exportPdfQuote({
+      apartmentPrice,
+      downPaymentAmount,
+      downPaymentPercent,
+      months,
+      frequency,
+      paymentPerPeriodUsd,
+      usdRate,
+      rateDate,
+      selectedApartment: null,
+      paymentSchedule,
+    });
+  };
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   return (
     <PaymentLayout
@@ -926,7 +1025,142 @@ export default function InstallmentPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
-      {/* 1. БЛОК ГОТОВЫХ РАСЧЕТОВ ПО ОБЪЕКТАМ */}
+      
+      {/* 1. ИНТЕРАКТИВНЫЙ МИНИ-КАЛЬКУЛЯТОР НА СТРАНИЦЕ РАССРОЧКИ */}
+      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
+        <div className="text-center max-w-xl mx-auto mb-8">
+          <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+            {c.calcBadge}
+          </span>
+          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
+            {c.calcTitle}
+          </h3>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
+            {c.calcDesc}
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          <div className="p-3.5 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-gray-700 dark:text-gray-200">
+                Курс НБКР онлайн: <strong>{usdRate} сом/$</strong> {rateDate ? `(${rateDate})` : ''}
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
+              <IconShieldCheck className="w-3.5 h-3.5" />
+              <span>0% переплат без банка</span>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5 text-xs font-bold uppercase">
+              <span className="text-gray-600 dark:text-gray-300">Стоимость квартиры:</span>
+              <span className="text-[#064734] dark:text-[#d4b26f] font-black text-sm">${apartmentPrice.toLocaleString('ru-RU')}</span>
+            </div>
+            <input
+              type="range"
+              min="30000"
+              max="200000"
+              step="1000"
+              value={apartmentPrice}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setApartmentPrice(val);
+                const newDown = Math.round((val * downPaymentPercent) / 100);
+                setDownPaymentAmount(newDown);
+              }}
+              className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
+            />
+          </div>
+
+          <div>
+            <div className="flex justify-between items-center mb-1.5 text-xs font-bold uppercase">
+              <span className="text-gray-600 dark:text-gray-300">Первый взнос ({downPaymentPercent}%):</span>
+              <span className="text-[#064734] dark:text-[#d4b26f] font-black text-sm">${downPaymentAmount.toLocaleString('ru-RU')}</span>
+            </div>
+            <input
+              type="range"
+              min="20"
+              max="50"
+              step="5"
+              value={downPaymentPercent}
+              onChange={(e) => {
+                const pct = Number(e.target.value);
+                setDownPaymentPercent(pct);
+                const newDown = Math.round((apartmentPrice * pct) / 100);
+                setDownPaymentAmount(newDown);
+              }}
+              className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
+            />
+          </div>
+
+          <div className="p-6 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold text-gray-500 uppercase">Ежемесячный платеж (0%):</span>
+              <div className="text-3xl sm:text-4xl font-black text-[#064734] dark:text-[#d4b26f] mt-0.5">
+                ${paymentPerPeriodUsd.toLocaleString('ru-RU')} <span className="text-xs font-semibold text-gray-400">/ мес.</span>
+              </div>
+              <div className="text-xs font-semibold text-gray-600 dark:text-neutral-300 mt-0.5">
+                ≈ {Math.round(paymentPerPeriodUsd * usdRate).toLocaleString('ru-RU')} сом • Остаток: ${remainingAmount.toLocaleString('ru-RU')}
+              </div>
+            </div>
+
+            <div className="w-full md:w-auto flex flex-col gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleDownloadPdf}
+                className="w-full bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-6 py-3 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>{c.btnDownloadPdf}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowSchedule(!showSchedule)}
+                className="w-full bg-white dark:bg-white/10 hover:bg-gray-100 text-gray-800 dark:text-gray-200 font-bold px-4 py-2 rounded-xl text-xs transition-colors border border-gray-200 dark:border-white/10 cursor-pointer text-center"
+              >
+                {showSchedule ? 'Скрыть график выплат' : 'Посмотреть детальный график выплат'}
+              </button>
+            </div>
+          </div>
+
+          {showSchedule && (
+            <div className="border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden animate-fadeIn">
+              <div className="max-h-60 overflow-y-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#064734] text-white sticky top-0">
+                    <tr>
+                      <th className="p-3 font-bold">№</th>
+                      <th className="p-3 font-bold">Период</th>
+                      <th className="p-3 font-bold">Платеж ($ / сом)</th>
+                      <th className="p-3 font-bold text-right">Остаток</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-white/10 bg-white dark:bg-[#0b1b15]">
+                    {paymentSchedule.map((item: ScheduleItem) => (
+                      <tr key={item.num} className="hover:bg-gray-50 dark:hover:bg-white/5">
+                        <td className="p-3 font-bold text-[#064734] dark:text-[#d4b26f]">{item.num}</td>
+                        <td className="p-3 font-medium">{item.period}</td>
+                        <td className="p-3 font-bold">
+                          ${item.paymentUsd.toLocaleString('ru-RU')} <span className="text-[10px] text-gray-400">(≈ {item.paymentKgs.toLocaleString('ru-RU')} с)</span>
+                        </td>
+                        <td className="p-3 text-right font-semibold text-gray-500">${item.balanceUsd.toLocaleString('ru-RU')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 2. БЛОК ГОТОВЫХ РАСЧЕТОВ ПО ОБЪЕКТАМ */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1014,7 +1248,7 @@ export default function InstallmentPage() {
         </div>
       </div>
 
-      {/* 2. СРАВНИТЕЛЬНАЯ ТАБЛИЦА: EL ORDO vs БАНКОВСКАЯ ИПОТЕКА */}
+      {/* 3. СРАВНИТЕЛЬНАЯ ТАБЛИЦА */}
       <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1101,7 +1335,7 @@ export default function InstallmentPage() {
         </div>
       </div>
 
-      {/* 3. ПОШАГОВЫЙ ПРОЦЕСС ПОКУПКИ */}
+      {/* 4. ПОШАГОВЫЙ ПРОЦЕСС ПОКУПКИ */}
       <div className="my-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1113,20 +1347,20 @@ export default function InstallmentPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {c.steps.map((s, idx) => (
+          {c.steps.map((st, idx) => (
             <div
               key={idx}
               className="bg-white dark:bg-[#0b1b15] p-6 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none flex flex-col justify-between transition-colors"
             >
               <div>
                 <span className="text-3xl font-black text-[#d4b26f] block mb-3">
-                  {s.step}
+                  {st.step}
                 </span>
                 <h4 className="text-sm font-black text-gray-950 dark:text-white mb-2">
-                  {s.title}
+                  {st.title}
                 </h4>
                 <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
-                  {s.desc}
+                  {st.desc}
                 </p>
               </div>
             </div>

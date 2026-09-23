@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
@@ -12,6 +12,7 @@ import {
   IconBuilding,
   IconWhatsApp,
   IconArrowRight,
+  IconShieldCheck,
 } from '@/components/Icons';
 
 interface TradeInCase {
@@ -86,6 +87,27 @@ interface TradeInContent {
   stepsBadge: string;
   stepsTitle: string;
   steps: TradeInStep[];
+  calcBadge: string;
+  calcTitle: string;
+  calcDesc: string;
+  tabAuto: string;
+  tabRealty: string;
+  targetComplexLabel: string;
+  targetComplexAll: string;
+  labelAutoModel: string;
+  phAutoModel: string;
+  labelRealtyAddress: string;
+  phRealtyAddress: string;
+  labelYear: string;
+  phYear: string;
+  labelEstimated: string;
+  phEstimated: string;
+  btnSubmit: string;
+  photoTip: string;
+  previewTitle: string;
+  previewDownCovered: string;
+  previewRemaining: string;
+  somUnit: string;
 }
 
 const CONTENT: Record<Locale, TradeInContent> = {
@@ -243,48 +265,46 @@ const CONTENT: Record<Locale, TradeInContent> = {
         desc: 'Стоимость вашего авто или жилья официально засчитывается в качестве первого взноса. Юристы компании берут все переоформление на себя.',
       },
     ],
+    calcBadge: 'Интерактивный расчет зачета',
+    calcTitle: 'Рассчитайте покрытие вашей квартиры',
+    calcDesc: 'Укажите ориентировочную стоимость вашего актива, чтобы узнать остаток суммы в рассрочку 0%.',
+    tabAuto: 'Автомобиль',
+    tabRealty: 'Недвижимость',
+    targetComplexLabel: 'В счет какого ЖК зачесть:',
+    targetComplexAll: 'Любой объект компании',
+    labelAutoModel: 'Марка, модель и год выпуска авто:',
+    phAutoModel: 'Например: Toyota Camry 70, 2021',
+    labelRealtyAddress: 'Адрес и параметры вторичной квартиры:',
+    phRealtyAddress: 'Например: 2-комн., 60 м², ул. Киевская',
+    labelYear: 'Год выпуска / Состояние:',
+    phYear: 'Например: 2021, идеальное состояние',
+    labelEstimated: 'Желаемая сумма оценки ($):',
+    phEstimated: '25 000',
+    btnSubmit: 'Отправить заявку на оценку в WhatsApp',
+    photoTip: '📸 Фотографии машины или техпаспорта можно прикрепить прямо в диалог WhatsApp для экспресс-оценки за 2 часа.',
+    previewTitle: 'Предварительный результат зачета:',
+    previewDownCovered: '✓ Полностью закрывает 30% взнос (наличными = $0)!',
+    previewRemaining: 'Остаток к доплате в рассрочку 0%:',
+    somUnit: 'сом',
   },
   kg: {
     pageTitle: 'Trade-in (Бартер)',
-    heroTitle: 'УНААНЫ ЖЕ ЭСКИ ТУРАК ЖАЙДЫ ЖАҢЫ ҮЙГӨ АЛМАШТЫРУУ',
-    heroSubtitle: 'EL ORDO GROUP турак жай комплекстеринен батир алуу үчүн учурдагы унааңызды же эски кыймылсыз мүлкүңүздү баштапкы төлөм катары колдонуңуз. 24 саатта кезексиз жана автобазарсыз адилеттүү баалоо.',
-    noticeText: 'Trade-in программасы сизди автобазарда жумалап туруудан же риелторлор аркылуу эски үйдү сатуу убарагерчилигинен куткарат. Биз активиңизди объективдүү базар баасында баалап, бул сумманы дароо жаңы батирдин эсебине кошобуз.',
-    blockTitle: 'TRADE-IN ПРОГРАММАСЫ КАНДАЙ ИШТЕЙТ',
-    descriptionText: 'Биздин долбоорлордун биринен батир тандайсыз (ЖК Abu Dhabi, Madina Residence, ЖД Айкол+ же Айкол). Биздин эксперт унааңызды же мүлкүңүздү 24 саатта адилеттүү базар баасында баалайт. Макулдашылган сумма толугу менен баштапкы төлөм же бөлүк төлөм катары эсептелинет, ал эми калган суммага 36 айга чейин 0% пайызсыз бөлүп төлөө таризделет.',
-    documentsText: 'Унаа үчүн: Унааны каттоо күбөлүгү (техпаспорт) жана ээсинин паспорту. Кыймылсыз мүлк үчүн: Укук белгилөөчү документтер (сатуу-сатып алуу/белекке берүү келишими), БТИ техпаспорту жана чектөөлөр жоктугу тууралуу маалымкат.',
+    heroTitle: 'УНААНЫ ЖЕ ЭСКИ ТУРАК ЖАЙДЫ ЖАҢЫ КВАРТИРАГА АЛМАШТЫРУУ',
+    heroSubtitle: 'Машинаңызды же эски батирди сатууга айларча убакыт сарптабаңыз. Биз сиздин мүлкүңүздү 24 саатта базар баасы менен баалап, алгачкы төлөм катары эсептейбиз.',
+    noticeText: 'EL ORDO GROUP компаниясынын Trade-in программасы унаасын же эски мүлкүн убакыт жоготпостон биздин комплекстердеги батирлерге алмаштырууну каалагандар үчүн түзүлгөн.',
+    blockTitle: 'TRADE-IN ПРОГРАММАСЫНЫН ШАРТТАРЫ ЖАНА АРТЫКЧЫЛЫКТАРЫ',
+    descriptionText: 'Биздин эксперттер мүлкүңүзгө көз карандысыз базар баасын аныктайт. Макулдашылган сумма жаңы батирдин баштапкы төлөмү катары түздөн-түз эсепке алынат. Калган бөлүгүн 36 айга чейин 0% бөлүп төлөөгө тариздей аласыз.',
+    documentsText: 'Унаалар үчүн техникалык паспорт жана ээсинин паспорту талап кылынат. Кыймылсыз мүлк үчүн — укук күбөлөндүрүүчү документтер жана камакка алынбагандыгы тууралуу маалымкат.',
     faqList: [
-      {
-        q: 'Унаанын баасы кандай аныкталат?',
-        a: 'Баалоо реалдуу базар анализине (Mashina.kg, Бишкек автобазарынын бүтүмдөрү) негизделип, чыгарылган жылы, абалы жана жүрүшү эске алынат. Бааны атайылап түшүрбөйбүз.',
-      },
-      {
-        q: 'Унаанын баасы биринчи төлөмдөн ашып кетсе эмне болот?',
-        a: 'Ашык сумма батирдин негизги баасын жабууга багытталат жана ай сайын төлөмдөрдү же жалпы мөөнөттү азайтат.',
-      },
-      {
-        q: 'Унаанын баасы 30% взноско жетпесе эмне кылуу керек?',
-        a: 'Жетпеген айырманы накталай же эсепке которуу аркылуу кошуп койсоңуз болот.',
-      },
-      {
-        q: 'Унааны «Унаа» мекемесинен кайра каттоодон ким өткөрөт?',
-        a: 'EL ORDO GROUP юристтери документтерди даярдоону жана каттоону толук өзүнө алат.',
-      },
-      {
-        q: 'Советтик үйлөрдөгү (104, 105, 106-серия) батирлер кабыл алынабы?',
-        a: 'Ооба. Толук документтери бар жана чектөөлөрү жок батирлер кабыл алынат.',
-      },
-      {
-        q: 'Бир батирге эки унааны кошсо болобу?',
-        a: 'Ооба, Trade-in программасы бир нече активди бириктирүүгө мүмкүнчүлүк берет.',
-      },
-      {
-        q: 'Баалоо учурунда жаңы батирдин баасы бекитилеби?',
-        a: 'Ооба. Баалоо макулдашылган учурда батир брондолуп, чарчы метрдин баасы ДДУ келишиминде бекитилет.',
-      },
+      { q: 'Кандай маркадагы унаалар кабыл алынат?', a: 'Биз укуктук жактан таза, жакшы техникалык абактагы жеңил унааларды жана кроссоверлерди карайбыз.' },
+      { q: 'Эгерде унаанын баасы биринчи төлөмдөн жогору болсочы?', a: 'Ашык сумма ай сайын төлөмдөргө эсептелет.' },
+      { q: 'Баалоо канча убакыт алат?', a: 'Онлайн баалоо 2 саат, акыркы экспертиза 24 саат.' },
+      { q: 'Бишкектин башка районундагы эски батирди өткөрсө болобу?', a: 'Ооба, юристтер жардам берет.' },
+      { q: 'Унааны каттонон өзүм чечишим керекпи?', a: 'Компания өзүнө алат.' },
     ],
     casesBadge: 'Практикалык мисалдар',
     casesTitle: 'Trade-in алмашуунун реалдуу сценарийлери',
-    casesSubtitle: 'Биздин жашоочулар кошумча накталай каражатсыз эле турак жай шарттарын кантип жакшыртышат',
+    casesSubtitle: 'Кошумча накталай каражатсыз эле турак жай шарттарын жакшыртуу',
     cases: [
       {
         asset: 'Toyota Camry 70 (2020-ж.)',
@@ -297,7 +317,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: 'Калган $4 385 ай сайын төлөмдөргө которулду',
         badge: 'Популярдуу алмашуу',
         slug: 'madina-residence',
-        waText: 'Саламатсызбы! Toyota Camry унаамды Trade-in аркылуу ЖК Madina Residence батирине алмаштыргым келет. Көрүүгө качан барсам болот?',
+        waText: 'Саламатсызбы! Toyota Camry унаамды Trade-in аркылуу ЖК Madina Residence батирине алмаштыргым келет.',
       },
       {
         asset: 'Lexus GX 460 (2016-ж.)',
@@ -333,7 +353,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tableBadge: 'Убакытты жана каражатты үнөмдөө',
     tableTitle: 'EL ORDO Trade-in же автобазарда сатуубу?',
     tableSubtitle: 'Эмне үчүн куруучуга түз алмаштыруу өз алдынча сатуудан пайдалуураак',
-    colCriteria: 'Бүтүм критерийи',
+    colCriteria: 'Критерий',
     colElOrdo: 'EL ORDO Trade-in',
     colMarket: 'Өз алдынча сатуу',
     row1Criteria: 'Бүтүмдү жабуу мөөнөтү',
@@ -341,105 +361,72 @@ const CONTENT: Record<Locale, TradeInContent> = {
     row1Market: '1ден 4 айга чейин',
     row2Criteria: 'Батирди брондоо жана бааны бекитүү',
     row2ElOrdo: 'Батир дароо бекитилет',
-    row2Market: 'Батир кымбаттап же сатылып кетиши мүмкүн',
+    row2Market: 'Батир кымбаттап кетиши мүмкүн',
     row3Criteria: 'Бааны түшүрүү жана соодалашуу',
-    row3ElOrdo: 'Адилеттүү объективдүү базар баасы',
-    row3Market: 'Алып-сатарлардын бааны түшүрүү басымы',
-    row4Criteria: 'Комиссиялар жана жарнама чыгымдары',
+    row3ElOrdo: 'Адилеттүү базар баасы',
+    row3Market: 'Алып-сатарлардын басымы',
+    row4Criteria: 'Комиссиялар жана чыгымдар',
     row4ElOrdo: '0 сом (Бардык чыгымдар куруучудан)',
-    row4Market: 'Жарнама, жууп-тазалоо, базар акысы, риелторлор',
+    row4Market: 'Жарнама, базар акысы',
     row5Criteria: 'Юридикалык тариздөө',
     row5ElOrdo: 'Компаниянын штаттык юристтери',
-    row5Market: '«Унаа» мекемесиндеги кезектер, тобокелдиктер',
+    row5Market: 'Кезектер, тобокелдиктер',
     categoriesBadge: 'Активдердин критерийлери',
     categoriesTitle: 'Программага кандай мүлктөр катыша алат',
     requirementsLabel: 'Талаптар:',
     categories: [
-      {
-        type: 'car',
-        title: 'Унаалар жана жол тандабастар',
-        desc: 'Таза юридикалык тарыхы бар техникалык жактан жакшы чет элдик унаалар (Toyota, Lexus, Hyundai, Kia, BMW, Mercedes ж.б.).',
-        reqs: 'Унаанын техпаспорту, ээсинин паспорту, айып пулдар менен камактардын жоктугу.',
-      },
-      {
-        type: 'realty',
-        title: 'Бишкектеги экинчилик батирлер',
-        desc: '104, 105, 106-сериялардагы 1, 2, 3 бөлмөлүү батирлер, ошондой эле шаардагы бүткөн жаңы үйлөр.',
-        reqs: 'Укук белгилөөчү документтер, БТИ техпаспорту, чектөөлөр жоктугу тууралуу маалымкат.',
-      },
-      {
-        type: 'land',
-        title: 'Жер тилкелери жана коммерция',
-        desc: 'Бишкекте жана түштүк тоо этегинде жайгашкан жеке турак жай куруу үчүн жерлер жана коммерциялык жайлар.',
-        reqs: 'Кызыл китеп (мамлекеттик акт), укук белгилөөчү документтер, макулдашылган АПУ.',
-      },
+      { type: 'car', title: 'Унаалар', desc: 'Таза юридикалык тарыхы бар техникалык жактан жакшы чет элдик унаалар.', reqs: 'Техпаспорт, паспорт.' },
+      { type: 'realty', title: 'Бишкектеги экинчилик батирлер', desc: '104, 105, 106-сериялардагы батирлер.', reqs: 'Документтер, техпаспорт.' },
+      { type: 'land', title: 'Жер тилкелери', desc: 'ИЖС жерлери.', reqs: 'Кызыл китеп.' },
     ],
     stepsBadge: '24 сааттык жол-жобо',
     stepsTitle: 'Trade-in боюнча тариздөө этаптары',
     steps: [
-      {
-        num: '01',
-        title: 'Онлайн-табыштама берүү',
-        desc: 'Баштапкы баасын аныктоо үчүн базалык маалыматтарды (үлгүсү, жылы, жүрүшү же сүрөтү) WhatsApp аркылуу жөнөтөсүз.',
-      },
-      {
-        num: '02',
-        title: 'Кароо жана бааны бекитүү',
-        desc: 'Эксперт 24 саат ичинде карап чыгып, жашыруун төмөндөтүүлөрсүз адилеттүү базар баасын айтат.',
-      },
-      {
-        num: '03',
-        title: 'Жаңы батирди тандоо',
-        desc: 'EL ORDO GROUP долбоорлорунан жаккан кабатты жана планды чарчы метрдин баасын бекитүү менен тандайсыз.',
-      },
-      {
-        num: '04',
-        title: 'ДДУ түзүү жана эсепке алуу',
-        desc: 'Сиздин мүлкүңүздүн баасы расмий түрдө биринчи взнос катары эсептелет. Кайра каттоону компания өзүнө алат.',
-      },
+      { num: '01', title: 'Онлайн-табыштама', desc: 'Маалыматты WhatsApp аркылуу жөнөтөсүз.' },
+      { num: '02', title: 'Кароо жана бааны бекитүү', desc: 'Эксперт 24 саатта базар баасын айтат.' },
+      { num: '03', title: 'Жаңы батирди тандоо', desc: 'Долбоорлордон кабатты тандайсыз.' },
+      { num: '04', title: 'ДДУ түзүү', desc: 'Мүлкүңүз баштапкы төлөм катары эсептелет.' },
     ],
+    calcBadge: 'Интерактивдүү баалоо',
+    calcTitle: 'Батириңиздин жабылышын эсептеңиз',
+    calcDesc: '0% бөлүп төлөө калган суммасын билүү үчүн мүлкүңүздүн баасын жазыңыз.',
+    tabAuto: 'Унаа',
+    tabRealty: 'Мүлк',
+    targetComplexLabel: 'Кайсы ЖК эсебине алуу:',
+    targetComplexAll: 'Компаниянын каалаган объектиси',
+    labelAutoModel: 'Унаанын маркасы, модели жана жылы:',
+    phAutoModel: 'Мисалы: Toyota Camry 70, 2021',
+    labelRealtyAddress: 'Эски батирдин дареги:',
+    phRealtyAddress: 'Мисалы: 2 бөлмө, 60 м²',
+    labelYear: 'Жылы / Абалы:',
+    phYear: 'Мисалы: 2021',
+    labelEstimated: 'Баалоо суммасы ($):',
+    phEstimated: '25 000',
+    btnSubmit: 'WhatsApp аркылуу баалоого өтүнүч жиберүү',
+    photoTip: '📸 Экспресс-баалоо үчүн сүрөттөрдү WhatsApp чатына жөнөтсөңүз болот.',
+    previewTitle: 'Алдын ала эсептөө натыйжасы:',
+    previewDownCovered: '✓ Баштапкы 30% төлөмдү толук жабат (накталай = $0)!',
+    previewRemaining: '0% бөлүп төлөөгө калган сумма:',
+    somUnit: 'сом',
   },
   kz: {
     pageTitle: 'Trade-in (Бартер)',
     heroTitle: 'КӨЛІКТІ НЕМЕСЕ ЕСКІ БАСПАНАНЫ ЖАҢА ҮЙГЕ АЙЫРБАСТАУ',
     heroSubtitle: 'EL ORDO GROUP кешендерінен жаңа пәтер алу үшін көлігіңізді немесе ескі пәтеріңізді бастапқы жарна ретінде қолданыңыз. 24 сағатта кезексіз әділ бағалау.',
-    noticeText: 'Trade-in бағдарламасы көлік базарында апталап тұрудан және риелторларға комиссия төлеуден құтқарады. Активіңізді әділ нарықтық бағамен бағалап, соманы жаңа пәтердің шотына есептейміз.',
+    noticeText: 'Trade-in бағдарламасы көлік базарында апталап тұрудан құтқарады. Активіңізді әділ нарықтық бағамен бағалап, соманы жаңа пәтердің шотына есептейміз.',
     blockTitle: 'TRADE-IN БАҒДАРЛАМАСЫ ҚАЛАЙ ЖҰМЫС ІСТЕЙДІ',
-    descriptionText: 'Жобаларымыздың бірінен пәтер таңдайсыз (ЖК Abu Dhabi, Madina Residence, ЖД Айкол+ немесе Айкол). Сарапшы көлігіңізді немесе мүлкіңізді 24 сағатта әділ бағалайды. Келісілген сома толық көлемде бастапқы жарна ретінде есептеліп, қалдық сомаға 36 айға дейін 0% бөліп төлеу ресімделеді.',
-    documentsText: 'Көлік үшін: Техпаспорт және иесінің төлқұжаты. Жылжымайтын мүлік үшін: Құқық белгілейтін құжаттар, БТИ техпаспорты және ауыртпалықтардың жоқтығы туралы анықтама.',
+    descriptionText: 'Жобаларымыздың бірінен пәтер таңдайсыз. Сарапшы көлігіңізді немесе мүлкіңізді 24 сағатта әділ бағалайды. Келісілген сома толық көлемде бастапқы жарна ретінде есептеліп, қалдық сомаға 36 айға дейін 0% бөліп төлеу ресімделеді.',
+    documentsText: 'Көлік үшін: Техпаспорт және иесінің төлқұжаты. Жылжымайтын мүлік үшін: Құқық белгілейтін құжаттар.',
     faqList: [
-      {
-        q: 'Көлік құны қалай анықталады?',
-        a: 'Бағалау нақты нарықтық талдауға (Mashina.kg және нақты мәмілелер) негізделеді. Бағаны негізсіз түсірмейміз.',
-      },
-      {
-        q: 'Көлік құны бастапқы жарнадан асып кетсе ше?',
-        a: 'Артық сома пәтердің қалған құнын өтеуге бағытталып, ай сайынғы төлемді азайтады.',
-      },
-      {
-        q: 'Көлік сомасы 30% жарнаға жетпесе не істеу керек?',
-        a: 'Жетпеген соманы қолма-қол немесе аударым арқылы толықтыруға болады.',
-      },
-      {
-        q: 'Көлікті қайта тіркеуді кім жүргізеді?',
-        a: 'EL ORDO GROUP заңгерлері құжаттарды дайындап, толық сүйемелдейді.',
-      },
-      {
-        q: '104, 105, 106-сериядағы ескі пәтерлер қабылдана ма?',
-        a: 'Иә, толық құжаттары бар және кепілде жоқ пәтерлер қабылданады.',
-      },
-      {
-        q: 'Бір пәтерге екі көлік тапсыруға бола ма?',
-        a: 'Иә, Trade-in бағдарламасы бірнеше активті біріктіруге мүмкіндік береді.',
-      },
-      {
-        q: 'Бағалау кезінде жаңа пәтердің бағасы бекітіле ме?',
-        a: 'Иә, бағалау келісілген сәтте пәтер брондалып, шаршы метр құны ДДУ шартында бекітіледі.',
-      },
+      { q: 'Көлік құны қалай анықталады?', a: 'Нарықтық талдау негізінде.' },
+      { q: 'Көлік құны бастапқы жарнадан асып кетсе ше?', a: 'Артық сома ай сайынғы төлемді азайтады.' },
+      { q: 'Бағалау қанша уақыт алады?', a: '24 сағатқа дейін.' },
+      { q: 'Ескі пәтерді өткізуге бола ма?', a: 'Иә, қабылданады.' },
+      { q: 'Қайта тіркеуді кім жүргізеді?', a: 'Компания заңгерлері.' },
     ],
     casesBadge: 'Тәжірибелік мысалдар',
     casesTitle: 'Trade-in айырбастаудың нақты сценарийлері',
-    casesSubtitle: 'Тұрғындарымыз қосымша қолма-қол қаражатсыз тұрғын үй жағдайын қалай жақсартады',
+    casesSubtitle: 'Қосымша қаражатсыз тұрғын үй жағдайын жақсарту',
     cases: [
       {
         asset: 'Toyota Camry 70 (2020 ж.)',
@@ -452,11 +439,11 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: 'Қалған $4 385 ай сайынғы төлемдерге бағытталды',
         badge: 'Танымал айырбас',
         slug: 'madina-residence',
-        waText: 'Сәлеметсіз бе! Toyota Camry көлігімді Trade-in бойынша ЖК Madina Residence пәтеріне айырбастағым келеді. Қалай тексеруге болады?',
+        waText: 'Сәлеметсіз бе! Toyota Camry көлігімді Trade-in бойынша ЖК Madina Residence пәтеріне айырбастағым келеді.',
       },
       {
         asset: 'Lexus GX 460 (2016 ж.)',
-        assetCategory: 'Премиум жол талғамайтын көлік',
+        assetCategory: 'Премиум жол таңғажайып көлік',
         valuation: '$38 000',
         valuationKgs: '≈ 3 325 000 сом',
         targetComplex: 'ЖК Abu Dhabi',
@@ -465,7 +452,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: 'Ай сайынғы төлем 36 айға $1 250 дейін төмендетілді',
         badge: 'Премиум Trade-in',
         slug: 'abu-dhabi',
-        waText: 'Сәлеметсіз бе! Жол талғамайтын көлікті ЖК Abu Dhabi кешеніндегі 2 бөлмелі пәтерге айырбастау шарттарын білгім келеді.',
+        waText: 'Сәлеметсіз бе! Жол таңғажайып көлікті ЖК Abu Dhabi кешеніндегі 2 бөлмелі пәтерге айырбастау шарттарын білгім келеді.',
       },
       {
         asset: '105-сериялы 1 бөлмелі пәтер',
@@ -473,7 +460,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         valuation: '$46 000',
         valuationKgs: '≈ 4 025 000 сом',
         targetComplex: 'ЖД Айкол + (Көк-Жар)',
-        targetApartment: 'Кең 2 бөлмелі (74.3 м² тау бөктерінде)',
+        targetApartment: 'Кең 2 бөлмелі (74.3 м²)',
         result: 'Жаңа пәтер құнының 50%-дан астамы жабылды',
         surplus: 'Қалдық сомаға ыңғайлы мерзімге 0% бөліп төлеу рәсімделді',
         badge: 'Баспана айырбасы',
@@ -487,72 +474,62 @@ const CONTENT: Record<Locale, TradeInContent> = {
     aboutComplexBtn: 'Кешен туралы',
     tableBadge: 'Уақыт пен қаражатты үнемдеу',
     tableTitle: 'EL ORDO Trade-in немесе көлік базарында сату?',
-    tableSubtitle: 'Неліктен құрылыс салушыға тікелей айырбастау өз бетінше сатудан тиімді',
-    colCriteria: 'Мәміле критерийі',
+    tableSubtitle: 'Тікелей құрылыс салушыдан айырбастаудың тиімділігі',
+    colCriteria: 'Критерий',
     colElOrdo: 'EL ORDO Trade-in',
     colMarket: 'Өз бетінше сату',
     row1Criteria: 'Мәмілені жабу мерзімі',
     row1ElOrdo: 'Бар болғаны 24 сағат',
     row1Market: '1-ден 4 айға дейін',
-    row2Criteria: 'Пәтерді брондау және бағаны бекіту',
+    row2Criteria: 'Пәтерді брондау',
     row2ElOrdo: 'Пәтер бірден бекітіледі',
-    row2Market: 'Пәтер қымбаттап не сатылып кетуі мүмкін',
-    row3Criteria: 'Бағаны төмендету мен саудаласу',
-    row3ElOrdo: 'Әділ объективті нарықтық баға',
+    row2Market: 'Пәтер сатылып кетуі мүмкін',
+    row3Criteria: 'Бағаны түсіру',
+    row3ElOrdo: 'Әділ нарықтық баға',
     row3Market: 'Алып-сатарлардың қысымы',
-    row4Criteria: 'Комиссиялар мен жарнама шығындары',
-    row4ElOrdo: '0 сом (Шығындарды девелопер көтереді)',
-    row4Market: 'Жарнама, көлік жуу, базар ақысы, риелторлар',
+    row4Criteria: 'Шығындар',
+    row4ElOrdo: '0 сом',
+    row4Market: 'Жарнама, риелторлар',
     row5Criteria: 'Заңдық рәсімдеу',
-    row5ElOrdo: 'Компанияның штаттық заңгерлері',
-    row5Market: '«Унаа» мекемесіндегі кезектер, тәуекелдер',
+    row5ElOrdo: 'Компания заңгерлері',
+    row5Market: 'Кезектер, тәуекелдер',
     categoriesBadge: 'Активтер критерийлері',
-    categoriesTitle: 'Бағдарламаға қандай мүлік қатыса алады',
+    categoriesTitle: 'Қандай мүлік қатыса алады',
     requirementsLabel: 'Талаптар:',
     categories: [
-      {
-        type: 'car',
-        title: 'Көліктер мен жол талғамайтын көліктер',
-        desc: 'Таза заңдық тарихы бар шетелдік көліктер (Toyota, Lexus, Hyundai, Kia, BMW, Mercedes т.б.).',
-        reqs: 'Көлік техпаспорты, иесінің төлқұжаты, айыппұлдар мен тыйымдардың болмауы.',
-      },
-      {
-        type: 'realty',
-        title: 'Бішкектегі екінші нарық пәтерлері',
-        desc: '104, 105, 106-сериядағы 1, 2, 3 бөлмелі пәтерлер және пайдалануға берілген жаңа үйлер.',
-        reqs: 'Құқық белгілейтін құжаттар, БТИ техпаспорты, ауыртпалықтардың болмауы.',
-      },
-      {
-        type: 'land',
-        title: 'Жер телімдері мен коммерция',
-        desc: 'Бішкекте және оңтүстік бөктерде орналасқан құрылысқа арналған жерлер мен коммерциялық орындар.',
-        reqs: 'Қызыл кітап (мемлекеттік акт), құқық құжаттары, келісілген АПУ.',
-      },
+      { type: 'car', title: 'Көліктер', desc: 'Таза заңдық тарихы бар шетелдік көліктер.', reqs: 'Техпаспорт.' },
+      { type: 'realty', title: 'Екінші нарық пәтерлері', desc: '1, 2, 3 бөлмелі пәтерлер.', reqs: 'Құқық белгілейтін құжаттар.' },
+      { type: 'land', title: 'Жер телімдері', desc: 'Құрылысқа арналған жерлер.', reqs: 'Қызыл кітап.' },
     ],
     stepsBadge: '24 сағаттық рәсім',
-    stepsTitle: 'Trade-in бойынша рәсімдеу кезеңдері',
+    stepsTitle: 'Trade-in рәсімдеу кезеңдері',
     steps: [
-      {
-        num: '01',
-        title: 'Онлайн-өтінім беру',
-        desc: 'Бастапқы бағаны білу үшін негізгі деректерді (маркасы, жылы, суреті) WhatsApp-қа жібересіз.',
-      },
-      {
-        num: '02',
-        title: 'Тексеру және бағаны бекіту',
-        desc: 'Сарапшы 24 сағат ішінде қарап, жасырын жеңілдіктерсіз әділ нарықтық бағаны ұсынады.',
-      },
-      {
-        num: '03',
-        title: 'Жаңа пәтерді таңдау',
-        desc: 'EL ORDO GROUP кешендерінен шаршы метр құнын бекіте отырып, ұнаған қабат пен жоспарды таңдайсыз.',
-      },
-      {
-        num: '04',
-        title: 'ДДУ жасасу және өзара есеп',
-        desc: 'Мүлкіңіздің құны ресми түрде бастапқы жарна ретінде есептеледі. Қайта тіркеуді заңгерлер атқарады.',
-      },
+      { num: '01', title: 'Өтінім беру', desc: 'Деректерді WhatsApp-қа жібересіз.' },
+      { num: '02', title: 'Бағалау', desc: 'Сарапшы базар баасын айтады.' },
+      { num: '03', title: 'Пәтерді таңдау', desc: 'Жобадан қабатты тандайсыз.' },
+      { num: '04', title: 'ДДУ жасасу', desc: 'Мүлкіңіз жарна ретінде есептеледі.' },
     ],
+    calcBadge: 'Интерактивті бағалау',
+    calcTitle: 'Пәтеріңіздің жабылышын есептеңіз',
+    calcDesc: '0% бөлүп төлеу калган суммасын билүү үшін мүлкүңүздүн баасын жазыңыз.',
+    tabAuto: 'Көлік',
+    tabRealty: 'Мүлк',
+    targetComplexLabel: 'Қайсы ТҮК есебіне жазу:',
+    targetComplexAll: 'Компанияның кез келген нысаны',
+    labelAutoModel: 'Көліктің маркасы, моделі және жылы:',
+    phAutoModel: 'Мысалы: Toyota Camry 70, 2021',
+    labelRealtyAddress: 'Ескі пәтердің мекенжайы:',
+    phRealtyAddress: 'Мысалы: 2 бөлме, 60 м²',
+    labelYear: 'Жылы / Жағдайы:',
+    phYear: 'Мысалы: 2021',
+    labelEstimated: 'Бағалау сомасы ($):',
+    phEstimated: '25 000',
+    btnSubmit: 'WhatsApp арқылы баалоого өтүнүч жиберүү',
+    photoTip: '📸 Суреттерді WhatsApp чатына жібере аласыз.',
+    previewTitle: 'Алдын ала есептеу нәтижесі:',
+    previewDownCovered: '✓ Бастапқы 30% жарнаны толық жабады (қолма-қол = $0)!',
+    previewRemaining: '0% бөліп төлеуге қалған сома:',
+    somUnit: 'сом',
   },
   uk: {
     pageTitle: 'Trade-in (Бартер)',
@@ -563,38 +540,15 @@ const CONTENT: Record<Locale, TradeInContent> = {
     descriptionText: 'Ви обираєте квартиру в будь-якому з наших проєктів (Abu Dhabi, Madina Residence, Айкол+ чи Айкол). Наш експерт оцінює авто або житло за справедливою ціною за 24 години. Сума повністю зараховується як перший внесок, а на залишок оформлюється розстрочка 0% до 36 місяців.',
     documentsText: 'Для авто: Техпаспорт авто та паспорт власника. Для нерухомості: Правовстановлюючі документи, техпаспорт БТІ та довідка про відсутність арештів.',
     faqList: [
-      {
-        q: 'Як визначається вартість авто під час оцінки?',
-        a: 'Оцінка ґрунтується на детальному ринковому аналізі з урахуванням року, комплектації та технічного стану.',
-      },
-      {
-        q: 'Що якщо оцінка авто перевищує перший внесок?',
-        a: 'Уся сума понад перший внесок спрямовується на зменшення загальної суми боргу.',
-      },
-      {
-        q: 'Що робити, якщо вартості авто недостатньо?',
-        a: 'Різницю можна доплатити коштами або узгодити персональний графік.',
-      },
-      {
-        q: 'Хто здійснює переоформлення автомобіля?',
-        a: 'Юридичний відділ компанії бере на себе всі процедури оформлення.',
-      },
-      {
-        q: 'Чи приймаються старі квартири?',
-        a: 'Так, ліквідне вторинне житло за наявності чистих документів.',
-      },
-      {
-        q: 'Чи можна здати два автомобілі?',
-        a: 'Так, можливо комбінувати кілька авто або авто з доплатою.',
-      },
-      {
-        q: 'Чи фіксується ціна нової квартири?',
-        a: 'Так, ціна квадратного метра фіксується в офіційному ДДУ в момент оцінки.',
-      },
+      { q: 'Як визначається вартість авто під час оцінки?', a: 'Оцінка ґрунтується на ринковому аналізі.' },
+      { q: 'Що якщо оцінка авто перевищує перший внесок?', a: 'Сума йде на зменшення загального боргу.' },
+      { q: 'Скільки часу займає оцінка?', a: 'До 24 годин.' },
+      { q: 'Чи можна здати вторинну квартиру?', a: 'Так, за наявності чистих документів.' },
+      { q: 'Хто здійснює переоформлення?', a: 'Юристи компанії.' },
     ],
     casesBadge: 'Практичні приклади',
     casesTitle: 'Реальні сценарії зарахування Trade-in',
-    casesSubtitle: 'Як резиденти покращують житлові умови без вільних готівкових коштів',
+    casesSubtitle: 'Покращення житлових умов без вільних коштів',
     cases: [
       {
         asset: 'Toyota Camry 70 (2020 р.)',
@@ -628,7 +582,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         valuation: '$46 000',
         valuationKgs: '≈ 4 025 000 сом',
         targetComplex: 'ЖД Айкол + (Кок-Жар)',
-        targetApartment: '2-кімнатна (74.3 м² у передгір’ї)',
+        targetApartment: '2-кімнатна (74.3 м²)',
         result: 'Покрито понад 50% вартості нової квартири',
         surplus: 'Мінімальний залишок у розстрочку 0%',
         badge: 'Обмін житла',
@@ -642,114 +596,81 @@ const CONTENT: Record<Locale, TradeInContent> = {
     aboutComplexBtn: 'Про комплекс',
     tableBadge: 'Економія часу та коштів',
     tableTitle: 'Trade-in EL ORDO чи продаж на ринку?',
-    tableSubtitle: 'Чому обмін безпосередньо забудовнику вигідніший за самостійний продаж',
-    colCriteria: 'Критерій угоди',
+    tableSubtitle: 'Чому обмін безпосередньо забудовнику вигідніший',
+    colCriteria: 'Критерій',
     colElOrdo: 'Trade-in в EL ORDO',
     colMarket: 'Самостійний продаж',
     row1Criteria: 'Термін закриття угоди',
     row1ElOrdo: 'Всього 24 години',
     row1Market: 'від 1 до 4 місяців',
-    row2Criteria: 'Бронь квартири та фіксація ціни',
-    row2ElOrdo: 'Квартира бронюється одразу',
-    row2Market: 'Квартира може подорожчати',
+    row2Criteria: 'Бронь квартири',
+    row2ElOrdo: 'Бронюється одразу',
+    row2Market: 'Може подорожчати',
     row3Criteria: 'Торг та збивання ціни',
     row3ElOrdo: 'Чесна ринкова вартість',
-    row3Market: 'Постійний тиск перекупників',
+    row3Market: 'Тиск перекупників',
     row4Criteria: 'Комісії та реклама',
-    row4ElOrdo: '0 сом (Витрати бере забудовник)',
-    row4Market: 'Оплата реклами, авторинку, рієлторів',
+    row4ElOrdo: '0 сом',
+    row4Market: 'Оплата реклами, рієлторів',
     row5Criteria: 'Юридичне оформлення',
     row5ElOrdo: 'Штатні юристи компанії',
-    row5Market: 'Черги в установах, ризики розрахунків',
+    row5Market: 'Черги, ризики',
     categoriesBadge: 'Критерії активів',
     categoriesTitle: 'Яке майно бере участь у програмі',
     requirementsLabel: 'Вимоги:',
     categories: [
-      {
-        type: 'car',
-        title: 'Автомобілі та позашляховики',
-        desc: 'Іномарки у справному стані з прозорою історією (Toyota, Lexus, Hyundai, Kia, BMW тощо).',
-        reqs: 'Техпаспорт, паспорт власника, відсутність штрафів та обтяжень.',
-      },
-      {
-        type: 'realty',
-        title: 'Вторинні квартири у Бішкеку',
-        desc: '1-, 2-, 3-кімнатні квартири типових серій або здані новобудови.',
-        reqs: 'Правовстановлюючі документи, техпаспорт БТІ, довідка про відсутність арештів.',
-      },
-      {
-        type: 'land',
-        title: 'Земельні ділянки та комерція',
-        desc: 'Ліквідні ділянки під будівництво у Бішкеку та комерційні приміщення.',
-        reqs: 'Червона книга (держакт), правовстановлюючі документи.',
-      },
+      { type: 'car', title: 'Автомобілі', desc: 'Іномарки у справному стані.', reqs: 'Техпаспорт, паспорт.' },
+      { type: 'realty', title: 'Вторинні квартири', desc: '1-, 2-, 3-кімнатні квартири.', reqs: 'Документи, БТІ.' },
+      { type: 'land', title: 'Земельні ділянки', desc: 'Ділянки під будівництво.', reqs: 'Червона книга.' },
     ],
     stepsBadge: 'Процедура за 24 години',
     stepsTitle: 'Етапи оформлення за Trade-in',
     steps: [
-      {
-        num: '01',
-        title: 'Подання онлайн-заявки',
-        desc: 'Надсилаєте базові дані нам у WhatsApp для попереднього погодження діапазону вартості.',
-      },
-      {
-        num: '02',
-        title: 'Огляд та фіксація ціни',
-        desc: 'Експерт оглядає об\'єкт і протягом 24 годин озвучує справедливу ринкову ціну.',
-      },
-      {
-        num: '03',
-        title: 'Вибір нової квартири',
-        desc: 'Бронюєте планування та поверх у будь-якому комплексі з фіксацією ціни.',
-      },
-      {
-        num: '04',
-        title: 'Підписання ДДУ та взаємозалік',
-        desc: 'Вартість майна зараховується як перший внесок. Юристи компанії оформлюють документи.',
-      },
+      { num: '01', title: 'Заявка', desc: 'Надсилаєте дані у WhatsApp.' },
+      { num: '02', title: 'Огляд', desc: 'Експерт озвучує ціну за 24 години.' },
+      { num: '03', title: 'Вибір нової квартири', desc: 'Бронюєте планування.' },
+      { num: '04', title: 'Підписання ДДУ', desc: 'Майно зараховується як внесок.' },
     ],
+    calcBadge: 'Інтерактивний розрахунок заліку',
+    calcTitle: 'Розрахуйте покриття вашої квартири',
+    calcDesc: 'Вкажіть орієнтовну вартість активу, щоб дізнатися залишок суми в розстрочку 0%.',
+    tabAuto: 'Автомобіль',
+    tabRealty: 'Нерухомість',
+    targetComplexLabel: 'В рахунок якого ЖК зарахувати:',
+    targetComplexAll: 'Будь-який об’єкт компанії',
+    labelAutoModel: 'Марка та модель авто:',
+    phAutoModel: 'Наприклад: Toyota Camry 70',
+    labelRealtyAddress: 'Адреса квартири:',
+    phRealtyAddress: 'Наприклад: 2-кімн., 60 м²',
+    labelYear: 'Рік випуску:',
+    phYear: 'Наприклад: 2021',
+    labelEstimated: 'Бажана сума ($):',
+    phEstimated: '25 000',
+    btnSubmit: 'Надіслати заявку у WhatsApp',
+    photoTip: '📸 Фото можна надіслати безпосередньо у WhatsApp.',
+    previewTitle: 'Попередній результат заліку:',
+    previewDownCovered: '✓ Повністю закриває 30% внесок (готівкою = $0)!',
+    previewRemaining: 'Залишок до доплати в розстрочку 0%:',
+    somUnit: 'сом',
   },
   en: {
     pageTitle: 'Trade-in (Barter)',
-    heroTitle: 'TRADE YOUR CAR OR PROPERTY FOR A BRAND NEW HOME',
+    heroTitle: 'EXCHANGE YOUR CAR OR SECONDARY PROPERTY FOR A NEW APARTMENT',
     heroSubtitle: 'Use your current vehicle or secondary property as the initial down payment for an apartment in modern EL ORDO GROUP developments. Fair market evaluation within 24 hours without marketplaces.',
-    noticeText: 'The Trade-in program saves you from spending weeks negotiating on auto markets or paying realtor commissions. We evaluate your asset at fair market value and immediately apply the amount toward your new home.',
+    noticeText: 'The Trade-in program saves you from spending months negotiating on auto markets or paying realtor commissions. We appraise your asset at fair market value and immediately apply the amount toward your new home.',
     blockTitle: 'HOW THE TRADE-IN PROGRAM WORKS',
     descriptionText: 'Choose an apartment in any of our projects (Abu Dhabi RC, Madina Residence, Aykol+ or Aykol). Our certified appraiser evaluates your car or secondary property at fair market value within 24 hours. The agreed amount is fully credited toward your down payment or upfront cost, with remaining balance financed via 0% installment up to 36 months.',
-    documentsText: 'For vehicles: Vehicle Registration Certificate (technical passport) and owner\'s passport. For real estate: Property ownership deeds, BTI title passport, and encumbrance-free certificate.',
+    documentsText: 'For vehicles: Vehicle Registration Certificate (technical passport) and owner\'s passport. For real estate: Property ownership deeds, BTI title passport, and encumbrance clearance.',
     faqList: [
-      {
-        q: 'How is the car\'s valuation determined?',
-        a: 'Evaluation is based on market dynamics, model year, trim specifications, mileage, and technical condition.',
-      },
-      {
-        q: 'What if the car\'s value exceeds the required down payment?',
-        a: 'Any surplus is deducted from the principal apartment price, reducing subsequent monthly installments.',
-      },
-      {
-        q: 'What if the car\'s valuation does not cover 30%?',
-        a: 'The difference can be settled in cash or added to an individualized payment plan.',
-      },
-      {
-        q: 'Who handles the vehicle title re-registration?',
-        a: 'The legal department of EL ORDO GROUP prepares all documentation and assists with re-registration.',
-      },
-      {
-        q: 'Are older apartments accepted for trade-in?',
-        a: 'Yes, secondary market apartments in Bishkek are accepted with full ownership documentation.',
-      },
-      {
-        q: 'Can I trade in two cars for a single apartment?',
-        a: 'Yes, combining multiple assets or a car plus cash is supported under the program.',
-      },
-      {
-        q: 'Is the price of the new apartment locked upon evaluation?',
-        a: 'Yes. The chosen unit is reserved and its price per square meter is secured in the official DDU agreement.',
-      },
+      { q: 'How is the car\'s valuation determined?', a: 'Based on current market analysis.' },
+      { q: 'What if the car\'s value exceeds the down payment?', a: 'Surplus goes toward reducing overall debt.' },
+      { q: 'How long does appraisal take?', a: 'Up to 24 hours.' },
+      { q: 'Are secondary apartments accepted?', a: 'Yes, with clean documentation.' },
+      { q: 'Who handles re-registration?', a: 'Company legal team.' },
     ],
     casesBadge: 'Practical Cases',
     casesTitle: 'Real Trade-in Scenarios',
-    casesSubtitle: 'How our residents upgrade their living standards without surplus cash reserves',
+    casesSubtitle: 'Upgrading living standards without cash reserves',
     cases: [
       {
         asset: 'Toyota Camry 70 (2020)',
@@ -762,7 +683,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: 'Remaining $4,385 credited toward monthly installments',
         badge: 'Popular Exchange',
         slug: 'madina-residence',
-        waText: 'Hello! I want to trade in my passenger car for an apartment in Madina Residence. How do I schedule an inspection?',
+        waText: 'Hello! I want to trade in my passenger car for an apartment in Madina Residence.',
       },
       {
         asset: 'Lexus GX 460 (2016)',
@@ -783,7 +704,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         valuation: '$46,000',
         valuationKgs: '≈ 4,025,000 KGS',
         targetComplex: 'Aykol + (Kok-Jar)',
-        targetApartment: 'Spacious 2-Room (74.3 m² foothills)',
+        targetApartment: 'Spacious 2-Room (74.3 m²)',
         result: 'Covered over 50% of the new apartment cost',
         surplus: 'Minimal balance financed at 0% installment',
         badge: 'Property Exchange',
@@ -797,114 +718,81 @@ const CONTENT: Record<Locale, TradeInContent> = {
     aboutComplexBtn: 'About Complex',
     tableBadge: 'Time & Money Savings',
     tableTitle: 'EL ORDO Trade-in vs Car Market Sale?',
-    tableSubtitle: 'Why direct exchange with developer is more beneficial than independent sale',
-    colCriteria: 'Deal Criteria',
+    tableSubtitle: 'Why direct exchange with developer is more beneficial',
+    colCriteria: 'Criteria',
     colElOrdo: 'Trade-in at EL ORDO',
     colMarket: 'Independent Sale',
     row1Criteria: 'Deal Closing Time',
     row1ElOrdo: 'Only 24 hours',
     row1Market: '1 to 4 months',
-    row2Criteria: 'Apartment Reservation & Locked Price',
-    row2ElOrdo: 'Apartment reserved immediately',
-    row2Market: 'Unit may sell out or increase in price',
-    row3Criteria: 'Price Haggling & Undervaluation',
-    row3ElOrdo: 'Fair objective market price',
-    row3Market: 'Constant pressure from bargain hunters',
+    row2Criteria: 'Apartment Reservation',
+    row2ElOrdo: 'Reserved immediately',
+    row2Market: 'Unit may sell out',
+    row3Criteria: 'Price Haggling',
+    row3ElOrdo: 'Fair market price',
+    row3Market: 'Bargain hunters pressure',
     row4Criteria: 'Commissions & Ad Costs',
-    row4ElOrdo: '$0 (Developer covers all expenses)',
-    row4Market: 'Online listings, car wash, market fees, agents',
+    row4ElOrdo: '$0',
+    row4Market: 'Listing and agent fees',
     row5Criteria: 'Legal Formalities',
-    row5ElOrdo: 'In-house company legal team',
-    row5Market: 'Registry queues, transaction risks',
+    row5ElOrdo: 'In-house legal team',
+    row5Market: 'Registry queues',
     categoriesBadge: 'Asset Criteria',
     categoriesTitle: 'Eligible Property for the Program',
     requirementsLabel: 'Requirements:',
     categories: [
-      {
-        type: 'car',
-        title: 'Cars & SUVs',
-        desc: 'Liquid vehicles (Toyota, Lexus, Hyundai, Kia, BMW, Mercedes, etc.) in sound mechanical condition with clean legal titles.',
-        reqs: 'Vehicle technical passport, owner ID, clear of liens and fines.',
-      },
-      {
-        type: 'realty',
-        title: 'Secondary Apartments in Bishkek',
-        desc: '1-, 2-, 3-room apartments of standard series or commissioned new builds in city limits.',
-        reqs: 'Title deeds, BTI technical passport, clear of encumbrances.',
-      },
-      {
-        type: 'land',
-        title: 'Land Plots & Commercial',
-        desc: 'Plots designated for residential development in Bishkek and southern foothills, plus commercial spaces.',
-        reqs: 'Red Book state title act, legal documents, approved master plan.',
-      },
+      { type: 'car', title: 'Cars & SUVs', desc: 'Liquid vehicles in sound mechanical condition.', reqs: 'Tech passport, ID.' },
+      { type: 'realty', title: 'Secondary Apartments', desc: '1, 2, 3-room apartments.', reqs: 'Title deeds, BTI.' },
+      { type: 'land', title: 'Land Plots', desc: 'Residential plots.', reqs: 'Red Book.' },
     ],
     stepsBadge: '24-Hour Procedure',
     stepsTitle: 'Trade-in Deal Execution Stages',
     steps: [
-      {
-        num: '01',
-        title: 'Submit Online Inquiry',
-        desc: 'Send basic vehicle or property specifications to our WhatsApp for initial price range assessment.',
-      },
-      {
-        num: '02',
-        title: 'Inspection & Price Lock',
-        desc: 'Company appraiser inspects the asset and confirms an objective fair market value within 24 hours.',
-      },
-      {
-        num: '03',
-        title: 'Choose New Apartment',
-        desc: 'Reserve your desired floor plan in any EL ORDO GROUP development with a locked square-meter rate.',
-      },
-      {
-        num: '04',
-        title: 'Sign Contract & Credit Balance',
-        desc: 'Asset value is formally credited as your down payment. Legal counsel handles all title transfers.',
-      },
+      { num: '01', title: 'Inquiry', desc: 'Send details via WhatsApp.' },
+      { num: '02', title: 'Inspection', desc: 'Appraiser confirms value in 24 hours.' },
+      { num: '03', title: 'Choose Apartment', desc: 'Reserve your unit.' },
+      { num: '04', title: 'Sign Agreement', desc: 'Asset is credited as down payment.' },
     ],
+    calcBadge: 'Interactive Trade-In Calculator',
+    calcTitle: 'Calculate Your Property Coverage',
+    calcDesc: 'Enter estimated value of your asset to instantly see remaining 0% installment balance.',
+    tabAuto: 'Automobile',
+    tabRealty: 'Real Estate',
+    targetComplexLabel: 'Target Residential Complex:',
+    targetComplexAll: 'Any Company Development',
+    labelAutoModel: 'Car Make & Model:',
+    phAutoModel: 'e.g. Toyota Camry 70',
+    labelRealtyAddress: 'Property Address:',
+    phRealtyAddress: 'e.g. 2-room, 60 sq.m',
+    labelYear: 'Year / Condition:',
+    phYear: 'e.g. 2021',
+    labelEstimated: 'Desired Valuation ($):',
+    phEstimated: '25,000',
+    btnSubmit: 'Send Valuation via WhatsApp',
+    photoTip: '📸 Attach photos directly in WhatsApp.',
+    previewTitle: 'Preliminary Trade-In Coverage:',
+    previewDownCovered: '✓ Fully covers the 30% down payment ($0 cash required)!',
+    previewRemaining: 'Remaining balance in 0% installment:',
+    somUnit: 'som',
   },
   zh: {
-    pageTitle: '以旧换新 (Trade-in)',
-    heroTitle: '汽车或二手房产直接置换高品质新居',
+    pageTitle: '置换购房 (Trade-in)',
+    heroTitle: '汽车或二手房产直接置换全新精奢华宅',
     heroSubtitle: '使用您的现有汽车或二手房产作为首付款，轻松置业 EL ORDO GROUP 旗下现代住宅区。专业评估团队24小时公允估值，无需奔波二手车市。',
-    noticeText: '以旧换新置换服务让您免于耗费数月在二手车市或房产中介苦等买家。我们按公允市场价值评估您的资产，评估款项直接抵扣新房购房款。',
-    blockTitle: '以旧换新（置换）运作模式',
-    descriptionText: '您可在旗下任一热销项目中挑选心仪房源（阿布扎比、玛迪娜公馆、艾科尔+或艾科尔）。我们的持证评估师将在24小时内按公允市价出具客观估值，该笔款项全额冲抵新房首付或部分房款，余款可享受最长36个月的0%免息分期。',
-    documentsText: '车辆所需：车辆行驶证（产权证书）及车主身份证明。房产所需：不动产权属证明文件、BTI房屋技术档案及无司法查封抵押证明。',
+    noticeText: 'EL ORDO GROUP 专属置换计划（Trade-in）旨在帮助意向客户将名下现有汽车或房产高效变现，无缝对接旗下精奢楼盘房源。',
+    blockTitle: '资产置换细则与核心优势',
+    descriptionText: '资深评估师对您的置换资产进行严谨的公允市场作价，双方确认的评估总额将无缝冲抵新房首期房款。剩余未结清房款可尊享最长36个月0%免息分期。',
+    documentsText: '置换汽车需提供车辆行驶证及车主有效证件；置换房产需提供房产确权证、BTI技术档案及无查封证明。',
     faqList: [
-      {
-        q: '车辆折价估值是如何确定的？',
-        a: '评估基于本地二手车大盘成交数据，综合年份、配置、里程数及实际车况出具公允市价，绝无恶意压价。',
-      },
-      {
-        q: '若车辆估值高于约定首付怎么办？',
-        a: '超出首付款的金额将全部直接抵充新房后续款项，按比例降低每月分期月供或缩短还款期限。',
-      },
-      {
-        q: '若车辆估值不足30%首付该如何处理？',
-        a: '差额部分可通过现金、银行转账补齐，或与我们协商个性化的补足付款方案。',
-      },
-      {
-        q: '车辆过户手续由谁负责办理？',
-        a: 'EL ORDO GROUP 专业法务团队全程代办车辆过户与车管所登记手续，快捷合规。',
-      },
-      {
-        q: '老旧二手房（104、105、106系列）是否支持置换？',
-        a: '支持。只要产权清晰、无司法查封抵押且证件齐全的二手房均可参与置换评估。',
-      },
-      {
-        q: '能否同时置换两辆汽车冲抵一套新房？',
-        a: '可以。以旧换新支持组合置换，例如同时置换两辆汽车，或汽车搭配部分现金。',
-      },
-      {
-        q: '在评估期间所选新房价格是否会被锁定？',
-        a: '是的。在双方确认评估方案的瞬间，您所选房源立即被锁定保留，每平米单价正式录入官方合同。',
-      },
+      { q: '车辆折价估值是如何确定的？', a: '基于大盘成交数据及车况客观评估。' },
+      { q: '若车辆估值高于约定首付怎么办？', a: '超出部分直接冲抵后续房款。' },
+      { q: '资产评估需要耗时多久？', a: '不超过24小时。' },
+      { q: '是否接受市区二手房置换？', a: '支持产权清晰的二手房。' },
+      { q: '过户手续由谁负责办理？', a: '公司法务专人代办。' },
     ],
     casesBadge: '真实置换案例',
     casesTitle: '以旧换新真实落地场景',
-    casesSubtitle: '看我们的业主如何在无需动用大额流动资金的前提下实现居住品质升级',
+    casesSubtitle: '无需动用大额流动资金轻松升级居住品质',
     cases: [
       {
         asset: '丰田凯美瑞 70 (2020年款)',
@@ -917,7 +805,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: '结余 $4 385 直接冲抵后续月供',
         badge: '经典热门置换',
         slug: 'madina-residence',
-        waText: '您好！我想通过以旧换新置换服务，用轿车置换玛迪娜公馆的房源，请问如何预约上门查验车况？',
+        waText: '您好！我想通过以旧换新置换服务，用轿车置换玛迪娜公馆的房源。',
       },
       {
         asset: '雷克萨斯 GX 460 (2016年款)',
@@ -930,7 +818,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: '36期分期月供大幅降低至 $1 250/月',
         badge: '豪华车尊享置换',
         slug: 'abu-dhabi',
-        waText: '您好！我想用豪华越野车置换阿布扎比住宅区的两居室房源，请告知评估及签约流程。',
+        waText: '您好！我想用豪华越野车置换阿布扎比住宅区的两居室房源。',
       },
       {
         asset: '105系列单身公寓二手房',
@@ -943,7 +831,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         surplus: '极低剩余尾款享受0%超长免息分期',
         badge: '以旧换新置业',
         slug: 'ajkol-plus',
-        waText: '您好！我想用市区旧房置换艾科尔+的生态新居，请安排专业房屋评估师联系我。',
+        waText: '您好！我想用市区旧房置换艾科尔+的生态新居。',
       },
     ],
     valuationLabel: 'EL ORDO 专业评估估值:',
@@ -952,72 +840,62 @@ const CONTENT: Record<Locale, TradeInContent> = {
     aboutComplexBtn: '了解楼盘详情',
     tableBadge: '省时省心省费',
     tableTitle: 'EL ORDO 置换 vs 自行二手车市出售',
-    tableSubtitle: '为何直接与品牌开发商置换比自行寻找二手买家更加省心高效',
+    tableSubtitle: '为何直接与品牌开发商置换更加省心高效',
     colCriteria: '对比指标',
     colElOrdo: 'EL ORDO 以旧换新',
     colMarket: '自行挂牌出售',
     row1Criteria: '成交周期',
     row1ElOrdo: '仅需 24 小时',
     row1Market: '通常需要 1 至 4 个月',
-    row2Criteria: '心仪房源锁定与保价',
+    row2Criteria: '房源锁定',
     row2ElOrdo: '即刻锁定房号与价格',
-    row2Market: '新房可能随时涨价或售罄',
-    row3Criteria: '议价压力与恶意压价',
-    row3ElOrdo: '公允客观的市场评估价',
-    row3Market: '面临车贩与中介反复压价',
-    row4Criteria: '佣金与广告整备成本',
-    row4ElOrdo: '0 索姆 (开发商承担全部手续费)',
-    row4Market: '广告置顶费、洗车整备、中介佣金',
-    row5Criteria: '法务与过户手续',
-    row5ElOrdo: '公司法务专人全程协助',
-    row5Market: '车管所排队耗时，存在资金安全风险',
+    row2Market: '新房可能随时售罄',
+    row3Criteria: '议价压力',
+    row3ElOrdo: '公允客观的市价',
+    row3Market: '面临反复压价',
+    row4Criteria: '佣金成本',
+    row4ElOrdo: '0 索姆',
+    row4Market: '中介佣金及广告费',
+    row5Criteria: '过户手续',
+    row5ElOrdo: '公司法务代办',
+    row5Market: '排队耗时风险高',
     categoriesBadge: '置换资产范围',
     categoriesTitle: '可参与置换计划的资产类别',
     requirementsLabel: '基本要求:',
     categories: [
-      {
-        type: 'car',
-        title: '品牌乘用车与越野车',
-        desc: '车况良好、无重大事故及产权清晰的各主流合资与进口品牌汽车（丰田、雷克萨斯、现代、起亚、宝马、奔驰等）。',
-        reqs: '车辆行驶证及权属证书、车主有效证件、无未处理扣分罚款及查封。',
-      },
-      {
-        type: 'realty',
-        title: '比什凯克市区二手房产',
-        desc: '104、105、106等系列一至三居室二手公寓，或已竣工交付办结产权的新楼盘住宅。',
-        reqs: '房屋所有权凭证、BTI技术测绘档案、无抵押查封公证书。',
-      },
-      {
-        type: 'land',
-        title: '优质住宅用地与商办',
-        desc: '位于比什凯克市区及南部宜居山麓的自建住宅用地（ИЖС），以及核心地段商铺。',
-        reqs: '国家土地红本、规划许可证、权属清晰无争议。',
-      },
+      { type: 'car', title: '品牌乘用车与越野车', desc: '车况良好、无重大事故及产权清晰的各主流车型。', reqs: '行驶证、车主证件。' },
+      { type: 'realty', title: '比什凯克市区二手房产', desc: '各系列一至三居室二手公寓。', reqs: '房产证、BTI档案。' },
+      { type: 'land', title: '优质住宅用地', desc: '自建住宅用地（ИЖС）。', reqs: '国家土地红本。' },
     ],
     stepsBadge: '24小时极速通道',
     stepsTitle: '以旧换新4步极速置业流程',
     steps: [
-      {
-        num: '01',
-        title: '提交在线置换意向',
-        desc: '将车辆或房产的基础信息（品牌、年份、里程或房屋实景图）发送至官方 WhatsApp 预估区间。',
-      },
-      {
-        num: '02',
-        title: '专业勘验并锁定估值',
-        desc: '专业评估顾问现场勘验车况或房况，并在24小时内正式出具公正透明的收购定价。',
-      },
-      {
-        num: '03',
-        title: '优选开发商热销新居',
-        desc: '在 EL ORDO GROUP 任一住宅项目中挑选心仪户型与景观楼层，即刻锁定房源单价。',
-      },
-      {
-        num: '04',
-        title: '签署合同并折抵首付',
-        desc: '旧资产评估款项全额折抵为新房首付款，法务团队协助办理全套合法过户手续。',
-      },
+      { num: '01', title: '提交意向', desc: '将基础信息发送至 WhatsApp。' },
+      { num: '02', title: '专业勘验', desc: '24小时内出具公正透明的收购定价。' },
+      { num: '03', title: '优选新居', desc: '在项目中挑选心仪户型。' },
+      { num: '04', title: '签署合同', desc: '旧资产评估款项全额折抵为首付款。' },
     ],
+    calcBadge: '交互式资产冲抵测算',
+    calcTitle: '测算您的资产能冲抵多少房款',
+    calcDesc: '输入拟置换资产的预估市值，实时测算能够冲抵新房多少房款。',
+    tabAuto: '置换汽车',
+    tabRealty: '置换房产',
+    targetComplexLabel: '意向抵扣的目标楼盘：',
+    targetComplexAll: '旗下全线在售楼盘均可',
+    labelAutoModel: '车辆品牌、型号及年份：',
+    phAutoModel: '例如：丰田凯美瑞 70, 2021',
+    labelRealtyAddress: '二手房产地址及核心户型：',
+    phRealtyAddress: '例如：2居室, 60平米',
+    labelYear: '出厂年份 / 车况：',
+    phYear: '例如：2021，车况极佳',
+    labelEstimated: '期望评估作价金额 ($)：',
+    phEstimated: '25 000',
+    btnSubmit: '通过 WhatsApp 发送评估申请',
+    photoTip: '📸 可在 WhatsApp 中直接发送照片。',
+    previewTitle: '资产置换测算概览：',
+    previewDownCovered: '✓ 完全冲抵30%首付款（现金首付款 = $0）！',
+    previewRemaining: '剩余款项可享受0%免息分期：',
+    somUnit: '索姆',
   },
 };
 
@@ -1026,13 +904,89 @@ export default function TradeInPage() {
   const lang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[lang] || CONTENT.ru;
 
-  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+  const [usdRate, setUsdRate] = useState<number>(87.45);
+  const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
+  const [tradeInTargetComplex, setTradeInTargetComplex] = useState<string>('all');
+  const [assetName, setAssetName] = useState<string>('');
+  const [assetYear, setAssetYear] = useState<string>('');
+  const [estimatedValue, setEstimatedValue] = useState<string>('25000');
+  const [estimatedInput, setEstimatedInput] = useState<string>('25 000');
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/currency')
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.rate && typeof data.rate === 'number') {
+          setUsdRate(data.rate);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.title = `${c.pageTitle} | EL ORDO GROUP`;
     }
   }, [c.pageTitle]);
+
+  const parsedEstimatedValue = useMemo(() => {
+    const raw = estimatedValue.replace(/\D/g, '');
+    return raw ? parseInt(raw, 10) : 0;
+  }, [estimatedValue]);
+
+  const targetApartmentPrice = useMemo(() => {
+    if (tradeInTargetComplex === 'abu-dhabi') return 81642;
+    if (tradeInTargetComplex === 'madina-residence') return 65385;
+    if (tradeInTargetComplex === 'ajkol-plus') return 50400;
+    return 65000;
+  }, [tradeInTargetComplex]);
+
+  const tradeInCoveragePercent = useMemo(() => {
+    if (targetApartmentPrice <= 0 || parsedEstimatedValue <= 0) return 0;
+    return Math.min(100, Math.round((parsedEstimatedValue / targetApartmentPrice) * 100));
+  }, [parsedEstimatedValue, targetApartmentPrice]);
+
+  const tradeInRemainingToPay = useMemo(() => {
+    return Math.max(0, targetApartmentPrice - parsedEstimatedValue);
+  }, [targetApartmentPrice, parsedEstimatedValue]);
+
+  const handleEstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
+    setEstimatedValue(raw);
+    setEstimatedInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
+  };
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+
+  const handleSendTradeIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    const typeLabel = tradeInType === 'auto' ? c.tabAuto : c.tabRealty;
+    const numEst = parsedEstimatedValue;
+    const kgsEst = numEst > 0 ? Math.round(numEst * usdRate) : 0;
+    const targetLabel =
+      tradeInTargetComplex === 'abu-dhabi'
+        ? 'ЖК Abu Dhabi'
+        : tradeInTargetComplex === 'madina-residence'
+        ? 'ЖК Madina Residence'
+        : tradeInTargetComplex === 'ajkol-plus'
+        ? 'ЖД Айкол +'
+        : 'Все объекты компании';
+
+    const text =
+      `Здравствуйте! Хочу подать заявку по программе Trade-in / Бартер в EL ORDO GROUP:\n\n` +
+      `• Тип актива: ${typeLabel}\n` +
+      `• Описание: ${assetName || '—'}\n` +
+      (tradeInType === 'auto' && assetYear ? `• Состояние/Год: ${assetYear}\n` : '') +
+      `• В счет объекта: ${targetLabel}\n` +
+      `• Оценочная стоимость: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${c.somUnit})\n\n` +
+      `Готов отправить фотографии и документы актива для экспресс-оценки.`;
+
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   return (
     <PaymentLayout
@@ -1046,6 +1000,208 @@ export default function TradeInPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
+      
+      {/* ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР TRADE-IN НА СТРАНИЦЕ */}
+      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <div className="lg:col-span-6 space-y-6">
+          <div>
+            <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+              {c.calcBadge}
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
+              {c.calcTitle}
+            </h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
+              {c.calcDesc}
+            </p>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="font-bold text-gray-700 dark:text-gray-200">
+                Курс НБКР онлайн: <strong>{usdRate} сом/$</strong>
+              </span>
+            </div>
+            <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
+              <IconShieldCheck className="w-3.5 h-3.5" />
+              <span>Оценка за 24 часа</span>
+            </div>
+          </div>
+
+          {parsedEstimatedValue > 0 && (
+            <div className="p-4 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/30 space-y-2 animate-fadeIn">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-[#064734] dark:text-[#d4b26f] uppercase tracking-wider">
+                  {c.previewTitle}
+                </span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                  {tradeInCoveragePercent}% квартиры
+                </span>
+              </div>
+
+              <div className="h-2.5 w-full bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden p-0.5">
+                <div
+                  style={{ width: `${tradeInCoveragePercent}%` }}
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                />
+              </div>
+
+              <div className="text-[11px] text-gray-700 dark:text-neutral-300 space-y-1 pt-1">
+                <p className="text-emerald-800 dark:text-emerald-400 font-bold">
+                  {c.previewDownCovered}
+                </p>
+                <p className="text-gray-500 dark:text-neutral-400">
+                  {c.previewRemaining} <strong className="text-gray-900 dark:text-white font-black">${tradeInRemainingToPay.toLocaleString('ru-RU')}</strong> (~${Math.round(tradeInRemainingToPay / 36).toLocaleString('ru-RU')}/мес на 36 мес)
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Форма быстрой заявки */}
+        <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-inner space-y-4">
+          
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setTradeInType('auto');
+                setAssetName('');
+              }}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                tradeInType === 'auto'
+                  ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                  : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
+              }`}
+            >
+              <IconCar className="w-4 h-4" />
+              <span>{c.tabAuto}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTradeInType('realty');
+                setAssetName('');
+              }}
+              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                tradeInType === 'realty'
+                  ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow'
+                  : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
+              }`}
+            >
+              <IconBuilding className="w-4 h-4" />
+              <span>{c.tabRealty}</span>
+            </button>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 mb-1">
+              {c.targetComplexLabel}
+            </label>
+            <select
+              value={tradeInTargetComplex}
+              onChange={(e) => setTradeInTargetComplex(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-xs font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] cursor-pointer"
+            >
+              <option value="all">{c.targetComplexAll}</option>
+              <option value="abu-dhabi">ЖК Abu Dhabi (ул. Сухомлинова, 29)</option>
+              <option value="madina-residence">ЖК Madina Residence (ул. Огонбаева, 12)</option>
+              <option value="ajkol-plus">ЖД Айкол + (с. Кок-Жар)</option>
+            </select>
+          </div>
+
+          <form onSubmit={handleSendTradeIn} className="space-y-3.5 text-xs">
+            <div>
+              <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
+                {tradeInType === 'auto' ? c.labelAutoModel : c.labelRealtyAddress}
+              </label>
+              <input
+                type="text"
+                required
+                placeholder={tradeInType === 'auto' ? c.phAutoModel : c.phRealtyAddress}
+                value={assetName}
+                onChange={(e) => setAssetName(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
+              />
+
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {(tradeInType === 'auto'
+                  ? ['Toyota Camry', 'Lexus RX / GX', 'Kia K5', 'Hyundai', 'Кроссовер']
+                  : ['1-комн. вторичка', '2-комн. вторичка', '3-комн. вторичка', 'Участок / Дом']
+                ).map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setAssetName(tag)}
+                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-white/10 hover:bg-gray-100 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 transition-colors cursor-pointer"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {tradeInType === 'auto' && (
+              <div>
+                <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
+                  {c.labelYear}
+                </label>
+                <input
+                  type="text"
+                  placeholder={c.phYear}
+                  value={assetYear}
+                  onChange={(e) => setAssetYear(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
+                />
+              </div>
+            )}
+
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block text-gray-600 dark:text-gray-300 font-semibold">
+                  {c.labelEstimated}
+                </label>
+                {parsedEstimatedValue > 0 && (
+                  <span className="text-[11px] text-gray-400 font-medium">
+                    ≈ {Math.round(parsedEstimatedValue * usdRate).toLocaleString('ru-RU')} {c.somUnit}
+                  </span>
+                )}
+              </div>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-[#064734] dark:text-[#d4b26f]">$</span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  placeholder={c.phEstimated}
+                  value={estimatedInput}
+                  onChange={handleEstChange}
+                  onFocus={(e) => e.target.select()}
+                  autoComplete="off"
+                  spellCheck="false"
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 font-black text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] cursor-pointer"
+                />
+              </div>
+            </div>
+
+            <p className="text-[10px] text-gray-400 dark:text-neutral-400 italic">
+              {c.photoTip}
+            </p>
+
+            <button
+              type="submit"
+              className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <IconWhatsApp className="w-4 h-4 text-[#064734]" />
+              <span>{c.btnSubmit}</span>
+              <IconArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </form>
+        </div>
+
+      </div>
+
       {/* 1. КЕЙСЫ РЕАЛЬНОГО ОБМЕНА */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
