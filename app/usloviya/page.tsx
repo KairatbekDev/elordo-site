@@ -6,6 +6,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
+import MortgageComparison from '@/components/MortgageComparison';
 import {
   IconCheck,
   IconCar,
@@ -1635,7 +1636,10 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 7. Вопросы и ответы (FAQ Accordion) */}
+      {/* 7. ИНТЕРАКТИВНОЕ СРАВНЕНИЕ С БАНКОВСКОЙ ИПОТЕКОЙ */}
+      <MortgageComparison usdRate={usdRate} />
+
+      {/* 8. Вопросы и ответы (FAQ Accordion) */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 mt-20">
         <div className="text-center mb-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
@@ -1684,7 +1688,7 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 8. Консультация юриста и менеджера */}
+      {/* 9. Консультация юриста и менеджера */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 mt-20">
         <div className="bg-[#032b20] rounded-3xl p-8 sm:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 border border-white/10">
           <div className="max-w-xl">
