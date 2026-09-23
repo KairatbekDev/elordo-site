@@ -51,7 +51,8 @@ const UI_STRINGS = {
     consultantBadge: 'Консультация финансиста',
     officeTitle: 'Офис продаж и оформление',
     officeHead: 'Центральный офис в Бишкеке:',
-    workHours: '(Пн — Сб 09:00 – 19:00)',
+    workHours: 'Пн — Пт: 09:00 – 18:00 | Сб: 10:00 – 16:00',
+    sundayClosed: 'Воскресенье: Выходной',
     btnRoute2Gis: 'Маршрут в 2GIS',
   },
   kg: {
@@ -72,7 +73,8 @@ const UI_STRINGS = {
     consultantBadge: 'Финансисттин кеңеши',
     officeTitle: 'Сатуу кеңсеси жана тариздөө',
     officeHead: 'Бишкектеги башкы сатуу кеңсеси:',
-    workHours: '(Дүй — Иш 09:00 – 19:00)',
+    workHours: 'Дүй — Жума: 09:00 – 18:00 | Иш: 10:00 – 16:00',
+    sundayClosed: 'Жекшемби: Дем алыш',
     btnRoute2Gis: '2GIS аркылуу жол',
   },
   kz: {
@@ -93,8 +95,9 @@ const UI_STRINGS = {
     consultantBadge: 'Қаржыгердің кеңесі',
     officeTitle: 'Сату кеңсесі және ресімдеу',
     officeHead: 'Бішкектегі бас сату кеңсесі:',
-    workHours: '(Дс — Сб 09:00 – 19:00)',
-    btnRoute2Gis: '2GIS арқылы бағыт',
+    workHours: 'Дс — Жм: 09:00 – 18:00 | Сб: 10:00 – 16:00',
+    sundayClosed: 'Жексенбі: Демалыс',
+    btnRoute2Gis: '2GIS аркылы бағыт',
   },
   uk: {
     home: 'Головна',
@@ -114,7 +117,8 @@ const UI_STRINGS = {
     consultantBadge: 'Консультація фінансиста',
     officeTitle: 'Офіс продажів та оформлення',
     officeHead: 'Центральний офіс у Бішкеку:',
-    workHours: '(Пн — Сб 09:00 – 19:00)',
+    workHours: 'Пн — Пт: 09:00 – 18:00 | Сб: 10:00 – 16:00',
+    sundayClosed: 'Неділя: Вихідний',
     btnRoute2Gis: 'Маршрут у 2GIS',
   },
   en: {
@@ -135,7 +139,8 @@ const UI_STRINGS = {
     consultantBadge: 'Financial Advisory',
     officeTitle: 'Sales & Registration Office',
     officeHead: 'Central Sales Office in Bishkek:',
-    workHours: '(Mon — Sat 09:00 – 19:00)',
+    workHours: 'Mon — Fri: 09:00 – 18:00 | Sat: 10:00 – 16:00',
+    sundayClosed: 'Sunday: Closed',
     btnRoute2Gis: 'Directions in 2GIS',
   },
   zh: {
@@ -156,7 +161,8 @@ const UI_STRINGS = {
     consultantBadge: '置业财务专属咨询',
     officeTitle: '品牌营销与签约中心',
     officeHead: '比什凯克营销中心地址：',
-    workHours: '(周一至周六 09:00 – 19:00)',
+    workHours: '周一至周五: 09:00 – 18:00 | 周六: 10:00 – 16:00',
+    sundayClosed: '周日: 休息',
     btnRoute2Gis: '2GIS 导航路线',
   },
 };
@@ -230,7 +236,6 @@ export default function PaymentLayout({
   const ui = UI_STRINGS[currentLang] || UI_STRINGS.ru;
   const tabs = getPaymentTabs(currentLang);
 
-  // По умолчанию первый вопрос открыт
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (index: number) => {
@@ -486,17 +491,17 @@ export default function PaymentLayout({
           </div>
 
           <div className="bg-[#fafbfa] dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
-            <div className="space-y-2 text-center md:text-left">
+            <div className="space-y-3 text-center md:text-left">
               <span className="text-xs text-gray-400 dark:text-neutral-400 font-bold uppercase tracking-wider block">
                 {ui.officeHead}
               </span>
               <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
                 {COMPANY_INFO.address}
               </p>
-              <div className="space-y-1 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
-                {COMPANY_INFO.phones.map((phone, idx) => (
-                  <p key={idx}>{phone} {idx === 0 ? ui.workHours : ''}</p>
-                ))}
+              <div className="space-y-1.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <p className="text-gray-900 dark:text-white font-black">{COMPANY_INFO.phones[0]}</p>
+                <p className="text-emerald-700 dark:text-emerald-400">🕒 {ui.workHours}</p>
+                <p className="text-gray-400">🚫 {ui.sundayClosed}</p>
               </div>
             </div>
 

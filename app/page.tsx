@@ -151,8 +151,8 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
   kg: {
     heroTag: 'EL ORDO GROUP • ИШЕНИМДҮҮ КУРУУЧУ',
-    heroTitle: 'БИШКЕКТЕГИ ЗАМАНБАП ТУРАК ЖАЙ КОМПЛЕКСТЕРИ',
-    heroDesc: 'Келечегиңиз үчүн туура тандоо. Бишкектин мыкты аймактарында премиум-класстагы турак жайлар. Банксыз 36 айга чейин 0% пайызсыз бөлүп төлөө жана Trade-in.',
+    heroTitle: 'Келечегиңиз үчүн туура тандоо',
+    heroDesc: 'Бишкектин мыкты аймактарында статустуу турак жай комплекстерин куруу. Банксыз 36 айга чейин 0% үстөксүз бөлүп төлөө жана пайдалуу Trade-in.',
     heroBtnCatalog: 'Объекттерди көрүү',
     heroBtnWa: 'WhatsApp аркылуу байланышуу',
     statTotalLabel: 'Портфолиодогу объекттер:',
@@ -203,8 +203,8 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
   kz: {
     heroTag: 'EL ORDO GROUP • СЕНІМДІ ҚҰРЫЛЫС САЛУШЫ',
-    heroTitle: 'БІШКЕКТЕГІ ЗАМАНАУИ ТҰРҒЫН ҮЙ КЕШЕНДЕРІ',
-    heroDesc: 'Сіздің болашағыңыз үшін дұрыс таңдау. Бішкектің үздік аудандарындағы тұрғын үйлер. Банксіз 36 айға дейін 0% бөліп төлеу және Trade-in.',
+    heroTitle: 'Болашағыңыз үшін дұрыс таңдау',
+    heroDesc: 'Бішкектің таңдаулы аудандарында мәртебелі тұрғын үй кешендерін салу. Банксіз 36 айға дейін 0% пайызсыз бөліп төлеу және тиімді Trade-in.',
     heroBtnCatalog: 'Нысандарды көру',
     heroBtnWa: 'WhatsApp-та кеңес алу',
     statTotalLabel: 'Портфолиодағы нысандар:',
@@ -255,8 +255,8 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
   uk: {
     heroTag: 'EL ORDO GROUP • НАДІЙНИЙ ДЕВЕЛОПЕР',
-    heroTitle: 'СУЧАСНІ ЖИТЛОВІ КОМПЛЕКСИ В БІШКЕКУ',
-    heroDesc: 'Правильний вибір для вашого майбутнього. Будівництво статусних житлових комплексів у найкращих районах Бішкека. Безвідсоткова розстрочка 0% до 36 місяців без банку та обмін за Trade-in.',
+    heroTitle: 'Правильний вибір для вашого майбутнього',
+    heroDesc: 'Будівництво статусних житлових комплексів у найкращих локаціях Бішкека. Безвідсоткова розстрочка 0% до 36 місяців без банку та вигідний Trade-in.',
     heroBtnCatalog: 'Дивитися об’єкти',
     heroBtnWa: 'Консультація у WhatsApp',
     statTotalLabel: 'Об’єктів у портфоліо:',
@@ -307,8 +307,8 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
   en: {
     heroTag: 'EL ORDO GROUP • TRUSTED DEVELOPER',
-    heroTitle: 'MODERN RESIDENTIAL PROPERTIES IN BISHKEK',
-    heroDesc: 'The right choice for your future. Constructing prestigious residential high-rises in prime Bishkek districts. 0% interest-free developer installment plans up to 36 months and seamless Trade-in exchange.',
+    heroTitle: 'The Right Choice for Your Future',
+    heroDesc: 'Construction of premium residential developments in prime Bishkek locations. 0% interest-free installment up to 36 months without banks and favorable Trade-in.',
     heroBtnCatalog: 'Explore Projects',
     heroBtnWa: 'WhatsApp Consultation',
     statTotalLabel: 'Portfolio Projects:',
@@ -359,8 +359,8 @@ const CONTENT: Record<Locale, HomeContent> = {
   },
   zh: {
     heroTag: 'EL ORDO GROUP • 值得信赖的品牌开发商',
-    heroTitle: '比什凯克现代高品质人居标杆楼盘',
-    heroDesc: '开启未来的明智之选。深耕比什凯克核心政商及生态宜居腹地，精工筑造高端住宅区。提供最长36个月开发商直营0%免息分期与以旧换新服务。',
+    heroTitle: '为您的未来做出明智抉择',
+    heroDesc: '在比什凯克黄金地段打造尊尚品质人居。0% 免息分期长达36个月（无需银行介入）及尊享置换 (Trade-in) 服务。',
     heroBtnCatalog: '浏览热销楼盘',
     heroBtnWa: '在 WhatsApp 中咨询',
     statTotalLabel: '旗下开发项目：',
@@ -605,7 +605,7 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
           
-          {/* Фирменный крупный горизонтальный логотип logo-2.jpeg */}
+          {/* Фирменный крупный горизонтальный логотип */}
           <div className="mb-6 inline-flex items-center justify-center">
             <img
               src="/logo-2.png"

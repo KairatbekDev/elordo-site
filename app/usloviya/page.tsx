@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
@@ -14,6 +14,7 @@ import {
   IconCalendar,
   IconWhatsApp,
   IconArrowRight,
+  IconShieldCheck,
 } from '@/components/Icons';
 
 const RATE_DISCLAIMERS: Record<Locale, string> = {
@@ -34,16 +35,246 @@ const BANNER_WA_TEXTS: Record<Locale, string> = {
   zh: '您好！我想咨询 EL ORDO GROUP 旗下的置业购房政策及免息分期付款细则。',
 };
 
+const CALC_STRINGS: Record<Locale, {
+  down: string;
+  balance: string;
+  editHint: string;
+  rateLabel: string;
+  rateFixedBadge: string;
+  btnOpenCatalog: string;
+  btnCloseCatalog: string;
+  filterComplexAll: string;
+  filterRoomsAll: string;
+  selectedAptPrefix: string;
+  btnResetSelected: string;
+  payFrequency: string;
+  monthly: string;
+  quarterly: string;
+  savingsTitle: string;
+  savingsDesc: string;
+  btnSchedule: string;
+  btnScheduleHide: string;
+  colNum: string;
+  colPeriod: string;
+  colPayment: string;
+  colRemaining: string;
+}> = {
+  ru: {
+    down: 'Первый взнос',
+    balance: 'В рассрочку 0%',
+    editHint: 'нажмите, чтобы изменить вручную',
+    rateLabel: 'Курс НБКР онлайн:',
+    rateFixedBadge: 'Возможна фиксация курса в ДДУ',
+    btnOpenCatalog: 'Выбрать планировку из каталога (11 вариантов)',
+    btnCloseCatalog: 'Свернуть каталог планировок',
+    filterComplexAll: 'Все комплексы',
+    filterRoomsAll: 'Все комнаты',
+    selectedAptPrefix: 'Выбрана квартира:',
+    btnResetSelected: 'Сбросить',
+    payFrequency: 'Периодичность выплат:',
+    monthly: 'Ежемесячно',
+    quarterly: 'Поквартально (раз в 3 мес.)',
+    savingsTitle: 'Переплата: $0 • Без скрытых процентов банка',
+    savingsDesc: 'Экономия до $15 000+ по сравнению со стандартной банковской ипотекой (18–22% годовых).',
+    btnSchedule: 'Посмотреть детальный график выплат',
+    btnScheduleHide: 'Скрыть график выплат',
+    colNum: '№',
+    colPeriod: 'Период',
+    colPayment: 'Платеж',
+    colRemaining: 'Остаток',
+  },
+  kg: {
+    down: 'Баштапкы төлөм',
+    balance: '0% бөлүп төлөө калдыгы',
+    editHint: 'кол менен өзгөртүү үчүн басыңыз',
+    rateLabel: 'УБ онлайн курсу:',
+    rateFixedBadge: 'Келишимде курсту бекитүү мүмкүнчүлүгү',
+    btnOpenCatalog: 'Планировкалар каталогун тандоо (11 вариант)',
+    btnCloseCatalog: 'Каталогду жашыруу',
+    filterComplexAll: 'Бардык комплекстер',
+    filterRoomsAll: 'Бардык бөлмөлөр',
+    selectedAptPrefix: 'Тандалган батир:',
+    btnResetSelected: 'Тазалоо',
+    payFrequency: 'Төлөм мезгилдүүлүгү:',
+    monthly: 'Ай сайын',
+    quarterly: 'Квартал сайын (3 айда 1)',
+    savingsTitle: 'Ашыкча төлөм: $0 • Банк пайыздары жок',
+    savingsDesc: 'Банктык ипотекага (18–22%) салыштырмалуу $15 000+ чейин үнөмдөө.',
+    btnSchedule: 'Төлөм графигин толук көрүү',
+    btnScheduleHide: 'Графикти жашыруу',
+    colNum: '№',
+    colPeriod: 'Мөөнөтү',
+    colPayment: 'Төлөм',
+    colRemaining: 'Калдык',
+  },
+  kz: {
+    down: 'Бастапқы жарна',
+    balance: '0% бөліп төлеу қалдығы',
+    editHint: 'қолмен өзгерту үшін басыңыз',
+    rateLabel: 'ҰБ онлайн бағамы:',
+    rateFixedBadge: 'Келісімшартта бағамды бекіту мүмкіндігі',
+    btnOpenCatalog: 'Жоспарлар каталогынан таңдау (11 нұсқа)',
+    btnCloseCatalog: 'Каталогты жасыру',
+    filterComplexAll: 'Барлық кешендер',
+    filterRoomsAll: 'Барлық бөлмелер',
+    selectedAptPrefix: 'Таңдалған пәтер:',
+    btnResetSelected: 'Қайтару',
+    payFrequency: 'Төлем мерзімділігі:',
+    monthly: 'Ай сайын',
+    quarterly: 'Тоқсан сайын (3 айда 1)',
+    savingsTitle: 'Артық төлем: $0 • Банк пайызы жоқ',
+    savingsDesc: 'Банк ипотекасына (18–22%) қарағанда $15 000+ дейін үнемдеу.',
+    btnSchedule: 'Төлем кестесін толық қарау',
+    btnScheduleHide: 'Күктені жасыру',
+    colNum: '№',
+    colPeriod: 'Кезең',
+    colPayment: 'Төлем',
+    colRemaining: 'Қалдық',
+  },
+  uk: {
+    down: 'Перший внесок',
+    balance: 'У розстрочку 0%',
+    editHint: 'натисніть, щоб змінити вручну',
+    rateLabel: 'Курс НБКР онлайн:',
+    rateFixedBadge: 'Можлива фіксація курсу в договорі',
+    btnOpenCatalog: 'Обрати планування з каталогу (11 варіантів)',
+    btnCloseCatalog: 'Згорнути каталог планувань',
+    filterComplexAll: 'Всі комплекси',
+    filterRoomsAll: 'Всі кімнати',
+    selectedAptPrefix: 'Обрана квартира:',
+    btnResetSelected: 'Скинути',
+    payFrequency: 'Періодичність виплат:',
+    monthly: 'Щомісяця',
+    quarterly: 'Поквартально (раз на 3 міс.)',
+    savingsTitle: 'Переплата: $0 • Без банківських відсотків',
+    savingsDesc: 'Економія до $15 000+ порівняно зі звичайною іпотекою банку.',
+    btnSchedule: 'Переглянути графік платежів',
+    btnScheduleHide: 'Сховати графік платежів',
+    colNum: '№',
+    colPeriod: 'Період',
+    colPayment: 'Платіж',
+    colRemaining: 'Залишок',
+  },
+  en: {
+    down: 'Down Payment',
+    balance: '0% Installment Balance',
+    editHint: 'click to edit manually',
+    rateLabel: 'Live NBKR Rate:',
+    rateFixedBadge: 'Exchange rate pegging in contract',
+    btnOpenCatalog: 'Select Floor Plan from Catalog (11 Units)',
+    btnCloseCatalog: 'Collapse Layouts Catalog',
+    filterComplexAll: 'All Developments',
+    filterRoomsAll: 'All Rooms',
+    selectedAptPrefix: 'Selected Apartment:',
+    btnResetSelected: 'Reset',
+    payFrequency: 'Payment frequency:',
+    monthly: 'Monthly',
+    quarterly: 'Quarterly (every 3 mos)',
+    savingsTitle: 'Overpayment: $0 • Zero Bank Markups',
+    savingsDesc: 'Save up to $15,000+ compared to commercial mortgage interest rates.',
+    btnSchedule: 'View Full Payment Schedule',
+    btnScheduleHide: 'Hide Schedule',
+    colNum: '#',
+    colPeriod: 'Period',
+    colPayment: 'Payment',
+    colRemaining: 'Balance',
+  },
+  zh: {
+    down: '首付款',
+    balance: '0% 免息分期余款',
+    editHint: '点击可手动输入金额',
+    rateLabel: '央行实时汇率:',
+    rateFixedBadge: '合同中支持锁定汇率机制',
+    btnOpenCatalog: '在售主力户型库中挑选 (共11款)',
+    btnCloseCatalog: '收起户型列表',
+    filterComplexAll: '全部楼盘',
+    filterRoomsAll: '全部房型',
+    selectedAptPrefix: '当前选定房源：',
+    btnResetSelected: '重置',
+    payFrequency: '还款周期频率：',
+    monthly: '按月还款',
+    quarterly: '按季度还款 (每3个月)',
+    savingsTitle: '利息支出: $0 • 无商业银行附加成本',
+    savingsDesc: '相较商业银行 18%–22% 高息按揭贷款，全周期立省 $15,000+。',
+    btnSchedule: '展开还款明细测算表',
+    btnScheduleHide: '收起还款明细',
+    colNum: '序号',
+    colPeriod: '期数',
+    colPayment: '还款金额',
+    colRemaining: '剩余本金',
+  },
+};
+
+// Все реальные планировки девелопера
+interface ApartmentUnit {
+  id: string;
+  complex: string;
+  complexSlug: 'abu-dhabi' | 'madina-residence' | 'ajkol-plus';
+  rooms: 1 | 2 | 3;
+  area: number;
+  priceM2: number;
+  totalPrice: number;
+  floor: string;
+  badge?: string;
+}
+
+const APARTMENTS_CATALOG: ApartmentUnit[] = [
+  // ЖК Abu Dhabi
+  { id: 'ad-1k-49', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 49.48, priceM2: 1650, totalPrice: 81642, floor: '4–22 этажи', badge: 'Панорама гор' },
+  { id: 'ad-1k-55', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 55.62, priceM2: 1650, totalPrice: 91773, floor: '3–20 этажи', badge: 'Видовая' },
+  { id: 'ad-2k-78', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 78.30, priceM2: 1650, totalPrice: 129195, floor: '5–24 этажи', badge: 'Премиум' },
+  { id: 'ad-2k-83', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 83.58, priceM2: 1650, totalPrice: 137907, floor: '6–22 этажи', badge: 'Двусторонняя' },
+  { id: 'ad-3k-119', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 3, area: 119.32, priceM2: 1650, totalPrice: 196878, floor: 'блок Б', badge: 'Премиум • Блок Б' },
+
+  // ЖК Madina Residence
+  { id: 'mr-1k-43', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 43.59, priceM2: 1500, totalPrice: 65385, floor: '3–12 этажи', badge: 'Хит продаж' },
+  { id: 'mr-2k-68', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 68.20, priceM2: 1500, totalPrice: 102300, floor: '2–14 этажи', badge: 'Бизнес в центре' },
+  { id: 'mr-3k-92', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 3, area: 92.40, priceM2: 1500, totalPrice: 138600, floor: '6–14 этажи', badge: 'Для семьи' },
+
+  // ЖД Айкол +
+  { id: 'aik-1k-42', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 1, area: 42.00, priceM2: 1200, totalPrice: 50400, floor: '2–9 этажи', badge: 'Эко-предгорье' },
+  { id: 'aik-2k-74', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 2, area: 74.30, priceM2: 1200, totalPrice: 89160, floor: '3–8 этажи', badge: 'Чистый воздух' },
+  { id: 'aik-3k-88', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 3, area: 88.50, priceM2: 1200, totalPrice: 106200, floor: '3–7 этажи', badge: 'Просторная' },
+];
+
 export default function PurchaseTermsPage() {
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
+  const s = CALC_STRINGS[currentLang] || CALC_STRINGS.ru;
 
-  // Состояние калькулятора рассрочки (по умолчанию 36 месяцев)
+  // Состояние калькулятора рассрочки
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
   const [months, setMonths] = useState<number>(36);
+  const [frequency, setFrequency] = useState<'monthly' | 'quarterly'>('monthly');
   const [currencyMode, setCurrencyMode] = useState<'USD' | 'KGS'>('USD');
+  const [usdRate, setUsdRate] = useState<number>(87.45);
+  const [rateDate, setRateDate] = useState<string>('');
+  const [showSchedule, setShowSchedule] = useState<boolean>(false);
+
+  // Сворачиваемый каталог планировок
+  const [isCatalogOpen, setIsCatalogOpen] = useState<boolean>(false);
+  const [selectedComplexFilter, setSelectedComplexFilter] = useState<string>('all');
+  const [selectedRoomsFilter, setSelectedRoomsFilter] = useState<number | 'all'>('all');
+  const [selectedApartment, setSelectedApartment] = useState<ApartmentUnit | null>(null);
+
+  // Автоматическая загрузка официального курса из API
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/currency')
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data?.rate && typeof data.rate === 'number') {
+          setUsdRate(data.rate);
+          if (data.date) setRateDate(data.date);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Состояние Trade-in калькулятора
   const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
@@ -54,22 +285,100 @@ export default function PurchaseTermsPage() {
   // Состояние FAQ
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
+  // Фильтрация планировок в каталоге
+  const filteredCatalog = useMemo(() => {
+    return APARTMENTS_CATALOG.filter((apt) => {
+      const matchComplex = selectedComplexFilter === 'all' || apt.complexSlug === selectedComplexFilter;
+      const matchRooms = selectedRoomsFilter === 'all' || apt.rooms === selectedRoomsFilter;
+      return matchComplex && matchRooms;
+    });
+  }, [selectedComplexFilter, selectedRoomsFilter]);
+
   // Расчеты рассрочки
-  const usdToKgs = 87.5;
   const downPaymentAmount = Math.round((apartmentPrice * downPaymentPercent) / 100);
-  const remainingAmount = apartmentPrice - downPaymentAmount;
-  const monthlyPaymentUsd = months > 0 ? Math.round(remainingAmount / months) : 0;
-  const monthlyPaymentKgs = Math.round(monthlyPaymentUsd * usdToKgs);
+  const remainingAmount = Math.max(0, apartmentPrice - downPaymentAmount);
+
+  const numberOfPayments = frequency === 'monthly' ? months : Math.max(1, Math.ceil(months / 3));
+  const paymentPerPeriodUsd = numberOfPayments > 0 ? Math.round(remainingAmount / numberOfPayments) : 0;
+  const paymentPerPeriodKgs = Math.round(paymentPerPeriodUsd * usdRate);
 
   const rateDisclaimer = RATE_DISCLAIMERS[currentLang] || RATE_DISCLAIMERS.ru;
 
+  // Клик по планировке из каталога
+  const handleSelectApartment = (apt: ApartmentUnit) => {
+    setApartmentPrice(apt.totalPrice);
+    setSelectedApartment(apt);
+  };
+
+  const handleResetApartment = () => {
+    setSelectedApartment(null);
+  };
+
+  // Ручной ввод стоимости
+  const handlePriceInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    const num = raw ? parseInt(raw, 10) : 0;
+    setApartmentPrice(Math.min(1000000, num));
+    setSelectedApartment(null);
+  };
+
+  // Ручной ввод первоначального взноса
+  const handleDownAmountInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    const num = raw ? parseInt(raw, 10) : 0;
+    if (apartmentPrice > 0) {
+      const pct = Math.min(90, Math.max(10, Number(((num / apartmentPrice) * 100).toFixed(1))));
+      setDownPaymentPercent(pct);
+    }
+  };
+
+  const handleMonthsInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    const num = raw ? parseInt(raw, 10) : 1;
+    setMonths(Math.min(36, Math.max(1, num)));
+  };
+
+  const handleRateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value.replace(',', '.'));
+    if (!isNaN(val) && val > 0) {
+      setUsdRate(val);
+    }
+  };
+
+  // Детальный график выплат
+  const paymentSchedule = useMemo(() => {
+    const items = [];
+    let currentBalance = remainingAmount;
+
+    for (let i = 1; i <= numberOfPayments; i++) {
+      const isLast = i === numberOfPayments;
+      const currentPay = isLast ? currentBalance : paymentPerPeriodUsd;
+      currentBalance = Math.max(0, currentBalance - currentPay);
+      items.push({
+        num: i,
+        period: frequency === 'monthly' ? `${i} мес.` : `${i * 3} мес. (${i} кв.)`,
+        paymentUsd: currentPay,
+        paymentKgs: Math.round(currentPay * usdRate),
+        balanceUsd: currentBalance,
+      });
+    }
+    return items;
+  }, [numberOfPayments, remainingAmount, paymentPerPeriodUsd, frequency, usdRate]);
+
   const handleSendCalculation = () => {
+    const freqLabel = frequency === 'monthly' ? s.monthly : s.quarterly;
+    const aptInfo = selectedApartment
+      ? `• Выбранный объект: ${selectedApartment.complex} (${selectedApartment.rooms}-комн., ${selectedApartment.area} м² • ${selectedApartment.floor})\n`
+      : '';
+
     const text =
       `${t.termsPage.waCalcGreeting}\n\n` +
-      `• ${t.termsPage.waCalcPrice} $${apartmentPrice.toLocaleString()} (~${Math.round(apartmentPrice * usdToKgs).toLocaleString()} ${t.termsPage.somUnit})\n` +
-      `• ${t.termsPage.waCalcDown} (${downPaymentPercent}%): $${downPaymentAmount.toLocaleString()} (~${Math.round(downPaymentAmount * usdToKgs).toLocaleString()} ${t.termsPage.somUnit})\n` +
-      `• ${t.termsPage.waCalcTerm} ${months} ${t.termsPage.calcMonths}\n` +
-      `• ${t.termsPage.waCalcMonthly} $${monthlyPaymentUsd.toLocaleString()}${t.termsPage.calcPerMonth} (~${monthlyPaymentKgs.toLocaleString()} ${t.termsPage.calcSomPerMonth})\n\n` +
+      aptInfo +
+      `• ${t.termsPage.waCalcPrice} $${apartmentPrice.toLocaleString('ru-RU')} (~${Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} ${t.termsPage.somUnit})\n` +
+      `• ${t.termsPage.waCalcDown} (${downPaymentPercent}%): $${downPaymentAmount.toLocaleString('ru-RU')} (~${Math.round(downPaymentAmount * usdRate).toLocaleString('ru-RU')} ${t.termsPage.somUnit})\n` +
+      `• ${t.termsPage.waCalcTerm} ${months} ${t.termsPage.calcMonths} (${freqLabel})\n` +
+      `• Платеж: $${paymentPerPeriodUsd.toLocaleString('ru-RU')} (~${paymentPerPeriodKgs.toLocaleString('ru-RU')} ${t.termsPage.somUnit}) • Выплат: ${numberOfPayments}\n` +
+      `• Курс НБКР: ${usdRate} сом/$\n\n` +
       `${t.termsPage.waCalcQuestion}`;
 
     window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
@@ -204,7 +513,7 @@ export default function PurchaseTermsPage() {
               className="mt-6 text-center bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1.5"
             >
               <span>{t.termsPage.card2Btn}</span>
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 5v14M19 12l-7 7-7-7" />
               </svg>
             </a>
@@ -251,7 +560,7 @@ export default function PurchaseTermsPage() {
         </div>
       </div>
 
-      {/* 4. Интерактивный калькулятор рассрочки */}
+      {/* 4. ПРЕМИАЛЬНЫЙ КАЛЬКУЛЯТОР РАССРОЧКИ С КАТАЛОГОМ ПЛАНИРОВОК */}
       <section id="calculator" className="max-w-5xl mx-auto px-4 sm:px-6 mt-20 scroll-mt-24">
         <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
           
@@ -269,63 +578,242 @@ export default function PurchaseTermsPage() {
 
           <div className="space-y-8">
             
+            {/* Панель живого курса валют НБКР */}
+            <div className="p-4 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-bold text-gray-700 dark:text-gray-200">
+                  {s.rateLabel} {rateDate ? `(${rateDate})` : ''}
+                </span>
+                <div className="inline-flex items-center gap-1 bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/20 px-2.5 py-1 rounded-lg">
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={usdRate}
+                    onChange={handleRateInput}
+                    className="w-16 text-center font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none"
+                  />
+                  <span className="text-[10px] text-gray-400">сом/$</span>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-300 dark:border-emerald-800">
+                <IconShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                <span>{s.rateFixedBadge}</span>
+              </div>
+            </div>
+
+            {/* КНОПКА РАСКРЫТИЯ КАТАЛОГА ПЛАНИРОВОК (С ФИРМЕННЫМ SVG) */}
+            <div>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+                  className="py-3 px-5 rounded-2xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2.5 cursor-pointer group"
+                >
+                  <IconBuilding className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
+                  <span>{isCatalogOpen ? s.btnCloseCatalog : s.btnOpenCatalog}</span>
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform duration-300 ${isCatalogOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {selectedApartment && (
+                  <div className="inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-white/10 border border-emerald-300 dark:border-white/20 text-xs">
+                    <span className="font-bold text-emerald-900 dark:text-[#d4b26f]">
+                      {s.selectedAptPrefix} <strong>{selectedApartment.complex}</strong> ({selectedApartment.rooms}-к, {selectedApartment.area} м²)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleResetApartment}
+                      className="text-[11px] font-bold text-gray-400 hover:text-rose-500 transition-colors ml-2 cursor-pointer"
+                    >
+                      ✕ {s.btnResetSelected}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* РАСКРЫВАЮЩИЙСЯ БЛОК ВСЕХ ПЛАНИРОВОК */}
+              {isCatalogOpen && (
+                <div className="mt-4 p-5 sm:p-6 rounded-3xl bg-[#f7faf8] dark:bg-[#040c09] border border-[#064734]/20 dark:border-white/15 animate-fadeIn space-y-4">
+                  {/* Панель фильтров каталога */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-white/10">
+                    {/* Фильтр ЖК */}
+                    <div className="flex flex-wrap gap-1.5 text-xs font-bold">
+                      {[
+                        { id: 'all', label: s.filterComplexAll },
+                        { id: 'abu-dhabi', label: 'Abu Dhabi' },
+                        { id: 'madina-residence', label: 'Madina' },
+                        { id: 'ajkol-plus', label: 'Айкол +' },
+                      ].map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onClick={() => setSelectedComplexFilter(c.id)}
+                          className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                            selectedComplexFilter === c.id
+                              ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                              : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
+                          }`}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Фильтр комнатности */}
+                    <div className="flex gap-1.5 text-xs font-bold">
+                      {[
+                        { id: 'all', label: s.filterRoomsAll },
+                        { id: 1, label: '1-к' },
+                        { id: 2, label: '2-к' },
+                        { id: 3, label: '3-к' },
+                      ].map((r) => (
+                        <button
+                          key={String(r.id)}
+                          type="button"
+                          onClick={() => setSelectedRoomsFilter(r.id as any)}
+                          className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                            selectedRoomsFilter === r.id
+                              ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                              : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
+                          }`}
+                        >
+                          {r.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Сетка планировок */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {filteredCatalog.map((apt) => {
+                      const isSelected = selectedApartment?.id === apt.id;
+                      return (
+                        <button
+                          key={apt.id}
+                          type="button"
+                          onClick={() => handleSelectApartment(apt)}
+                          className={`p-4 rounded-2xl text-left transition-all border cursor-pointer relative group ${
+                            isSelected
+                              ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow-lg scale-[1.01]'
+                              : 'bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 hover:border-[#064734]/40 dark:hover:border-[#d4b26f]/40 text-gray-900 dark:text-white'
+                          }`}
+                        >
+                          {apt.badge && (
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full absolute top-3 right-3 ${
+                              isSelected
+                                ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#064734]'
+                                : 'bg-[#d4b26f]/20 text-[#064734] dark:text-[#d4b26f]'
+                            }`}>
+                              {apt.badge}
+                            </span>
+                          )}
+
+                          <span className="text-[11px] font-bold block opacity-70 mb-0.5">
+                            {apt.rooms}-комнатная • {apt.area} м²
+                          </span>
+                          <h4 className="text-sm font-black mb-2">
+                            {apt.complex}
+                          </h4>
+
+                          <div className="flex items-baseline justify-between pt-2 border-t border-current/10">
+                            <strong className="text-base font-black">
+                              ${apt.totalPrice.toLocaleString('ru-RU')}
+                            </strong>
+                            <span className="text-[10px] opacity-75">
+                              от ${apt.priceM2}/м²
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Параметр 1: Стоимость квартиры */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
-                  {t.termsPage.calcPriceLabel}
-                </span>
-                <div className="text-right">
-                  <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${apartmentPrice.toLocaleString()}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+                <div>
+                  <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300 block">
+                    {t.termsPage.calcPriceLabel}
                   </span>
-                  <span className="text-xs text-gray-400 dark:text-neutral-500 block">
-                    ≈ {Math.round(apartmentPrice * usdToKgs).toLocaleString()} {t.termsPage.somUnit}
+                  <span className="text-[10px] text-gray-400 dark:text-neutral-500">
+                    {s.editHint}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <div className="flex items-center gap-1 bg-[#f2f6f4] dark:bg-[#071912] border border-[#064734]/20 dark:border-[#d4b26f]/30 px-3 py-1.5 rounded-xl shadow-inner focus-within:ring-2 focus-within:ring-[#d4b26f] transition-all">
+                    <span className="text-base font-black text-[#064734] dark:text-[#d4b26f]">$</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={apartmentPrice > 0 ? apartmentPrice.toLocaleString('ru-RU') : ''}
+                      onChange={handlePriceInput}
+                      placeholder="0"
+                      className="w-28 sm:w-36 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none"
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 dark:text-neutral-500 hidden sm:inline whitespace-nowrap">
+                    ≈ {Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} {t.termsPage.somUnit}
                   </span>
                 </div>
               </div>
+
               <input
                 type="range"
-                min="35000"
+                min="30000"
                 max="250000"
                 step="1000"
                 value={apartmentPrice}
-                onChange={(e) => setApartmentPrice(Number(e.target.value))}
+                onChange={(e) => {
+                  setApartmentPrice(Number(e.target.value));
+                  setSelectedApartment(null);
+                }}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
-              <div className="flex flex-wrap gap-2 mt-3">
-                {[45000, 65000, 95000, 140000].map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setApartmentPrice(preset)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      apartmentPrice === preset
-                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
-                        : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
-                    }`}
-                  >
-                    ${preset / 1000}k
-                  </button>
-                ))}
-              </div>
             </div>
 
             {/* Параметр 2: Первоначальный взнос */}
             <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
-                  {t.termsPage.calcDownLabel} ({downPaymentPercent}%):
-                </span>
-                <div className="text-right">
-                  <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${downPaymentAmount.toLocaleString()}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+                <div>
+                  <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300 block">
+                    {t.termsPage.calcDownLabel} ({downPaymentPercent}%):
                   </span>
-                  <span className="text-xs text-gray-400 dark:text-neutral-500 block">
-                    ≈ {Math.round(downPaymentAmount * usdToKgs).toLocaleString()} {t.termsPage.somUnit}
+                  <span className="text-[10px] text-gray-400 dark:text-neutral-500">
+                    {s.editHint}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <div className="flex items-center gap-1 bg-[#f2f6f4] dark:bg-[#071912] border border-[#064734]/20 dark:border-[#d4b26f]/30 px-3 py-1.5 rounded-xl shadow-inner focus-within:ring-2 focus-within:ring-[#d4b26f] transition-all">
+                    <span className="text-base font-black text-[#064734] dark:text-[#d4b26f]">$</span>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={downPaymentAmount > 0 ? downPaymentAmount.toLocaleString('ru-RU') : ''}
+                      onChange={handleDownAmountInput}
+                      placeholder="0"
+                      className="w-24 sm:w-32 bg-transparent text-right text-lg sm:text-xl font-black text-[#064734] dark:text-[#d4b26f] focus:outline-none"
+                    />
+                  </div>
+                  <span className="text-xs text-gray-400 dark:text-neutral-500 hidden sm:inline whitespace-nowrap">
+                    ≈ {Math.round(downPaymentAmount * usdRate).toLocaleString('ru-RU')} {t.termsPage.somUnit}
                   </span>
                 </div>
               </div>
+
               <input
                 type="range"
                 min="20"
@@ -335,6 +823,7 @@ export default function PurchaseTermsPage() {
                 onChange={(e) => setDownPaymentPercent(Number(e.target.value))}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
+
               <div className="flex gap-2 mt-3">
                 {[20, 30, 40, 50].map((pct) => (
                   <button
@@ -353,51 +842,135 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Параметр 3: Срок рассрочки (до 36 месяцев максимум) */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
-                  {t.termsPage.calcTermLabel}
-                </span>
-                <span className="text-xl font-black text-[#064734] dark:text-[#d4b26f]">
-                  {months} {t.termsPage.calcMonths} ({Number((months / 12).toFixed(1))} {t.termsPage.calcYears})
-                </span>
+            {/* Параметр 3: Срок и периодичность платежей */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">
+                    {t.termsPage.calcTermLabel}
+                  </span>
+                  <div className="flex items-center gap-1.5 bg-[#f2f6f4] dark:bg-[#071912] border border-[#064734]/20 dark:border-[#d4b26f]/30 px-2.5 py-1 rounded-xl">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={months}
+                      onChange={handleMonthsInput}
+                      className="w-8 text-center text-sm font-black text-[#064734] dark:text-[#d4b26f] bg-transparent focus:outline-none"
+                    />
+                    <span className="text-[11px] font-bold text-gray-500 dark:text-neutral-400">
+                      {t.termsPage.calcMonths}
+                    </span>
+                  </div>
+                </div>
+
+                <input
+                  type="range"
+                  min="12"
+                  max="36"
+                  step="1"
+                  value={months}
+                  onChange={(e) => setMonths(Number(e.target.value))}
+                  className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
+                />
+
+                <div className="flex gap-2 mt-3">
+                  {[12, 18, 24, 36].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setMonths(m)}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
+                        months === m
+                          ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
+                          : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {m} {t.termsPage.calcMonths} {m === 36 ? t.termsPage.calcMaxBadge : ''}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <input
-                type="range"
-                min="12"
-                max="36"
-                step="1"
-                value={months}
-                onChange={(e) => setMonths(Number(e.target.value))}
-                className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
-              />
-              <div className="flex gap-2 mt-3">
-                {[12, 18, 24, 36].map((m) => (
+
+              <div>
+                <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300 block mb-2">
+                  {s.payFrequency}
+                </span>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    key={m}
                     type="button"
-                    onClick={() => setMonths(m)}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      months === m
-                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734]'
-                        : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
+                    onClick={() => setFrequency('monthly')}
+                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all text-center cursor-pointer border ${
+                      frequency === 'monthly'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow'
+                        : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    {m} {t.termsPage.calcMonths} {m === 36 ? t.termsPage.calcMaxBadge : ''}
+                    <span>{s.monthly}</span>
+                    <span className="block text-[10px] opacity-75 mt-0.5">{months} выплат</span>
                   </button>
-                ))}
+
+                  <button
+                    type="button"
+                    onClick={() => setFrequency('quarterly')}
+                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all text-center cursor-pointer border ${
+                      frequency === 'quarterly'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow'
+                        : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300'
+                    }`}
+                  >
+                    <span>{s.quarterly}</span>
+                    <span className="block text-[10px] opacity-75 mt-0.5">{Math.ceil(months / 3)} выплат</span>
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Итоговая панель расчета с переключателем валют и дисклеймером НБКР */}
+            {/* Визуальная шкала распределения суммы */}
+            <div className="pt-2">
+              <div className="flex flex-col sm:flex-row justify-between text-xs font-bold mb-2 gap-1">
+                <span className="text-[#064734] dark:text-[#d4b26f] flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#d4b26f] shrink-0" />
+                  {s.down}: ${downPaymentAmount.toLocaleString('ru-RU')} ({downPaymentPercent}%)
+                </span>
+                <span className="text-gray-600 dark:text-neutral-300 flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#064734] dark:bg-emerald-500 shrink-0" />
+                  {s.balance}: ${remainingAmount.toLocaleString('ru-RU')} ({Number((100 - downPaymentPercent).toFixed(1))}%)
+                </span>
+              </div>
+              <div className="h-3.5 w-full bg-gray-100 dark:bg-neutral-800 rounded-full overflow-hidden flex p-0.5 border border-gray-200 dark:border-white/10 shadow-inner">
+                <div
+                  style={{ width: `${downPaymentPercent}%` }}
+                  className="h-full bg-[#d4b26f] rounded-full transition-all duration-300"
+                />
+                <div
+                  style={{ width: `${100 - downPaymentPercent}%` }}
+                  className="h-full bg-[#064734] dark:bg-emerald-600 rounded-full transition-all duration-300"
+                />
+              </div>
+            </div>
+
+            {/* Маркетинговый блок экономии на банковских процентах */}
+            <div className="p-4 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/20 flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center shrink-0 font-black">
+                %
+              </div>
+              <div>
+                <strong className="text-xs font-black uppercase text-[#064734] dark:text-[#d4b26f] block">
+                  {s.savingsTitle}
+                </strong>
+                <p className="text-[11px] text-gray-600 dark:text-gray-300 mt-0.5">
+                  {s.savingsDesc}
+                </p>
+              </div>
+            </div>
+
+            {/* Итоговая панель расчета */}
             <div className="bg-[#f2f6f4] dark:bg-[#040c09] rounded-3xl p-6 sm:p-8 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 transition-colors">
               <div className="max-w-xl w-full">
                 
-                {/* Переключатель валюты расчета */}
                 <div className="flex items-center justify-between gap-2 mb-3">
                   <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400">
-                    {t.termsPage.calcMonthlyLabel}
+                    {frequency === 'monthly' ? t.termsPage.calcMonthlyLabel : 'Платеж в квартал (0% переплат):'}
                   </span>
                   
                   <div className="inline-flex p-1 rounded-xl bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-xs font-black">
@@ -426,48 +999,95 @@ export default function PurchaseTermsPage() {
                   </div>
                 </div>
 
-                {/* Основная цифра платежа */}
                 {currencyMode === 'USD' ? (
                   <>
                     <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
-                      ${monthlyPaymentUsd.toLocaleString()}
-                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">{t.termsPage.calcPerMonth}</span>
+                      ${paymentPerPeriodUsd.toLocaleString('ru-RU')}
+                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">
+                        {frequency === 'monthly' ? t.termsPage.calcPerMonth : '/ квартал'}
+                      </span>
                     </div>
                     <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
-                      ≈ {monthlyPaymentKgs.toLocaleString()} {t.termsPage.calcSomPerMonth} (курс НБКР: {usdToKgs})
+                      ≈ {paymentPerPeriodKgs.toLocaleString('ru-RU')} {t.termsPage.somUnit} ({numberOfPayments} выплат)
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f]">
-                      {monthlyPaymentKgs.toLocaleString()}
-                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">{t.termsPage.calcSomPerMonth}</span>
+                      {paymentPerPeriodKgs.toLocaleString('ru-RU')}
+                      <span className="text-sm font-bold text-gray-600 dark:text-gray-400 ml-2">
+                        {t.termsPage.somUnit} {frequency === 'monthly' ? t.termsPage.calcPerMonth : '/ квартал'}
+                      </span>
                     </div>
                     <div className="text-sm font-semibold text-[#064734]/80 dark:text-neutral-300 mt-1">
-                      ≈ ${monthlyPaymentUsd.toLocaleString()} {t.termsPage.calcPerMonth}
+                      ≈ ${paymentPerPeriodUsd.toLocaleString('ru-RU')} ({numberOfPayments} выплат)
                     </div>
                   </>
                 )}
 
                 <p className="text-xs text-gray-500 dark:text-neutral-400 mt-2 font-medium">
-                  {t.termsPage.calcRemaining} ${remainingAmount.toLocaleString()} • {t.termsPage.calcNoBankFee}
+                  {t.termsPage.calcRemaining} ${remainingAmount.toLocaleString('ru-RU')} • {t.termsPage.calcNoBankFee}
                 </p>
 
-                {/* Официальный дисклеймер НБКР под все 6 языков */}
                 <p className="text-[11px] text-gray-500 dark:text-neutral-400/90 mt-3 pt-3 border-t border-gray-200 dark:border-white/10 leading-relaxed italic">
                   {rateDisclaimer}
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleSendCalculation}
-                className="w-full md:w-auto shrink-0 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black px-8 py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
-              >
-                <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
-                <span>{t.termsPage.calcWaBtn}</span>
-              </button>
+              <div className="w-full md:w-auto flex flex-col gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleSendCalculation}
+                  className="w-full bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white font-black px-8 py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2.5 cursor-pointer"
+                >
+                  <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
+                  <span>{t.termsPage.calcWaBtn}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSchedule(!showSchedule)}
+                  className="w-full bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/15 text-gray-800 dark:text-gray-200 font-bold px-4 py-2.5 rounded-xl text-xs transition-colors border border-gray-200 dark:border-white/10 cursor-pointer text-center"
+                >
+                  {showSchedule ? s.btnScheduleHide : s.btnSchedule}
+                </button>
+              </div>
             </div>
+
+            {/* Раскрывающийся подробный график платежей */}
+            {showSchedule && (
+              <div className="mt-6 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden animate-fadeIn">
+                <div className="max-h-80 overflow-y-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-[#064734] text-white sticky top-0">
+                      <tr>
+                        <th className="p-3 font-bold">{s.colNum}</th>
+                        <th className="p-3 font-bold">{s.colPeriod}</th>
+                        <th className="p-3 font-bold">{s.colPayment} ($ / сом)</th>
+                        <th className="p-3 font-bold text-right">{s.colRemaining}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/10 bg-white dark:bg-[#0b1b15]">
+                      {paymentSchedule.map((item) => (
+                        <tr key={item.num} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                          <td className="p-3 font-bold text-[#064734] dark:text-[#d4b26f]">{item.num}</td>
+                          <td className="p-3 font-medium text-gray-700 dark:text-gray-300">{item.period}</td>
+                          <td className="p-3 font-bold text-gray-900 dark:text-white">
+                            ${item.paymentUsd.toLocaleString('ru-RU')}{' '}
+                            <span className="text-[10px] text-gray-400 font-normal">
+                              (≈ {item.paymentKgs.toLocaleString('ru-RU')} с)
+                            </span>
+                          </td>
+                          <td className="p-3 text-right font-semibold text-gray-500 dark:text-neutral-400">
+                            ${item.balanceUsd.toLocaleString('ru-RU')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
