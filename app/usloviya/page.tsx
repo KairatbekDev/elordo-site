@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import MortgageComparison from '@/components/MortgageComparison';
+import PurchaseRoadmap from '@/components/PurchaseRoadmap';
 import {
   IconCheck,
   IconCar,
@@ -1638,8 +1639,11 @@ export default function PurchaseTermsPage() {
 
       {/* 7. ИНТЕРАКТИВНОЕ СРАВНЕНИЕ С БАНКОВСКОЙ ИПОТЕКОЙ */}
       <MortgageComparison usdRate={usdRate} />
+      
+{/* 8. ДОРОЖНАЯ КАРТА СДЕЛКИ: 5 ШАГОВ ОТ БРОНИ ДО КЛЮЧЕЙ */}
+      <PurchaseRoadmap />
 
-      {/* 8. Вопросы и ответы (FAQ Accordion) */}
+      {/* 9. Вопросы и ответы (FAQ Accordion) */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 mt-20">
         <div className="text-center mb-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-1">
