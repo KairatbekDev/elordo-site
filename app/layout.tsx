@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
 import YandexMetrika from '@/components/YandexMetrika';
 import UtmTracker from '@/components/UtmTracker';
+import FaqSchema from "@/components/FaqSchema";
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -213,6 +214,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <LanguageProvider>
             <DynamicSeo />
+            <FaqSchema />
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-5 focus:py-3 focus:bg-[#064734] focus:text-[#d4b26f] focus:rounded-xl focus:shadow-2xl focus:font-bold focus:text-xs uppercase tracking-wider"
