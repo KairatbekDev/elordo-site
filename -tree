@@ -1,0 +1,87 @@
+* [33m49b8c2b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m feat(og): add official logo-2.png and high-contrast cinematic cover for home page
+* [33me3816c4[m feat(og): render real complex background images with emerald gradient in opengraph previews
+* [33m38c8d0b[m feat(seo): add dynamic opengraph cards for individual real estate project pages
+* [33ma5f316d[m fix(seo): remove hardcoded images to trigger opengraph-image generator
+* [33m7b52f4a[m feat(seo): add dynamic opengraph social preview, multilingual sitemap with hreflang, and FAQ rich snippets
+* [33m35d67bc[m feat: perfect mobile sticky bar with safe-area spacing and animated ticker counters
+* [33m29dfc49[m fix(quiz): render full 36-month schedule in 2-column layout with QR verification
+* [33m1ddffa1[m feat: add interactive Smart Apartment Quiz with instant match and PDF export
+* [33m3e5b75b[m fix(pdf): sandbox rendering inside clean iframe to eliminate lab color crash
+* [33m66cbee4[m fix(pdf): upgrade engine to html2canvas-pro and jspdf to support lab colors
+* [33m0a45163[m fix: isolate PDF generation in clean iframe to resolve lab color error and UI freeze
+* [33m3fd96ef[m feat: switch PDF export to direct download and remove A4 labels
+* [33mbeb197f[m Add company brochure PDF download and keep print features in exportPdfQuote
+* [33md8810a0[m Upgrade polniy-raschet page with interactive discount calculator, live NBKR rate, and full localization
+* [33m1e80e65[m Fix company info import in exportPdfQuote and enable 1-click A4 PDF export
+* [33m3149f62[m Add interactive 5-step PurchaseRoadmap component to usloviya page
+* [33ma98017c[m Add interactive MortgageComparison block and fix input flow in usloviya
+* [33mc374476[m Sync live NBKR rate, full 11 units catalog, and multilingual support in ApartmentSelector
+* [33mddffa98[m Fix calculator input state handling and finalize interactive payment terms page
+* [33m6ce4a05[m Fix calculator input state handling and finalize interactive payment terms page
+* [33m52cedb0[m Add live NBKR currency API, interactive layout selector, and enhanced installment calculator
+* [33m41d6c44[m Add 3-room apartments to ApartmentSelector for Abu Dhabi and Ajkol Plus
+* [33m465a490[m Update logo-2.png, layout, and dynamic sales status
+* [33m2ac911d[m feat: integrate InfrastructureMap section into homepage
+* [33m4fe1630[m feat(prod): add interactive apartment calculator, pwa manifest and utm analytics
+* [33m4d91828[m feat(prod): optimize all conversion pages, seo metadata and telegram api handlers
+* [33m3817f1c[m fix(api): phone normalization, safe html entities and webhook deep links
+* [33mc455571[m feat(seo): finalize sitemap, robots.txt, catalog ux and metrika tracking
+* [33m172a332[m feat(ux): optimize DownloadBrochureModal for mobile, safe areas and i18n
+* [33m2ac7d24[m fix(theme): unify dark mode across all complexes and enhance floor plan views
+* [33mb241cda[m fix(ui): resolve header z-index conflict with map and hide map attribution
+* [33ma7dc4f6[m feat: setup Yandex Metrika events, tracking and SEO
+* [33m9b900ca[m feat: add consultation form to homepage, fix madina layouts filenames and catalog hydration
+* [33mfe56fb7[m fix: persist language state and harmonize RU/KG command responses
+* [33m3c3bd46[m feat: add Kyrgyz and Russian bilingual support
+* [33mc214a99[m feat: add 1-click phone request and manager notification
+* [33ma9df334[m fix: replace all elordo_group_bot occurrences with elordo_crm_bot
+* [33m0e3c01f[m fix: set default botUsername to elordo_crm_bot in FloorPlansSection
+* [33m52634ef[m feat: add telegram webhook, brochure download modal and floorplan pdf linking
+* [33m2bd0475[m feat: complete performance optimization, unified data sources and harden lead UX
+* [33m381f251[m feat: optimize images with next/image, enhance lead api route and split slug for seo
+* [33m09fc38c[m feat: complete SEO configs, fix map touch gestures, add lead spam protection and update styles
+* [33m5669375[m fix(seo): sync dynamic base url and verify active sitemap routes
+* [33m92d8e84[m fix(slug): make testimonials section background image dynamic per project
+* [33mc4d674f[m security(form): implement honeypot trap field and server status code handling
+* [33m8522c6c[m fix(plans): replace building facade fallback with localized architectural blueprint SVG
+* [33me9eae8d[m fix(mobile): prevent Leaflet scroll trapping with cooperative touch gestures and multi-language controls
+* [33mf20888d[m feat: rich formatted Telegram lead notifications with WhatsApp action button and compact floating trigger
+* [33m715664d[m feat(leads): real API lead intake and full 6-language support for consultation form
+* [33m84776dd[m fix(ui): responsive bottom positioning and complete dark mode for FloatingContact component
+* [33mf8bc8df[m fix(seo): configure target metadata URL, rich social preview cards, and real estate schema
+* [33mb4374c5[m fix(ui): brand-styled multilingual 404 page with dark mode and vector icons
+* [33maeded80[m fix(i18n): fully localize featured projects cards, floor labels, and price formatting on home page
+* [33m65731a2[m feat: add currency mode switch, official NBKR rate disclaimer and multilingual WhatsApp templates
+* [33m5b5cf41[m feat: add completed projects (Kelechek, Ordo) and Ajkol to construction progress with full i18n
+* [33m7ae1519[m fix(i18n): ensure robust reactive dictionary binding in footer component
+* [33m56ed212[m fix(i18n): full 6-language support for mobile menu and header WhatsApp links
+* [33m1105ef3[m fix(i18n): direct TRANSLATIONS binding for projects page to guarantee full Chinese & 6-language support
+* [33mad009cb[m fix(i18n): full 6-language support and dynamic floor labeling for typical floors section
+* [33m50542a2[m fix(i18n): dynamic 6-language support and interactive availability badges in floor plans section
+* [33m4db8670[m fix(i18n): dynamic localization for construction progress breadcrumbs, units and WhatsApp banner
+* [33mbc73b7c[m fix(i18n): dynamic localization for contacts page dropdown and direct WhatsApp message
+* [33m38ae98f[m fix(i18n): full 6-language support for legal documents in about page
+* [33mfc74567[m feat: complete i18n for slug & payments, add legal docs and callback form
+* [33m6a0dc8a[m style: full dark mode adaptation for BishkekMap component
+* [33m4749934[m style: adapt typical floors viewer and plan canvas for dark and light themes
+* [33m6b44687[m fix: resolve syntax error and enable universal video player in construction progress
+* [33m347eb35[m feat: add 4K drone video modal and detailed milestone progress to construction page
+* [33m8ac7cf9[m feat: add construction progress page, update sitemap and header navigation
+* [33md8561a8[m feat: implement dynamic multi-language SEO, OpenGraph and hreflang alternates
+* [33m4639a48[m feat: restore and localize homepage across all 6 languages
+* [33mf7297b9[m feat: localize interactive BishkekMap component across all 6 languages
+* [33m5c8cf09[m feat: localize projects catalog page and floating contact
+* [33maa095e6[m feat: complete localization for projects catalog page
+* [33m3c0dae8[m feat: complete multilingual localization across all pages and components
+* [33m0777a7d[m feat: localize projects catalog page
+* [33m03b4173[m Описание изменений
+* [33m3f360c5[m feat: localize terms and contacts pages across all 6 languages
+* [33mfc3180a[m feat: complete localization for home page
+* [33m5870e0b[m fix: sync translation types with home page
+* [33mf34dfdc[m feat: enable multi-language support and fix types
+* [33mee65491[m feat: enable multi-language support and fix types
+* [33m00d866d[m feat: add multi-language support (RU, KG, KZ, UK, EN, ZH)
+* [33m6288d47[m feat: complete dark mode across all pages and layouts
+* [33m3cf52fd[m feat: implement dark and light theme across layout, header and home page
+* [33meb7a4be[m feat: add next-themes dark mode support and header theme toggle
+* [33mcaab3d7[m fix: update transparent logo icon and verify production build

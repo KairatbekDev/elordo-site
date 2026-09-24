@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-// Хранилище лимитов с автоматической очисткой памяти (до 4 заявок за 5 минут на IP)
+// Хранилище лимитов с автоматической очисткой (до 5 заявок за 5 минут на IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
@@ -21,7 +21,7 @@ function isRateLimited(ip: string): boolean {
     return false;
   }
 
-  if (record.count >= 4) {
+  if (record.count >= 5) {
     return true;
   }
 
@@ -37,13 +37,17 @@ function escapeHtml(str: string = ''): string {
     .replace(/"/g, '&quot;');
 }
 
+// Нормализация номеров Кыргызстана, Казахстана, РФ и международного формата
 function normalizePhoneForWhatsApp(rawDigits: string): string {
+  // Кыргызстан: 0700123456 -> 996700123456
   if (rawDigits.startsWith('0') && rawDigits.length === 10) {
     return `996${rawDigits.slice(1)}`;
   }
+  // Кыргызстан без кода страны: 700123456 -> 996700123456
   if (rawDigits.length === 9) {
     return `996${rawDigits}`;
   }
+  // Казахстан / РФ через восьмерку: 87011234567 -> 77011234567
   if (rawDigits.startsWith('8') && rawDigits.length === 11) {
     return `7${rawDigits.slice(1)}`;
   }
@@ -54,9 +58,9 @@ export async function POST(req: Request) {
   try {
     const forwardedFor = req.headers.get('x-forwarded-for');
     const realIp = req.headers.get('x-real-ip');
-    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : (realIp || '127.0.0.1');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || '127.0.0.1';
 
-    // 1. Защита от спама и флуда
+    // 1. Защита от спама и спам-флуда
     if (isRateLimited(clientIp)) {
       return NextResponse.json(
         { success: false, error: 'Слишком много запросов. Подождите 5 минут.' },
@@ -65,7 +69,19 @@ export async function POST(req: Request) {
     }
 
     const data = await req.json();
-    const { name, phone, project, goal, lang, website, utm } = data;
+    const {
+      name,
+      phone,
+      project,
+      goal,
+      details,
+      comment,
+      budget,
+      rooms,
+      lang,
+      website,
+      utm,
+    } = data;
 
     // 2. Honeypot-ловушка для спам-ботов
     if (website && String(website).trim().length > 0) {
@@ -92,22 +108,31 @@ export async function POST(req: Request) {
     const safeGoal = escapeHtml(String(goal || 'Консультация').slice(0, 80));
     const safeLang = escapeHtml(String(lang || 'RU').toUpperCase().slice(0, 10));
 
-    // 5. Формирование строки рекламного источника (UTM)
+    // Дополнительные параметры (из квиза, селектора или комментариев)
+    const extraDetails: string[] = [];
+    if (rooms) extraDetails.push(`Планировка: <b>${escapeHtml(String(rooms))}</b>`);
+    if (budget) extraDetails.push(`Бюджет: <b>${escapeHtml(String(budget))}</b>`);
+    if (details) extraDetails.push(`Параметры: ${escapeHtml(String(details).slice(0, 150))}`);
+    if (comment) extraDetails.push(`Комментарий: <i>${escapeHtml(String(comment).slice(0, 200))}</i>`);
+
+    // 5. Разбор рекламных меток (UTM) для отдела маркетинга
     let marketingInfo = 'Прямой заход / Органический поиск';
     if (utm && typeof utm === 'object') {
       const source = escapeHtml(utm.utm_source || '');
       const medium = escapeHtml(utm.utm_medium || '');
       const campaign = escapeHtml(utm.utm_campaign || '');
       const content = escapeHtml(utm.utm_content || '');
+      const term = escapeHtml(utm.utm_term || '');
 
-      const parts = [];
+      const parts: string[] = [];
       if (source) parts.push(`Источник: <b>${source}</b>`);
       if (medium) parts.push(`Тип: <i>${medium}</i>`);
       if (campaign) parts.push(`Кампания: <code>${campaign}</code>`);
-      if (content) parts.push(`Креатив: ${content}`);
+      if (term) parts.push(`Ключ: <u>${term}</u>`);
+      if (content) parts.push(`Объявление: ${content}`);
 
       if (parts.length > 0) {
-        marketingInfo = parts.join(' | ');
+        marketingInfo = parts.join('\n📢 ');
       }
     }
 
@@ -115,38 +140,49 @@ export async function POST(req: Request) {
     const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!token || !chatId) {
-      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены!');
+      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены в переменных окружения Vercel!');
       return NextResponse.json(
         { success: false, error: 'Ошибка конфигурации сервера' },
         { status: 500 }
       );
     }
 
-    // Время по Бишкеку
+    // Время заявки по часовому поясу Бишкека (UTC+6)
     const bishkekDateTime = new Intl.DateTimeFormat('ru-RU', {
       timeZone: 'Asia/Bishkek',
       day: '2-digit',
       month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
+      second: '2-digit',
     }).format(new Date());
 
-    const messageHtml =
+    // Формирование структурированного сообщения для Telegram
+    let messageHtml =
       `🏛 <b>НОВАЯ ЗАЯВКА • EL ORDO GROUP</b>\n` +
-      `━━━━━━━━━━━━━━━━━━\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
       `👤 <b>Клиент:</b> ${safeName}\n` +
-      `📞 <b>Телефон:</b> <code>${safePhone}</code>\n` +
-      `🏢 <b>Объект:</b> ${safeProject}\n` +
-      `🎯 <b>Цель:</b> ${safeGoal}\n` +
-      `📢 <b>Реклама:</b> ${marketingInfo}\n` +
-      `🌐 <b>Язык:</b> ${safeLang}\n` +
-      `⏰ <b>Время (Бишкек):</b> ${bishkekDateTime}\n` +
-      `━━━━━━━━━━━━━━━━━━`;
+      `📞 <b>Телефон:</b> <a href="tel:+${waPhone}">+${waPhone}</a> (<code>${safePhone}</code>)\n` +
+      `🏢 <b>Объект:</b> <b>${safeProject}</b>\n` +
+      `🎯 <b>Цель:</b> ${safeGoal}\n`;
 
+    if (extraDetails.length > 0) {
+      messageHtml += `📋 <b>Детали:</b>\n• ${extraDetails.join('\n• ')}\n`;
+    }
+
+    messageHtml +=
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `📢 <b>Реклама:</b>\n📢 ${marketingInfo}\n` +
+      `🌐 <b>Язык сайта:</b> ${safeLang}\n` +
+      `⏰ <b>Время (Бишкек):</b> ${bishkekDateTime}\n` +
+      `━━━━━━━━━━━━━━━━━━━━`;
+
+    // Инлайн-кнопка для моментального перехода в WhatsApp
     const replyMarkup = {
       inline_keyboard: [
         [
-          { text: '💬 Открыть диалог в WhatsApp', url: clientWaUrl },
+          { text: '💬 Написать клиенту в WhatsApp', url: clientWaUrl },
         ],
       ],
     };
@@ -158,6 +194,7 @@ export async function POST(req: Request) {
         chat_id: chatId,
         text: messageHtml,
         parse_mode: 'HTML',
+        disable_web_page_preview: true,
         reply_markup: replyMarkup,
       }),
       signal: AbortSignal.timeout(7000),
