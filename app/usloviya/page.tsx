@@ -82,7 +82,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Экономия до $15 000+ по сравнению со стандартной банковской ипотекой (18–22% годовых).',
     btnSchedule: 'Посмотреть детальный график выплат',
     btnScheduleHide: 'Скрыть график выплат',
-    btnDownloadPdf: 'Скачать расчет в PDF (А4)',
+    btnDownloadPdf: 'Скачать расчет в PDF',
     colNum: '№',
     colPeriod: 'Период',
     colPayment: 'Платеж',
@@ -107,7 +107,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Банктык ипотекага (18–22%) салыштырмалуу $15 000+ чейин үнөмдөө.',
     btnSchedule: 'Төлөм графигин толук көрүү',
     btnScheduleHide: 'Графикти жашыруу',
-    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу',
     colNum: '№',
     colPeriod: 'Мөөнөтү',
     colPayment: 'Төлөм',
@@ -132,7 +132,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Банк ипотекасына (18–22%) қарағанда $15 000+ дейін үнемдеу.',
     btnSchedule: 'Төлем кестесін толық қарау',
     btnScheduleHide: 'Күктені жасыру',
-    btnDownloadPdf: 'PDF есебін жүктеп алу (А4)',
+    btnDownloadPdf: 'PDF есебін жүктеп алу',
     colNum: '№',
     colPeriod: 'Кезең',
     colPayment: 'Төлем',
@@ -157,7 +157,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Економія до $15 000+ порівняно зі звичайною іпотекою банку.',
     btnSchedule: 'Переглянути графік платежів',
     btnScheduleHide: 'Сховати графік платежів',
-    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF',
     colNum: '№',
     colPeriod: 'Період',
     colPayment: 'Платіж',
@@ -182,7 +182,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: 'Save up to $15,000+ compared to commercial mortgage interest rates.',
     btnSchedule: 'View Full Payment Schedule',
     btnScheduleHide: 'Hide Schedule',
-    btnDownloadPdf: 'Download PDF Quote (A4)',
+    btnDownloadPdf: 'Download PDF Quote',
     colNum: '#',
     colPeriod: 'Period',
     colPayment: 'Payment',
@@ -207,7 +207,7 @@ const CALC_STRINGS: Record<Locale, {
     savingsDesc: '相较商业银行 18%–22% 高息按揭贷款，全周期立省 $15,000+。',
     btnSchedule: '展开还款明细测算表',
     btnScheduleHide: '收起还款明细',
-    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
+    btnDownloadPdf: '一键下载 PDF 格式预算单',
     colNum: '序号',
     colPeriod: '期数',
     colPayment: '还款金额',
@@ -870,7 +870,7 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* КНОПКА РАСКРЫТИЯ КАТАЛОГА ПЛАНИРОВОК (С ФИРМЕННЫМ SVG) */}
+            {/* КНОПКА РАСКРЫТИЯ КАТАЛОГА ПЛАНИРОВОК */}
             <div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <button

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
+import { downloadCompanyBrochurePdf } from '@/lib/exportPdfQuote';
 import { IconWhatsApp } from '@/components/Icons';
 import { reachGoal } from '@/components/YandexMetrika';
 import { useLanguage } from '@/context/LanguageContext';
@@ -17,6 +18,7 @@ const MODAL_TEXTS: Record<Locale, {
   triggerBtn: string;
   title: string;
   desc: (name: string) => string;
+  btnDirectDownload: string;
   btnTelegram: string;
   btnWhatsApp: string;
   footnote: string;
@@ -25,61 +27,67 @@ const MODAL_TEXTS: Record<Locale, {
 }> = {
   ru: {
     triggerBtn: 'Скачать презентацию и шахматку (PDF)',
-    title: 'Куда отправить PDF?',
+    title: 'Получить официальный PDF',
     desc: (name) => `Официальный буклет, свободные этажи и актуальные цены по объекту «${name}»`,
+    btnDirectDownload: 'Скачать PDF на устройство',
     btnTelegram: 'Получить мгновенно в Telegram',
     btnWhatsApp: 'Получить в WhatsApp',
-    footnote: 'Без спама • Бот выдает документ в течение 2 секунд',
+    footnote: 'Прямая загрузка официального документа от застройщика EL ORDO GROUP',
     closeAria: 'Закрыть модальное окно',
     waMessage: (name) => `Здравствуйте! Отправьте, пожалуйста, официальную презентацию, шахматку и планировки по объекту «${name}» в формате PDF.`,
   },
   kg: {
     triggerBtn: 'Презентация жана шахматканы алуу (PDF)',
-    title: 'PDF кайсы жерге жөнөтүлсүн?',
+    title: 'Расмий PDF алуу',
     desc: (name) => `«${name}» объектиси боюнча расмий буклет, бош кабаттар жана баалар`,
+    btnDirectDownload: 'Түзмөккө PDF көчүрүп алуу',
     btnTelegram: 'Telegram аркылуу тез алуу',
     btnWhatsApp: 'WhatsApp аркылуу алуу',
-    footnote: 'Спам жок • Бот 2 секунддун ичинде документти берет',
+    footnote: 'EL ORDO GROUP куруучусунан расмий документти түз көчүрүү',
     closeAria: 'Терезени жабуу',
     waMessage: (name) => `Саламатсызбы! «${name}» объектиси боюнча расмий презентацияны, шахматканы жана пландарды PDF форматында жөнөтүңүзчү.`,
   },
   kz: {
     triggerBtn: 'Презентация мен шахматканы жүктеу (PDF)',
-    title: 'PDF қайда жіберілсін?',
+    title: 'Ресми PDF алу',
     desc: (name) => `«${name}» нысаны бойынша ресми буклет, бос қабаттар мен бағалар`,
+    btnDirectDownload: 'Құрылғыға PDF жүктеп алу',
     btnTelegram: 'Telegram арқылы лезде алу',
     btnWhatsApp: 'WhatsApp-та алу',
-    footnote: 'Спамсыз • Бот құжатты 2 секунд ішінде береді',
+    footnote: 'EL ORDO GROUP құрылыс салушысынан ресми құжатты тікелей жүктеу',
     closeAria: 'Терезені жабу',
     waMessage: (name) => `Сәлеметсіз бе! «${name}» нысаны бойынша ресми презентация, шахматка мен жоспарларды PDF форматында жіберіңізші.`,
   },
   uk: {
     triggerBtn: 'Завантажити буклет та шахматку (PDF)',
-    title: 'Куди надіслати PDF?',
+    title: 'Отримати офіційний PDF',
     desc: (name) => `Офіційний буклет, вільні поверхи та актуальні ціни щодо об’єкта «${name}»`,
+    btnDirectDownload: 'Завантажити PDF на пристрій',
     btnTelegram: 'Отримати миттєво в Telegram',
     btnWhatsApp: 'Отримати у WhatsApp',
-    footnote: 'Без спаму • Бот видає документ протягом 2 секунд',
+    footnote: 'Пряме завантаження офіційного документа від забудовника EL ORDO GROUP',
     closeAria: 'Закрити вікно',
     waMessage: (name) => `Доброго дня! Надішліть, будь ласка, офіційну презентацію, шахматку та планування щодо об’єкта «${name}» у форматі PDF.`,
   },
   en: {
     triggerBtn: 'Download Brochure & Pricing (PDF)',
-    title: 'Where should we send the PDF?',
+    title: 'Get Official PDF',
     desc: (name) => `Official brochure, floor availability, and up-to-date pricing for "${name}"`,
+    btnDirectDownload: 'Download PDF directly to device',
     btnTelegram: 'Get instantly via Telegram',
     btnWhatsApp: 'Receive in WhatsApp',
-    footnote: 'No spam • Bot delivers the file within 2 seconds',
+    footnote: 'Direct download of official documentation from EL ORDO GROUP',
     closeAria: 'Close dialog',
     waMessage: (name) => `Hello! Please send the official presentation, floor availability, and layouts for "${name}" in PDF.`,
   },
   zh: {
     triggerBtn: '获取楼盘图册与在售房源表 (PDF)',
-    title: '请选择接收 PDF 的方式：',
+    title: '获取官方 PDF 资料',
     desc: (name) => `「${name}」官方楼盘简介、可选楼层与最新在售销控底价`,
+    btnDirectDownload: '一键下载 PDF 至本地设备',
     btnTelegram: '在 Telegram 中极速下载',
     btnWhatsApp: '在 WhatsApp 中直接接收',
-    footnote: '绿色无广告 • 智能机器人2秒内自动推送文档',
+    footnote: '开发商 EL ORDO GROUP 官方合规文件直接下载',
     closeAria: '关闭窗口',
     waMessage: (name) => `您好！请向我发送「${name}」项目的官方楼盘宣传图册、可选楼层销控表及户型规划 (PDF)。`,
   },
@@ -91,6 +99,7 @@ export default function DownloadBrochureModal({
   botUsername = COMPANY_INFO.telegramBot || 'elordo_crm_bot',
 }: DownloadBrochureModalProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { locale } = useLanguage();
   const currentLang: Locale = (locale as Locale) || 'ru';
   const ui = MODAL_TEXTS[currentLang] || MODAL_TEXTS.ru;
@@ -121,6 +130,20 @@ export default function DownloadBrochureModal({
     }
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, handleClose]);
+
+  // Прямое скачивание файла PDF
+  const handleDirectDownload = async () => {
+    try {
+      setIsDownloading(true);
+      reachGoal('pdf_download_direct');
+      await downloadCompanyBrochurePdf();
+      handleClose();
+    } catch {
+      // Игнорируем ошибку при отмене
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   // Сопоставление с вебхуком бота
   const slugMapping: Record<string, string> = {
@@ -165,7 +188,7 @@ export default function DownloadBrochureModal({
             className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 max-w-md w-full rounded-t-3xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl relative text-center max-h-[92vh] overflow-y-auto pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Крестик с увеличенной областью клика */}
+            {/* Крестик закрытия */}
             <button
               type="button"
               onClick={handleClose}
@@ -196,21 +219,34 @@ export default function DownloadBrochureModal({
             </p>
 
             <div className="space-y-3">
-              {/* Telegram */}
+              {/* Кнопка 1: Прямое мгновенное скачивание файла PDF */}
+              <button
+                type="button"
+                onClick={handleDirectDownload}
+                disabled={isDownloading}
+                className="w-full py-4 px-5 rounded-2xl bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.98] text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50"
+              >
+                <svg className="w-5 h-5 text-[#064734] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>{isDownloading ? 'Формирование файла...' : ui.btnDirectDownload}</span>
+              </button>
+
+              {/* Кнопка 2: Telegram */}
               <a
                 href={tgUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={handleClose}
-                className="w-full py-4 px-5 rounded-2xl bg-[#229ED9] hover:bg-[#1e8ec3] active:scale-[0.98] text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-2xl bg-[#229ED9] hover:bg-[#1e8ec3] active:scale-[0.98] text-white font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-3 cursor-pointer"
               >
-                <svg className="w-5 h-5 fill-current shrink-0" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 fill-current shrink-0" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" />
                 </svg>
                 <span>{ui.btnTelegram}</span>
               </a>
 
-              {/* WhatsApp */}
+              {/* Кнопка 3: WhatsApp */}
               <a
                 href={waUrl}
                 target="_blank"
@@ -219,9 +255,9 @@ export default function DownloadBrochureModal({
                   reachGoal('wa_click');
                   handleClose();
                 }}
-                className="w-full py-4 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer"
+                className="w-full py-3.5 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-white font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-3 cursor-pointer"
               >
-                <IconWhatsApp className="w-5 h-5 text-white shrink-0" />
+                <IconWhatsApp className="w-4 h-4 text-white shrink-0" />
                 <span>{ui.btnWhatsApp}</span>
               </a>
             </div>

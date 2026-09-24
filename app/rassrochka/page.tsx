@@ -224,7 +224,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: 'Интерактивный калькулятор',
     calcTitle: 'Рассчитайте свой платеж онлайн',
     calcDesc: 'Настройте стоимость и срок для получения готового расчета с графиком.',
-    btnDownloadPdf: 'Скачать расчет в PDF (А4)',
+    btnDownloadPdf: 'Скачать расчет в PDF',
   },
   kg: {
     pageTitle: '0% Бөлүп төлөө',
@@ -366,7 +366,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: 'Интерактивдүү калькулятор',
     calcTitle: 'Төлөмүңүздү онлайн эсептеңиз',
     calcDesc: 'График менен даяр эсептөөнү алуу үчүн наркты жана мөөнөттү тууралаңыз.',
-    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу',
   },
   kz: {
     pageTitle: '0% Бөліп төлеу',
@@ -508,7 +508,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: 'Интерактивті калькулятор',
     calcTitle: 'Төлемді онлайн есептеңіз',
     calcDesc: 'Графикпен дайын есептеуді алу үшін құн мен мерзімді реттеңіз.',
-    btnDownloadPdf: 'PDF есебін жүктеп алу (А4)',
+    btnDownloadPdf: 'PDF есебін жүктеп алу',
   },
   uk: {
     pageTitle: 'Розстрочка 0%',
@@ -650,7 +650,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: 'Інтерактивний калькулятор',
     calcTitle: 'Розрахуйте свій платіж онлайн',
     calcDesc: 'Налаштуйте вартість та термін для отримання готового розрахунку з графіком.',
-    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF',
   },
   en: {
     pageTitle: '0% Installment',
@@ -792,7 +792,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: 'Interactive Calculator',
     calcTitle: 'Calculate Your Payment Online',
     calcDesc: 'Customize price and term to get an instant calculation with a payment schedule.',
-    btnDownloadPdf: 'Download PDF Quote (A4)',
+    btnDownloadPdf: 'Download PDF Quote',
   },
   zh: {
     pageTitle: '0% 免息分期',
@@ -934,7 +934,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     calcBadge: '交互式计算器',
     calcTitle: '在线测算您的分期月供',
     calcDesc: '调整总价与期数，立即生成专属的还款明细测算表。',
-    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
+    btnDownloadPdf: '下载 PDF 格式预算单',
   },
 };
 

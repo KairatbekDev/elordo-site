@@ -25,11 +25,29 @@ export interface PdfQuoteData {
   }>;
 }
 
-// 1. Новая функция для скачивания полной презентации / каталога компании со всей важной информацией
-export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
+// Загрузка конвертера в браузере для прямого скачивания файла
+async function getPdfEngine(): Promise<any> {
+  if (typeof window === 'undefined') return null;
+  if ((window as any).html2pdf) return (window as any).html2pdf;
 
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-pdf-engine="true"]');
+    if (existing) {
+      if ((window as any).html2pdf) return resolve((window as any).html2pdf);
+      existing.addEventListener('load', () => resolve((window as any).html2pdf));
+      return;
+    }
+    const script = document.createElement('script');
+    script.setAttribute('data-pdf-engine', 'true');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.onload = () => resolve((window as any).html2pdf);
+    script.onerror = () => reject(new Error('Не удалось загрузить PDF-конвертер'));
+    document.head.appendChild(script);
+  });
+}
+
+// 1. Прямое скачивание каталога и презентации компании в файл .pdf
+export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
   const todayStr = new Intl.DateTimeFormat('ru-RU', {
     timeZone: 'Asia/Bishkek',
     day: '2-digit',
@@ -40,19 +58,17 @@ export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
   const phone = COMPANY_INFO?.phones?.[0] || '+996 709 115 115';
   const whatsapp = COMPANY_INFO?.whatsapp || '996709115115';
 
-  const html = `
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-      <meta charset="UTF-8">
-      <title>Официальный каталог и презентация — EL ORDO GROUP</title>
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.width = '794px';
+  container.style.zIndex = '-9999';
+  container.style.background = '#ffffff';
+
+  container.innerHTML = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; background: #fff; font-size: 10pt; line-height: 1.4; padding: 24px 30px;">
       <style>
-        @page { size: A4 portrait; margin: 12mm 15mm; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; background: #fff; font-size: 10pt; line-height: 1.4; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-        .download-action-bar { background: #064734; color: #d4b26f; padding: 12px 18px; border-radius: 8px; font-size: 9.5pt; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; box-shadow: 0 4px 12px rgba(6,71,52,0.2); }
-        .download-action-bar button { background: #d4b26f; color: #064734; border: none; font-weight: 900; padding: 8px 16px; border-radius: 6px; cursor: pointer; text-transform: uppercase; font-size: 8.5pt; }
-        @media print { .download-action-bar { display: none; } }
         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 16px; }
         .brand-title { font-size: 19pt; font-weight: 900; color: #064734; text-transform: uppercase; }
         .brand-sub { font-size: 8pt; font-weight: 700; color: #d4b26f; letter-spacing: 1.5px; text-transform: uppercase; }
@@ -70,17 +86,11 @@ export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
         .term-card p { font-size: 8pt; color: #4a5568; line-height: 1.3; }
         .footer { border-top: 1px solid #e2e8f0; padding-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 8pt; color: #718096; }
       </style>
-    </head>
-    <body>
-      <div class="download-action-bar">
-        <div>📥 <strong>Скачать каталог в PDF:</strong> Нажмите кнопку справа или <strong>Ctrl+P</strong>, в поле «Принтер» выберите <strong>«Сохранить как PDF»</strong>.</div>
-        <button onclick="window.print()">Сохранить PDF</button>
-      </div>
 
       <div class="header">
         <div class="brand">
-          <span class="brand-title">EL ORDO GROUP</span>
-          <span class="brand-sub">Строительная компания • Официальная презентация</span>
+          <div class="brand-title">EL ORDO GROUP</div>
+          <div class="brand-sub">Строительная компания • Официальная презентация</div>
         </div>
         <div class="doc-meta">
           <div>Дата: <strong>${todayStr}</strong></div>
@@ -119,7 +129,7 @@ export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
             <th>Класс</th>
             <th>Адрес / Локация</th>
             <th>Срок сдачи</th>
-            <th>Стоимость за м²</th>
+            <th style="text-align: right;">Стоимость за м²</th>
           </tr>
         </thead>
         <tbody>
@@ -129,7 +139,7 @@ export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
               <td>${proj.classType}</td>
               <td>${proj.address}</td>
               <td>${proj.deadline}</td>
-              <td><strong style="color: #064734;">${proj.price}</strong></td>
+              <td style="text-align: right;"><strong style="color: #064734;">${proj.price}</strong></td>
             </tr>
           `).join('')}
         </tbody>
@@ -143,261 +153,78 @@ export function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
         <div>Центральный офис: ${COMPANY_INFO.address} • Тел: <strong>${phone}</strong> • WhatsApp: <strong>${whatsapp}</strong></div>
         <div>Сайт: <strong>elordogroup.com</strong></div>
       </div>
-    </body>
-    </html>
+    </div>
   `;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  document.body.appendChild(container);
+
+  try {
+    const html2pdf = await getPdfEngine();
+    const opt = {
+      margin: [6, 6, 6, 6],
+      filename: `Katalog_EL_ORDO_GROUP.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
+
+    await html2pdf().set(opt).from(container).save();
+  } finally {
+    document.body.removeChild(container);
+  }
 }
 
-// 2. Ваша оригинальная функция персонального расчета КП (сохранена на 100%)
-export interface PdfQuoteData {
-  apartmentPrice: number;
-  downPaymentAmount: number;
-  downPaymentPercent: number;
-  months: number;
-  frequency: 'monthly' | 'quarterly';
-  paymentPerPeriodUsd: number;
-  usdRate: number;
-  rateDate: string;
-  selectedApartment?: {
-    complex: string;
-    rooms: number;
-    area: number;
-    floor: string;
-    priceM2: number;
-  } | null;
-  paymentSchedule: Array<{
-    num: number;
-    period: string;
-    paymentUsd: number;
-    paymentKgs: number;
-    balanceUsd: number;
-  }>;
-}
-
-export function exportPdfQuote(data: PdfQuoteData) {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) return;
+// 2. Прямое скачивание персонального расчета КП в файл .pdf
+export async function exportPdfQuote(data: PdfQuoteData) {
+  const quoteNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
+  const totalKgs = Math.round(data.apartmentPrice * data.usdRate);
+  const downKgs = Math.round(data.downPaymentAmount * data.usdRate);
+  const paymentKgs = Math.round(data.paymentPerPeriodUsd * data.usdRate);
 
   const todayStr = new Intl.DateTimeFormat('ru-RU', {
     timeZone: 'Asia/Bishkek',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   }).format(new Date());
-
-  const quoteNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
-  const totalKgs = Math.round(data.apartmentPrice * data.usdRate);
-  const downKgs = Math.round(data.downPaymentAmount * data.usdRate);
-  const paymentKgs = Math.round(data.paymentPerPeriodUsd * data.usdRate);
 
   const phone = COMPANY_INFO?.phones?.[0] || '+996 709 115 115';
   const whatsapp = COMPANY_INFO?.whatsapp || '996709115115';
 
-  const html = `
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-      <meta charset="UTF-8">
-      <title>Коммерческое предложение ${quoteNumber} — EL ORDO GROUP</title>
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.width = '794px';
+  container.style.zIndex = '-9999';
+  container.style.background = '#ffffff';
+
+  container.innerHTML = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1a1a1a; background: #ffffff; font-size: 10pt; line-height: 1.4; padding: 24px 30px;">
       <style>
-        @page {
-          size: A4 portrait;
-          margin: 12mm 15mm;
-        }
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          color: #1a1a1a;
-          background: #ffffff;
-          font-size: 10.5pt;
-          line-height: 1.4;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        .download-action-bar {
-          background: #064734;
-          color: #d4b26f;
-          padding: 10px 16px;
-          border-radius: 8px;
-          font-size: 9pt;
-          margin-bottom: 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-weight: 700;
-        }
-        .download-action-bar button {
-          background: #d4b26f;
-          color: #064734;
-          border: none;
-          font-weight: 900;
-          padding: 6px 14px;
-          border-radius: 4px;
-          cursor: pointer;
-          text-transform: uppercase;
-          font-size: 8pt;
-        }
-        @media print { .download-action-bar { display: none; } }
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          border-bottom: 2px solid #064734;
-          padding-bottom: 10px;
-          margin-bottom: 16px;
-        }
-        .brand {
-          display: flex;
-          flex-direction: column;
-        }
-        .brand-title {
-          font-size: 19pt;
-          font-weight: 900;
-          color: #064734;
-          letter-spacing: -0.5px;
-          text-transform: uppercase;
-        }
-        .brand-sub {
-          font-size: 8pt;
-          font-weight: 700;
-          color: #d4b26f;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-        }
-        .doc-meta {
-          text-align: right;
-          font-size: 8.5pt;
-          color: #555555;
-        }
-        .doc-meta strong {
-          color: #064734;
-        }
-        .banner-quote {
-          background: #064734;
-          color: #ffffff;
-          padding: 10px 16px;
-          border-radius: 8px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-        }
-        .banner-title {
-          font-size: 11pt;
-          font-weight: 800;
-          text-transform: uppercase;
-        }
-        .banner-badge {
-          background: #d4b26f;
-          color: #064734;
-          font-size: 8.5pt;
-          font-weight: 900;
-          padding: 3px 10px;
-          border-radius: 20px;
-          text-transform: uppercase;
-        }
-        .section-title {
-          font-size: 9.5pt;
-          font-weight: 800;
-          color: #064734;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          margin-bottom: 8px;
-        }
-        .grid-cards {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-        .card {
-          border: 1px solid #e2e8f0;
-          background: #f8faf9;
-          padding: 9px 12px;
-          border-radius: 8px;
-        }
-        .card-label {
-          font-size: 7.5pt;
-          font-weight: 700;
-          text-transform: uppercase;
-          color: #718096;
-          margin-bottom: 2px;
-        }
-        .card-val {
-          font-size: 12pt;
-          font-weight: 900;
-          color: #064734;
-        }
-        .card-sub {
-          font-size: 7.5pt;
-          color: #718096;
-          margin-top: 1px;
-        }
-        .apt-box {
-          border: 1.5px solid #d4b26f;
-          background: #fdfbf7;
-          border-radius: 8px;
-          padding: 10px 14px;
-          margin-bottom: 16px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-        .table-schedule {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 8pt;
-          margin-bottom: 14px;
-        }
-        .table-schedule th {
-          background: #064734;
-          color: #ffffff;
-          padding: 5px 8px;
-          text-align: left;
-          font-weight: 700;
-        }
-        .table-schedule td {
-          padding: 4px 8px;
-          border-bottom: 1px solid #edf2f7;
-        }
-        .table-schedule tr:nth-child(even) {
-          background: #f8faf9;
-        }
-        .footer {
-          border-top: 1px solid #e2e8f0;
-          padding-top: 8px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 8pt;
-          color: #718096;
-        }
-        .footer-contacts strong {
-          color: #064734;
-        }
-        @media print {
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-          }
-        }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 16px; }
+        .brand { display: flex; flex-direction: column; }
+        .brand-title { font-size: 19pt; font-weight: 900; color: #064734; letter-spacing: -0.5px; text-transform: uppercase; }
+        .brand-sub { font-size: 8pt; font-weight: 700; color: #d4b26f; letter-spacing: 1.5px; text-transform: uppercase; }
+        .doc-meta { text-align: right; font-size: 8.5pt; color: #555555; }
+        .doc-meta strong { color: #064734; }
+        .banner-quote { background: #064734; color: #ffffff; padding: 10px 16px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .banner-title { font-size: 11pt; font-weight: 800; text-transform: uppercase; }
+        .banner-badge { background: #d4b26f; color: #064734; font-size: 8.5pt; font-weight: 900; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; }
+        .section-title { font-size: 9.5pt; font-weight: 800; color: #064734; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+        .card { border: 1px solid #e2e8f0; background: #f8faf9; padding: 9px 12px; border-radius: 8px; }
+        .card-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; color: #718096; margin-bottom: 2px; }
+        .card-val { font-size: 12pt; font-weight: 900; color: #064734; }
+        .card-sub { font-size: 7.5pt; color: #718096; margin-top: 1px; }
+        .apt-box { border: 1.5px solid #d4b26f; background: #fdfbf7; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .table-schedule { width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 14px; }
+        .table-schedule th { background: #064734; color: #ffffff; padding: 5px 8px; text-align: left; font-weight: 700; }
+        .table-schedule td { padding: 4px 8px; border-bottom: 1px solid #edf2f7; }
+        .table-schedule tr:nth-child(even) { background: #f8faf9; }
+        .footer { border-top: 1px solid #e2e8f0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 8pt; color: #718096; }
+        .footer-contacts strong { color: #064734; }
       </style>
-    </head>
-    <body>
-      <div class="download-action-bar">
-        <div>📥 <strong>Сохранить расчет в PDF:</strong> Нажмите кнопку справа или <strong>Ctrl+P</strong>, в поле «Принтер» выберите <strong>«Сохранить как PDF»</strong>.</div>
-        <button onclick="window.print()">Сохранить PDF</button>
-      </div>
 
       <div class="header">
         <div class="brand">
@@ -488,11 +315,23 @@ export function exportPdfQuote(data: PdfQuoteData) {
         </div>
         <div>Официальный сайт: <strong>elordogroup.com</strong></div>
       </div>
-    </body>
-    </html>
+    </div>
   `;
 
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+  document.body.appendChild(container);
+
+  try {
+    const html2pdf = await getPdfEngine();
+    const opt = {
+      margin: [6, 6, 6, 6],
+      filename: `Raschet_EL_ORDO_${quoteNumber}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    };
+
+    await html2pdf().set(opt).from(container).save();
+  } finally {
+    document.body.removeChild(container);
+  }
 }

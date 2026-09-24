@@ -225,7 +225,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: 'Интерактивный расчет 100% оплаты',
     calcTitle: 'Рассчитайте вашу экономию онлайн',
     calcDesc: 'Двигайте ползунок, чтобы мгновенно увидеть размер скидки и спеццену при единовременном расчете.',
-    btnDownloadPdf: 'Скачать расчет 100% оплаты в PDF (А4)',
+    btnDownloadPdf: 'Скачать расчет в PDF',
     netSavingsLabel: 'Ваша чистая экономия (дисконт 6%):',
   },
   kg: {
@@ -371,7 +371,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: 'Интерактивдүү 100% калькулятор',
     calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
     calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
-    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
+    btnDownloadPdf: 'PDF эсебин көчүрүп алуу',
     netSavingsLabel: 'Сиздин таза үнөмдөөңүз (дисконт 6%):',
   },
   kz: {
@@ -517,8 +517,8 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: 'Интерактивдүү 100% калькулятор',
     calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
     calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
-    btnDownloadPdf: 'PDF эсебин көчүрүп алуу (А4)',
-    netSavingsLabel: 'Сиздин таза үнөмдөөңүз (дисконт 6%):',
+    btnDownloadPdf: 'PDF есебін жүктеп алу',
+    netSavingsLabel: 'Сіздің таза үнемдеуіңіз (дисконт 6%):',
   },
   uk: {
     pageTitle: '100% розрахунок',
@@ -663,7 +663,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: 'Інтерактивний розрахунок 100% оплати',
     calcTitle: 'Розрахуйте вашу економію онлайн',
     calcDesc: 'Налаштуйте вартість для отримання розрахунку.',
-    btnDownloadPdf: 'Завантажити розрахунок у PDF (А4)',
+    btnDownloadPdf: 'Завантажити розрахунок у PDF',
     netSavingsLabel: 'Ваша чиста економія (дисконт 6%):',
   },
   en: {
@@ -809,7 +809,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: 'Interactive Calculator',
     calcTitle: 'Calculate Your Savings Online',
     calcDesc: 'Adjust price to see instant cash discount.',
-    btnDownloadPdf: 'Download PDF Quote (A4)',
+    btnDownloadPdf: 'Download PDF Quote',
     netSavingsLabel: 'Your Net Savings (6% Discount):',
   },
   zh: {
@@ -955,7 +955,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     calcBadge: '交互式全款计算器',
     calcTitle: '在线测算全款购房优惠',
     calcDesc: '调整总价，即刻测算现金全款折扣。',
-    btnDownloadPdf: '一键下载 PDF 格式预算单 (A4)',
+    btnDownloadPdf: '下载 PDF 格式预算单',
     netSavingsLabel: '您的净节省额（6%折扣）：',
   },
 };
