@@ -11,6 +11,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
+import LegalDocuments from '@/components/LegalDocuments';
 import {
   IconCheck,
   IconMapPin,
@@ -2031,18 +2032,14 @@ export default function ComplexView({ slug }: { slug: string }) {
         </div>
       </section>
 
-      {/* 8. Юридические гарантии */}
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 py-12 text-center">
-        <div className="p-6 sm:p-8 rounded-3xl border bg-white dark:bg-[#0b1b15] border-gray-200 dark:border-white/10 transition-colors">
-          <h2 className="text-lg sm:text-xl font-black uppercase tracking-tight mb-3 text-[#064734] dark:text-[#d4b26f]">
-            {ui.legalTitle}
-          </h2>
-          <p className="text-xs sm:text-sm leading-relaxed max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
-            {project.legalText}
-          </p>
-        </div>
-      </section>
-
+    {/* 8. Официальная разрешительная документация и лицензии */}
+      <LegalDocuments
+        initialComplex={
+          ['abu-dhabi', 'madina-residence', 'ajkol-plus'].includes(lookupKey)
+            ? (lookupKey as 'abu-dhabi' | 'madina-residence' | 'ajkol-plus')
+            : 'all'
+        }
+      />
       {/* 9. Отзывы резидентов */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
         <div className="absolute inset-0 z-0">
