@@ -6,6 +6,8 @@ import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { trackWhatsAppClick, trackLeadSubmit } from '@/lib/analytics';
+import { getStoredUtm } from '@/lib/utm';
 import {
   IconCheck,
   IconCar,
@@ -94,12 +96,17 @@ interface TradeInContent {
   tabRealty: string;
   targetComplexLabel: string;
   targetComplexAll: string;
+  roomsLabel: string;
+  rooms1: string;
+  rooms2: string;
+  rooms3: string;
   labelAutoModel: string;
   phAutoModel: string;
   labelRealtyAddress: string;
   phRealtyAddress: string;
   labelYear: string;
   phYear: string;
+  labelPhone: string;
   labelEstimated: string;
   phEstimated: string;
   btnSubmit: string;
@@ -107,6 +114,10 @@ interface TradeInContent {
   previewTitle: string;
   previewDownCovered: string;
   previewRemaining: string;
+  downPaymentRequiredLabel: string;
+  cashNeededLabel: string;
+  monthlyEstimateLabel: string;
+  totalApartmentCostLabel: string;
   somUnit: string;
 }
 
@@ -272,19 +283,28 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: 'Недвижимость',
     targetComplexLabel: 'В счет какого ЖК зачесть:',
     targetComplexAll: 'Любой объект компании',
+    roomsLabel: 'Желаемая комнатность:',
+    rooms1: '1-комн.',
+    rooms2: '2-комн.',
+    rooms3: '3-комн.',
     labelAutoModel: 'Марка, модель и год выпуска авто:',
     phAutoModel: 'Например: Toyota Camry 70, 2021',
     labelRealtyAddress: 'Адрес и параметры вторичной квартиры:',
     phRealtyAddress: 'Например: 2-комн., 60 м², ул. Киевская',
     labelYear: 'Год выпуска / Состояние:',
-    phYear: 'Например: 2021, идеальное состояние',
-    labelEstimated: 'Желаемая сумма оценки ($):',
+    phYear: 'Например: 2021, отличное состояние',
+    labelPhone: 'Ваш телефон для связи:',
+    labelEstimated: 'Оценочная стоимость актива ($):',
     phEstimated: '25 000',
-    btnSubmit: 'Отправить заявку на оценку в WhatsApp',
-    photoTip: '📸 Фотографии машины или техпаспорта можно прикрепить прямо в диалог WhatsApp для экспресс-оценки за 2 часа.',
-    previewTitle: 'Предварительный результат зачета:',
+    btnSubmit: 'Получить официальную экспресс-оценку',
+    photoTip: '📸 Фотографии машины или техпаспорта можно прикрепить прямо в диалоге WhatsApp для подтверждения суммы за 2 часа.',
+    previewTitle: 'Результат покрытия стоимости:',
     previewDownCovered: '✓ Полностью закрывает 30% взнос (наличными = $0)!',
     previewRemaining: 'Остаток к доплате в рассрочку 0%:',
+    downPaymentRequiredLabel: 'Первый взнос (30%):',
+    cashNeededLabel: 'Доплата наличными:',
+    monthlyEstimateLabel: 'Платеж по 0% рассрочке:',
+    totalApartmentCostLabel: 'Ориентир цены квартиры:',
     somUnit: 'сом',
   },
   kg: {
@@ -297,7 +317,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
     documentsText: 'Унаалар үчүн техникалык паспорт жана ээсинин паспорту талап кылынат. Кыймылсыз мүлк үчүн — укук күбөлөндүрүүчү документтер жана камакка алынбагандыгы тууралуу маалымкат.',
     faqList: [
       { q: 'Кандай маркадагы унаалар кабыл алынат?', a: 'Биз укуктук жактан таза, жакшы техникалык абактагы жеңил унааларды жана кроссоверлерди карайбыз.' },
-      { q: 'Эгерде унаанын баасы биринчи төлөмдөн жогору болсочы?', a: 'Ашык сумма ай сайын төлөмдөргө эсептелет.' },
+      { q: 'Эгерде унаанын баасы биринчи төлөмдөн жогору болсочу?', a: 'Ашык сумма ай сайын төлөмдөргө эсептелет.' },
       { q: 'Баалоо канча убакыт алат?', a: 'Онлайн баалоо 2 саат, акыркы экспертиза 24 саат.' },
       { q: 'Бишкектин башка районундагы эски батирди өткөрсө болобу?', a: 'Ооба, юристтер жардам берет.' },
       { q: 'Унааны каттонон өзүм чечишим керекпи?', a: 'Компания өзүнө алат.' },
@@ -394,12 +414,17 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: 'Мүлк',
     targetComplexLabel: 'Кайсы ЖК эсебине алуу:',
     targetComplexAll: 'Компаниянын каалаган объектиси',
+    roomsLabel: 'Бөлмө саны:',
+    rooms1: '1 бөлмөлүү',
+    rooms2: '2 бөлмөлүү',
+    rooms3: '3 бөлмөлүү',
     labelAutoModel: 'Унаанын маркасы, модели жана жылы:',
     phAutoModel: 'Мисалы: Toyota Camry 70, 2021',
     labelRealtyAddress: 'Эски батирдин дареги:',
     phRealtyAddress: 'Мисалы: 2 бөлмө, 60 м²',
     labelYear: 'Жылы / Абалы:',
     phYear: 'Мисалы: 2021',
+    labelPhone: 'Байланыш номериңиз:',
     labelEstimated: 'Баалоо суммасы ($):',
     phEstimated: '25 000',
     btnSubmit: 'WhatsApp аркылуу баалоого өтүнүч жиберүү',
@@ -407,6 +432,10 @@ const CONTENT: Record<Locale, TradeInContent> = {
     previewTitle: 'Алдын ала эсептөө натыйжасы:',
     previewDownCovered: '✓ Баштапкы 30% төлөмдү толук жабат (накталай = $0)!',
     previewRemaining: '0% бөлүп төлөөгө калган сумма:',
+    downPaymentRequiredLabel: '30% баштапкы төлөм:',
+    cashNeededLabel: 'Накталай кошумча:',
+    monthlyEstimateLabel: 'Ай сайын төлөм (0%):',
+    totalApartmentCostLabel: 'Батирдин баасы:',
     somUnit: 'сом',
   },
   kz: {
@@ -516,12 +545,17 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: 'Мүлк',
     targetComplexLabel: 'Қайсы ТҮК есебіне жазу:',
     targetComplexAll: 'Компанияның кез келген нысаны',
+    roomsLabel: 'Бөлме саны:',
+    rooms1: '1 бөлмелі',
+    rooms2: '2 бөлмелі',
+    rooms3: '3 бөлмелі',
     labelAutoModel: 'Көліктің маркасы, моделі және жылы:',
     phAutoModel: 'Мысалы: Toyota Camry 70, 2021',
     labelRealtyAddress: 'Ескі пәтердің мекенжайы:',
     phRealtyAddress: 'Мысалы: 2 бөлме, 60 м²',
     labelYear: 'Жылы / Жағдайы:',
     phYear: 'Мысалы: 2021',
+    labelPhone: 'Байланыс телефоныңыз:',
     labelEstimated: 'Бағалау сомасы ($):',
     phEstimated: '25 000',
     btnSubmit: 'WhatsApp арқылы баалоого өтүнүч жиберүү',
@@ -529,6 +563,10 @@ const CONTENT: Record<Locale, TradeInContent> = {
     previewTitle: 'Алдын ала есептеу нәтижесі:',
     previewDownCovered: '✓ Бастапқы 30% жарнаны толық жабады (қолма-қол = $0)!',
     previewRemaining: '0% бөліп төлеуге қалған сома:',
+    downPaymentRequiredLabel: '30% бастапқы жарна:',
+    cashNeededLabel: 'Қолма-қол қосымша:',
+    monthlyEstimateLabel: 'Ай сайынғы төлем (0%):',
+    totalApartmentCostLabel: 'Пәтер құны:',
     somUnit: 'сом',
   },
   uk: {
@@ -638,12 +676,17 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: 'Нерухомість',
     targetComplexLabel: 'В рахунок якого ЖК зарахувати:',
     targetComplexAll: 'Будь-який об’єкт компанії',
+    roomsLabel: 'Кількість кімнат:',
+    rooms1: '1-кімн.',
+    rooms2: '2-кімн.',
+    rooms3: '3-кімн.',
     labelAutoModel: 'Марка та модель авто:',
     phAutoModel: 'Наприклад: Toyota Camry 70',
     labelRealtyAddress: 'Адреса квартири:',
     phRealtyAddress: 'Наприклад: 2-кімн., 60 м²',
     labelYear: 'Рік випуску:',
     phYear: 'Наприклад: 2021',
+    labelPhone: 'Номер телефону для зв’язку:',
     labelEstimated: 'Бажана сума ($):',
     phEstimated: '25 000',
     btnSubmit: 'Надіслати заявку у WhatsApp',
@@ -651,6 +694,10 @@ const CONTENT: Record<Locale, TradeInContent> = {
     previewTitle: 'Попередній результат заліку:',
     previewDownCovered: '✓ Повністю закриває 30% внесок (готівкою = $0)!',
     previewRemaining: 'Залишок до доплати в розстрочку 0%:',
+    downPaymentRequiredLabel: 'Перший внесок (30%):',
+    cashNeededLabel: 'Доплата готівкою:',
+    monthlyEstimateLabel: 'Щомісячний платіж (0%):',
+    totalApartmentCostLabel: 'Вартість квартири:',
     somUnit: 'сом',
   },
   en: {
@@ -760,19 +807,28 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: 'Real Estate',
     targetComplexLabel: 'Target Residential Complex:',
     targetComplexAll: 'Any Company Development',
+    roomsLabel: 'Target Apartment Size:',
+    rooms1: '1-Room',
+    rooms2: '2-Room',
+    rooms3: '3-Room',
     labelAutoModel: 'Car Make & Model:',
     phAutoModel: 'e.g. Toyota Camry 70',
     labelRealtyAddress: 'Property Address:',
     phRealtyAddress: 'e.g. 2-room, 60 sq.m',
     labelYear: 'Year / Condition:',
     phYear: 'e.g. 2021',
+    labelPhone: 'Phone Number:',
     labelEstimated: 'Desired Valuation ($):',
     phEstimated: '25,000',
     btnSubmit: 'Send Valuation via WhatsApp',
-    photoTip: '📸 Attach photos directly in WhatsApp.',
+    photoTip: '📸 Attach photos directly in WhatsApp for express evaluation within 2 hours.',
     previewTitle: 'Preliminary Trade-In Coverage:',
     previewDownCovered: '✓ Fully covers the 30% down payment ($0 cash required)!',
     previewRemaining: 'Remaining balance in 0% installment:',
+    downPaymentRequiredLabel: '30% Down Payment:',
+    cashNeededLabel: 'Cash Balance Needed:',
+    monthlyEstimateLabel: 'Monthly Payment (0%):',
+    totalApartmentCostLabel: 'Estimated Apartment Price:',
     somUnit: 'som',
   },
   zh: {
@@ -882,12 +938,17 @@ const CONTENT: Record<Locale, TradeInContent> = {
     tabRealty: '置换房产',
     targetComplexLabel: '意向抵扣的目标楼盘：',
     targetComplexAll: '旗下全线在售楼盘均可',
+    roomsLabel: '意向户型居室：',
+    rooms1: '一居室',
+    rooms2: '二居室',
+    rooms3: '三居室',
     labelAutoModel: '车辆品牌、型号及年份：',
     phAutoModel: '例如：丰田凯美瑞 70, 2021',
     labelRealtyAddress: '二手房产地址及核心户型：',
     phRealtyAddress: '例如：2居室, 60平米',
     labelYear: '出厂年份 / 车况：',
     phYear: '例如：2021，车况极佳',
+    labelPhone: '您的联系电话：',
     labelEstimated: '期望评估作价金额 ($)：',
     phEstimated: '25 000',
     btnSubmit: '通过 WhatsApp 发送评估申请',
@@ -895,8 +956,30 @@ const CONTENT: Record<Locale, TradeInContent> = {
     previewTitle: '资产置换测算概览：',
     previewDownCovered: '✓ 完全冲抵30%首付款（现金首付款 = $0）！',
     previewRemaining: '剩余款项可享受0%免息分期：',
+    downPaymentRequiredLabel: '30%首付款：',
+    cashNeededLabel: '需补足现金：',
+    monthlyEstimateLabel: '每月还款金额：',
+    totalApartmentCostLabel: '新房预估总价：',
     somUnit: '索姆',
   },
+};
+
+// Популярные автомобили на авторынке Бишкека и вторичное жилье с рыночными оценками
+const QUICK_PRESETS = {
+  auto: [
+    { label: 'Camry 70 (2020)', val: 24000, name: 'Toyota Camry 70, 2020' },
+    { label: 'Lexus GX 460', val: 38000, name: 'Lexus GX 460, 2016' },
+    { label: 'Kia K5 (2021)', val: 19000, name: 'Kia K5, 2021' },
+    { label: 'Hyundai Santa Fe', val: 25000, name: 'Hyundai Santa Fe, 2020' },
+    { label: 'Zeekr 001', val: 41000, name: 'Zeekr 001, 2023' },
+    { label: 'Honda CR-V', val: 15000, name: 'Honda CR-V, 2017' },
+  ],
+  realty: [
+    { label: '1-к 105 серия (Бишкек)', val: 45000, name: '1-комн. кв., 105 серия, г. Бишкек' },
+    { label: '2-к 106 серия (Бишкек)', val: 62000, name: '2-комн. кв., 106 серия, г. Бишкек' },
+    { label: '3-к вторичка (Центр)', val: 85000, name: '3-комн. кв., Центр, г. Бишкек' },
+    { label: 'Участок ИЖС (Юг)', val: 48000, name: 'Земельный участок ИЖС, Южная зона' },
+  ],
 };
 
 export default function TradeInPage() {
@@ -906,11 +989,13 @@ export default function TradeInPage() {
 
   const [usdRate, setUsdRate] = useState<number>(87.45);
   const [tradeInType, setTradeInType] = useState<'auto' | 'realty'>('auto');
-  const [tradeInTargetComplex, setTradeInTargetComplex] = useState<string>('all');
-  const [assetName, setAssetName] = useState<string>('');
-  const [assetYear, setAssetYear] = useState<string>('');
-  const [estimatedValue, setEstimatedValue] = useState<string>('25000');
-  const [estimatedInput, setEstimatedInput] = useState<string>('25 000');
+  const [tradeInTargetComplex, setTradeInTargetComplex] = useState<string>('abu-dhabi');
+  const [targetRooms, setTargetRooms] = useState<1 | 2 | 3>(1);
+  const [assetName, setAssetName] = useState<string>('Toyota Camry 70, 2020');
+  const [assetYear, setAssetYear] = useState<string>('2020 г., отличное состояние');
+  const [phone, setPhone] = useState<string>('');
+  const [estimatedValue, setEstimatedValue] = useState<string>('24000');
+  const [estimatedInput, setEstimatedInput] = useState<string>('24 000');
 
   useEffect(() => {
     let isMounted = true;
@@ -938,21 +1023,62 @@ export default function TradeInPage() {
     return raw ? parseInt(raw, 10) : 0;
   }, [estimatedValue]);
 
+  // Точный расчет стоимости квартиры исходя из проекта и комнатности
   const targetApartmentPrice = useMemo(() => {
-    if (tradeInTargetComplex === 'abu-dhabi') return 81642;
-    if (tradeInTargetComplex === 'madina-residence') return 65385;
-    if (tradeInTargetComplex === 'ajkol-plus') return 50400;
-    return 65000;
-  }, [tradeInTargetComplex]);
+    if (tradeInTargetComplex === 'abu-dhabi') {
+      if (targetRooms === 1) return 81675; // 49.5 м² * 1650
+      if (targetRooms === 2) return 129195; // 78.3 м² * 1650
+      return 196845; // 119.3 м² * 1650
+    }
+    if (tradeInTargetComplex === 'madina-residence') {
+      if (targetRooms === 1) return 65400; // 43.6 м² * 1500
+      if (targetRooms === 2) return 102300; // 68.2 м² * 1500
+      return 138600; // 92.4 м² * 1500
+    }
+    if (tradeInTargetComplex === 'ajkol-plus') {
+      if (targetRooms === 1) return 50400; // 42.0 м² * 1200
+      if (targetRooms === 2) return 89160; // 74.3 м² * 1200
+      return 106200; // 88.5 м² * 1200
+    }
+    // all / общий ориентир
+    if (targetRooms === 1) return 65000;
+    if (targetRooms === 2) return 95000;
+    return 140000;
+  }, [tradeInTargetComplex, targetRooms]);
 
+  // Необходимый первый взнос (30%)
+  const requiredDownPayment = useMemo(() => {
+    return Math.round(targetApartmentPrice * 0.3);
+  }, [targetApartmentPrice]);
+
+  // Процент покрытия всей квартиры автомобилем
   const tradeInCoveragePercent = useMemo(() => {
     if (targetApartmentPrice <= 0 || parsedEstimatedValue <= 0) return 0;
     return Math.min(100, Math.round((parsedEstimatedValue / targetApartmentPrice) * 100));
   }, [parsedEstimatedValue, targetApartmentPrice]);
 
+  // Закрыт ли 30% взнос целиком
+  const isDownPaymentCovered = parsedEstimatedValue >= requiredDownPayment;
+
+  // Сколько нужно доплатить наличными к первому взносу (если авто < 30%)
+  const cashNeededForDownPayment = useMemo(() => {
+    return Math.max(0, requiredDownPayment - parsedEstimatedValue);
+  }, [requiredDownPayment, parsedEstimatedValue]);
+
+  // Излишек сверх первого взноса (уменьшает рассрочку)
+  const surplusTowardInstallment = useMemo(() => {
+    return Math.max(0, parsedEstimatedValue - requiredDownPayment);
+  }, [parsedEstimatedValue, requiredDownPayment]);
+
+  // Остаток к выплате в беспроцентную рассрочку 0%
   const tradeInRemainingToPay = useMemo(() => {
     return Math.max(0, targetApartmentPrice - parsedEstimatedValue);
   }, [targetApartmentPrice, parsedEstimatedValue]);
+
+  // Ежемесячный платеж на 36 месяцев
+  const monthlyPayment36 = useMemo(() => {
+    return Math.round(tradeInRemainingToPay / 36);
+  }, [tradeInRemainingToPay]);
 
   const handleEstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
@@ -960,9 +1086,15 @@ export default function TradeInPage() {
     setEstimatedInput(raw ? Number(raw).toLocaleString('ru-RU') : '');
   };
 
+  const handleSelectPreset = (preset: { label: string; val: number; name: string }) => {
+    setAssetName(preset.name);
+    setEstimatedValue(String(preset.val));
+    setEstimatedInput(preset.val.toLocaleString('ru-RU'));
+  };
+
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
-  const handleSendTradeIn = (e: React.FormEvent) => {
+  const handleSendTradeIn = async (e: React.FormEvent) => {
     e.preventDefault();
     const typeLabel = tradeInType === 'auto' ? c.tabAuto : c.tabRealty;
     const numEst = parsedEstimatedValue;
@@ -976,14 +1108,51 @@ export default function TradeInPage() {
         ? 'ЖД Айкол +'
         : 'Все объекты компании';
 
+    const detailsStr =
+      `${typeLabel}: ${assetName || '—'}${assetYear ? ` (${assetYear})` : ''} | ` +
+      `Оценка: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${c.somUnit}) | ` +
+      `Объект: ${targetLabel} (${targetRooms}-комн.)`;
+
+    // 1. Отправляем в Telegram через API лидогенерации
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Клиент Trade-in',
+          phone: phone.trim() || 'Через WhatsApp',
+          project: targetLabel,
+          goal: `Trade-in (${typeLabel})`,
+          budget: `$${numEst.toLocaleString('ru-RU')}`,
+          rooms: `${targetRooms}-комн.`,
+          details: detailsStr,
+          comment: `Покрытие: ${tradeInCoveragePercent}%. Остаток в рассрочку: $${tradeInRemainingToPay.toLocaleString('ru-RU')}`,
+          lang,
+          source: 'TradeInPage',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 2. Трекинг конверсий для рекламы
+    trackWhatsAppClick('trade_in_calculator', targetLabel);
+    trackLeadSubmit(`Trade-in (${typeLabel})`, targetLabel);
+
+    // 3. Формирование персонализированного сообщения в WhatsApp
     const text =
-      `Здравствуйте! Хочу подать заявку по программе Trade-in / Бартер в EL ORDO GROUP:\n\n` +
+      `Здравствуйте! Хочу подать заявку по программе Trade-in (Бартер) в EL ORDO GROUP:\n\n` +
       `• Тип актива: ${typeLabel}\n` +
-      `• Описание: ${assetName || '—'}\n` +
+      `• Модель/Параметры: ${assetName || '—'}\n` +
       (tradeInType === 'auto' && assetYear ? `• Состояние/Год: ${assetYear}\n` : '') +
-      `• В счет объекта: ${targetLabel}\n` +
-      `• Оценочная стоимость: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${c.somUnit})\n\n` +
-      `Готов отправить фотографии и документы актива для экспресс-оценки.`;
+      (phone ? `• Мой телефон: ${phone}\n` : '') +
+      `• В счет объекта: ${targetLabel} (${targetRooms}-комнатная квартира)\n` +
+      `• Оценочная стоимость актива: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${c.somUnit})\n` +
+      `• Расчет покрытия: ${tradeInCoveragePercent}% от квартиры ($${targetApartmentPrice.toLocaleString('ru-RU')})\n` +
+      (isDownPaymentCovered
+        ? `• Первый взнос 30% закрыт полностью! Остаток в рассрочку: $${monthlyPayment36.toLocaleString('ru-RU')}/мес на 36 мес.\n\n`
+        : `• Требуется доплата к первому взносу: $${cashNeededForDownPayment.toLocaleString('ru-RU')}.\n\n`) +
+      `Готов отправить фотографии и техпаспорт актива для экспресс-оценки.`;
 
     window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -1000,10 +1169,9 @@ export default function TradeInPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
-      
-      {/* ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР TRADE-IN НА СТРАНИЦЕ */}
+      {/* ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР TRADE-IN */}
       <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
+        {/* Левая колонка: Описание, курс и живой расчет */}
         <div className="lg:col-span-6 space-y-6">
           <div>
             <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1021,7 +1189,7 @@ export default function TradeInPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-bold text-gray-700 dark:text-gray-200">
-                Курс НБКР онлайн: <strong>{usdRate} сом/$</strong>
+                Курс НБКР: <strong>{usdRate} сом/$</strong>
               </span>
             </div>
             <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
@@ -1030,45 +1198,90 @@ export default function TradeInPage() {
             </div>
           </div>
 
+          {/* Интерактивный виджет покрытия */}
           {parsedEstimatedValue > 0 && (
-            <div className="p-4 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/30 space-y-2 animate-fadeIn">
+            <div className="p-5 rounded-3xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/30 space-y-3 animate-fadeIn">
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-[#064734] dark:text-[#d4b26f] uppercase tracking-wider">
                   {c.previewTitle}
                 </span>
-                <span className="text-emerald-600 dark:text-emerald-400 font-black">
-                  {tradeInCoveragePercent}% квартиры
+                <span className="text-emerald-700 dark:text-emerald-400 font-black text-sm">
+                  {tradeInCoveragePercent}% стоимости квартиры
                 </span>
               </div>
 
-              <div className="h-2.5 w-full bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden p-0.5">
+              {/* Шкала заполнения */}
+              <div className="h-3 w-full bg-gray-200 dark:bg-neutral-800 rounded-full overflow-hidden p-0.5">
                 <div
                   style={{ width: `${tradeInCoveragePercent}%` }}
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                  className="h-full bg-emerald-600 dark:bg-emerald-500 rounded-full transition-all duration-500"
                 />
               </div>
 
-              <div className="text-[11px] text-gray-700 dark:text-neutral-300 space-y-1 pt-1">
-                <p className="text-emerald-800 dark:text-emerald-400 font-bold">
-                  {c.previewDownCovered}
-                </p>
-                <p className="text-gray-500 dark:text-neutral-400">
-                  {c.previewRemaining} <strong className="text-gray-900 dark:text-white font-black">${tradeInRemainingToPay.toLocaleString('ru-RU')}</strong> (~${Math.round(tradeInRemainingToPay / 36).toLocaleString('ru-RU')}/мес на 36 мес)
-                </p>
+              {/* Финансовая раскладка */}
+              <div className="grid grid-cols-2 gap-3 pt-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10">
+                  <span className="text-gray-500 dark:text-neutral-400 text-[11px] block">
+                    {c.totalApartmentCostLabel}
+                  </span>
+                  <strong className="text-gray-900 dark:text-white font-black text-sm block">
+                    ${targetApartmentPrice.toLocaleString('ru-RU')}
+                  </strong>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200/60 dark:border-white/10">
+                  <span className="text-gray-500 dark:text-neutral-400 text-[11px] block">
+                    {c.downPaymentRequiredLabel}
+                  </span>
+                  <strong className="text-[#064734] dark:text-[#d4b26f] font-black text-sm block">
+                    ${requiredDownPayment.toLocaleString('ru-RU')}
+                  </strong>
+                </div>
+              </div>
+
+              {/* Статус первого взноса */}
+              <div className="pt-1 text-xs">
+                {isDownPaymentCovered ? (
+                  <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800 flex items-center gap-2">
+                    <IconCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>
+                      Первоначальный взнос 30% закрыт полностью! Наличными = $0
+                      {surplusTowardInstallment > 0 && ` (излишек $${surplusTowardInstallment.toLocaleString('ru-RU')} идет в счет рассрочки)`}.
+                    </span>
+                  </div>
+                ) : (
+                  <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
+                    {c.cashNeededLabel} <strong>${cashNeededForDownPayment.toLocaleString('ru-RU')}</strong> (~{Math.round(cashNeededForDownPayment * usdRate).toLocaleString('ru-RU')} {c.somUnit}) для полного закрытия 30% взноса.
+                  </div>
+                )}
+
+                <div className="mt-3 flex justify-between items-baseline pt-2 border-t border-[#064734]/15 dark:border-white/10">
+                  <span className="text-gray-600 dark:text-neutral-300 text-xs font-semibold">
+                    {c.monthlyEstimateLabel}
+                  </span>
+                  <strong className="text-base font-black text-[#064734] dark:text-[#d4b26f]">
+                    ${monthlyPayment36.toLocaleString('ru-RU')}/мес{' '}
+                    <span className="text-[11px] font-normal text-gray-500 dark:text-neutral-400">
+                      (~{Math.round(monthlyPayment36 * usdRate).toLocaleString('ru-RU')} сом)
+                    </span>
+                  </strong>
+                </div>
               </div>
             </div>
           )}
         </div>
 
-        {/* Форма быстрой заявки */}
+        {/* Правая колонка: Форма с пресетами и выбором */}
         <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-inner space-y-4">
-          
+          {/* Переключатель типа: Авто / Недвижимость */}
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => {
                 setTradeInType('auto');
-                setAssetName('');
+                setAssetName('Toyota Camry 70, 2020');
+                setEstimatedValue('24000');
+                setEstimatedInput('24 000');
               }}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 tradeInType === 'auto'
@@ -1083,7 +1296,9 @@ export default function TradeInPage() {
               type="button"
               onClick={() => {
                 setTradeInType('realty');
-                setAssetName('');
+                setAssetName('1-комн. кв., 105 серия, г. Бишкек');
+                setEstimatedValue('45000');
+                setEstimatedInput('45 000');
               }}
               className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 tradeInType === 'realty'
@@ -1096,25 +1311,69 @@ export default function TradeInPage() {
             </button>
           </div>
 
+          {/* Быстрые кликабельные пресеты */}
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 mb-1">
-              {c.targetComplexLabel}
-            </label>
-            <select
-              value={tradeInTargetComplex}
-              onChange={(e) => setTradeInTargetComplex(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-xs font-semibold text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] cursor-pointer"
-            >
-              <option value="all">{c.targetComplexAll}</option>
-              <option value="abu-dhabi">ЖК Abu Dhabi (ул. Сухомлинова, 29)</option>
-              <option value="madina-residence">ЖК Madina Residence (ул. Огонбаева, 12)</option>
-              <option value="ajkol-plus">ЖД Айкол + (с. Кок-Жар)</option>
-            </select>
+            <span className="block text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 mb-1.5">
+              Популярные варианты на рынке Бишкека (нажмите для автозаполнения):
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {(tradeInType === 'auto' ? QUICK_PRESETS.auto : QUICK_PRESETS.realty).map((preset) => (
+                <button
+                  key={preset.label}
+                  type="button"
+                  onClick={() => handleSelectPreset(preset)}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-white/10 hover:bg-emerald-50 dark:hover:bg-white/20 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-white/10 transition-colors cursor-pointer shadow-sm"
+                >
+                  + {preset.label}
+                </button>
+              ))}
+            </div>
           </div>
 
+          {/* Выбор ЖК и комнатности */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-400 mb-1">
+                {c.targetComplexLabel}
+              </label>
+              <select
+                value={tradeInTargetComplex}
+                onChange={(e) => setTradeInTargetComplex(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-xs font-bold text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] cursor-pointer"
+              >
+                <option value="abu-dhabi">ЖК Abu Dhabi (ул. Сухомлинова)</option>
+                <option value="madina-residence">ЖК Madina Residence (ул. Огонбаева)</option>
+                <option value="ajkol-plus">ЖД Айкол + (с. Кок-Жар)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-neutral-400 mb-1">
+                {c.roomsLabel}
+              </label>
+              <div className="grid grid-cols-3 gap-1">
+                {[1, 2, 3].map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => setTargetRooms(r as any)}
+                    className={`py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      targetRooms === r
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] shadow-sm'
+                        : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10'
+                    }`}
+                  >
+                    {r}-к
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Форма отправки */}
           <form onSubmit={handleSendTradeIn} className="space-y-3.5 text-xs">
             <div>
-              <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-bold mb-1">
                 {tradeInType === 'auto' ? c.labelAutoModel : c.labelRealtyAddress}
               </label>
               <input
@@ -1125,46 +1384,58 @@ export default function TradeInPage() {
                 onChange={(e) => setAssetName(e.target.value)}
                 className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
               />
-
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {(tradeInType === 'auto'
-                  ? ['Toyota Camry', 'Lexus RX / GX', 'Kia K5', 'Hyundai', 'Кроссовер']
-                  : ['1-комн. вторичка', '2-комн. вторичка', '3-комн. вторичка', 'Участок / Дом']
-                ).map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => setAssetName(tag)}
-                    className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-white/10 hover:bg-gray-100 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-white/10 transition-colors cursor-pointer"
-                  >
-                    + {tag}
-                  </button>
-                ))}
-              </div>
             </div>
 
-            {tradeInType === 'auto' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {tradeInType === 'auto' ? (
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-bold mb-1">
+                    {c.labelYear}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={c.phYear}
+                    value={assetYear}
+                    onChange={(e) => setAssetYear(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300 font-bold mb-1">
+                    Этаж / Серия дома:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Например: 4/9 этаж, 105 серия"
+                    value={assetYear}
+                    onChange={(e) => setAssetYear(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
+                  />
+                </div>
+              )}
+
               <div>
-                <label className="block text-gray-600 dark:text-gray-300 font-semibold mb-1">
-                  {c.labelYear}
+                <label className="block text-gray-700 dark:text-gray-300 font-bold mb-1">
+                  {c.labelPhone}
                 </label>
                 <input
-                  type="text"
-                  placeholder={c.phYear}
-                  value={assetYear}
-                  onChange={(e) => setAssetYear(e.target.value)}
+                  type="tel"
+                  placeholder="+996 (700) 00-00-00"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
                 />
               </div>
-            )}
+            </div>
 
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-gray-600 dark:text-gray-300 font-semibold">
+                <label className="block text-gray-700 dark:text-gray-300 font-bold">
                   {c.labelEstimated}
                 </label>
                 {parsedEstimatedValue > 0 && (
-                  <span className="text-[11px] text-gray-400 font-medium">
+                  <span className="text-[11px] text-gray-500 dark:text-neutral-400 font-semibold">
                     ≈ {Math.round(parsedEstimatedValue * usdRate).toLocaleString('ru-RU')} {c.somUnit}
                   </span>
                 )}
@@ -1179,19 +1450,18 @@ export default function TradeInPage() {
                   onChange={handleEstChange}
                   onFocus={(e) => e.target.select()}
                   autoComplete="off"
-                  spellCheck="false"
-                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 font-black text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] cursor-pointer"
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 font-black text-gray-900 dark:text-white focus:outline-none focus:border-[#064734]"
                 />
               </div>
             </div>
 
-            <p className="text-[10px] text-gray-400 dark:text-neutral-400 italic">
+            <p className="text-[10px] text-gray-500 dark:text-neutral-400 italic">
               {c.photoTip}
             </p>
 
             <button
               type="submit"
-              className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider transition-all shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full mt-2 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider transition-all shadow-xl text-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#064734]" />
               <span>{c.btnSubmit}</span>
@@ -1199,7 +1469,6 @@ export default function TradeInPage() {
             </button>
           </form>
         </div>
-
       </div>
 
       {/* 1. КЕЙСЫ РЕАЛЬНОГО ОБМЕНА */}
@@ -1271,6 +1540,7 @@ export default function TradeInPage() {
                   href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('trade_in_case', item.targetComplex)}
                   className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
