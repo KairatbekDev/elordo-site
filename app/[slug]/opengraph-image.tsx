@@ -113,18 +113,18 @@ export default async function ProjectOpenGraphImage({
     (
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          width: '1200px',
+          height: '630px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '48px 56px',
+          padding: '44px 52px',
           position: 'relative',
           fontFamily: 'sans-serif',
-          backgroundColor: '#064734',
+          backgroundColor: '#021f15',
         }}
       >
-        {/* 1. Фоновый рендер конкретного жилого комплекса */}
+        {/* 1. Фоновое изображение объекта с кинематографичной прозрачностью */}
         {bgImageBase64 && (
           <img
             src={bgImageBase64}
@@ -136,34 +136,40 @@ export default async function ProjectOpenGraphImage({
               width: '1200px',
               height: '630px',
               objectFit: 'cover',
+              opacity: 0.38,
             }}
           />
         )}
 
-        {/* 2. Изумрудный градиент-фильтр */}
+        {/* 2. Глубокий темный изумрудный оверлей для 100% контрастности */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(135deg, rgba(6, 71, 52, 0.88) 0%, rgba(4, 45, 33, 0.82) 45%, rgba(2, 20, 15, 0.95) 100%)',
+            top: 0,
+            left: 0,
+            width: '1200px',
+            height: '630px',
+            backgroundColor: 'rgba(2, 31, 21, 0.72)',
             display: 'flex',
           }}
         />
 
-        {/* 3. Золотая рамка */}
+        {/* 3. Золотая декоративная рамка */}
         <div
           style={{
             position: 'absolute',
-            inset: '24px',
-            border: '1.5px solid rgba(212, 178, 111, 0.45)',
+            top: '20px',
+            left: '20px',
+            width: '1160px',
+            height: '590px',
+            border: '2px solid rgba(212, 178, 111, 0.45)',
             borderRadius: '24px',
             display: 'flex',
             pointerEvents: 'none',
           }}
         />
 
-        {/* 4. Верхний ряд: Бренд и статус */}
+        {/* 4. Верхний ряд: Бренд и статусный бейдж */}
         <div
           style={{
             display: 'flex',
@@ -176,10 +182,10 @@ export default async function ProjectOpenGraphImage({
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span
               style={{
-                fontSize: 30,
+                fontSize: 34,
                 fontWeight: 900,
                 color: '#d4b26f',
-                letterSpacing: '2px',
+                letterSpacing: '2.5px',
                 textTransform: 'uppercase',
               }}
             >
@@ -188,15 +194,15 @@ export default async function ProjectOpenGraphImage({
             <span
               style={{
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 800,
                 color: '#ffffff',
-                opacity: 0.85,
-                letterSpacing: '2px',
+                opacity: 0.9,
+                letterSpacing: '2.5px',
                 textTransform: 'uppercase',
-                marginTop: '4px',
+                marginTop: '3px',
               }}
             >
-              Официальное предложение застройщика
+              Строительная компания • Официальное предложение
             </span>
           </div>
 
@@ -204,8 +210,7 @@ export default async function ProjectOpenGraphImage({
             style={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: 'rgba(6, 71, 52, 0.85)',
-              border: '1.5px solid #d4b26f',
+              backgroundColor: '#d4b26f',
               padding: '10px 22px',
               borderRadius: '999px',
             }}
@@ -214,8 +219,8 @@ export default async function ProjectOpenGraphImage({
               style={{
                 fontSize: 13,
                 fontWeight: 900,
-                color: '#d4b26f',
-                letterSpacing: '1.5px',
+                color: '#021f15',
+                letterSpacing: '1px',
                 textTransform: 'uppercase',
               }}
             >
@@ -224,35 +229,38 @@ export default async function ProjectOpenGraphImage({
           </div>
         </div>
 
-        {/* 5. Центр: Класс, Название ЖК и Адрес */}
+        {/* 5. Центральная часть: Класс, Название ЖК и Адрес */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            marginTop: '10px',
-            marginBottom: '10px',
             position: 'relative',
             zIndex: 10,
           }}
         >
-          <span
-            style={{
-              fontSize: 16,
-              fontWeight: 800,
-              color: '#d4b26f',
-              textTransform: 'uppercase',
-              letterSpacing: '1.5px',
-              marginBottom: '6px',
-            }}
-          >
-            {project.classType}
-          </span>
+          <div style={{ display: 'flex', marginBottom: '8px' }}>
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 900,
+                color: '#d4b26f',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                backgroundColor: 'rgba(2, 25, 17, 0.85)',
+                border: '1px solid rgba(212, 178, 111, 0.4)',
+                padding: '6px 14px',
+                borderRadius: '8px',
+              }}
+            >
+              {project.classType}
+            </span>
+          </div>
 
           <span
             style={{
-              fontSize: 58,
+              fontSize: 60,
               fontWeight: 900,
-              lineHeight: 1.1,
+              lineHeight: 1.05,
               textTransform: 'uppercase',
               letterSpacing: '-1px',
               color: '#ffffff',
@@ -263,22 +271,22 @@ export default async function ProjectOpenGraphImage({
 
           <span
             style={{
-              fontSize: 20,
-              fontWeight: 600,
-              color: 'rgba(255, 255, 255, 0.9)',
-              marginTop: '10px',
+              fontSize: 22,
+              fontWeight: 700,
+              color: '#f1f5f9',
+              marginTop: '12px',
             }}
           >
             📍 {project.address}
           </span>
         </div>
 
-        {/* 6. Нижний ряд: Финансовые условия */}
+        {/* 6. Нижний ряд: 4 контрастные карточки параметров */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
-            gap: '14px',
+            gap: '12px',
             position: 'relative',
             zIndex: 10,
           }}
@@ -286,15 +294,15 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1.2,
-              backgroundColor: 'rgba(6, 71, 52, 0.8)',
-              border: '1.5px solid #d4b26f',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '2px solid #d4b26f',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Стоимость за м²
             </span>
             <span style={{ fontSize: 20, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
@@ -305,34 +313,34 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.8)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
-              Рассрочка
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
+              Рассрочка 0%
             </span>
             <span style={{ fontSize: 16, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
-              0% до 36 мес. без банка
+              до 36 мес. без банка
             </span>
           </div>
 
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.8)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Срок сдачи
             </span>
             <span style={{ fontSize: 15, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
@@ -343,15 +351,15 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.8)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Оплата и Trade-in
             </span>
             <span style={{ fontSize: 15, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>

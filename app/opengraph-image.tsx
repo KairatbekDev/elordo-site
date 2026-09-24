@@ -9,75 +9,90 @@ export const size = {
 };
 export const contentType = 'image/png';
 
+// Универсальное чтение локального изображения из папки public в Base64
 function getLocalBase64Image(relativePath: string) {
   try {
     const cleanPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
     const fullPath = path.join(process.cwd(), 'public', cleanPath);
+    if (!fs.existsSync(fullPath)) return null;
     const file = fs.readFileSync(fullPath);
-    return `data:image/png;base64,${file.toString('base64')}`;
+    const ext = path.extname(cleanPath).replace('.', '').toLowerCase();
+    const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/png';
+    return `data:${mime};base64,${file.toString('base64')}`;
   } catch (e) {
     return null;
   }
 }
 
 export default async function OpenGraphImage() {
+  // Загружаем реальный логотип и рендер жилого комплекса
+  const logoBase64 = getLocalBase64Image('logo-2.png') || getLocalBase64Image('logo.png');
   const bgImageBase64 = getLocalBase64Image('projects/Abu-Dhabi.png');
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: '100%',
-          height: '100%',
+          width: '1200px',
+          height: '630px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          padding: '48px 56px',
+          padding: '44px 52px',
           position: 'relative',
           fontFamily: 'sans-serif',
-          backgroundColor: '#064734',
+          backgroundColor: '#021f15',
         }}
       >
-        {/* 1. Фоновое изображение жилого комплекса */}
+        {/* 1. Фоновое изображение жилого комплекса Abu Dhabi */}
         {bgImageBase64 && (
           <img
             src={bgImageBase64}
-            alt="Abu Dhabi Background"
+            alt="EL ORDO GROUP Building"
             style={{
               position: 'absolute',
               top: 0,
-              left: 0,
+              right: 0,
               width: '1200px',
               height: '630px',
               objectFit: 'cover',
+              objectPosition: 'right center',
             }}
           />
         )}
 
-        {/* 2. Изумрудный градиент-оверлей (для 100% контрастности и читаемости текста) */}
+        {/* 2. Кинематографичный горизонтальный градиент: 
+               Слева темный изумруд для 100% читаемости логотипа и текста, 
+               Справа полупрозрачный, чтобы показать архитектуру */}
         <div
           style={{
             position: 'absolute',
-            inset: 0,
+            top: 0,
+            left: 0,
+            width: '1200px',
+            height: '630px',
             background:
-              'linear-gradient(135deg, rgba(6, 71, 52, 0.88) 0%, rgba(4, 45, 33, 0.82) 45%, rgba(2, 20, 15, 0.95) 100%)',
+              'linear-gradient(90deg, rgba(2, 31, 21, 0.97) 0%, rgba(3, 41, 28, 0.92) 50%, rgba(2, 31, 21, 0.65) 100%)',
             display: 'flex',
           }}
         />
 
-        {/* 3. Золотая декоративная окантовка */}
+        {/* 3. Золотая декоративная рамка */}
         <div
           style={{
             position: 'absolute',
-            inset: '24px',
-            border: '1.5px solid rgba(212, 178, 111, 0.45)',
+            top: '20px',
+            left: '20px',
+            width: '1160px',
+            height: '590px',
+            border: '2px solid rgba(212, 178, 111, 0.45)',
             borderRadius: '24px',
             display: 'flex',
             pointerEvents: 'none',
           }}
         />
 
-        {/* 4. Верхний ряд: Логотип и бейдж условий */}
+        {/* 4. Верхний ряд: Официальный логотип и золотой бейдж */}
         <div
           style={{
             display: 'flex',
@@ -87,39 +102,53 @@ export default async function OpenGraphImage() {
             zIndex: 10,
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span
-              style={{
-                fontSize: 34,
-                fontWeight: 900,
-                color: '#d4b26f',
-                letterSpacing: '2px',
-                textTransform: 'uppercase',
-              }}
-            >
-              EL ORDO GROUP
-            </span>
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: '#ffffff',
-                opacity: 0.85,
-                letterSpacing: '3px',
-                textTransform: 'uppercase',
-                marginTop: '4px',
-              }}
-            >
-              Строительная компания • Кыргызстан
-            </span>
+          {/* Логотип компании */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {logoBase64 ? (
+              <img
+                src={logoBase64}
+                alt="EL ORDO GROUP"
+                style={{
+                  height: '64px',
+                  width: 'auto',
+                  objectFit: 'contain',
+                }}
+              />
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span
+                  style={{
+                    fontSize: 34,
+                    fontWeight: 900,
+                    color: '#d4b26f',
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  EL ORDO GROUP
+                </span>
+                <span
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    opacity: 0.85,
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Строительная компания
+                </span>
+              </div>
+            )}
           </div>
 
+          {/* Золотой бейдж */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: 'rgba(6, 71, 52, 0.85)',
-              border: '1.5px solid #d4b26f',
+              backgroundColor: '#d4b26f',
               padding: '10px 22px',
               borderRadius: '999px',
             }}
@@ -128,8 +157,8 @@ export default async function OpenGraphImage() {
               style={{
                 fontSize: 13,
                 fontWeight: 900,
-                color: '#d4b26f',
-                letterSpacing: '1.5px',
+                color: '#021f15',
+                letterSpacing: '1px',
                 textTransform: 'uppercase',
               }}
             >
@@ -138,29 +167,45 @@ export default async function OpenGraphImage() {
           </div>
         </div>
 
-        {/* 5. Центральная часть: Заголовок и флагманские комплексы */}
+        {/* 5. Центральная часть: Главный заголовок и флагманские комплексы */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            marginTop: '10px',
-            marginBottom: '10px',
             position: 'relative',
             zIndex: 10,
+            maxWidth: '850px',
           }}
         >
+          <div style={{ display: 'flex', marginBottom: '8px' }}>
+            <span
+              style={{
+                fontSize: 14,
+                fontWeight: 900,
+                color: '#d4b26f',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+                backgroundColor: 'rgba(2, 25, 17, 0.85)',
+                border: '1px solid rgba(212, 178, 111, 0.4)',
+                padding: '6px 14px',
+                borderRadius: '8px',
+              }}
+            >
+              Надежный застройщик в Бишкеке
+            </span>
+          </div>
+
           <span
             style={{
-              fontSize: 52,
+              fontSize: 54,
               fontWeight: 900,
-              lineHeight: 1.15,
+              lineHeight: 1.08,
               textTransform: 'uppercase',
-              letterSpacing: '-0.5px',
+              letterSpacing: '-1px',
               color: '#ffffff',
-              maxWidth: '980px',
             }}
           >
-            Квартиры премиум и бизнес-класса в Бишкеке
+            Квартиры премиум и бизнес-класса
           </span>
 
           <span
@@ -168,7 +213,7 @@ export default async function OpenGraphImage() {
               fontSize: 22,
               fontWeight: 700,
               color: '#d4b26f',
-              marginTop: '12px',
+              marginTop: '10px',
               letterSpacing: '0.5px',
             }}
           >
@@ -176,12 +221,12 @@ export default async function OpenGraphImage() {
           </span>
         </div>
 
-        {/* 6. Нижний ряд: 4 плашки преимуществ */}
+        {/* 6. Нижний ряд: 4 карточки преимуществ */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
-            gap: '14px',
+            gap: '12px',
             position: 'relative',
             zIndex: 10,
           }}
@@ -189,15 +234,15 @@ export default async function OpenGraphImage() {
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1.5px solid rgba(212, 178, 111, 0.5)',
               borderRadius: '16px',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Рассрочка 0%
             </span>
             <span style={{ fontSize: 16, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
@@ -208,15 +253,15 @@ export default async function OpenGraphImage() {
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1.5px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Стоимость метра
             </span>
             <span style={{ fontSize: 16, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
@@ -227,15 +272,15 @@ export default async function OpenGraphImage() {
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1.5px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Trade-in программа
             </span>
             <span style={{ fontSize: 16, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
@@ -246,15 +291,15 @@ export default async function OpenGraphImage() {
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(6, 71, 52, 0.75)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              backgroundColor: 'rgba(2, 25, 17, 0.92)',
+              border: '1.5px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '16px',
               padding: '16px 18px',
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 900, textTransform: 'uppercase' }}>
               Надежность
             </span>
             <span style={{ fontSize: 16, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
