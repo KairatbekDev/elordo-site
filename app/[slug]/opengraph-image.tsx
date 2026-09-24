@@ -1,4 +1,6 @@
 import { ImageResponse } from 'next/og';
+import fs from 'fs';
+import path from 'path';
 
 export const alt = 'Жилой комплекс — EL ORDO GROUP';
 export const size = {
@@ -16,6 +18,7 @@ const PROJECTS_METADATA: Record<
     price: string;
     deadline: string;
     badge: string;
+    imageFile: string;
   }
 > = {
   'abu-dhabi': {
@@ -25,6 +28,7 @@ const PROJECTS_METADATA: Record<
     price: 'от $1 650 / м²',
     deadline: 'Срок сдачи: IV кв. 2026 г.',
     badge: 'Флагманский проект',
+    imageFile: 'projects/Abu-Dhabi.png',
   },
   'madina-residence': {
     name: 'ЖК Madina Residence',
@@ -33,6 +37,7 @@ const PROJECTS_METADATA: Record<
     price: 'от $1 500 / м²',
     deadline: 'Срок сдачи: IV кв. 2026 г.',
     badge: '14 этажей • 3 блока',
+    imageFile: 'projects/Madina-Residense.png',
   },
   'ajkol-plus': {
     name: 'ЖД Айкол +',
@@ -41,6 +46,7 @@ const PROJECTS_METADATA: Record<
     price: 'от $1 200 / м²',
     deadline: 'Срок сдачи: IV кв. 2026 г.',
     badge: 'Чистый горный воздух',
+    imageFile: 'projects/Aikolplus.png',
   },
   ajkol: {
     name: 'ЖД Айкол',
@@ -49,6 +55,7 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
+    imageFile: 'projects/ajkol.jpg',
   },
   kelechek: {
     name: 'ЖК Келечек',
@@ -57,6 +64,7 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
+    imageFile: 'projects/Kelechek.jpg',
   },
   ordo: {
     name: 'КД Ордо',
@@ -65,8 +73,22 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
+    imageFile: 'projects/Ordo.jpg',
   },
 };
+
+function getLocalBase64Image(relativePath: string) {
+  try {
+    const cleanPath = relativePath.startsWith('/') ? relativePath.slice(1) : relativePath;
+    const fullPath = path.join(process.cwd(), 'public', cleanPath);
+    const file = fs.readFileSync(fullPath);
+    const ext = path.extname(cleanPath).replace('.', '').toLowerCase();
+    const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : 'image/png';
+    return `data:${mime};base64,${file.toString('base64')}`;
+  } catch (e) {
+    return null;
+  }
+}
 
 export default async function ProjectOpenGraphImage({
   params,
@@ -82,7 +104,10 @@ export default async function ProjectOpenGraphImage({
     price: 'от $1 200 / м²',
     deadline: 'Рассрочка 0% до 36 мес.',
     badge: 'EL ORDO GROUP',
+    imageFile: 'projects/Abu-Dhabi.png',
   };
+
+  const bgImageBase64 = getLocalBase64Image(project.imageFile);
 
   return new ImageResponse(
     (
@@ -93,28 +118,52 @@ export default async function ProjectOpenGraphImage({
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          backgroundColor: '#064734',
-          backgroundImage:
-            'radial-gradient(circle at 80% 20%, #0d5c43 0%, #064734 50%, #032017 100%)',
           padding: '48px 56px',
-          color: '#ffffff',
           position: 'relative',
           fontFamily: 'sans-serif',
+          backgroundColor: '#064734',
         }}
       >
-        {/* Золотая декоративная рамка */}
+        {/* 1. Фоновый рендер конкретного жилого комплекса */}
+        {bgImageBase64 && (
+          <img
+            src={bgImageBase64}
+            alt={project.name}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '1200px',
+              height: '630px',
+              objectFit: 'cover',
+            }}
+          />
+        )}
+
+        {/* 2. Изумрудный градиент-фильтр */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background:
+              'linear-gradient(135deg, rgba(6, 71, 52, 0.88) 0%, rgba(4, 45, 33, 0.82) 45%, rgba(2, 20, 15, 0.95) 100%)',
+            display: 'flex',
+          }}
+        />
+
+        {/* 3. Золотая рамка */}
         <div
           style={{
             position: 'absolute',
             inset: '24px',
-            border: '1.5px solid rgba(212, 178, 111, 0.4)',
+            border: '1.5px solid rgba(212, 178, 111, 0.45)',
             borderRadius: '24px',
             display: 'flex',
             pointerEvents: 'none',
           }}
         />
 
-        {/* 1. Верхний ряд: Бренд и бейдж объекта */}
+        {/* 4. Верхний ряд: Бренд и статус */}
         <div
           style={{
             display: 'flex',
@@ -141,7 +190,7 @@ export default async function ProjectOpenGraphImage({
                 fontSize: 12,
                 fontWeight: 700,
                 color: '#ffffff',
-                opacity: 0.8,
+                opacity: 0.85,
                 letterSpacing: '2px',
                 textTransform: 'uppercase',
                 marginTop: '4px',
@@ -155,7 +204,7 @@ export default async function ProjectOpenGraphImage({
             style={{
               display: 'flex',
               alignItems: 'center',
-              backgroundColor: 'rgba(212, 178, 111, 0.15)',
+              backgroundColor: 'rgba(6, 71, 52, 0.85)',
               border: '1.5px solid #d4b26f',
               padding: '10px 22px',
               borderRadius: '999px',
@@ -175,30 +224,29 @@ export default async function ProjectOpenGraphImage({
           </div>
         </div>
 
-        {/* 2. Центральная часть: Название ЖК, класс и локация */}
+        {/* 5. Центр: Класс, Название ЖК и Адрес */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
-            marginTop: '20px',
-            marginBottom: '20px',
+            marginTop: '10px',
+            marginBottom: '10px',
             position: 'relative',
             zIndex: 10,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 800,
-                color: '#d4b26f',
-                textTransform: 'uppercase',
-                letterSpacing: '1.5px',
-              }}
-            >
-              {project.classType}
-            </span>
-          </div>
+          <span
+            style={{
+              fontSize: 16,
+              fontWeight: 800,
+              color: '#d4b26f',
+              textTransform: 'uppercase',
+              letterSpacing: '1.5px',
+              marginBottom: '6px',
+            }}
+          >
+            {project.classType}
+          </span>
 
           <span
             style={{
@@ -217,15 +265,15 @@ export default async function ProjectOpenGraphImage({
             style={{
               fontSize: 20,
               fontWeight: 600,
-              color: 'rgba(255, 255, 255, 0.85)',
-              marginTop: '12px',
+              color: 'rgba(255, 255, 255, 0.9)',
+              marginTop: '10px',
             }}
           >
             📍 {project.address}
           </span>
         </div>
 
-        {/* 3. Нижний ряд: Финансовые условия и параметры покупки */}
+        {/* 6. Нижний ряд: Финансовые условия */}
         <div
           style={{
             display: 'flex',
@@ -238,7 +286,7 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1.2,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
+              backgroundColor: 'rgba(6, 71, 52, 0.8)',
               border: '1.5px solid #d4b26f',
               borderRadius: '16px',
               padding: '16px 20px',
@@ -257,8 +305,8 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              backgroundColor: 'rgba(6, 71, 52, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
@@ -276,8 +324,8 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              backgroundColor: 'rgba(6, 71, 52, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
@@ -285,7 +333,7 @@ export default async function ProjectOpenGraphImage({
             }}
           >
             <span style={{ fontSize: 11, color: '#d4b26f', fontWeight: 800, textTransform: 'uppercase' }}>
-              График строительства
+              Срок сдачи
             </span>
             <span style={{ fontSize: 15, fontWeight: 900, color: '#ffffff', marginTop: '4px' }}>
               {project.deadline}
@@ -295,8 +343,8 @@ export default async function ProjectOpenGraphImage({
           <div
             style={{
               flex: 1,
-              backgroundColor: 'rgba(255, 255, 255, 0.08)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              backgroundColor: 'rgba(6, 71, 52, 0.8)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '16px',
               padding: '16px 20px',
               display: 'flex',
