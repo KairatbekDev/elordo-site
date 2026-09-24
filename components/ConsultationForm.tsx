@@ -6,6 +6,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { reachGoal } from '@/components/YandexMetrika';
 import { getStoredUtm } from '@/lib/utm';
+import { trackLeadSubmit, trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconCheck,
   IconWhatsApp,
@@ -430,7 +431,12 @@ export default function ConsultationForm() {
         return;
       }
 
+      // Фиксация цели в Яндекс.Метрике
       reachGoal('lead_submit');
+      
+      // Сквозной трекинг лида для Meta Pixel (Instagram) и Google Analytics
+      trackLeadSubmit(selectedGoal, selectedProject);
+
       setIsSuccess(true);
     } catch (err) {
       console.error('Lead submission network error:', err);
@@ -444,6 +450,7 @@ export default function ConsultationForm() {
     if (!validatePhone()) return;
 
     reachGoal('wa_click');
+    trackWhatsAppClick('consultation_form', selectedProject);
 
     const clientName = name.trim() ? name.trim() : ui.defaultClient;
     const message = ui.waTemplate(clientName, selectedProject, selectedGoal, phone);

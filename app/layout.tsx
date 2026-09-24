@@ -12,6 +12,7 @@ import { LanguageProvider } from "@/context/LanguageContext";
 import YandexMetrika from '@/components/YandexMetrika';
 import UtmTracker from '@/components/UtmTracker';
 import FaqSchema from "@/components/FaqSchema";
+import MetaPixel from '@/components/MetaPixel';
 
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -224,6 +225,7 @@ export default function RootLayout({
           </LanguageProvider>
         </ThemeProvider>
         <YandexMetrika />
+        <MetaPixel />
         <UtmTracker />
       </body>
     </html>

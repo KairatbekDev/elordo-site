@@ -7,14 +7,13 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import { trackWhatsAppClick, trackPdfDownload } from '@/lib/analytics';
 import {
   IconWhatsApp,
   IconArrowRight,
   IconBuilding,
   IconCheck,
   IconShieldCheck,
-  IconDiamond,
-  IconDocument,
 } from '@/components/Icons';
 
 interface ApartmentUnit {
@@ -476,6 +475,9 @@ export default function ApartmentSelector() {
   // Скачивание персонального PDF-расчета
   const handleDownloadPdf = useCallback(
     (apt: ApartmentUnit) => {
+      // 1. Фиксация события скачивания PDF в аналитике
+      trackPdfDownload(apt.complex, apt.area);
+
       const totalPrice = Math.round(apt.area * apt.priceM2);
       const downPayment = Math.round(totalPrice * (downPaymentPercent / 100));
       const remaining = totalPrice - downPayment;
@@ -903,6 +905,7 @@ export default function ApartmentSelector() {
                     href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(waMessage)}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick('apartment_selector_card', apt.complex)}
                     className="w-full py-3.5 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
@@ -1018,7 +1021,7 @@ export default function ApartmentSelector() {
                     src={activePlanModal.image}
                     alt={activePlanModal.complex}
                     className="max-h-[360px] max-w-full object-contain"
-                  />
+                  ></img>
                 </div>
               </div>
 
@@ -1068,6 +1071,7 @@ export default function ApartmentSelector() {
                     href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Здравствуйте! Хочу забронировать планировку ${activePlanModal.rooms}-комн. (${activePlanModal.area} м²) в ${activePlanModal.complex}.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick('apartment_selector_modal', activePlanModal.complex)}
                     className="w-full py-3.5 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 border border-emerald-500/30 cursor-pointer"
                   >
                     <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
