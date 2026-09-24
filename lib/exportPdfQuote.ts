@@ -25,64 +25,102 @@ export interface PdfQuoteData {
   }>;
 }
 
-// Загрузчик современного html2canvas-pro (с поддержкой lab/oklch) и jsPDF
-async function getPdfTools(): Promise<{ html2canvas: any; jsPDF: any }> {
-  if (typeof window === 'undefined') throw new Error('Client-only');
+// Загрузка стабильных библиотек генерации
+async function loadPdfDependencies(): Promise<{ html2canvas: any; jsPDF: any }> {
+  if (typeof window === 'undefined') throw new Error('Client only');
 
-  try {
-    const [h2cMod, jspdfMod] = await Promise.all([
-      import('html2canvas-pro'),
-      import('jspdf'),
-    ]);
-    const html2canvas = h2cMod.default || h2cMod;
-    const jsPDF = jspdfMod.jsPDF || jspdfMod.default;
-    if (html2canvas && jsPDF) return { html2canvas, jsPDF };
-  } catch {
-    // Fallback на случай сборки без предварительной установки пакетов
-  }
-
-  const loadScript = (src: string, globalName: string) => {
+  const loadScript = (src: string, globalCheck: () => any) => {
     return new Promise((resolve, reject) => {
-      if ((window as any)[globalName]) return resolve((window as any)[globalName]);
-      const s = document.createElement('script');
-      s.src = src;
-      s.onload = () => resolve((window as any)[globalName]);
-      s.onerror = () => reject(new Error(`Failed to load ${src}`));
-      document.head.appendChild(s);
+      const existing = globalCheck();
+      if (existing) return resolve(existing);
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = () => resolve(globalCheck());
+      script.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(script);
     });
   };
 
-  const [html2canvas, jspdfNamespace] = await Promise.all([
-    loadScript('https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.13/dist/html2canvas-pro.min.js', 'html2canvas'),
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf'),
+  await Promise.all([
+    loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+      () => (window as any).html2canvas
+    ),
+    loadScript(
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+      () => (window as any).jspdf?.jsPDF
+    ),
   ]);
 
-  const jsPDF = (jspdfNamespace as any)?.jsPDF || (window as any).jspdf?.jsPDF;
+  const html2canvas = (window as any).html2canvas;
+  const jsPDF = (window as any).jspdf?.jsPDF;
+
+  if (!html2canvas || !jsPDF) {
+    throw new Error('PDF libraries failed to initialize');
+  }
+
   return { html2canvas, jsPDF };
 }
 
-// Генерация PDF через html2canvas-pro + jsPDF
-async function renderHtmlToPdf(htmlContent: string, filename: string) {
-  const { html2canvas, jsPDF } = await getPdfTools();
+// Генерация PDF в изолированном песочном фрейме (полная изоляция от Tailwind и функции lab())
+async function generatePdfFromHtml(htmlContent: string, filename: string) {
+  const { html2canvas, jsPDF } = await loadPdfDependencies();
 
-  const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.left = '-9999px';
-  container.style.top = '0';
-  container.style.width = '794px';
-  container.style.padding = '24px 28px';
-  container.style.background = '#ffffff';
-  container.style.color = '#1a1a1a';
-  container.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-  container.innerHTML = htmlContent;
-  document.body.appendChild(container);
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.left = '-9999px';
+  iframe.style.top = '-9999px';
+  iframe.style.width = '794px';
+  iframe.style.height = '1123px';
+  iframe.style.border = 'none';
+  iframe.style.opacity = '0';
+  iframe.style.pointerEvents = 'none';
+  document.body.appendChild(iframe);
 
   try {
-    const canvas = await html2canvas(container, {
+    const iframeWin = iframe.contentWindow;
+    const iframeDoc = iframe.contentDocument || iframeWin?.document;
+    if (!iframeDoc || !iframeWin) {
+      throw new Error('Failed to access isolated iframe document');
+    }
+
+    // Записываем разметку в изолированный контекст без Tailwind-стилей
+    iframeDoc.open();
+    iframeDoc.write(`
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          * { box-sizing: border-box; margin: 0; padding: 0; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-size: 10pt;
+            line-height: 1.4;
+            padding: 24px 28px;
+            width: 794px;
+          }
+        </style>
+      </head>
+      <body>
+        ${htmlContent}
+      </body>
+      </html>
+    `);
+    iframeDoc.close();
+
+    // Задержка 150мс для завершения расчета геометрии документа браузером
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    // Рендерим ТОЛЬКО изолированный body фрейма (в нем нет функции lab())
+    const canvas = await html2canvas(iframeDoc.body, {
       scale: 2,
       useCORS: true,
       logging: false,
       backgroundColor: '#ffffff',
+      windowWidth: 794,
     });
 
     const imgData = canvas.toDataURL('image/jpeg', 0.98);
@@ -98,8 +136,8 @@ async function renderHtmlToPdf(htmlContent: string, filename: string) {
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
     pdf.save(filename);
   } finally {
-    if (container.parentNode) {
-      container.parentNode.removeChild(container);
+    if (iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
     }
   }
 }
@@ -209,7 +247,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
     </div>
   `;
 
-  await renderHtmlToPdf(html, `Raschet_EL_ORDO_${quoteNumber}.pdf`);
+  await generatePdfFromHtml(html, `Raschet_EL_ORDO_${quoteNumber}.pdf`);
 }
 
 // 2. Прямое скачивание каталога и презентации компании в файл .pdf
@@ -287,5 +325,5 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
     </div>
   `;
 
-  await renderHtmlToPdf(html, `Katalog_EL_ORDO_GROUP.pdf`);
+  await generatePdfFromHtml(html, `Katalog_EL_ORDO_GROUP.pdf`);
 }
