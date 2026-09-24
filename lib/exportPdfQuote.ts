@@ -25,92 +25,81 @@ export interface PdfQuoteData {
   }>;
 }
 
-// Загрузчик html2pdf без конфликтов со стилями страницы
-async function getPdfEngine(): Promise<any> {
-  if (typeof window === 'undefined') return null;
-  if ((window as any).html2pdf) return (window as any).html2pdf;
-
-  return new Promise((resolve, reject) => {
-    const existing = document.querySelector('script[data-pdf-engine="true"]');
-    if (existing) {
-      if ((window as any).html2pdf) return resolve((window as any).html2pdf);
-      existing.addEventListener('load', () => resolve((window as any).html2pdf));
-      return;
-    }
-    const script = document.createElement('script');
-    script.setAttribute('data-pdf-engine', 'true');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-    script.onload = () => resolve((window as any).html2pdf);
-    script.onerror = () => reject(new Error('Не удалось загрузить PDF-конвертер'));
-    document.head.appendChild(script);
-  });
-}
-
-// Вспомогательная функция безопасного скачивания через изолированный iframe (обходит ошибку "lab" и зависания)
-async function renderAndDownloadInIsolatedFrame(htmlContent: string, filename: string) {
-  const html2pdf = await getPdfEngine();
-  if (!html2pdf) return;
-
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.left = '-9999px';
-  iframe.style.top = '0';
-  iframe.style.width = '794px';
-  iframe.style.height = '1123px';
-  iframe.style.border = 'none';
-  iframe.style.opacity = '0';
-  iframe.style.pointerEvents = 'none';
-  document.body.appendChild(iframe);
+// Загрузчик современного html2canvas-pro (с поддержкой lab/oklch) и jsPDF
+async function getPdfTools(): Promise<{ html2canvas: any; jsPDF: any }> {
+  if (typeof window === 'undefined') throw new Error('Client-only');
 
   try {
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!iframeDoc) throw new Error('Не удалось создать изолированный контекст печати');
+    const [h2cMod, jspdfMod] = await Promise.all([
+      import('html2canvas-pro'),
+      import('jspdf'),
+    ]);
+    const html2canvas = h2cMod.default || h2cMod;
+    const jsPDF = jspdfMod.jsPDF || jspdfMod.default;
+    if (html2canvas && jsPDF) return { html2canvas, jsPDF };
+  } catch {
+    // Fallback на случай сборки без предварительной установки пакетов
+  }
 
-    iframeDoc.open();
-    iframeDoc.write(`
-      <!DOCTYPE html>
-      <html lang="ru">
-      <head>
-        <meta charset="UTF-8">
-        <style>
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: #1a1a1a;
-            background: #ffffff;
-            font-size: 9.5pt;
-            line-height: 1.4;
-            padding: 24px 28px;
-          }
-        </style>
-      </head>
-      <body>
-        ${htmlContent}
-      </body>
-      </html>
-    `);
-    iframeDoc.close();
+  const loadScript = (src: string, globalName: string) => {
+    return new Promise((resolve, reject) => {
+      if ((window as any)[globalName]) return resolve((window as any)[globalName]);
+      const s = document.createElement('script');
+      s.src = src;
+      s.onload = () => resolve((window as any)[globalName]);
+      s.onerror = () => reject(new Error(`Failed to load ${src}`));
+      document.head.appendChild(s);
+    });
+  };
 
-    // Небольшая задержка для завершения отрисовки разметки браузером
-    await new Promise((resolve) => setTimeout(resolve, 120));
+  const [html2canvas, jspdfNamespace] = await Promise.all([
+    loadScript('https://cdn.jsdelivr.net/npm/html2canvas-pro@1.5.13/dist/html2canvas-pro.min.js', 'html2canvas'),
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js', 'jspdf'),
+  ]);
 
-    const opt = {
-      margin: [6, 6, 6, 6],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        windowWidth: 794,
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    };
+  const jsPDF = (jspdfNamespace as any)?.jsPDF || (window as any).jspdf?.jsPDF;
+  return { html2canvas, jsPDF };
+}
 
-    await html2pdf().set(opt).from(iframeDoc.body).save();
+// Генерация PDF через html2canvas-pro + jsPDF
+async function renderHtmlToPdf(htmlContent: string, filename: string) {
+  const { html2canvas, jsPDF } = await getPdfTools();
+
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.width = '794px';
+  container.style.padding = '24px 28px';
+  container.style.background = '#ffffff';
+  container.style.color = '#1a1a1a';
+  container.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+  container.innerHTML = htmlContent;
+  document.body.appendChild(container);
+
+  try {
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    });
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(filename);
   } finally {
-    if (iframe.parentNode) {
-      iframe.parentNode.removeChild(iframe);
+    if (container.parentNode) {
+      container.parentNode.removeChild(container);
     }
   }
 }
@@ -220,7 +209,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
     </div>
   `;
 
-  await renderAndDownloadInIsolatedFrame(html, `Raschet_EL_ORDO_${quoteNumber}.pdf`);
+  await renderHtmlToPdf(html, `Raschet_EL_ORDO_${quoteNumber}.pdf`);
 }
 
 // 2. Прямое скачивание каталога и презентации компании в файл .pdf
@@ -298,5 +287,5 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
     </div>
   `;
 
-  await renderAndDownloadInIsolatedFrame(html, `Katalog_EL_ORDO_GROUP.pdf`);
+  await renderHtmlToPdf(html, `Katalog_EL_ORDO_GROUP.pdf`);
 }
