@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FloatingContact from "@/components/FloatingContact";
+import MobileStickyBar from "@/components/MobileStickyBar";
 import DynamicSeo from "@/components/DynamicSeo";
 import { COMPANY_INFO } from "@/lib/data";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -24,7 +25,6 @@ const SITE_URL =
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
   'https://elordogroup.kg';
 
-// Адаптивный статус-бар смартфона (Изумрудный днем, глубокий графитовый ночью)
 export const viewport: Viewport = {
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#064734' },
@@ -228,6 +228,7 @@ export default function RootLayout({
 
             <Footer />
             <FloatingContact />
+            <MobileStickyBar />
           </LanguageProvider>
         </ThemeProvider>
         <YandexMetrika />

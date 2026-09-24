@@ -115,7 +115,6 @@ export default function FloatingContact() {
   const currentLang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[currentLang] || CONTENT.ru;
 
-  // Закрытие по нажатию клавиши Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setIsOpen(false);
@@ -142,10 +141,9 @@ export default function FloatingContact() {
         />
       )}
 
-      {/* 2. Плавающий контейнер с безопасным отступом для iPhone (safe-area) */}
+      {/* 2. Плавающий контейнер: выверенная позиция с учетом безопасных зон */}
       <div 
-        style={{ bottom: 'calc(1.25rem + env(safe-area-inset-bottom, 0px))' }}
-        className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 font-sans select-none"
+        className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-2.5 font-sans select-none bottom-[calc(4.85rem+env(safe-area-inset-bottom,0px))] md:bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] transition-all duration-300"
       >
         
         {/* Всплывающее меню каналов связи */}

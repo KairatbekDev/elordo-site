@@ -6,6 +6,7 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
+import AnimatedCounter from '@/components/AnimatedCounter';
 import {
   IconCheck,
   IconArrowRight,
@@ -850,7 +851,7 @@ export default function SmartApartmentQuiz() {
           <div className="relative z-10 max-w-3xl mx-auto animate-fadeIn">
             <div className="bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-[#064734]/20 dark:border-white/15 shadow-xl">
               
-              {/* Верхняя плашка результата */}
+              {/* Верхняя плашка результата с анимированным счетчиком цены */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-white/10">
                 <div>
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider mb-1">
@@ -868,10 +869,10 @@ export default function SmartApartmentQuiz() {
                 <div className="text-right self-stretch sm:self-auto bg-white dark:bg-white/5 p-3 rounded-2xl border border-gray-200 dark:border-white/10">
                   <span className="text-[10px] font-bold uppercase text-gray-400 block">{c.estPriceLabel}</span>
                   <strong className="text-2xl font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${financialCalc.totalPrice.toLocaleString('ru-RU')}
+                    $<AnimatedCounter value={financialCalc.totalPrice} />
                   </strong>
                   <span className="text-[11px] text-gray-500 block">
-                    ≈ {Math.round(financialCalc.totalPrice * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
+                    ≈ <AnimatedCounter value={Math.round(financialCalc.totalPrice * usdRate)} /> {c.somSuffix}
                   </span>
                 </div>
               </div>
@@ -918,17 +919,17 @@ export default function SmartApartmentQuiz() {
                 </div>
               </div>
 
-              {/* Финансовая сетка условий */}
+              {/* Финансовая сетка условий с анимированными счетчиками */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-xs">
                 <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10">
                   <span className="text-[11px] text-gray-500 block mb-1">
                     {financialCalc.isCash ? 'Полная сумма:' : c.estDownLabel}
                   </span>
                   <strong className="text-base font-black text-gray-900 dark:text-white">
-                    ${financialCalc.downPayment.toLocaleString('ru-RU')}
+                    $<AnimatedCounter value={financialCalc.downPayment} />
                   </strong>
                   <span className="text-[10px] text-gray-400 block mt-0.5">
-                    ≈ {Math.round(financialCalc.downPayment * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
+                    ≈ <AnimatedCounter value={Math.round(financialCalc.downPayment * usdRate)} /> {c.somSuffix}
                   </span>
                 </div>
 
@@ -947,10 +948,10 @@ export default function SmartApartmentQuiz() {
                     {financialCalc.isCash ? 'Чистая выгода:' : `Платеж в ${paymentMode === 'quarterly' ? 'квартал' : 'месяц'}:`}
                   </span>
                   <strong className="text-lg font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${(financialCalc.isCash ? Math.round(matchedProject.totalPriceUsd * 0.06) : financialCalc.paymentPerPeriod).toLocaleString('ru-RU')}
+                    $<AnimatedCounter value={financialCalc.isCash ? Math.round(matchedProject.totalPriceUsd * 0.06) : financialCalc.paymentPerPeriod} />
                   </strong>
                   <span className="text-[10px] text-gray-600 dark:text-neutral-300 block mt-0.5 font-semibold">
-                    ≈ {Math.round((financialCalc.isCash ? matchedProject.totalPriceUsd * 0.06 : financialCalc.paymentPerPeriod) * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
+                    ≈ <AnimatedCounter value={Math.round((financialCalc.isCash ? matchedProject.totalPriceUsd * 0.06 : financialCalc.paymentPerPeriod) * usdRate)} /> {c.somSuffix}
                   </span>
                 </div>
               </div>
