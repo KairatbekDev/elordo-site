@@ -11,10 +11,7 @@ import {
   IconArrowRight,
   IconWhatsApp,
   IconShieldCheck,
-  IconBuilding,
   IconDiamond,
-  IconCar,
-  IconCalendar,
 } from '@/components/Icons';
 
 interface QuizOption {
@@ -22,7 +19,7 @@ interface QuizOption {
   title: string;
   desc: string;
   badge?: string;
-  iconType: 'family' | 'roi' | 'rent' | 'safe' | 'installment' | 'cash' | 'tradein' | 'r1' | 'r2' | 'r3' | 'center' | 'eco' | 'mountains';
+  iconType: string;
 }
 
 interface QuizStep {
@@ -72,7 +69,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: 'Платеж в месяц (0% без банка):',
     estDownLabel: 'Первоначальный взнос (30%):',
     btnWa: 'Получить планировки и шахматку в WhatsApp',
-    btnPdf: 'Скачать расчет в PDF',
+    btnPdf: 'Скачать полный расчет в PDF',
     btnExplore: 'Смотреть страницу комплекса',
     liveRatePrefix: 'Курс НБКР онлайн:',
     somSuffix: 'сом',
@@ -83,9 +80,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         subtitle: 'Это поможет определить класс дома, планировку и приоритетные характеристики объекта.',
         options: [
           { id: 'family', title: 'Для жизни семьи', desc: 'Просторные комнаты, закрытый безопасный двор без машин, детские сады и школы рядом.', badge: 'Комфорт и уют', iconType: 'family' },
-          { id: 'roi', title: 'Инвестиции и перепродажа', desc: 'Покупка на стадии котлована/монолита с приростом капитала до 25–35% к сдаче дома.', badge: 'Высокий ROI', iconType: 'roi' },
-          { id: 'rent', title: 'Пассивный доход от аренды', desc: 'Высокий арендный спрос в центре Бишкека с доходностью 8–11% годовых в твердой валюте.', badge: 'Арендный бизнес', iconType: 'rent' },
-          { id: 'safe', title: 'Сохранение капитала', desc: 'Защита сбережений от девальвации и инфляции в надежных монолитно-кирпичных домах.', badge: 'Надежность', iconType: 'safe' },
+          { id: 'roi', title: 'Инвестиции и перепродажа', desc: 'Покупка на стадии монолита с приростом капитала до 25–35% к сдаче дома.', badge: 'Высокий ROI', iconType: 'roi' },
+          { id: 'rent', title: 'Пассивный доход от аренды', desc: 'Высокий арендный спрос в центре Бишкека с доходностью 8–11% годовых в валюте.', badge: 'Арендный бизнес', iconType: 'rent' },
+          { id: 'safe', title: 'Сохранение капитала', desc: 'Защита сбережений от девальвации и инфляции в монолитно-кирпичных домах.', badge: 'Надежность', iconType: 'safe' },
         ],
       },
       {
@@ -136,7 +133,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: 'Ай сайын төлөм (банксыз 0%):',
     estDownLabel: 'Баштапкы төлөм (30%):',
     btnWa: 'Пландарды жана шахматканы WhatsApp-тан алуу',
-    btnPdf: 'PDF эсебин көчүрүп алуу',
+    btnPdf: 'Толук PDF эсебин көчүрүп алуу',
     btnExplore: 'Комплекстин барагына өтүү',
     liveRatePrefix: 'УБ онлайн курсу:',
     somSuffix: 'сом',
@@ -200,7 +197,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: 'Ай сайынғы төлем (банксіз 0%):',
     estDownLabel: 'Бастапқы жарна (30%):',
     btnWa: 'WhatsApp арқылы жоспарлар мен шахматканы алу',
-    btnPdf: 'PDF есебін жүктеп алу',
+    btnPdf: 'Толық PDF есебін жүктеп алу',
     btnExplore: 'Кешен парақшасына өту',
     liveRatePrefix: 'ҰБ онлайн бағамы:',
     somSuffix: 'сом',
@@ -264,7 +261,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: 'Платіж на місяць (0% без банку):',
     estDownLabel: 'Перший внесок (30%):',
     btnWa: 'Отримати планування та шахматку у WhatsApp',
-    btnPdf: 'Завантажити розрахунок у PDF',
+    btnPdf: 'Завантажити повний розрахунок у PDF',
     btnExplore: 'Сторінка комплексу',
     liveRatePrefix: 'Курс НБКР онлайн:',
     somSuffix: 'сом',
@@ -328,7 +325,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: 'Monthly Payment (0% Developer Plan):',
     estDownLabel: 'Down Payment (30%):',
     btnWa: 'Get Floor Plans & Availability on WhatsApp',
-    btnPdf: 'Download PDF Quote',
+    btnPdf: 'Download Full PDF Quote',
     btnExplore: 'View Development Page',
     liveRatePrefix: 'Live NBKR Rate:',
     somSuffix: 'KGS',
@@ -392,7 +389,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estMonthlyLabel: '每月还款金额（开发商0%免息）：',
     estDownLabel: '首付款（30%）：',
     btnWa: '在 WhatsApp 中获取详细户型图册与销控表',
-    btnPdf: '一键下载 PDF 格式预算单',
+    btnPdf: '一键下载完整 PDF 预算单',
     btnExplore: '查看该楼盘详情主页',
     liveRatePrefix: '央行实时汇率：',
     somSuffix: '索姆',
@@ -451,9 +448,6 @@ interface MatchedProject {
   unitTitle: string;
   unitArea: number;
   totalPriceUsd: number;
-  downPaymentUsd: number;
-  monthlyUsd: number;
-  months: number;
 }
 
 export default function SmartApartmentQuiz() {
@@ -469,6 +463,7 @@ export default function SmartApartmentQuiz() {
     3: 'center',
   });
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
+  const [paymentMode, setPaymentMode] = useState<'monthly' | 'quarterly' | 'cash'>('monthly');
   const [usdRate, setUsdRate] = useState<number>(87.45);
   const [rateDate, setRateDate] = useState<string>('');
 
@@ -494,6 +489,10 @@ export default function SmartApartmentQuiz() {
 
   const handleSelectOption = (optionId: string) => {
     setAnswers((prev) => ({ ...prev, [currentStepIndex]: optionId }));
+    if (currentStepIndex === 1) {
+      if (optionId === 'cash') setPaymentMode('cash');
+      else setPaymentMode('monthly');
+    }
     if (currentStepIndex < totalSteps - 1) {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
@@ -512,13 +511,12 @@ export default function SmartApartmentQuiz() {
     setIsCompleted(false);
   };
 
-  // Интеллектуальный расчет наиболее подходящего объекта
+  // Определение подобранного ЖК
   const matchedProject: MatchedProject = useMemo(() => {
     const locPref = answers[3] || 'center';
     const roomPref = answers[2] || 'r2';
-    const payPref = answers[1] || 'installment';
 
-    // 1. ЖК Abu Dhabi (Премиум-класс, центр/горы)
+    // 1. ЖК Abu Dhabi
     if (locPref === 'center' || locPref === 'mountains' || answers[0] === 'roi') {
       let area = 49.48;
       let price = 81642;
@@ -533,14 +531,6 @@ export default function SmartApartmentQuiz() {
         title = '3-комнатный премиум-пентхаус';
       }
 
-      if (payPref === 'cash') {
-        price = Math.round(price * 0.94);
-      }
-
-      const down = Math.round(price * 0.3);
-      const remaining = price - down;
-      const monthly = Math.round(remaining / 36);
-
       return {
         slug: 'abu-dhabi',
         name: 'ЖК Abu Dhabi',
@@ -550,13 +540,10 @@ export default function SmartApartmentQuiz() {
         unitTitle: title,
         unitArea: area,
         totalPriceUsd: price,
-        downPaymentUsd: down,
-        monthlyUsd: monthly,
-        months: 36,
       };
     }
 
-    // 2. ЖД Айкол + (Эко-предгорье, чистый воздух)
+    // 2. ЖД Айкол +
     if (locPref === 'eco') {
       let area = 42.0;
       let price = 50400;
@@ -571,14 +558,6 @@ export default function SmartApartmentQuiz() {
         title = '3-комнатная просторная квартира';
       }
 
-      if (payPref === 'cash') {
-        price = Math.round(price * 0.94);
-      }
-
-      const down = Math.round(price * 0.3);
-      const remaining = price - down;
-      const monthly = Math.round(remaining / 36);
-
       return {
         slug: 'ajkol-plus',
         name: 'ЖД Айкол +',
@@ -588,13 +567,10 @@ export default function SmartApartmentQuiz() {
         unitTitle: title,
         unitArea: area,
         totalPriceUsd: price,
-        downPaymentUsd: down,
-        monthlyUsd: monthly,
-        months: 36,
       };
     }
 
-    // 3. ЖК Madina Residence (Бизнес-класс в центре)
+    // 3. ЖК Madina Residence
     let area = 43.59;
     let price = 65385;
     let title = '1-комнатная бизнес-квартира';
@@ -608,14 +584,6 @@ export default function SmartApartmentQuiz() {
       title = '3-комнатная семейная квартира';
     }
 
-    if (payPref === 'cash') {
-      price = Math.round(price * 0.94);
-    }
-
-    const down = Math.round(price * 0.3);
-    const remaining = price - down;
-    const monthly = Math.round(remaining / 36);
-
     return {
       slug: 'madina-residence',
       name: 'ЖК Madina Residence',
@@ -625,22 +593,100 @@ export default function SmartApartmentQuiz() {
       unitTitle: title,
       unitArea: area,
       totalPriceUsd: price,
-      downPaymentUsd: down,
-      monthlyUsd: monthly,
-      months: 36,
     };
   }, [answers]);
 
-  // Скачивание сформированного персонального предложения
+  // Финансовый расчет на основе выбранного режима (monthly, quarterly, cash)
+  const financialCalc = useMemo(() => {
+    let finalPrice = matchedProject.totalPriceUsd;
+    if (paymentMode === 'cash') {
+      finalPrice = Math.round(finalPrice * 0.94); // 6% скидка
+      return {
+        totalPrice: finalPrice,
+        downPayment: finalPrice,
+        paymentPerPeriod: 0,
+        numberOfPayments: 1,
+        frequency: 'monthly' as const,
+        months: 0,
+        isCash: true,
+      };
+    }
+
+    const downPayment = Math.round(finalPrice * 0.3);
+    const balance = finalPrice - downPayment;
+
+    if (paymentMode === 'quarterly') {
+      const numberOfPayments = 12; // 36 месяцев / 3
+      const perQuarter = Math.round(balance / numberOfPayments);
+      return {
+        totalPrice: finalPrice,
+        downPayment,
+        paymentPerPeriod: perQuarter,
+        numberOfPayments,
+        frequency: 'quarterly' as const,
+        months: 36,
+        isCash: false,
+      };
+    }
+
+    // По умолчанию 36 месяцев ежемесячно
+    const numberOfPayments = 36;
+    const perMonth = Math.round(balance / numberOfPayments);
+    return {
+      totalPrice: finalPrice,
+      downPayment,
+      paymentPerPeriod: perMonth,
+      numberOfPayments,
+      frequency: 'monthly' as const,
+      months: 36,
+      isCash: false,
+    };
+  }, [matchedProject, paymentMode]);
+
+  // Генерация ПОЛНОГО графика выплат на все 36 месяцев
+  const fullPaymentSchedule = useMemo(() => {
+    if (financialCalc.isCash) {
+      return [
+        {
+          num: 1,
+          period: 'Единоразово (100% расчет со скидкой 6%)',
+          paymentUsd: financialCalc.totalPrice,
+          paymentKgs: Math.round(financialCalc.totalPrice * usdRate),
+          balanceUsd: 0,
+        },
+      ];
+    }
+
+    const schedule = [];
+    const remaining = financialCalc.totalPrice - financialCalc.downPayment;
+    let currentBalance = remaining;
+
+    for (let i = 1; i <= financialCalc.numberOfPayments; i++) {
+      const isLast = i === financialCalc.numberOfPayments;
+      const currentPay = isLast ? currentBalance : financialCalc.paymentPerPeriod;
+      currentBalance = Math.max(0, currentBalance - currentPay);
+
+      schedule.push({
+        num: i,
+        period: financialCalc.frequency === 'monthly' ? `${i} мес.` : `${i * 3} мес. (${i} кв.)`,
+        paymentUsd: currentPay,
+        paymentKgs: Math.round(currentPay * usdRate),
+        balanceUsd: currentBalance,
+      });
+    }
+
+    return schedule;
+  }, [financialCalc, usdRate]);
+
+  // Скачивание ПОЛНОГО расчета в PDF
   const handleDownloadPdf = () => {
-    const isCash = answers[1] === 'cash';
     exportPdfQuote({
-      apartmentPrice: matchedProject.totalPriceUsd,
-      downPaymentAmount: matchedProject.downPaymentUsd,
-      downPaymentPercent: 30,
-      months: isCash ? 0 : 36,
-      frequency: 'monthly',
-      paymentPerPeriodUsd: isCash ? 0 : matchedProject.monthlyUsd,
+      apartmentPrice: financialCalc.totalPrice,
+      downPaymentAmount: financialCalc.downPayment,
+      downPaymentPercent: financialCalc.isCash ? 100 : 30,
+      months: financialCalc.months,
+      frequency: financialCalc.frequency,
+      paymentPerPeriodUsd: financialCalc.paymentPerPeriod,
       usdRate,
       rateDate,
       selectedApartment: {
@@ -648,38 +694,39 @@ export default function SmartApartmentQuiz() {
         rooms: answers[2] === 'r1' ? 1 : answers[2] === 'r3' ? 3 : 2,
         area: matchedProject.unitArea,
         floor: 'Видовые этажи',
-        priceM2: Math.round(matchedProject.totalPriceUsd / matchedProject.unitArea),
+        priceM2: Math.round(financialCalc.totalPrice / matchedProject.unitArea),
       },
-      paymentSchedule: [
-        {
-          num: 1,
-          period: isCash ? 'Единоразово (100% расчет)' : '1 мес.',
-          paymentUsd: isCash ? matchedProject.totalPriceUsd : matchedProject.monthlyUsd,
-          paymentKgs: Math.round((isCash ? matchedProject.totalPriceUsd : matchedProject.monthlyUsd) * usdRate),
-          balanceUsd: isCash ? 0 : matchedProject.totalPriceUsd - matchedProject.downPaymentUsd - matchedProject.monthlyUsd,
-        },
-      ],
+      paymentSchedule: fullPaymentSchedule,
     });
   };
 
   // WhatsApp-сообщение с параметрами
   const waUrl = useMemo(() => {
+    const modeText =
+      paymentMode === 'cash'
+        ? '100% расчет со скидкой'
+        : paymentMode === 'quarterly'
+        ? 'Поквартальная рассрочка 0% (12 выплат)'
+        : 'Ежемесячная рассрочка 0% (36 месяцев)';
+
     const text =
       `Здравствуйте! Я прошёл смарт-подбор квартиры на сайте EL ORDO GROUP:\n\n` +
       `• Рекомендованный объект: ${matchedProject.name} (${matchedProject.unitTitle}, ${matchedProject.unitArea} м²)\n` +
-      `• Бюджет: $${matchedProject.totalPriceUsd.toLocaleString('ru-RU')} (~${Math.round(matchedProject.totalPriceUsd * usdRate).toLocaleString('ru-RU')} сом)\n` +
-      `• Форма оплаты: ${answers[1] === 'cash' ? '100% расчет со скидкой' : answers[1] === 'tradein' ? 'Trade-in (обмен)' : 'Рассрочка 0% на 36 месяцев'}\n` +
-      `• Расчетный платеж: $${matchedProject.monthlyUsd.toLocaleString('ru-RU')}/мес.\n\n` +
-      `Отправьте, пожалуйста, актуальную шахматку свободных квартир и планировку в PDF.`;
+      `• Стоимость: $${financialCalc.totalPrice.toLocaleString('ru-RU')} (~${Math.round(financialCalc.totalPrice * usdRate).toLocaleString('ru-RU')} сом)\n` +
+      `• Форма оплаты: ${modeText}\n` +
+      (!financialCalc.isCash
+        ? `• Первый взнос: $${financialCalc.downPayment.toLocaleString('ru-RU')} • Платеж: $${financialCalc.paymentPerPeriod.toLocaleString('ru-RU')}/${paymentMode === 'quarterly' ? 'квартал' : 'мес'}\n\n`
+        : '\n') +
+      `Отправьте, пожалуйста, официальную презентацию и свободные планировки в WhatsApp.`;
 
     return `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`;
-  }, [matchedProject, answers, usdRate]);
+  }, [matchedProject, financialCalc, paymentMode, usdRate]);
 
   return (
     <section id="quiz" className="max-w-5xl mx-auto px-4 sm:px-6 my-16 scroll-mt-24">
       <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-2xl transition-colors relative overflow-hidden">
         
-        {/* Декоративное фоновое свечение в углах */}
+        {/* Фоновые градиенты */}
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-[#d4b26f]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-[#064734]/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -699,7 +746,7 @@ export default function SmartApartmentQuiz() {
           </p>
         </div>
 
-        {/* ПРОГРЕСС-БАР (если еще не завершен) */}
+        {/* ПРОГРЕСС-БАР */}
         {!isCompleted && (
           <div className="max-w-xl mx-auto mb-8 relative z-10">
             <div className="flex justify-between items-center text-xs font-bold uppercase text-gray-500 dark:text-neutral-400 mb-2">
@@ -715,7 +762,7 @@ export default function SmartApartmentQuiz() {
           </div>
         )}
 
-        {/* ОСНОВНОЙ КОНТЕНТ ШАГОВ */}
+        {/* ШАГИ КВИЗА */}
         {!isCompleted ? (
           <div className="relative z-10">
             <div className="text-center mb-6">
@@ -727,7 +774,6 @@ export default function SmartApartmentQuiz() {
               </p>
             </div>
 
-            {/* СЕТКА ВАРИАНТОВ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
               {currentStep.options.map((option) => {
                 const isSelected = answers[currentStepIndex] === option.id;
@@ -783,7 +829,6 @@ export default function SmartApartmentQuiz() {
               })}
             </div>
 
-            {/* НАВИГАЦИЯ */}
             <div className="flex items-center justify-between max-w-3xl mx-auto mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
               <button
                 type="button"
@@ -805,6 +850,7 @@ export default function SmartApartmentQuiz() {
           <div className="relative z-10 max-w-3xl mx-auto animate-fadeIn">
             <div className="bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-[#064734]/20 dark:border-white/15 shadow-xl">
               
+              {/* Верхняя плашка результата */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-white/10">
                 <div>
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider mb-1">
@@ -822,30 +868,74 @@ export default function SmartApartmentQuiz() {
                 <div className="text-right self-stretch sm:self-auto bg-white dark:bg-white/5 p-3 rounded-2xl border border-gray-200 dark:border-white/10">
                   <span className="text-[10px] font-bold uppercase text-gray-400 block">{c.estPriceLabel}</span>
                   <strong className="text-2xl font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${matchedProject.totalPriceUsd.toLocaleString('ru-RU')}
+                    ${financialCalc.totalPrice.toLocaleString('ru-RU')}
                   </strong>
                   <span className="text-[11px] text-gray-500 block">
-                    ≈ {Math.round(matchedProject.totalPriceUsd * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
+                    ≈ {Math.round(financialCalc.totalPrice * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
                   </span>
                 </div>
               </div>
 
+              {/* Интерактивный переключатель условий */}
+              <div className="my-5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-2">
+                  Формат расчета:
+                </span>
+                <div className="grid grid-cols-3 gap-2 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('monthly')}
+                    className={`py-2 px-3 rounded-xl transition-all cursor-pointer border ${
+                      paymentMode === 'monthly'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow'
+                        : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
+                    }`}
+                  >
+                    36 мес. (ежемесячно)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('quarterly')}
+                    className={`py-2 px-3 rounded-xl transition-all cursor-pointer border ${
+                      paymentMode === 'quarterly'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow'
+                        : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
+                    }`}
+                  >
+                    Поквартально (12 выплат)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMode('cash')}
+                    className={`py-2 px-3 rounded-xl transition-all cursor-pointer border ${
+                      paymentMode === 'cash'
+                        ? 'bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] border-transparent shadow'
+                        : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
+                    }`}
+                  >
+                    100% расчет (-6%)
+                  </button>
+                </div>
+              </div>
+
               {/* Финансовая сетка условий */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 my-6 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-xs">
                 <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10">
-                  <span className="text-[11px] text-gray-500 block mb-1">{c.estDownLabel}</span>
+                  <span className="text-[11px] text-gray-500 block mb-1">
+                    {financialCalc.isCash ? 'Полная сумма:' : c.estDownLabel}
+                  </span>
                   <strong className="text-base font-black text-gray-900 dark:text-white">
-                    ${matchedProject.downPaymentUsd.toLocaleString('ru-RU')}
+                    ${financialCalc.downPayment.toLocaleString('ru-RU')}
                   </strong>
                   <span className="text-[10px] text-gray-400 block mt-0.5">
-                    ≈ {Math.round(matchedProject.downPaymentUsd * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
+                    ≈ {Math.round(financialCalc.downPayment * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
                   </span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10">
-                  <span className="text-[11px] text-gray-500 block mb-1">Срок рассрочки:</span>
+                  <span className="text-[11px] text-gray-500 block mb-1">Срок и график:</span>
                   <strong className="text-base font-black text-gray-900 dark:text-white">
-                    {matchedProject.months} месяцев
+                    {financialCalc.isCash ? 'Единоразово' : `${financialCalc.months} мес. (${financialCalc.numberOfPayments} выплат)`}
                   </strong>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
                     0% переплат без банка
@@ -854,18 +944,18 @@ export default function SmartApartmentQuiz() {
 
                 <div className="p-3.5 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 border border-[#064734]/20 dark:border-[#d4b26f]/30">
                   <span className="text-[11px] text-[#064734] dark:text-[#d4b26f] font-bold block mb-1">
-                    {c.estMonthlyLabel}
+                    {financialCalc.isCash ? 'Чистая выгода:' : `Платеж в ${paymentMode === 'quarterly' ? 'квартал' : 'месяц'}:`}
                   </span>
                   <strong className="text-lg font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${matchedProject.monthlyUsd.toLocaleString('ru-RU')}
+                    ${(financialCalc.isCash ? Math.round(matchedProject.totalPriceUsd * 0.06) : financialCalc.paymentPerPeriod).toLocaleString('ru-RU')}
                   </strong>
                   <span className="text-[10px] text-gray-600 dark:text-neutral-300 block mt-0.5 font-semibold">
-                    ≈ {Math.round(matchedProject.monthlyUsd * usdRate).toLocaleString('ru-RU')} {c.somSuffix}/мес
+                    ≈ {Math.round((financialCalc.isCash ? matchedProject.totalPriceUsd * 0.06 : financialCalc.paymentPerPeriod) * usdRate).toLocaleString('ru-RU')} {c.somSuffix}
                   </span>
                 </div>
               </div>
 
-              {/* Кнопки целевых действий */}
+              {/* Кнопки действий */}
               <div className="space-y-3 pt-2">
                 <a
                   href={waUrl}

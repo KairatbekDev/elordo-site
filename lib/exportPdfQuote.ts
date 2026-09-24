@@ -62,7 +62,7 @@ async function loadPdfDependencies(): Promise<{ html2canvas: any; jsPDF: any }> 
   return { html2canvas, jsPDF };
 }
 
-// Генерация PDF в изолированном песочном фрейме (полная изоляция от Tailwind и функции lab())
+// Генерация PDF в изолированном iframe (без конфликта со стилями Tailwind и lab/oklch)
 async function generatePdfFromHtml(htmlContent: string, filename: string) {
   const { html2canvas, jsPDF } = await loadPdfDependencies();
 
@@ -84,7 +84,6 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
       throw new Error('Failed to access isolated iframe document');
     }
 
-    // Записываем разметку в изолированный контекст без Tailwind-стилей
     iframeDoc.open();
     iframeDoc.write(`
       <!DOCTYPE html>
@@ -97,9 +96,9 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #ffffff;
             color: #1a1a1a;
-            font-size: 10pt;
-            line-height: 1.4;
-            padding: 24px 28px;
+            font-size: 8.5pt;
+            line-height: 1.35;
+            padding: 20px 24px;
             width: 794px;
           }
         </style>
@@ -111,10 +110,8 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
     `);
     iframeDoc.close();
 
-    // Задержка 150мс для завершения расчета геометрии документа браузером
     await new Promise((resolve) => setTimeout(resolve, 150));
 
-    // Рендерим ТОЛЬКО изолированный body фрейма (в нем нет функции lab())
     const canvas = await html2canvas(iframeDoc.body, {
       scale: 2,
       useCORS: true,
@@ -158,92 +155,179 @@ export async function exportPdfQuote(data: PdfQuoteData) {
 
   const phone = COMPANY_INFO?.phones?.[0] || '+996 709 115 115';
   const whatsapp = COMPANY_INFO?.whatsapp || '996709115115';
+  const cleanWa = whatsapp.replace(/\D/g, '');
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://wa.me/${cleanWa}?text=Здравствуйте! Интересует коммерческое предложение ${quoteNumber}`)}`;
+
+  // Разделение графика на 2 колонки при большом количестве месяцев (> 12)
+  const isMultiColumn = data.paymentSchedule.length > 12;
+  const halfIndex = Math.ceil(data.paymentSchedule.length / 2);
+  const col1 = isMultiColumn ? data.paymentSchedule.slice(0, halfIndex) : data.paymentSchedule;
+  const col2 = isMultiColumn ? data.paymentSchedule.slice(halfIndex) : [];
 
   const html = `
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 14px;">
+    <!-- ШАПКА -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 8px; margin-bottom: 10px;">
       <div>
-        <div style="font-size: 19pt; font-weight: 900; color: #064734; text-transform: uppercase;">EL ORDO GROUP</div>
-        <div style="font-size: 8pt; font-weight: 700; color: #d4b26f; letter-spacing: 1.5px; text-transform: uppercase;">Строительная компания • Кыргызстан</div>
+        <div style="font-size: 18pt; font-weight: 900; color: #064734; text-transform: uppercase; letter-spacing: -0.5px;">EL ORDO GROUP</div>
+        <div style="font-size: 7.5pt; font-weight: 700; color: #d4b26f; letter-spacing: 1.5px; text-transform: uppercase;">Строительная компания • Официальное предложение</div>
       </div>
-      <div style="text-align: right; font-size: 8pt; color: #555555;">
+      <div style="text-align: right; font-size: 7.5pt; color: #555555; line-height: 1.3;">
         <div>Коммерческое предложение: <strong style="color: #064734;">${quoteNumber}</strong></div>
-        <div>Дата: ${todayStr}</div>
+        <div>Дата формирования: <strong>${todayStr}</strong></div>
         <div>Официальный курс НБКР: <strong style="color: #064734;">${data.usdRate} сом/$</strong></div>
       </div>
     </div>
 
-    <div style="background: #064734; color: #ffffff; padding: 10px 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+    <!-- ЗЕЛЕНЫЙ БАННЕР -->
+    <div style="background: #064734; color: #ffffff; padding: 8px 12px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div>
-        <div style="font-size: 11pt; font-weight: 800; text-transform: uppercase;">Индивидуальный расчет рассрочки 0%</div>
-        <div style="font-size: 8pt; opacity: 0.85; margin-top: 2px;">Без участия коммерческих банков • Без переплат • Переплата $0</div>
+        <div style="font-size: 10.5pt; font-weight: 800; text-transform: uppercase;">Индивидуальный расчет рассрочки 0% от застройщика</div>
+        <div style="font-size: 7.5pt; opacity: 0.9; margin-top: 1px;">Прямой договор • Без участия банков • Фиксация стоимости метра в ДДУ</div>
       </div>
-      <div style="background: #d4b26f; color: #064734; font-size: 8pt; font-weight: 900; padding: 3px 8px; border-radius: 12px; text-transform: uppercase;">0% переплат</div>
+      <div style="background: #d4b26f; color: #064734; font-size: 8pt; font-weight: 900; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; white-space: nowrap;">
+        0% переплат
+      </div>
     </div>
 
+    <!-- ВЫБРАННЫЙ ОБЪЕКТ -->
     ${data.selectedApartment ? `
-      <div style="border: 1.5px solid #d4b26f; background: #fdfbf7; border-radius: 8px; padding: 8px 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="border: 1.5px solid #d4b26f; background: #fdfbf7; border-radius: 6px; padding: 7px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-          <div style="font-size: 7.5pt; font-weight: 700; color: #d4b26f; text-transform: uppercase;">Выбранный объект</div>
-          <div style="font-size: 12pt; font-weight: 900; color: #064734;">${data.selectedApartment.complex}</div>
-          <div style="font-size: 8pt; color: #4a5568; margin-top: 1px;">
-            ${data.selectedApartment.rooms}-комнатная квартира • Площадь: ${data.selectedApartment.area} м² • ${data.selectedApartment.floor}           </div>         </div>         <div style="text-align: right;">           <div style="font-size: 7.5pt; color: #718096;">Стоимость за м²:</div>           <div style="font-size: 11pt; font-weight: 900; color: #064734;">$${data.selectedApartment.priceM2} / м²</div>
+          <div style="font-size: 7pt; font-weight: 700; color: #d4b26f; text-transform: uppercase;">Выбранный объект:</div>
+          <div style="font-size: 11.5pt; font-weight: 900; color: #064734;">${data.selectedApartment.complex}</div>
+          <div style="font-size: 7.5pt; color: #4a5568; margin-top: 1px;">
+            ${data.selectedApartment.rooms}-комнатная квартира • Площадь: <strong>${data.selectedApartment.area} м²</strong> • ${data.selectedApartment.floor}           </div>         </div>         <div style="text-align: right;">           <div style="font-size: 7pt; color: #718096;">Стоимость за м²:</div>           <div style="font-size: 11pt; font-weight: 900; color: #064734;">$${data.selectedApartment.priceM2} / м²</div>
         </div>
       </div>
     ` : ''}
 
-    <div style="font-size: 9.5pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 8px;">Финансовые условия покупки:</div>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;">
-      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
-        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #718096;">Стоимость квартиры</div>
-        <div style="font-size: 11pt; font-weight: 900; color: #064734;">$${data.apartmentPrice.toLocaleString('ru-RU')}</div>
-        <div style="font-size: 7pt; color: #718096;">≈ ${totalKgs.toLocaleString('ru-RU')} сом</div>
+    <!-- КАРТОЧКИ УСЛОВИЙ -->
+    <div style="font-size: 8.5pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 6px;">Финансовые параметры покупки:</div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;">
+      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 6px 8px; border-radius: 6px;">
+        <div style="font-size: 6.5pt; font-weight: 700; text-transform: uppercase; color: #718096;">Стоимость квартиры</div>
+        <div style="font-size: 10.5pt; font-weight: 900; color: #064734;">$${data.apartmentPrice.toLocaleString('ru-RU')}</div>
+        <div style="font-size: 6.5pt; color: #718096;">≈ ${totalKgs.toLocaleString('ru-RU')} сом</div>
       </div>
-      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
-        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #718096;">Первый взнос (${data.downPaymentPercent}%)</div>
-        <div style="font-size: 11pt; font-weight: 900; color: #064734;">$${data.downPaymentAmount.toLocaleString('ru-RU')}</div>
-        <div style="font-size: 7pt; color: #718096;">≈ ${downKgs.toLocaleString('ru-RU')} сом</div>
+      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 6px 8px; border-radius: 6px;">
+        <div style="font-size: 6.5pt; font-weight: 700; text-transform: uppercase; color: #718096;">Первый взнос (${data.downPaymentPercent}%)</div>
+        <div style="font-size: 10.5pt; font-weight: 900; color: #064734;">$${data.downPaymentAmount.toLocaleString('ru-RU')}</div>
+        <div style="font-size: 6.5pt; color: #718096;">≈ ${downKgs.toLocaleString('ru-RU')} сом</div>
       </div>
-      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
-        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #718096;">Срок рассрочки</div>
-        <div style="font-size: 11pt; font-weight: 900; color: #064734;">${data.months} мес.</div>
-        <div style="font-size: 7pt; color: #718096;">${data.frequency === 'monthly' ? 'Ежемесячно' : 'Поквартально'}</div>
+      <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 6px 8px; border-radius: 6px;">
+        <div style="font-size: 6.5pt; font-weight: 700; text-transform: uppercase; color: #718096;">Срок рассрочки</div>
+        <div style="font-size: 10.5pt; font-weight: 900; color: #064734;">${data.months > 0 ? `${data.months} мес.` : '100% расчет'}</div>
+        <div style="font-size: 6.5pt; color: #718096;">${data.frequency === 'monthly' ? 'Ежемесячно' : 'Поквартально'}</div>
       </div>
-      <div style="border: 1.5px solid #064734; background: #eef5f2; padding: 8px 10px; border-radius: 6px;">
-        <div style="font-size: 7pt; font-weight: 700; text-transform: uppercase; color: #064734;">Платеж в ${data.frequency === 'monthly' ? 'месяц' : 'квартал'}</div>
-        <div style="font-size: 11pt; font-weight: 900; color: #064734;">$${data.paymentPerPeriodUsd.toLocaleString('ru-RU')}</div>
-        <div style="font-size: 7pt; color: #064734; font-weight: 700;">≈ ${paymentKgs.toLocaleString('ru-RU')} сом</div>
+      <div style="border: 1.5px solid #064734; background: #eef5f2; padding: 6px 8px; border-radius: 6px;">
+        <div style="font-size: 6.5pt; font-weight: 700; text-transform: uppercase; color: #064734;">Платеж в ${data.frequency === 'monthly' ? 'месяц' : 'период'}</div>
+        <div style="font-size: 10.5pt; font-weight: 900; color: #064734;">$${data.paymentPerPeriodUsd.toLocaleString('ru-RU')}</div>
+        <div style="font-size: 6.5pt; color: #064734; font-weight: 700;">≈ ${paymentKgs.toLocaleString('ru-RU')} сом</div>
       </div>
     </div>
 
-    <div style="font-size: 9.5pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 6px;">График выплат беспроцентной рассрочки:</div>
-    <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 12px;">
-      <thead>
-        <tr style="background: #064734; color: #ffffff;">
-          <th style="padding: 5px 6px; text-align: left; width: 30px;">№</th>
-          <th style="padding: 5px 6px; text-align: left;">Период</th>
-          <th style="padding: 5px 6px; text-align: left;">Сумма платежа ($)</th>
-          <th style="padding: 5px 6px; text-align: left;">Сумма в сомах (НБКР: ${data.usdRate})</th>
-          <th style="padding: 5px 6px; text-align: right;">Остаток задолженности</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${data.paymentSchedule.map(row => `
-          <tr style="border-bottom: 1px solid #edf2f7; ${row.num % 2 === 0 ? 'background: #f8faf9;' : ''}">
-            <td style="padding: 3.5px 6px;"><strong>${row.num}</strong></td>
-            <td style="padding: 3.5px 6px;">${row.period}</td>             <td style="padding: 3.5px 6px;"><strong>$${row.paymentUsd.toLocaleString('ru-RU')}</strong></td>
-            <td style="padding: 3.5px 6px;">≈ ${row.paymentKgs.toLocaleString('ru-RU')} сом</td>             <td style="padding: 3.5px 6px; text-align: right; color: #718096;">$${row.balanceUsd.toLocaleString('ru-RU')}</td>
+    <!-- ЗАГОЛОВОК ГРАФИКА -->
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px;">
+      <div style="font-size: 8.5pt; font-weight: 800; color: #064734; text-transform: uppercase;">
+        График выплат беспроцентной рассрочки (${data.paymentSchedule.length} платежей):
+      </div>
+      <div style="font-size: 7pt; color: #718096; font-style: italic;">
+        Переплата: <strong>$0</strong> • Без скрытых комиссий
+      </div>
+    </div>
+
+    <!-- ТАБЛИЦА ГРАФИКА (Двухколоночная или одинарная) -->
+    ${isMultiColumn ? `
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+        <!-- Колонка 1 (1–18 мес.) -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt;">
+          <thead>
+            <tr style="background: #064734; color: #ffffff;">
+              <th style="padding: 3px 4px; text-align: left; width: 16px;">№</th>
+              <th style="padding: 3px 4px; text-align: left;">Период</th>
+              <th style="padding: 3px 4px; text-align: left;">Платеж ($)</th>
+              <th style="padding: 3px 4px; text-align: left;">В сомах</th>
+              <th style="padding: 3px 4px; text-align: right;">Остаток ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${col1.map(r => `
+              <tr style="border-bottom: 1px solid #edf2f7; ${r.num % 2 === 0 ? 'background: #f8faf9;' : ''}">
+                <td style="padding: 2px 4px;"><strong>${r.num}</strong></td>
+                <td style="padding: 2px 4px;">${r.period}</td>
+                <td style="padding: 2px 4px;"><strong>$${r.paymentUsd.toLocaleString('ru-RU')}</strong></td>
+                <td style="padding: 2px 4px;">≈ ${r.paymentKgs.toLocaleString('ru-RU')} с</td>
+                <td style="padding: 2px 4px; text-align: right; color: #718096;">$${r.balanceUsd.toLocaleString('ru-RU')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        <!-- Колонка 2 (19–36 мес.) -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt;">
+          <thead>
+            <tr style="background: #064734; color: #ffffff;">
+              <th style="padding: 3px 4px; text-align: left; width: 16px;">№</th>
+              <th style="padding: 3px 4px; text-align: left;">Период</th>
+              <th style="padding: 3px 4px; text-align: left;">Платеж ($)</th>
+              <th style="padding: 3px 4px; text-align: left;">В сомах</th>
+              <th style="padding: 3px 4px; text-align: right;">Остаток ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${col2.map(r => `
+              <tr style="border-bottom: 1px solid #edf2f7; ${r.num % 2 === 0 ? 'background: #f8faf9;' : ''}">
+                <td style="padding: 2px 4px;"><strong>${r.num}</strong></td>
+                <td style="padding: 2px 4px;">${r.period}</td>
+                <td style="padding: 2px 4px;"><strong>$${r.paymentUsd.toLocaleString('ru-RU')}</strong></td>
+                <td style="padding: 2px 4px;">≈ ${r.paymentKgs.toLocaleString('ru-RU')} с</td>
+                <td style="padding: 2px 4px; text-align: right; color: #718096;">$${r.balanceUsd.toLocaleString('ru-RU')}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    ` : `
+      <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 10px;">
+        <thead>
+          <tr style="background: #064734; color: #ffffff;">
+            <th style="padding: 4px 6px; text-align: left; width: 25px;">№</th>
+            <th style="padding: 4px 6px; text-align: left;">Период</th>
+            <th style="padding: 4px 6px; text-align: left;">Сумма платежа ($)</th>
+            <th style="padding: 4px 6px; text-align: left;">Сумма в сомах (НБКР: ${data.usdRate})</th>
+            <th style="padding: 4px 6px; text-align: right;">Остаток задолженности</th>
           </tr>
-        `).join('')}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          ${col1.map(r => `
+            <tr style="border-bottom: 1px solid #edf2f7; ${r.num % 2 === 0 ? 'background: #f8faf9;' : ''}">
+              <td style="padding: 3px 6px;"><strong>${r.num}</strong></td>
+              <td style="padding: 3px 6px;">${r.period}</td>
+              <td style="padding: 3px 6px;"><strong>$${r.paymentUsd.toLocaleString('ru-RU')}</strong></td>
+              <td style="padding: 3px 6px;">≈ ${r.paymentKgs.toLocaleString('ru-RU')} сом</td>
+              <td style="padding: 3px 6px; text-align: right; color: #718096;">$${r.balanceUsd.toLocaleString('ru-RU')}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `}
 
-    <div style="font-size: 6.5pt; color: #718096; line-height: 1.3; margin-bottom: 10px; font-style: italic;">
-      * Расчет носит предварительный характер. Оплата производится в национальной валюте (сом) по официальному учетному курсу НБКР на день фактической оплаты. Все сделки регистрируются в Едином государственном реестре прав на недвижимое имущество (Госрегистр КР).
-    </div>
+    <!-- ПРЕМИУМ-ФУТЕР С QR-КОДОМ И СТАТУСОМ -->
+    <div style="border-top: 1.5px solid #064734; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 7pt; color: #555555;">
+      <div style="max-w: 620px;">
+        <div style="font-size: 7.5pt; font-weight: 800; color: #064734; margin-bottom: 2px;">
+          Отдел продаж EL ORDO GROUP: ${phone} • WhatsApp: +${cleanWa}
+        </div>
+        <div style="line-height: 1.3; color: #718096; font-style: italic;">
+          * Расчет носит предварительный характер. Оплата производится в сомах по официальному учетному курсу НБКР на день фактической оплаты. Все договоры подлежат государственной регистрации в Госрегистре КР. Предложение действительно в течение 14 дней.
+        </div>
+        <div style="margin-top: 2px; color: #064734; font-weight: 700;">Официальный сайт: elordogroup.com • Центральный офис: ${COMPANY_INFO.address}</div>
+      </div>
 
-    <div style="border-top: 1px solid #e2e8f0; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: #718096;">
-      <div>Отдел продаж EL ORDO GROUP: <strong style="color: #064734;">${phone}</strong> • WhatsApp: <strong style="color: #064734;">${whatsapp}</strong></div>
-      <div>Официальный сайт: <strong style="color: #064734;">elordogroup.com</strong></div>
+      <div style="text-align: center; margin-left: 14px; flex-shrink: 0;">
+        <img src="${qrUrl}" alt="WhatsApp QR" style="width: 52px; height: 52px; display: block; margin: 0 auto 2px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px;" />
+        <span style="font-size: 5.5pt; color: #064734; font-weight: 800; text-transform: uppercase;">Связь в WhatsApp</span>
+      </div>
     </div>
   `;
 
@@ -261,9 +345,11 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
 
   const phone = COMPANY_INFO?.phones?.[0] || '+996 709 115 115';
   const whatsapp = COMPANY_INFO?.whatsapp || '996709115115';
+  const cleanWa = whatsapp.replace(/\D/g, '');
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://wa.me/${cleanWa}?text=Здравствуйте! Хочу получить официальный каталог объектов EL ORDO GROUP`)}`;
 
   const html = `
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 14px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 12px;">
       <div>
         <div style="font-size: 19pt; font-weight: 900; color: #064734; text-transform: uppercase;">EL ORDO GROUP</div>
         <div style="font-size: 8pt; font-weight: 700; color: #d4b26f; letter-spacing: 1.5px; text-transform: uppercase;">Строительная компания • Официальная презентация</div>
@@ -274,54 +360,60 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
       </div>
     </div>
 
-    <div style="background: #f8faf9; border: 1.5px solid #064734; padding: 12px 14px; border-radius: 8px; margin-bottom: 14px;">
-      <div style="font-size: 12pt; font-weight: 900; color: #064734; text-transform: uppercase; margin-bottom: 4px;">Архитектура вашего статуса и семейного уюта</div>
-      <div style="font-size: 8pt; color: #333333; line-height: 1.4;">${COMPANY_INFO.history.text}</div>
+    <div style="background: #f8faf9; border: 1.5px solid #064734; padding: 12px 14px; border-radius: 8px; margin-bottom: 12px;">
+      <div style="font-size: 11pt; font-weight: 900; color: #064734; text-transform: uppercase; margin-bottom: 4px;">Архитектура вашего статуса и семейного уюта</div>
+      <div style="font-size: 7.5pt; color: #333333; line-height: 1.4;">${COMPANY_INFO.history.text}</div>
     </div>
 
-    <div style="font-size: 9.5pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 8px; border-left: 3px solid #d4b26f; padding-left: 6px;">1. Программы покупки:</div>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;">
+    <div style="font-size: 9pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #d4b26f; padding-left: 6px;">1. Программы покупки:</div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
       <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
         <div style="font-size: 8pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 2px;">Рассрочка 0%</div>
-        <div style="font-size: 7.5pt; color: #4a5568; line-height: 1.3;">Прямо от застройщика до 36-40 месяцев без участия банков и справок.</div>
+        <div style="font-size: 7pt; color: #4a5568; line-height: 1.3;">Прямо от застройщика до 36-40 месяцев без участия банков и справок.</div>
       </div>
       <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
         <div style="font-size: 8pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 2px;">Trade-in (Бартер)</div>
-        <div style="font-size: 7.5pt; color: #4a5568; line-height: 1.3;">Обмен авто или вторичной недвижимости на новостройку с оценкой за 24 часа.</div>
+        <div style="font-size: 7pt; color: #4a5568; line-height: 1.3;">Обмен авто или вторичной недвижимости на новостройку с оценкой за 24 часа.</div>
       </div>
       <div style="border: 1px solid #e2e8f0; background: #f8faf9; padding: 8px 10px; border-radius: 6px;">
         <div style="font-size: 8pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 2px;">100% Расчет</div>
-        <div style="font-size: 7.5pt; color: #4a5568; line-height: 1.3;">Максимальный персональный дисконт и приоритетный выбор видовых этажей.</div>
+        <div style="font-size: 7pt; color: #4a5568; line-height: 1.3;">Максимальный персональный дисконт и приоритетный выбор видовых этажей.</div>
       </div>
     </div>
 
-    <div style="font-size: 9.5pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 8px; border-left: 3px solid #d4b26f; padding-left: 6px;">2. Каталог жилых комплексов:</div>
-    <table style="width: 100%; border-collapse: collapse; font-size: 8pt; margin-bottom: 14px;">
+    <div style="font-size: 9pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #d4b26f; padding-left: 6px;">2. Каталог строящихся и завершенных комплексов:</div>
+    <table style="width: 100%; border-collapse: collapse; font-size: 7.5pt; margin-bottom: 12px;">
       <thead>
         <tr style="background: #064734; color: #ffffff;">
-          <th style="padding: 5px 8px; text-align: left;">Жилой комплекс</th>
-          <th style="padding: 5px 8px; text-align: left;">Класс</th>
-          <th style="padding: 5px 8px; text-align: left;">Адрес</th>
-          <th style="padding: 5px 8px; text-align: left;">Срок сдачи</th>
-          <th style="padding: 5px 8px; text-align: right;">Стоимость за м²</th>
+          <th style="padding: 4px 6px; text-align: left;">Жилой комплекс</th>
+          <th style="padding: 4px 6px; text-align: left;">Класс</th>
+          <th style="padding: 4px 6px; text-align: left;">Адрес</th>
+          <th style="padding: 4px 6px; text-align: left;">Срок сдачи</th>
+          <th style="padding: 4px 6px; text-align: right;">Стоимость за м²</th>
         </tr>
       </thead>
       <tbody>
         ${PROJECTS.map((proj: any) => `
           <tr style="border-bottom: 1px solid #edf2f7;">
-            <td style="padding: 5px 8px;"><strong>${proj.name}</strong></td>
-            <td style="padding: 5px 8px;">${proj.classType}</td>
-            <td style="padding: 5px 8px;">${proj.address}</td>
-            <td style="padding: 5px 8px;">${proj.deadline}</td>
-            <td style="padding: 5px 8px; text-align: right; color: #064734; font-weight: 800;">${proj.price}</td>
+            <td style="padding: 4px 6px;"><strong>${proj.name}</strong></td>
+            <td style="padding: 4px 6px;">${proj.classType}</td>
+            <td style="padding: 4px 6px;">${proj.address}</td>
+            <td style="padding: 4px 6px;">${proj.deadline}</td>
+            <td style="padding: 4px 6px; text-align: right; color: #064734; font-weight: 800;">${proj.price}</td>
           </tr>
         `).join('')}
       </tbody>
     </table>
 
-    <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 7.5pt; color: #718096;">
-      <div>Центральный офис: ${COMPANY_INFO.address} • Тел: <strong style="color: #064734;">${phone}</strong> • WhatsApp: <strong style="color: #064734;">${whatsapp}</strong></div>
-      <div>Официальный сайт: <strong style="color: #064734;">elordogroup.com</strong></div>
+    <div style="border-top: 1.5px solid #064734; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 7pt; color: #718096;">
+      <div>
+        <div style="font-weight: 800; color: #064734;">Центральный офис: ${COMPANY_INFO.address} • Тел: ${phone} • WhatsApp: +${cleanWa}</div>
+        <div>Официальный сайт: <strong>elordogroup.com</strong></div>
+      </div>
+      <div style="text-align: center; flex-shrink: 0; margin-left: 12px;">
+        <img src="${qrUrl}" alt="QR" style="width: 50px; height: 50px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px; display: block; margin: 0 auto 2px;" />
+        <span style="font-size: 5.5pt; color: #064734; font-weight: 800; text-transform: uppercase;">WhatsApp отдел продаж</span>
+      </div>
     </div>
   `;
 
