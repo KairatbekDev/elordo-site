@@ -25,18 +25,33 @@ export interface PdfQuoteData {
   }>;
 }
 
-// Загрузка стабильных библиотек генерации
+// Динамическая загрузка библиотек html2canvas и jsPDF
 async function loadPdfDependencies(): Promise<{ html2canvas: any; jsPDF: any }> {
-  if (typeof window === 'undefined') throw new Error('Client only');
+  if (typeof window === 'undefined') throw new Error('Client only execution');
 
   const loadScript = (src: string, globalCheck: () => any) => {
     return new Promise((resolve, reject) => {
       const existing = globalCheck();
       if (existing) return resolve(existing);
+
       const script = document.createElement('script');
       script.src = src;
-      script.onload = () => resolve(globalCheck());
-      script.onerror = () => reject(new Error(`Failed to load ${src}`));
+      script.crossOrigin = 'anonymous';
+      script.async = true;
+
+      const timeoutId = setTimeout(() => {
+        reject(new Error(`Timeout loading PDF dependency: ${src}`));
+      }, 10000);
+
+      script.onload = () => {
+        clearTimeout(timeoutId);
+        resolve(globalCheck());
+      };
+      script.onerror = () => {
+        clearTimeout(timeoutId);
+        reject(new Error(`Failed to load ${src}`));
+      };
+
       document.head.appendChild(script);
     });
   };
@@ -56,7 +71,7 @@ async function loadPdfDependencies(): Promise<{ html2canvas: any; jsPDF: any }> 
   const jsPDF = (window as any).jspdf?.jsPDF;
 
   if (!html2canvas || !jsPDF) {
-    throw new Error('PDF libraries failed to initialize');
+    throw new Error('PDF generation libraries failed to initialize');
   }
 
   return { html2canvas, jsPDF };
@@ -71,7 +86,7 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
   iframe.style.left = '-9999px';
   iframe.style.top = '-9999px';
   iframe.style.width = '794px';
-  iframe.style.height = '1123px';
+  iframe.style.minHeight = '1123px';
   iframe.style.border = 'none';
   iframe.style.opacity = '0';
   iframe.style.pointerEvents = 'none';
@@ -98,8 +113,9 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
             color: #1a1a1a;
             font-size: 8.5pt;
             line-height: 1.35;
-            padding: 20px 24px;
+            padding: 24px 28px;
             width: 794px;
+            -webkit-print-color-adjust: exact;
           }
         </style>
       </head>
@@ -110,11 +126,13 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
     `);
     iframeDoc.close();
 
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    // Пауза для полной отрисовки шрифтов и изображений
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     const canvas = await html2canvas(iframeDoc.body, {
       scale: 2,
       useCORS: true,
+      allowTaint: false,
       logging: false,
       backgroundColor: '#ffffff',
       windowWidth: 794,
@@ -128,9 +146,26 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
     });
 
     const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    // Автоматическая многостраничная нарезка холста при необходимости
+    if (pdfHeight <= pageHeight) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    } else {
+      let heightLeft = pdfHeight;
+      let position = 0;
+
+      while (heightLeft > 0) {
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pageHeight;
+        position -= pageHeight;
+        if (heightLeft > 0) {
+          pdf.addPage();
+        }
+      }
+    }
+
     pdf.save(filename);
   } finally {
     if (iframe.parentNode) {
@@ -139,7 +174,7 @@ async function generatePdfFromHtml(htmlContent: string, filename: string) {
   }
 }
 
-// 1. Прямое скачивание персонального расчета КП в файл .pdf
+// 1. Генерация персонального коммерческого предложения рассрочки
 export async function exportPdfQuote(data: PdfQuoteData) {
   const quoteNumber = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
   const totalKgs = Math.round(data.apartmentPrice * data.usdRate);
@@ -158,7 +193,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
   const cleanWa = whatsapp.replace(/\D/g, '');
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://wa.me/${cleanWa}?text=Здравствуйте! Интересует коммерческое предложение ${quoteNumber}`)}`;
 
-  // Разделение графика на 2 колонки при большом количестве месяцев (> 12)
+  // Разделение графика на 2 колонки при большом количестве платежей (> 12)
   const isMultiColumn = data.paymentSchedule.length > 12;
   const halfIndex = Math.ceil(data.paymentSchedule.length / 2);
   const col1 = isMultiColumn ? data.paymentSchedule.slice(0, halfIndex) : data.paymentSchedule;
@@ -236,10 +271,9 @@ export async function exportPdfQuote(data: PdfQuoteData) {
       </div>
     </div>
 
-    <!-- ТАБЛИЦА ГРАФИКА (Двухколоночная или одинарная) -->
+    <!-- ТАБЛИЦА ГРАФИКА -->
     ${isMultiColumn ? `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-        <!-- Колонка 1 (1–18 мес.) -->
         <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt;">
           <thead>
             <tr style="background: #064734; color: #ffffff;">
@@ -263,7 +297,6 @@ export async function exportPdfQuote(data: PdfQuoteData) {
           </tbody>
         </table>
 
-        <!-- Колонка 2 (19–36 мес.) -->
         <table style="width: 100%; border-collapse: collapse; font-size: 6.5pt;">
           <thead>
             <tr style="background: #064734; color: #ffffff;">
@@ -314,7 +347,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
 
     <!-- ПРЕМИУМ-ФУТЕР С QR-КОДОМ И СТАТУСОМ -->
     <div style="border-top: 1.5px solid #064734; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 7pt; color: #555555;">
-      <div style="max-w: 620px;">
+      <div style="max-width: 620px;">
         <div style="font-size: 7.5pt; font-weight: 800; color: #064734; margin-bottom: 2px;">
           Отдел продаж EL ORDO GROUP: ${phone} • WhatsApp: +${cleanWa}
         </div>
@@ -325,7 +358,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
       </div>
 
       <div style="text-align: center; margin-left: 14px; flex-shrink: 0;">
-        <img src="${qrUrl}" alt="WhatsApp QR" style="width: 52px; height: 52px; display: block; margin: 0 auto 2px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px;" />
+        <img src="${qrUrl}" alt="WhatsApp QR" crossorigin="anonymous" style="width: 52px; height: 52px; display: block; margin: 0 auto 2px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px;" />
         <span style="font-size: 5.5pt; color: #064734; font-weight: 800; text-transform: uppercase;">Связь в WhatsApp</span>
       </div>
     </div>
@@ -334,7 +367,7 @@ export async function exportPdfQuote(data: PdfQuoteData) {
   await generatePdfFromHtml(html, `Raschet_EL_ORDO_${quoteNumber}.pdf`);
 }
 
-// 2. Прямое скачивание каталога и презентации компании в файл .pdf
+// 2. Генерация официального каталога и презентации компании
 export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
   const todayStr = new Intl.DateTimeFormat('ru-RU', {
     timeZone: 'Asia/Bishkek',
@@ -347,6 +380,15 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
   const whatsapp = COMPANY_INFO?.whatsapp || '996709115115';
   const cleanWa = whatsapp.replace(/\D/g, '');
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(`https://wa.me/${cleanWa}?text=Здравствуйте! Хочу получить официальный каталог объектов EL ORDO GROUP`)}`;
+
+  const companyHistory =
+    typeof COMPANY_INFO.history === 'string'
+      ? COMPANY_INFO.history
+      : (COMPANY_INFO as any).history?.text ||
+        (Array.isArray((COMPANY_INFO as any).history)
+          ? (COMPANY_INFO as any).history.map((h: any) => h.text || '').join(' ')
+          : '') ||
+        'EL ORDO GROUP — строительная компания нового поколения в Кыргызстане. Мы проектируем и возводим современные жилые комплексы повышенной комфортности с прямыми договорами долевого участия.';
 
   const html = `
     <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #064734; padding-bottom: 10px; margin-bottom: 12px;">
@@ -362,7 +404,7 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
 
     <div style="background: #f8faf9; border: 1.5px solid #064734; padding: 12px 14px; border-radius: 8px; margin-bottom: 12px;">
       <div style="font-size: 11pt; font-weight: 900; color: #064734; text-transform: uppercase; margin-bottom: 4px;">Архитектура вашего статуса и семейного уюта</div>
-      <div style="font-size: 7.5pt; color: #333333; line-height: 1.4;">${COMPANY_INFO.history.text}</div>
+      <div style="font-size: 7.5pt; color: #333333; line-height: 1.4;">${companyHistory}</div>
     </div>
 
     <div style="font-size: 9pt; font-weight: 800; color: #064734; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #d4b26f; padding-left: 6px;">1. Программы покупки:</div>
@@ -393,15 +435,22 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
         </tr>
       </thead>
       <tbody>
-        ${PROJECTS.map((proj: any) => `
-          <tr style="border-bottom: 1px solid #edf2f7;">
-            <td style="padding: 4px 6px;"><strong>${proj.name}</strong></td>
-            <td style="padding: 4px 6px;">${proj.classType}</td>
-            <td style="padding: 4px 6px;">${proj.address}</td>
-            <td style="padding: 4px 6px;">${proj.deadline}</td>
-            <td style="padding: 4px 6px; text-align: right; color: #064734; font-weight: 800;">${proj.price}</td>
-          </tr>
-        `).join('')}
+        ${PROJECTS.map((proj: any) => {
+          const priceDisplay = typeof proj.price === 'string' ? proj.price : proj.price?.ru || 'По запросу';
+          const deadlineDisplay = typeof proj.deadline === 'string' ? proj.deadline : proj.deadline?.ru || 'Уточняйте';
+          const classDisplay = typeof proj.classType === 'string' ? proj.classType : proj.classType?.ru || proj.class || 'Комфорт';
+          const addressDisplay = typeof proj.address === 'string' ? proj.address : proj.address?.ru || '';
+
+          return `
+            <tr style="border-bottom: 1px solid #edf2f7;">
+              <td style="padding: 4px 6px;"><strong>${proj.name}</strong></td>
+              <td style="padding: 4px 6px;">${classDisplay}</td>
+              <td style="padding: 4px 6px;">${addressDisplay}</td>
+              <td style="padding: 4px 6px;">${deadlineDisplay}</td>
+              <td style="padding: 4px 6px; text-align: right; color: #064734; font-weight: 800;">${priceDisplay}</td>
+            </tr>
+          `;
+        }).join('')}
       </tbody>
     </table>
 
@@ -411,7 +460,7 @@ export async function downloadCompanyBrochurePdf(usdRate: number = 87.45) {
         <div>Официальный сайт: <strong>elordogroup.com</strong></div>
       </div>
       <div style="text-align: center; flex-shrink: 0; margin-left: 12px;">
-        <img src="${qrUrl}" alt="QR" style="width: 50px; height: 50px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px; display: block; margin: 0 auto 2px;" />
+        <img src="${qrUrl}" alt="QR" crossorigin="anonymous" style="width: 50px; height: 50px; border: 1px solid #d4b26f; padding: 2px; border-radius: 4px; display: block; margin: 0 auto 2px;" />
         <span style="font-size: 5.5pt; color: #064734; font-weight: 800; text-transform: uppercase;">WhatsApp отдел продаж</span>
       </div>
     </div>
