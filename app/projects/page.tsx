@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import ApartmentSelector from '@/components/ApartmentSelector';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconBuilding,
   IconCrane,
@@ -25,6 +26,17 @@ interface ProjectRaw {
   classCategory: 'premium' | 'business' | 'comfort';
   image: string;
   priceNum: number;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const RAW_PROJECTS: ProjectRaw[] = [
@@ -131,7 +143,7 @@ const ADDRESSES: Record<string, Record<Locale, string>> = {
 
 export default function ProjectsCatalogPage() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
   const p = t.projectsPage;
 
@@ -142,7 +154,6 @@ export default function ProjectsCatalogPage() {
 
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
-  // Динамический заголовок вкладки браузера для каталога
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.title = `${p.heroTitle} | EL ORDO GROUP`;
@@ -170,7 +181,6 @@ export default function ProjectsCatalogPage() {
         case 'madina-residence':
           classType = p.madinaClass;
           deadline = p.madinaDeadline;
-          // Фиксируем «14 этажей • 3 блока» под все языки
           floors =
             currentLang === 'en'
               ? '14 floors • 3 blocks'
@@ -276,7 +286,7 @@ export default function ProjectsCatalogPage() {
       
       {/* 1. Хлебные крошки */}
       <div className="bg-white dark:bg-[#0b1b15] border-b border-gray-100 dark:border-white/10 transition-colors">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center gap-2 text-xs font-medium text-gray-400 dark:text-neutral-400">
           <Link href="/" className="hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors">
             {t.common.home}
           </Link>
@@ -285,35 +295,35 @@ export default function ProjectsCatalogPage() {
         </div>
       </div>
 
-      {/* 2. Заголовок раздела со сводными метриками */}
-      <section className="bg-[#064734] text-white py-16 px-6 relative overflow-hidden">
+      {/* 2. Заголовок раздела с живыми метриками */}
+      <section className="bg-gradient-to-b from-[#064734] to-[#04241a] text-white py-16 px-4 sm:px-6 relative overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             {p.heroBadge}
           </span>
-          <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-wide mb-4">
+          <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight mb-4 drop-shadow-sm">
             {p.heroTitle}
           </h1>
-          <p className="text-sm sm:text-base text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-8">
+          <p className="text-sm sm:text-base text-white/85 max-w-2xl mx-auto font-light leading-relaxed mb-8">
             {p.heroDesc}
           </p>
 
           {/* Быстрые цифры */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{p.statTotalLabel}</span>
+            <div className="p-4 rounded-2xl bg-white/10 dark:bg-black/30 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{p.statTotalLabel}</span>
               <strong className="text-lg font-black text-white">{p.statTotalVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{p.statPriceLabel}</span>
+            <div className="p-4 rounded-2xl bg-white/10 dark:bg-black/30 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{p.statPriceLabel}</span>
               <strong className="text-lg font-black text-[#d4b26f]">{p.statPriceVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{p.statInstallmentLabel}</span>
+            <div className="p-4 rounded-2xl bg-white/10 dark:bg-black/30 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{p.statInstallmentLabel}</span>
               <strong className="text-lg font-black text-white">{p.statInstallmentVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{p.statBarterLabel}</span>
+            <div className="p-4 rounded-2xl bg-white/10 dark:bg-black/30 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{p.statBarterLabel}</span>
               <strong className="text-lg font-black text-white">{p.statBarterVal}</strong>
             </div>
           </div>
@@ -321,7 +331,7 @@ export default function ProjectsCatalogPage() {
       </section>
 
       {/* 3. Панель поиска и фильтров */}
-      <div className="max-w-6xl mx-auto px-6 mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
         
         {/* Верхняя панель: Поиск и Сортировка */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-4">
@@ -433,7 +443,7 @@ export default function ProjectsCatalogPage() {
                 onClick={() => setClassFilter(cls.id as typeof classFilter)}
                 className={`px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   classFilter === cls.id
-                    ? 'bg-gray-900 dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold'
+                    ? 'bg-gray-900 dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold shadow-sm'
                     : 'bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -470,10 +480,10 @@ export default function ProjectsCatalogPage() {
               return (
                 <div
                   key={project.slug}
-                  className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl dark:hover:border-[#d4b26f]/30 transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-[#0b1b15] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-md hover:shadow-2xl dark:hover:border-[#d4b26f]/30 transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Изображение проекта через next/image */}
+                    {/* Изображение проекта */}
                     <div className="relative h-64 w-full overflow-hidden bg-neutral-900">
                       <Image
                         src={project.image}
@@ -481,19 +491,26 @@ export default function ProjectsCatalogPage() {
                         fill
                         priority={index < 2}
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
 
-                      {/* Бейдж статуса */}
+                      {/* Градиентная тень на рендере */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
+
+                      {/* Бейдж статуса с индикатором активности */}
                       <div className="absolute top-4 left-4 z-10">
                         <span
-                          className={`inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow-md ${
+                          className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl shadow-lg backdrop-blur-md ${
                             isFinished
-                              ? 'bg-[#2b2b2b] text-white'
-                              : 'bg-[#d4b26f] text-[#064734]'
+                              ? 'bg-neutral-900/90 text-white border border-white/15'
+                              : 'bg-[#d4b26f] text-[#064734] border border-[#d4b26f]/50'
                           }`}
                         >
-                          {isFinished && <IconCheck className="w-3.5 h-3.5 text-emerald-400" />}
+                          {isFinished ? (
+                            <IconCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full bg-[#064734] animate-pulse" />
+                          )}
                           <span>{isFinished ? p.statusFinished : project.classType}</span>
                         </span>
                       </div>
@@ -502,7 +519,7 @@ export default function ProjectsCatalogPage() {
                       {project.price && (
                         <div 
                           suppressHydrationWarning
-                          className="absolute bottom-4 right-4 z-10 bg-[#064734]/90 dark:bg-black/75 backdrop-blur-md text-[#d4b26f] text-xs font-black px-3 py-1.5 rounded-xl border border-white/10 shadow"
+                          className="absolute bottom-4 right-4 z-10 bg-[#064734]/95 dark:bg-black/85 backdrop-blur-md text-[#d4b26f] text-xs font-black px-3.5 py-1.5 rounded-xl border border-white/15 shadow-lg"
                         >
                           {project.price}
                         </div>
@@ -511,13 +528,30 @@ export default function ProjectsCatalogPage() {
 
                     {/* Контентная часть */}
                     <div className="p-6">
-                      <h2 className="text-xl font-black text-gray-950 dark:text-white mb-2 group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
-                        {project.name}
-                      </h2>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <h2 className="text-xl font-black text-gray-950 dark:text-white group-hover:text-[#064734] dark:group-hover:text-[#d4b26f] transition-colors">
+                          {project.name}
+                        </h2>
+                      </div>
                       
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-5 leading-relaxed line-clamp-2">
+                      <p className="text-xs text-gray-600 dark:text-gray-300 mb-4 leading-relaxed line-clamp-2">
                         {project.desc}
                       </p>
+
+                      {/* Теги преимуществ */}
+                      {!isFinished && (
+                        <div className="flex flex-wrap gap-1.5 mb-4">
+                          <span className="px-2 py-0.5 rounded-lg bg-emerald-50 dark:bg-white/5 border border-emerald-200/50 dark:border-white/10 text-[10px] font-bold text-emerald-800 dark:text-emerald-400">
+                            0% Рассрочка
+                          </span>
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-50 dark:bg-white/5 border border-amber-200/50 dark:border-white/10 text-[10px] font-bold text-amber-800 dark:text-[#d4b26f]">
+                            Trade-in
+                          </span>
+                          <span className="px-2 py-0.5 rounded-lg bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-[10px] font-bold text-gray-700 dark:text-gray-300">
+                            Красная книга
+                          </span>
+                        </div>
+                      )}
 
                       <div className="space-y-2.5 text-xs text-gray-600 dark:text-gray-300 border-t border-gray-100 dark:border-white/10 pt-4 font-medium">
                         <div className="flex items-center gap-2">
@@ -540,7 +574,7 @@ export default function ProjectsCatalogPage() {
                   <div className="p-6 pt-0 space-y-2">
                     <Link
                       href={`/${project.slug}`}
-                      className="w-full text-center bg-[#064734] hover:bg-[#042e22] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>{p.detailsBtn}</span>
                       <IconArrowRight className="w-4 h-4" />
@@ -551,6 +585,7 @@ export default function ProjectsCatalogPage() {
                         href={`https://wa.me/${cleanWaNumber}?text=${waProjectText}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => trackWhatsAppClick('catalog_card_ask', project.name)}
                         className="w-full text-center bg-gray-100 hover:bg-[#064734]/10 dark:bg-white/10 dark:hover:bg-white/15 text-[#064734] dark:text-[#d4b26f] font-bold py-2.5 rounded-xl uppercase tracking-wider text-[11px] transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <IconWhatsApp className="w-3.5 h-3.5 text-[#25D366]" />
@@ -592,7 +627,7 @@ export default function ProjectsCatalogPage() {
       </div>
 
       {/* 6. Баннер консультации внизу каталога */}
-      <div className="max-w-6xl mx-auto px-6 mt-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-8">
         <div className="bg-[#dbe3df] dark:bg-[#0b1b15] rounded-3xl p-8 sm:p-12 border border-[#064734]/15 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 transition-colors">
           <div className="max-w-xl text-center md:text-left">
             <span className="text-xs uppercase font-bold tracking-wider text-[#064734] dark:text-[#d4b26f] block mb-1">
@@ -610,6 +645,7 @@ export default function ProjectsCatalogPage() {
             href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(p.waCatalogText)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('catalog_bottom_cta', 'Все проекты')}
             className="shrink-0 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-white dark:text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 border border-transparent cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
