@@ -29,6 +29,7 @@ interface TradeInCase {
   badge: string;
   slug: string;
   waText: string;
+  btnText: string;
 }
 
 interface AcceptedCategory {
@@ -106,6 +107,8 @@ interface TradeInContent {
   phRealtyAddress: string;
   labelYear: string;
   phYear: string;
+  labelRealtyFloorSeries: string;
+  phRealtyFloorSeries: string;
   labelPhone: string;
   labelEstimated: string;
   phEstimated: string;
@@ -116,8 +119,15 @@ interface TradeInContent {
   previewRemaining: string;
   downPaymentRequiredLabel: string;
   cashNeededLabel: string;
+  cashNeededSuffix: string;
   monthlyEstimateLabel: string;
   totalApartmentCostLabel: string;
+  presetsLabel: string;
+  coverageSuffix: string;
+  surplusNotePrefix: string;
+  surplusNoteSuffix: string;
+  perMonthSuffix: string;
+  evalTimeBadge: string;
   somUnit: string;
 }
 
@@ -176,6 +186,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Популярный обмен',
         slug: 'madina-residence',
         waText: 'Здравствуйте! Хочу обменять легковой автомобиль (Toyota Camry / аналогичный) по программе Trade-in на квартиру в ЖК Madina Residence. Как пройти осмотр?',
+        btnText: 'Оценить похожее авто',
       },
       {
         asset: 'Lexus GX 460 (2016 г.)',
@@ -189,6 +200,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Премиум Trade-in',
         slug: 'abu-dhabi',
         waText: 'Здравствуйте! Интересует обмен внедорожника (Lexus / Toyota Prado) на 2-комнатную квартиру в ЖК Abu Dhabi по Trade-in. Подскажите условия оценки.',
+        btnText: 'Оценить похожее авто',
       },
       {
         asset: '1-комн. квартира 105 серии',
@@ -202,11 +214,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Обмен жилья',
         slug: 'ajkol-plus',
         waText: 'Здравствуйте! Хочу обменять вторичную 1-комнатную квартиру на новую в ЖД Айкол+ (Кок-Жар) по Trade-in. Подскажите процедуру выезда оценщика.',
+        btnText: 'Оценить недвижимость',
       },
     ],
     valuationLabel: 'Оценка эксперта EL ORDO:',
     selectedObjectLabel: 'Выбранный объект:',
-    btnEvaluateCase: 'Оценить похожее авто',
+    btnEvaluateCase: 'Оценить актив',
     aboutComplexBtn: 'О комплексе',
     tableBadge: 'Экономия времени и денег',
     tableTitle: 'Trade-in EL ORDO или продажа на авторынке?',
@@ -293,18 +306,27 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: 'Например: 2-комн., 60 м², ул. Киевская',
     labelYear: 'Год выпуска / Состояние:',
     phYear: 'Например: 2021, отличное состояние',
+    labelRealtyFloorSeries: 'Этаж / Серия дома / Параметры:',
+    phRealtyFloorSeries: 'Например: 4/9 этаж, 105 серия',
     labelPhone: 'Ваш телефон для связи:',
     labelEstimated: 'Оценочная стоимость актива ($):',
     phEstimated: '25 000',
     btnSubmit: 'Получить официальную экспресс-оценку',
     photoTip: '📸 Фотографии машины или техпаспорта можно прикрепить прямо в диалоге WhatsApp для подтверждения суммы за 2 часа.',
     previewTitle: 'Результат покрытия стоимости:',
-    previewDownCovered: '✓ Полностью закрывает 30% взнос (наличными = $0)!',
+    previewDownCovered: 'Первоначальный взнос 30% закрыт полностью! Наличными = $0',
     previewRemaining: 'Остаток к доплате в рассрочку 0%:',
     downPaymentRequiredLabel: 'Первый взнос (30%):',
     cashNeededLabel: 'Доплата наличными:',
+    cashNeededSuffix: 'для полного закрытия 30% взноса.',
     monthlyEstimateLabel: 'Платеж по 0% рассрочке:',
     totalApartmentCostLabel: 'Ориентир цены квартиры:',
+    presetsLabel: 'Популярные варианты на рынке Бишкека (нажмите для автозаполнения):',
+    coverageSuffix: 'стоимости квартиры',
+    surplusNotePrefix: '(излишек $',
+    surplusNoteSuffix: 'идет в счет рассрочки)',
+    perMonthSuffix: '/ мес.',
+    evalTimeBadge: 'Оценка за 24 часа',
     somUnit: 'сом',
   },
   kg: {
@@ -320,7 +342,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
       { q: 'Эгерде унаанын баасы биринчи төлөмдөн жогору болсочу?', a: 'Ашык сумма ай сайын төлөмдөргө эсептелет.' },
       { q: 'Баалоо канча убакыт алат?', a: 'Онлайн баалоо 2 саат, акыркы экспертиза 24 саат.' },
       { q: 'Бишкектин башка районундагы эски батирди өткөрсө болобу?', a: 'Ооба, юристтер жардам берет.' },
-      { q: 'Унааны каттонон өзүм чечишим керекпи?', a: 'Компания өзүнө алат.' },
+      { q: 'Унааны каттодон өзүм чечишим керекпи?', a: 'Компания өзүнө алат.' },
     ],
     casesBadge: 'Практикалык мисалдар',
     casesTitle: 'Trade-in алмашуунун реалдуу сценарийлери',
@@ -338,6 +360,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Популярдуу алмашуу',
         slug: 'madina-residence',
         waText: 'Саламатсызбы! Toyota Camry унаамды Trade-in аркылуу ЖК Madina Residence батирине алмаштыргым келет.',
+        btnText: 'Окшош унааны баалоо',
       },
       {
         asset: 'Lexus GX 460 (2016-ж.)',
@@ -351,6 +374,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Премиум Trade-in',
         slug: 'abu-dhabi',
         waText: 'Саламатсызбы! Жол тандабасымды ЖК Abu Dhabi 2 бөлмөлүү батирине Trade-in аркылуу алмаштыруу шарттарын билгим келет.',
+        btnText: 'Окшош унааны баалоо',
       },
       {
         asset: '105-сериядагы 1 бөлмөлүү батир',
@@ -364,11 +388,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Турак жай алмашуу',
         slug: 'ajkol-plus',
         waText: 'Саламатсызбы! Эски 1 бөлмөлүү батиримди ЖД Айкол+ комплексине Trade-in менен алмаштыруу үчүн баалоочуну кантип чакырсам болот?',
+        btnText: 'Кыймылсыз мүлктү баалоо',
       },
     ],
     valuationLabel: 'EL ORDO эксперттик баалоосу:',
     selectedObjectLabel: 'Тандалган объект:',
-    btnEvaluateCase: 'Унааны баалоо',
+    btnEvaluateCase: 'Мүлктү баалоо',
     aboutComplexBtn: 'Комплекс тууралуу',
     tableBadge: 'Убакытты жана каражатты үнөмдөө',
     tableTitle: 'EL ORDO Trade-in же автобазарда сатуубу?',
@@ -424,18 +449,27 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: 'Мисалы: 2 бөлмө, 60 м²',
     labelYear: 'Жылы / Абалы:',
     phYear: 'Мисалы: 2021',
+    labelRealtyFloorSeries: 'Кабаты / Үйдүн сериясы / Параметрлери:',
+    phRealtyFloorSeries: 'Мисалы: 4/9 кабат, 105-серия',
     labelPhone: 'Байланыш номериңиз:',
     labelEstimated: 'Баалоо суммасы ($):',
     phEstimated: '25 000',
     btnSubmit: 'WhatsApp аркылуу баалоого өтүнүч жиберүү',
     photoTip: '📸 Экспресс-баалоо үчүн сүрөттөрдү WhatsApp чатына жөнөтсөңүз болот.',
     previewTitle: 'Алдын ала эсептөө натыйжасы:',
-    previewDownCovered: '✓ Баштапкы 30% төлөмдү толук жабат (накталай = $0)!',
+    previewDownCovered: 'Баштапкы 30% төлөм толук жабылды! Накталай = $0',
     previewRemaining: '0% бөлүп төлөөгө калган сумма:',
     downPaymentRequiredLabel: '30% баштапкы төлөм:',
     cashNeededLabel: 'Накталай кошумча:',
+    cashNeededSuffix: '30% төлөмдү толук жабуу үчүн.',
     monthlyEstimateLabel: 'Ай сайын төлөм (0%):',
     totalApartmentCostLabel: 'Батирдин баасы:',
+    presetsLabel: 'Бишкек базарындагы популярдуу варианттар (тандоо үчүн басыңыз):',
+    coverageSuffix: 'батирдин наркынын',
+    surplusNotePrefix: '(ашык $',
+    surplusNoteSuffix: 'бөлүп төлөөгө которулат)',
+    perMonthSuffix: '/ айына',
+    evalTimeBadge: '24 саатта баалоо',
     somUnit: 'сом',
   },
   kz: {
@@ -469,6 +503,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Танымал айырбас',
         slug: 'madina-residence',
         waText: 'Сәлеметсіз бе! Toyota Camry көлігімді Trade-in бойынша ЖК Madina Residence пәтеріне айырбастағым келеді.',
+        btnText: 'Ұқсас автоны бағалау',
       },
       {
         asset: 'Lexus GX 460 (2016 ж.)',
@@ -482,6 +517,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Премиум Trade-in',
         slug: 'abu-dhabi',
         waText: 'Сәлеметсіз бе! Жол таңғажайып көлікті ЖК Abu Dhabi кешеніндегі 2 бөлмелі пәтерге айырбастау шарттарын білгім келеді.',
+        btnText: 'Ұқсас автоны бағалау',
       },
       {
         asset: '105-сериялы 1 бөлмелі пәтер',
@@ -495,11 +531,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Баспана айырбасы',
         slug: 'ajkol-plus',
         waText: 'Сәлеметсіз бе! 1 бөлмелі пәтерді ЖД Айкол+ жаңа пәтеріне Trade-in бойынша айырбастау үшін бағалаушыны қалай шақырамын?',
+        btnText: 'Жылжымайтын мүлікті бағалау',
       },
     ],
     valuationLabel: 'EL ORDO сарапшылық бағалауы:',
     selectedObjectLabel: 'Таңдалған нысан:',
-    btnEvaluateCase: 'Көлікті бағалау',
+    btnEvaluateCase: 'Мүлікті бағалау',
     aboutComplexBtn: 'Кешен туралы',
     tableBadge: 'Уақыт пен қаражатты үнемдеу',
     tableTitle: 'EL ORDO Trade-in немесе көлік базарында сату?',
@@ -534,15 +571,15 @@ const CONTENT: Record<Locale, TradeInContent> = {
     stepsTitle: 'Trade-in рәсімдеу кезеңдері',
     steps: [
       { num: '01', title: 'Өтінім беру', desc: 'Деректерді WhatsApp-қа жібересіз.' },
-      { num: '02', title: 'Бағалау', desc: 'Сарапшы базар баасын айтады.' },
-      { num: '03', title: 'Пәтерді таңдау', desc: 'Жобадан қабатты тандайсыз.' },
+      { num: '02', title: 'Бағалау', desc: 'Сарапшы базар бағасын айтады.' },
+      { num: '03', title: 'Пәтерді таңдау', desc: 'Жобадан қабатты таңдайсыз.' },
       { num: '04', title: 'ДДУ жасасу', desc: 'Мүлкіңіз жарна ретінде есептеледі.' },
     ],
     calcBadge: 'Интерактивті бағалау',
-    calcTitle: 'Пәтеріңіздің жабылышын есептеңіз',
-    calcDesc: '0% бөлүп төлеу калган суммасын билүү үшін мүлкүңүздүн баасын жазыңыз.',
+    calcTitle: 'Пәтеріңіздің жабылуын есептеңіз',
+    calcDesc: '0% бөліп төлеу қалған сомасын білу үшін мүлкіңіздің бағасын жазыңыз.',
     tabAuto: 'Көлік',
-    tabRealty: 'Мүлк',
+    tabRealty: 'Мүлік',
     targetComplexLabel: 'Қайсы ТҮК есебіне жазу:',
     targetComplexAll: 'Компанияның кез келген нысаны',
     roomsLabel: 'Бөлме саны:',
@@ -555,18 +592,27 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: 'Мысалы: 2 бөлме, 60 м²',
     labelYear: 'Жылы / Жағдайы:',
     phYear: 'Мысалы: 2021',
+    labelRealtyFloorSeries: 'Қабаты / Үй сериясы / Параметрлері:',
+    phRealtyFloorSeries: 'Мысалы: 4/9 қабат, 105 серия',
     labelPhone: 'Байланыс телефоныңыз:',
     labelEstimated: 'Бағалау сомасы ($):',
     phEstimated: '25 000',
-    btnSubmit: 'WhatsApp арқылы баалоого өтүнүч жиберүү',
+    btnSubmit: 'WhatsApp арқылы бағалауға өтініш жіберу',
     photoTip: '📸 Суреттерді WhatsApp чатына жібере аласыз.',
     previewTitle: 'Алдын ала есептеу нәтижесі:',
-    previewDownCovered: '✓ Бастапқы 30% жарнаны толық жабады (қолма-қол = $0)!',
+    previewDownCovered: 'Бастапқы 30% жарна толық жабылды! Қолма-қол = $0',
     previewRemaining: '0% бөліп төлеуге қалған сома:',
     downPaymentRequiredLabel: '30% бастапқы жарна:',
     cashNeededLabel: 'Қолма-қол қосымша:',
+    cashNeededSuffix: '30% жарнаны толық жабу үшін.',
     monthlyEstimateLabel: 'Ай сайынғы төлем (0%):',
     totalApartmentCostLabel: 'Пәтер құны:',
+    presetsLabel: 'Бішкек нарығындағы танымал нұсқалар (автотолтыру үшін басыңыз):',
+    coverageSuffix: 'пәтер құнының',
+    surplusNotePrefix: '(артық $',
+    surplusNoteSuffix: 'бөліп төлеуге бағытталады)',
+    perMonthSuffix: '/ айына',
+    evalTimeBadge: '24 сағатта бағалау',
     somUnit: 'сом',
   },
   uk: {
@@ -600,6 +646,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Популярний обмін',
         slug: 'madina-residence',
         waText: 'Доброго дня! Хочу обміняти автомобіль за програмою Trade-in на квартиру в ЖК Madina Residence.',
+        btnText: 'Оцінити схоже авто',
       },
       {
         asset: 'Lexus GX 460 (2016 р.)',
@@ -613,6 +660,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Преміум Trade-in',
         slug: 'abu-dhabi',
         waText: 'Доброго дня! Цікавить обмін позашляховика на 2-кімнатну квартиру в ЖК Abu Dhabi.',
+        btnText: 'Оцінити схоже авто',
       },
       {
         asset: '1-кімн. квартира 105 серії',
@@ -626,11 +674,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Обмін житла',
         slug: 'ajkol-plus',
         waText: 'Доброго дня! Хочу обміняти вторинну квартиру на нову в ЖД Айкол+ за Trade-in.',
+        btnText: 'Оцінити нерухомість',
       },
     ],
     valuationLabel: 'Оцінка експерта EL ORDO:',
     selectedObjectLabel: 'Обраний об’єкт:',
-    btnEvaluateCase: 'Оцінити авто',
+    btnEvaluateCase: 'Оцінити актив',
     aboutComplexBtn: 'Про комплекс',
     tableBadge: 'Економія часу та коштів',
     tableTitle: 'Trade-in EL ORDO чи продаж на ринку?',
@@ -686,18 +735,27 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: 'Наприклад: 2-кімн., 60 м²',
     labelYear: 'Рік випуску:',
     phYear: 'Наприклад: 2021',
+    labelRealtyFloorSeries: 'Поверх / Серія будинку / Параметри:',
+    phRealtyFloorSeries: 'Наприклад: 4/9 поверх, 105 серія',
     labelPhone: 'Номер телефону для зв’язку:',
     labelEstimated: 'Бажана сума ($):',
     phEstimated: '25 000',
     btnSubmit: 'Надіслати заявку у WhatsApp',
     photoTip: '📸 Фото можна надіслати безпосередньо у WhatsApp.',
     previewTitle: 'Попередній результат заліку:',
-    previewDownCovered: '✓ Повністю закриває 30% внесок (готівкою = $0)!',
+    previewDownCovered: 'Перший внесок 30% закрито повністю! Готівкою = $0',
     previewRemaining: 'Залишок до доплати в розстрочку 0%:',
     downPaymentRequiredLabel: 'Перший внесок (30%):',
     cashNeededLabel: 'Доплата готівкою:',
+    cashNeededSuffix: 'для повного покриття 30% внеску.',
     monthlyEstimateLabel: 'Щомісячний платіж (0%):',
     totalApartmentCostLabel: 'Вартість квартири:',
+    presetsLabel: 'Популярні варіанти на ринку Бішкека (натисніть для автозаповнення):',
+    coverageSuffix: 'вартості квартири',
+    surplusNotePrefix: '(надлишок $',
+    surplusNoteSuffix: 'зараховується у розстрочку)',
+    perMonthSuffix: '/ міс.',
+    evalTimeBadge: 'Оцінка за 24 години',
     somUnit: 'сом',
   },
   en: {
@@ -731,6 +789,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Popular Exchange',
         slug: 'madina-residence',
         waText: 'Hello! I want to trade in my passenger car for an apartment in Madina Residence.',
+        btnText: 'Evaluate Similar Car',
       },
       {
         asset: 'Lexus GX 460 (2016)',
@@ -744,6 +803,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Premium Trade-in',
         slug: 'abu-dhabi',
         waText: 'Hello! Inquiring about trading in an SUV for a 2-room apartment in Abu Dhabi RC via Trade-in.',
+        btnText: 'Evaluate Similar Car',
       },
       {
         asset: '1-Room Apartment (Series 105)',
@@ -757,11 +817,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: 'Property Exchange',
         slug: 'ajkol-plus',
         waText: 'Hello! I would like to exchange an older 1-room apartment for a new unit in Aykol+ (Kok-Jar) via Trade-in.',
+        btnText: 'Evaluate Real Estate',
       },
     ],
     valuationLabel: 'EL ORDO Expert Valuation:',
     selectedObjectLabel: 'Selected Property:',
-    btnEvaluateCase: 'Evaluate Similar Vehicle',
+    btnEvaluateCase: 'Evaluate Asset',
     aboutComplexBtn: 'About Complex',
     tableBadge: 'Time & Money Savings',
     tableTitle: 'EL ORDO Trade-in vs Car Market Sale?',
@@ -817,18 +878,27 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: 'e.g. 2-room, 60 sq.m',
     labelYear: 'Year / Condition:',
     phYear: 'e.g. 2021',
+    labelRealtyFloorSeries: 'Floor / Building Series / Details:',
+    phRealtyFloorSeries: 'e.g. 4th floor, 105 series',
     labelPhone: 'Phone Number:',
     labelEstimated: 'Desired Valuation ($):',
     phEstimated: '25,000',
     btnSubmit: 'Send Valuation via WhatsApp',
     photoTip: '📸 Attach photos directly in WhatsApp for express evaluation within 2 hours.',
     previewTitle: 'Preliminary Trade-In Coverage:',
-    previewDownCovered: '✓ Fully covers the 30% down payment ($0 cash required)!',
+    previewDownCovered: '30% Down Payment Fully Covered! ($0 cash required)',
     previewRemaining: 'Remaining balance in 0% installment:',
     downPaymentRequiredLabel: '30% Down Payment:',
     cashNeededLabel: 'Cash Balance Needed:',
+    cashNeededSuffix: 'to fully complete the 30% deposit.',
     monthlyEstimateLabel: 'Monthly Payment (0%):',
     totalApartmentCostLabel: 'Estimated Apartment Price:',
+    presetsLabel: 'Popular assets in the Bishkek market (click to auto-fill):',
+    coverageSuffix: 'of apartment cost',
+    surplusNotePrefix: '(surplus of $',
+    surplusNoteSuffix: 'credited toward installment)',
+    perMonthSuffix: '/ mo.',
+    evalTimeBadge: 'Valuation within 24h',
     somUnit: 'som',
   },
   zh: {
@@ -862,6 +932,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: '经典热门置换',
         slug: 'madina-residence',
         waText: '您好！我想通过以旧换新置换服务，用轿车置换玛迪娜公馆的房源。',
+        btnText: '评估类似车辆',
       },
       {
         asset: '雷克萨斯 GX 460 (2016年款)',
@@ -875,6 +946,7 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: '豪华车尊享置换',
         slug: 'abu-dhabi',
         waText: '您好！我想用豪华越野车置换阿布扎比住宅区的两居室房源。',
+        btnText: '评估类似车辆',
       },
       {
         asset: '105系列单身公寓二手房',
@@ -888,11 +960,12 @@ const CONTENT: Record<Locale, TradeInContent> = {
         badge: '以旧换新置业',
         slug: 'ajkol-plus',
         waText: '您好！我想用市区旧房置换艾科尔+的生态新居。',
+        btnText: '评估房产价值',
       },
     ],
     valuationLabel: 'EL ORDO 专业评估估值:',
     selectedObjectLabel: '所选置换新居:',
-    btnEvaluateCase: '评估类似车辆',
+    btnEvaluateCase: '评估置换资产',
     aboutComplexBtn: '了解楼盘详情',
     tableBadge: '省时省心省费',
     tableTitle: 'EL ORDO 置换 vs 自行二手车市出售',
@@ -948,23 +1021,31 @@ const CONTENT: Record<Locale, TradeInContent> = {
     phRealtyAddress: '例如：2居室, 60平米',
     labelYear: '出厂年份 / 车况：',
     phYear: '例如：2021，车况极佳',
+    labelRealtyFloorSeries: '所在楼层 / 建筑系列 / 户型参数：',
+    phRealtyFloorSeries: '例如：4/9层，105系列',
     labelPhone: '您的联系电话：',
     labelEstimated: '期望评估作价金额 ($)：',
     phEstimated: '25 000',
     btnSubmit: '通过 WhatsApp 发送评估申请',
     photoTip: '📸 可在 WhatsApp 中直接发送照片。',
     previewTitle: '资产置换测算概览：',
-    previewDownCovered: '✓ 完全冲抵30%首付款（现金首付款 = $0）！',
+    previewDownCovered: '30%首付款全额冲抵！现金首付 = $0',
     previewRemaining: '剩余款项可享受0%免息分期：',
     downPaymentRequiredLabel: '30%首付款：',
     cashNeededLabel: '需补足现金：',
+    cashNeededSuffix: '以全额补齐30%首付款。',
     monthlyEstimateLabel: '每月还款金额：',
     totalApartmentCostLabel: '新房预估总价：',
+    presetsLabel: '比什凯克市场热门置换标的（点击一键填入）：',
+    coverageSuffix: '新房总房款',
+    surplusNotePrefix: '(结余 $',
+    surplusNoteSuffix: '直接冲抵免息分期)',
+    perMonthSuffix: '/ 月',
+    evalTimeBadge: '24小时极速估值',
     somUnit: '索姆',
   },
 };
 
-// Популярные автомобили на авторынке Бишкека и вторичное жилье с рыночными оценками
 const QUICK_PRESETS = {
   auto: [
     { label: 'Camry 70 (2020)', val: 24000, name: 'Toyota Camry 70, 2020' },
@@ -1023,59 +1104,50 @@ export default function TradeInPage() {
     return raw ? parseInt(raw, 10) : 0;
   }, [estimatedValue]);
 
-  // Точный расчет стоимости квартиры исходя из проекта и комнатности
   const targetApartmentPrice = useMemo(() => {
     if (tradeInTargetComplex === 'abu-dhabi') {
-      if (targetRooms === 1) return 81675; // 49.5 м² * 1650
-      if (targetRooms === 2) return 129195; // 78.3 м² * 1650
-      return 196845; // 119.3 м² * 1650
+      if (targetRooms === 1) return 81675;
+      if (targetRooms === 2) return 129195;
+      return 196845;
     }
     if (tradeInTargetComplex === 'madina-residence') {
-      if (targetRooms === 1) return 65400; // 43.6 м² * 1500
-      if (targetRooms === 2) return 102300; // 68.2 м² * 1500
-      return 138600; // 92.4 м² * 1500
+      if (targetRooms === 1) return 65400;
+      if (targetRooms === 2) return 102300;
+      return 138600;
     }
     if (tradeInTargetComplex === 'ajkol-plus') {
-      if (targetRooms === 1) return 50400; // 42.0 м² * 1200
-      if (targetRooms === 2) return 89160; // 74.3 м² * 1200
-      return 106200; // 88.5 м² * 1200
+      if (targetRooms === 1) return 50400;
+      if (targetRooms === 2) return 89160;
+      return 106200;
     }
-    // all / общий ориентир
     if (targetRooms === 1) return 65000;
     if (targetRooms === 2) return 95000;
     return 140000;
   }, [tradeInTargetComplex, targetRooms]);
 
-  // Необходимый первый взнос (30%)
   const requiredDownPayment = useMemo(() => {
     return Math.round(targetApartmentPrice * 0.3);
   }, [targetApartmentPrice]);
 
-  // Процент покрытия всей квартиры автомобилем
   const tradeInCoveragePercent = useMemo(() => {
     if (targetApartmentPrice <= 0 || parsedEstimatedValue <= 0) return 0;
     return Math.min(100, Math.round((parsedEstimatedValue / targetApartmentPrice) * 100));
   }, [parsedEstimatedValue, targetApartmentPrice]);
 
-  // Закрыт ли 30% взнос целиком
   const isDownPaymentCovered = parsedEstimatedValue >= requiredDownPayment;
 
-  // Сколько нужно доплатить наличными к первому взносу (если авто < 30%)
   const cashNeededForDownPayment = useMemo(() => {
     return Math.max(0, requiredDownPayment - parsedEstimatedValue);
   }, [requiredDownPayment, parsedEstimatedValue]);
 
-  // Излишек сверх первого взноса (уменьшает рассрочку)
   const surplusTowardInstallment = useMemo(() => {
     return Math.max(0, parsedEstimatedValue - requiredDownPayment);
   }, [parsedEstimatedValue, requiredDownPayment]);
 
-  // Остаток к выплате в беспроцентную рассрочку 0%
   const tradeInRemainingToPay = useMemo(() => {
     return Math.max(0, targetApartmentPrice - parsedEstimatedValue);
   }, [targetApartmentPrice, parsedEstimatedValue]);
 
-  // Ежемесячный платеж на 36 месяцев
   const monthlyPayment36 = useMemo(() => {
     return Math.round(tradeInRemainingToPay / 36);
   }, [tradeInRemainingToPay]);
@@ -1113,7 +1185,6 @@ export default function TradeInPage() {
       `Оценка: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${c.somUnit}) | ` +
       `Объект: ${targetLabel} (${targetRooms}-комн.)`;
 
-    // 1. Отправляем в Telegram через API лидогенерации
     try {
       fetch('/api/lead', {
         method: 'POST',
@@ -1135,11 +1206,9 @@ export default function TradeInPage() {
       }).catch(() => {});
     } catch {}
 
-    // 2. Трекинг конверсий для рекламы
     trackWhatsAppClick('trade_in_calculator', targetLabel);
     trackLeadSubmit(`Trade-in (${typeLabel})`, targetLabel);
 
-    // 3. Формирование персонализированного сообщения в WhatsApp
     const text =
       `Здравствуйте! Хочу подать заявку по программе Trade-in (Бартер) в EL ORDO GROUP:\n\n` +
       `• Тип актива: ${typeLabel}\n` +
@@ -1171,6 +1240,7 @@ export default function TradeInPage() {
     >
       {/* ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР TRADE-IN */}
       <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
         {/* Левая колонка: Описание, курс и живой расчет */}
         <div className="lg:col-span-6 space-y-6">
           <div>
@@ -1189,12 +1259,12 @@ export default function TradeInPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-bold text-gray-700 dark:text-gray-200">
-                Курс НБКР: <strong>{usdRate} сом/$</strong>
+                Курс НБКР: <strong>{usdRate} {c.somUnit}/$</strong>
               </span>
             </div>
             <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
               <IconShieldCheck className="w-3.5 h-3.5" />
-              <span>Оценка за 24 часа</span>
+              <span>{c.evalTimeBadge}</span>
             </div>
           </div>
 
@@ -1206,7 +1276,7 @@ export default function TradeInPage() {
                   {c.previewTitle}
                 </span>
                 <span className="text-emerald-700 dark:text-emerald-400 font-black text-sm">
-                  {tradeInCoveragePercent}% стоимости квартиры
+                  {tradeInCoveragePercent}% {c.coverageSuffix}
                 </span>
               </div>
 
@@ -1245,13 +1315,13 @@ export default function TradeInPage() {
                   <div className="p-3 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 font-bold border border-emerald-300 dark:border-emerald-800 flex items-center gap-2">
                     <IconCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                     <span>
-                      Первоначальный взнос 30% закрыт полностью! Наличными = $0
-                      {surplusTowardInstallment > 0 && ` (излишек $${surplusTowardInstallment.toLocaleString('ru-RU')} идет в счет рассрочки)`}.
+                      {c.previewDownCovered}
+                      {surplusTowardInstallment > 0 && ` ${c.surplusNotePrefix}${surplusTowardInstallment.toLocaleString('ru-RU')} ${c.surplusNoteSuffix}`}.
                     </span>
                   </div>
                 ) : (
                   <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-bold border border-amber-200 dark:border-amber-800">
-                    {c.cashNeededLabel} <strong>${cashNeededForDownPayment.toLocaleString('ru-RU')}</strong> (~{Math.round(cashNeededForDownPayment * usdRate).toLocaleString('ru-RU')} {c.somUnit}) для полного закрытия 30% взноса.
+                    {c.cashNeededLabel} <strong>${cashNeededForDownPayment.toLocaleString('ru-RU')}</strong> (~{Math.round(cashNeededForDownPayment * usdRate).toLocaleString('ru-RU')} {c.somUnit}) {c.cashNeededSuffix}
                   </div>
                 )}
 
@@ -1260,9 +1330,9 @@ export default function TradeInPage() {
                     {c.monthlyEstimateLabel}
                   </span>
                   <strong className="text-base font-black text-[#064734] dark:text-[#d4b26f]">
-                    ${monthlyPayment36.toLocaleString('ru-RU')}/мес{' '}
+                    ${monthlyPayment36.toLocaleString('ru-RU')}{c.perMonthSuffix}{' '}
                     <span className="text-[11px] font-normal text-gray-500 dark:text-neutral-400">
-                      (~{Math.round(monthlyPayment36 * usdRate).toLocaleString('ru-RU')} сом)
+                      (~{Math.round(monthlyPayment36 * usdRate).toLocaleString('ru-RU')} {c.somUnit})
                     </span>
                   </strong>
                 </div>
@@ -1273,6 +1343,7 @@ export default function TradeInPage() {
 
         {/* Правая колонка: Форма с пресетами и выбором */}
         <div className="lg:col-span-6 bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-inner space-y-4">
+          
           {/* Переключатель типа: Авто / Недвижимость */}
           <div className="flex gap-2">
             <button
@@ -1314,7 +1385,7 @@ export default function TradeInPage() {
           {/* Быстрые кликабельные пресеты */}
           <div>
             <span className="block text-[10px] uppercase font-bold text-gray-400 dark:text-neutral-400 mb-1.5">
-              Популярные варианты на рынке Бишкека (нажмите для автозаполнения):
+              {c.presetsLabel}
             </span>
             <div className="flex flex-wrap gap-1.5">
               {(tradeInType === 'auto' ? QUICK_PRESETS.auto : QUICK_PRESETS.realty).map((preset) => (
@@ -1403,11 +1474,11 @@ export default function TradeInPage() {
               ) : (
                 <div>
                   <label className="block text-gray-700 dark:text-gray-300 font-bold mb-1">
-                    Этаж / Серия дома:
+                    {c.labelRealtyFloorSeries}
                   </label>
                   <input
                     type="text"
-                    placeholder="Например: 4/9 этаж, 105 серия"
+                    placeholder={c.phRealtyFloorSeries}
                     value={assetYear}
                     onChange={(e) => setAssetYear(e.target.value)}
                     className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734]"
@@ -1544,7 +1615,7 @@ export default function TradeInPage() {
                   className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
-                  <span>{c.btnEvaluateCase}</span>
+                  <span>{item.btnText || c.btnEvaluateCase}</span>
                   <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
                 <Link

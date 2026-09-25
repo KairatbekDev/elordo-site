@@ -32,7 +32,39 @@ interface PaymentLayoutProps {
   children?: React.ReactNode;
 }
 
-const UI_STRINGS = {
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
+const UI_STRINGS: Record<Locale, {
+  home: string;
+  terms: string;
+  heroBadge: string;
+  btnGetCalcWa: string;
+  btnLearnTerms: string;
+  officialNotice: string;
+  detailedDesc: string;
+  proposalCore: string;
+  documentsPackage: string;
+  noIncomeProof: string;
+  customSchedulePrompt: string;
+  customScheduleSub: string;
+  btnWriteWa: string;
+  faqTitle: string;
+  consultantBadge: string;
+  officeTitle: string;
+  officeHead: string;
+  workHours: string;
+  sundayClosed: string;
+  btnRoute2Gis: string;
+}> = {
   ru: {
     home: 'Главная',
     terms: 'Условия покупки',
@@ -167,56 +199,38 @@ const UI_STRINGS = {
   },
 };
 
-const getPaymentTabs = (lang: Locale) => [
-  {
-    href: '/rassrochka',
-    slug: 'rassrochka',
-    label:
-      lang === 'kg'
-        ? '0% Бөлүп төлөө'
-        : lang === 'kz'
-        ? '0% Бөліп төлеу'
-        : lang === 'uk'
-        ? 'Розстрочка 0%'
-        : lang === 'en'
-        ? '0% Installment'
-        : lang === 'zh'
-        ? '0% 免息分期'
-        : 'Рассрочка 0%',
-  },
-  {
-    href: '/trade-in',
-    slug: 'trade-in',
-    label:
-      lang === 'kg'
-        ? 'Trade-in (Бартер)'
-        : lang === 'kz'
-        ? 'Trade-in (Бартер)'
-        : lang === 'uk'
-        ? 'Trade-in (Бартер)'
-        : lang === 'en'
-        ? 'Trade-in (Barter)'
-        : lang === 'zh'
-        ? '以旧换新 (Trade-in)'
-        : 'Trade-in (Бартер)',
-  },
-  {
-    href: '/polniy-raschet',
-    slug: 'polniy-raschet',
-    label:
-      lang === 'kg'
-        ? '100% төлөм'
-        : lang === 'kz'
-        ? '100% төлем'
-        : lang === 'uk'
-        ? '100% розрахунок'
-        : lang === 'en'
-        ? '100% Payment'
-        : lang === 'zh'
-        ? '100% 全款'
-        : '100% расчет',
-  },
-];
+const PAYMENT_TABS: Record<Locale, { href: string; slug: 'rassrochka' | 'trade-in' | 'polniy-raschet'; label: string }[]> = {
+  ru: [
+    { href: '/rassrochka', slug: 'rassrochka', label: 'Рассрочка 0%' },
+    { href: '/trade-in', slug: 'trade-in', label: 'Trade-in (Бартер)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% расчет' },
+  ],
+  kg: [
+    { href: '/rassrochka', slug: 'rassrochka', label: '0% Бөлүп төлөө' },
+    { href: '/trade-in', slug: 'trade-in', label: 'Trade-in (Бартер)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% төлөм' },
+  ],
+  kz: [
+    { href: '/rassrochka', slug: 'rassrochka', label: '0% Бөліп төлеу' },
+    { href: '/trade-in', slug: 'trade-in', label: 'Trade-in (Бартер)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% төлем' },
+  ],
+  uk: [
+    { href: '/rassrochka', slug: 'rassrochka', label: 'Розстрочка 0%' },
+    { href: '/trade-in', slug: 'trade-in', label: 'Trade-in (Бартер)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% розрахунок' },
+  ],
+  en: [
+    { href: '/rassrochka', slug: 'rassrochka', label: '0% Installment' },
+    { href: '/trade-in', slug: 'trade-in', label: 'Trade-in (Barter)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% Payment' },
+  ],
+  zh: [
+    { href: '/rassrochka', slug: 'rassrochka', label: '0% 免息分期' },
+    { href: '/trade-in', slug: 'trade-in', label: '以旧换新 (Trade-in)' },
+    { href: '/polniy-raschet', slug: 'polniy-raschet', label: '100% 一次性全款' },
+  ],
+};
 
 export default function PaymentLayout({
   pageTitle,
@@ -232,15 +246,18 @@ export default function PaymentLayout({
   children,
 }: PaymentLayoutProps) {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang = normalizeLocale(locale);
+
   const ui = UI_STRINGS[currentLang] || UI_STRINGS.ru;
-  const tabs = getPaymentTabs(currentLang);
+  const tabs = PAYMENT_TABS[currentLang] || PAYMENT_TABS.ru;
 
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
   };
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const getWaMessage = () => {
     switch (currentLang) {
@@ -305,7 +322,7 @@ export default function PaymentLayout({
 
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-lg flex items-center gap-2 cursor-pointer"
@@ -326,11 +343,11 @@ export default function PaymentLayout({
         </div>
       </section>
 
-      {/* 3. Быстрое переключение способов оплаты */}
+      {/* 3. Быстрое переключение способов оплаты (мультиязычные табы) */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 -mt-7 relative z-20">
         <div className="bg-white dark:bg-[#0b1b15] p-2 rounded-2xl shadow-xl dark:shadow-none border border-gray-100 dark:border-white/10 flex items-center justify-center gap-2 overflow-x-auto scrollbar-none transition-colors">
           {tabs.map((tab) => {
-            const isActive = currentSlug === tab.slug || pageTitle.toLowerCase().includes(tab.slug);
+            const isActive = currentSlug === tab.slug;
             return (
               <Link
                 key={tab.slug}
@@ -413,7 +430,7 @@ export default function PaymentLayout({
                 <p className="text-xs text-gray-300">{ui.customScheduleSub}</p>
               </div>
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
+                href={`https://wa.me/${cleanWaNumber}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-5 py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 cursor-pointer"
@@ -507,7 +524,7 @@ export default function PaymentLayout({
 
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waMessage}`}
+                href={`https://wa.me/${cleanWaNumber}?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="py-3.5 px-6 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow flex items-center justify-center gap-2 border border-transparent dark:border-white/10 cursor-pointer"

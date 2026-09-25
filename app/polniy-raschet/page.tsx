@@ -7,6 +7,8 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
+import { trackWhatsAppClick, trackLeadSubmit } from '@/lib/analytics';
+import { getStoredUtm } from '@/lib/utm';
 import {
   IconCheck,
   IconDiamond,
@@ -79,7 +81,42 @@ interface FullPaymentContent {
   calcDesc: string;
   btnDownloadPdf: string;
   netSavingsLabel: string;
+  calcRateOnline: string;
+  calcMaxDiscountBadge: string;
+  calcBtnCatalog: string;
+  calcBtnCatalogSelected: string;
+  calcBasePriceLabel: string;
+  calcEditHint: string;
+  calcDiscountHeading: string;
+  calcDiscountStandard: string;
+  calcDiscountVip: string;
+  calcScaleSpecial: string;
+  calcScaleSaving: string;
+  calcBenefitTitle: string;
+  calcBenefitDesc: string;
+  calcResultTitle: string;
+  calcSavingsLabel: string;
+  calcBaseNote: string;
+  calcDisclaimer: string;
+  calcBtnFixWa: string;
+  calcBtnPdf: string;
+  calcBtnBookFloor: string;
+  somUnit: string;
 }
+
+const CATALOG_APARTMENTS = [
+  { complex: 'ЖК Abu Dhabi', title: '1-комн. Блок Б (49.48 м²)', price: 81642, slug: 'abu-dhabi' },
+  { complex: 'ЖК Abu Dhabi', title: '1-комн. Блок А (50.88 м²)', price: 83952, slug: 'abu-dhabi' },
+  { complex: 'ЖК Abu Dhabi', title: '2-комн. Блок Б (78.30 м²)', price: 129195, slug: 'abu-dhabi' },
+  { complex: 'ЖК Abu Dhabi', title: '3-комн. Блок Б (119.32 м²)', price: 196878, slug: 'abu-dhabi' },
+  { complex: 'ЖК Madina Residence', title: '1-комн. Блок А (43.59 м²)', price: 65385, slug: 'madina-residence' },
+  { complex: 'ЖК Madina Residence', title: '1-комн. Блок В (49.03 м²)', price: 73545, slug: 'madina-residence' },
+  { complex: 'ЖК Madina Residence', title: '2-комн. Блок А (71.00 м²)', price: 106500, slug: 'madina-residence' },
+  { complex: 'ЖК Madina Residence', title: '3-комн. Блок Б (108.48 м²)', price: 162720, slug: 'madina-residence' },
+  { complex: 'ЖД Айкол +', title: '1-комн. (42.00 м²)', price: 50400, slug: 'ajkol-plus' },
+  { complex: 'ЖД Айкол +', title: '2-комн. (74.30 м²)', price: 89160, slug: 'ajkol-plus' },
+  { complex: 'ЖД Айкол +', title: '3-комн. (88.50 м²)', price: 106200, slug: 'ajkol-plus' },
+];
 
 const CONTENT: Record<Locale, FullPaymentContent> = {
   ru: {
@@ -222,11 +259,32 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Вносите оплату через кассу компании или безналичным банковским переводом с выдачей всех финансовых чеков.',
       },
     ],
-    calcBadge: 'Интерактивный расчет 100% оплаты',
-    calcTitle: 'Рассчитайте вашу экономию онлайн',
-    calcDesc: 'Двигайте ползунок, чтобы мгновенно увидеть размер скидки и спеццену при единовременном расчете.',
+    calcBadge: 'ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 100% ОПЛАТЫ',
+    calcTitle: 'РАСЧЕТ ВЫГОДЫ ПРИ 100% ОПЛАТЕ',
+    calcDesc: 'Выберите планировку или настройте стоимость ползунком для моментального расчета персональной скидки.',
     btnDownloadPdf: 'Скачать расчет в PDF',
-    netSavingsLabel: 'Ваша чистая экономия (дисконт 6%):',
+    netSavingsLabel: 'Ваша чистая экономия:',
+    calcRateOnline: 'Курс НБКР онлайн',
+    calcMaxDiscountBadge: 'Максимальный дисконт от руководства',
+    calcBtnCatalog: 'ВЫБРАТЬ ПЛАНИРОВКУ ИЗ КАТАЛОГА (11 ВАРИАНТОВ)',
+    calcBtnCatalogSelected: 'ВЫБРАНО:',
+    calcBasePriceLabel: 'БАЗОВАЯ СТОИМОСТЬ КВАРТИРЫ:',
+    calcEditHint: 'нажмите, чтобы изменить вручную',
+    calcDiscountHeading: 'РАЗМЕР ДИСКОНТА ОТ ДЕВЕЛОПЕРА:',
+    calcDiscountStandard: '(стандарт)',
+    calcDiscountVip: '(VIP)',
+    calcScaleSpecial: 'Спеццена:',
+    calcScaleSaving: 'Ваша экономия:',
+    calcBenefitTitle: 'ЧИСТАЯ ВЫГОДА:',
+    calcBenefitDesc: 'Сэкономленные средства полностью покроют стоимость дизайн-проекта, чистового ремонта или машиноместа.',
+    calcResultTitle: 'ИТОГОВАЯ СПЕЦЦЕНА ПРИ 100% ОПЛАТЕ:',
+    calcSavingsLabel: 'Ваша экономия:',
+    calcBaseNote: 'Базовая цена:',
+    calcDisclaimer: '* Оплата производится в национальном соме по официальному учетному курсу НБКР на день фактической оплаты. Цена квадратного метра фиксируется в официальном ДДУ без права пересмотра.',
+    calcBtnFixWa: 'ЗАФИКСИРОВАТЬ СКИДКУ В WHATSAPP',
+    calcBtnPdf: 'СКАЧАТЬ РАСЧЕТ В PDF',
+    calcBtnBookFloor: 'Забронировать видовой этаж',
+    somUnit: 'сом',
   },
   kg: {
     pageTitle: '100% төлөм',
@@ -368,11 +426,32 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Касса аркылуу же банктык которуу менен төлөп, бардык каржылык чектерди аласыз.',
       },
     ],
-    calcBadge: 'Интерактивдүү 100% калькулятор',
-    calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
-    calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
+    calcBadge: '100% ТӨЛӨМДҮН ФИНАНСЫЛЫК КАЛЬКУЛЯТОРУ',
+    calcTitle: '100% ТӨЛӨМДӨГҮ ПАЙДАНЫ ЭСЕПТӨӨ',
+    calcDesc: 'Планировканы тандаңыз же жеке арзандатууну дароо эсептөө үчүн сумманы жылдырыңыз.',
     btnDownloadPdf: 'PDF эсебин көчүрүп алуу',
-    netSavingsLabel: 'Сиздин таза үнөмдөөңүз (дисконт 6%):',
+    netSavingsLabel: 'Сиздин таза үнөмдөөңүз:',
+    calcRateOnline: 'УБ онлайн курсу',
+    calcMaxDiscountBadge: 'Жетекчиликтен максималдуу дисконт',
+    calcBtnCatalog: 'КАТАЛОГДОН ПЛАНИРОВКАНЫ ТАНДОО (11 ВАРИАНТ)',
+    calcBtnCatalogSelected: 'ТАНДАЛДЫ:',
+    calcBasePriceLabel: 'БАТИРДИН БАЗАЛЫК БААСЫ:',
+    calcEditHint: 'кол менен өзгөртүү үчүн басыңыз',
+    calcDiscountHeading: 'КУРУУЧУДАН АРЗАНДАТУУ ӨЛЧӨМҮ:',
+    calcDiscountStandard: '(стандарт)',
+    calcDiscountVip: '(VIP)',
+    calcScaleSpecial: 'Атайын баа:',
+    calcScaleSaving: 'Сиздин үнөмдөөңүз:',
+    calcBenefitTitle: 'ТАЗА ПАЙДА:',
+    calcBenefitDesc: 'Үнөмдөлгөн каражат дизайн-долбоорду, оңдоп-түзөөнү же паркингди толук жабат.',
+    calcResultTitle: '100% ТӨЛӨМДӨГҮ АКЫРКЫ БАА:',
+    calcSavingsLabel: 'Сиздин үнөмдөөңүз:',
+    calcBaseNote: 'Базалык баасы:',
+    calcDisclaimer: '* Төлөмдөр накталай күндөгү КР Улуттук банкынын расмий курсу боюнча улуттук сомдо жүргүзүлөт. Чарчы метрдин баасы келишимде бекитилет.',
+    calcBtnFixWa: 'АРЗАНДАТУУНУ WHATSAPP АРКЫЛУУ БЕКИТҮҮ',
+    calcBtnPdf: 'PDF ЭСЕБИН КӨЧҮРҮП АЛУУ',
+    calcBtnBookFloor: 'Панорамалык кабатты брондоо',
+    somUnit: 'сом',
   },
   kz: {
     pageTitle: '100% төлем',
@@ -490,35 +569,56 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     investStat2Label: 'Ижарага берүүдөгү жылдык киреше',
     investStat3Val: 'Цессия',
     investStat3Label: 'Үй тапшырылганга чейин оңой кайра сатуу',
-    stepsBadge: 'Тез жана юридикалык жактан таза',
-    stepsTitle: 'Батирге ээ болуунун 4 кадамы',
+    stepsBadge: 'Тез және заңды түрде таза',
+    stepsTitle: 'Баспана алудың 4 қадамы',
     steps: [
       {
         num: '01',
-        title: 'Панорамалуу батирди тандоо',
-        desc: 'Сайттан пландарды көресіз же сатуу кеңсесине келип 3D-макеттен кабатты тандайсыз.',
+        title: 'Пәтерді таңдау',
+        desc: 'Жоспарларды сайттан немесе кеңседен көресіз.',
       },
       {
         num: '02',
-        title: 'Арнайы бааны бекитүү',
-        desc: 'Компаниянын жетекчилиги менен арзандатууну макулдашып, тандалган батирди брондойбуз.',
+        title: 'Бағаны бекіту',
+        desc: 'Басшылықпен жеңілдікті келісеміз.',
       },
       {
         num: '03',
         title: 'ДДУ-ға қол қою',
-        desc: 'Бардык пункттарды юридикалык түшүндүрүү менен 30 мүнөттө расмий ДДУ түзөбүз.',
+        desc: '30 минутта ресми шарт жасаймыз.',
       },
       {
         num: '04',
-        title: 'Төлөм жана документтерди алуу',
-        desc: 'Касса аркылуу же банктык которуу менен төлөп, бардык каржылык чектерди аласыз.',
+        title: 'Төлем және құжаттарды алу',
+        desc: 'Төлем жасап, құжаттарды аласыз.',
       },
     ],
-    calcBadge: 'Интерактивдүү 100% калькулятор',
-    calcTitle: 'Үнөмдөөңүздү онлайн эсептеңиз',
-    calcDesc: 'Жылдыргычты жылдырып, бир жолку төлөмдөгү арзандатууну көрүңүз.',
+    calcBadge: '100% ТӨЛЕМ ҚАРЖЫЛЫҚ КАЛЬКУЛЯТОРЫ',
+    calcTitle: '100% ТӨЛЕМДЕГІ ПАЙДАНЫ ЕСЕПТЕУ',
+    calcDesc: 'Жоспарды таңдаңыз немесе жеке жеңілдікті есептеу үшін соманы реттеңіз.',
     btnDownloadPdf: 'PDF есебін жүктеп алу',
-    netSavingsLabel: 'Сіздің таза үнемдеуіңіз (дисконт 6%):',
+    netSavingsLabel: 'Сіздің таза үнемдеуіңіз:',
+    calcRateOnline: 'ҰБ онлайн бағамы',
+    calcMaxDiscountBadge: 'Басшылықтан максималды дисконт',
+    calcBtnCatalog: 'КАТАЛОГТАН ЖОСПАРДЫ ТАҢДАУ (11 НҰСҚА)',
+    calcBtnCatalogSelected: 'ТАҢДАЛДЫ:',
+    calcBasePriceLabel: 'ПӘТЕРДІҢ БАЗАЛЫҚ БАҒАСЫ:',
+    calcEditHint: 'қолмен өзгерту үшін басыңыз',
+    calcDiscountHeading: 'ҚҰРЫЛЫС САЛУШЫДАН ЖЕҢІЛДІК МӨЛШЕРІ:',
+    calcDiscountStandard: '(стандарт)',
+    calcDiscountVip: '(VIP)',
+    calcScaleSpecial: 'Арнайы баға:',
+    calcScaleSaving: 'Сіздің үнемдеуіңіз:',
+    calcBenefitTitle: 'ТАЗА ПАЙДА:',
+    calcBenefitDesc: 'Үнемделген қаражат толық дизайн-жобаны немесе автотұрақты жабады.',
+    calcResultTitle: '100% ТӨЛЕМДЕГІ ТҮПКІЛІКТІ БАҒА:',
+    calcSavingsLabel: 'Сіздің үнемдеуіңіз:',
+    calcBaseNote: 'Базалық бағасы:',
+    calcDisclaimer: '* Төлем ҚР Ұлттық Банкінің нақты күнгі ресми бағамы бойынша ұлттық сомда жүргізіледі. Баға ДДУ шартында бекітіледі.',
+    calcBtnFixWa: 'ЖЕҢІЛДІКТІ WHATSAPP АРҚЫЛЫ БЕКІТУ',
+    calcBtnPdf: 'PDF ЕСЕБІН ЖҮКТЕП АЛУ',
+    calcBtnBookFloor: 'Видовой қабатты брондау',
+    somUnit: 'сом',
   },
   uk: {
     pageTitle: '100% розрахунок',
@@ -647,24 +747,45 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
       {
         num: '02',
         title: 'Фіксація спецціни',
-        desc: 'Узгоджуємо розмір знижки та бронюємо квартиру.',
+        desc: 'Узгоджуємо індивідуальну знижку та бронюємо квартиру.',
       },
       {
         num: '03',
         title: 'Підписання ДДУ',
-        desc: 'Укладаємо офіційний договір за 30 хвилин.',
+        desc: 'Офіційний договір за 30 хвилин.',
       },
       {
         num: '04',
         title: 'Оплата та отримання документів',
-        desc: 'Вносите оплату через банк або касу з видачею чеків.',
+        desc: 'Вносите кошти з видачею чеків.',
       },
     ],
-    calcBadge: 'Інтерактивний розрахунок 100% оплати',
-    calcTitle: 'Розрахуйте вашу економію онлайн',
-    calcDesc: 'Налаштуйте вартість для отримання розрахунку.',
+    calcBadge: 'ФІНАНСОВИЙ КАЛЬКУЛЯТОР 100% ОПЛАТИ',
+    calcTitle: 'РОЗРАХУНОК ВИГОДИ ПРИ 100% ОПЛАТІ',
+    calcDesc: 'Оберіть планування або налаштуйте вартість для розрахунку знижки.',
     btnDownloadPdf: 'Завантажити розрахунок у PDF',
-    netSavingsLabel: 'Ваша чиста економія (дисконт 6%):',
+    netSavingsLabel: 'Ваша чиста економія:',
+    calcRateOnline: 'Курс НБКР онлайн',
+    calcMaxDiscountBadge: 'Максимальний дисконт від керівництва',
+    calcBtnCatalog: 'ОБРАТИ ПЛАНУВАННЯ З КАТАЛОГУ (11 ВАРІАНТІВ)',
+    calcBtnCatalogSelected: 'ОБРАНО:',
+    calcBasePriceLabel: 'БАЗОВА ВАРТІСТЬ КВАРТИРИ:',
+    calcEditHint: 'натисніть, щоб змінити вручну',
+    calcDiscountHeading: 'РОЗМІР ДИСКОНТУ ВІД ДЕВЕЛОПЕРА:',
+    calcDiscountStandard: '(стандарт)',
+    calcDiscountVip: '(VIP)',
+    calcScaleSpecial: 'Спецціна:',
+    calcScaleSaving: 'Ваша економія:',
+    calcBenefitTitle: 'ЧИСТА ВИГОДА:',
+    calcBenefitDesc: 'Заощаджені кошти повністю покриють вартість дизайн-проєкту або паркінгу.',
+    calcResultTitle: 'ОСТАТОЧНА СПЕЦЦІНА ПРИ 100% ОПЛАТІ:',
+    calcSavingsLabel: 'Ваша економія:',
+    calcBaseNote: 'Базова ціна:',
+    calcDisclaimer: '* Оплата здійснюється у сомах за курсом НБКР на день оплати. Ціна фіксується у договорі.',
+    calcBtnFixWa: 'ЗАФІКСУВАТИ ЗНИЖКУ У WHATSAPP',
+    calcBtnPdf: 'ЗАВАНТАЖИТИ РОЗРАХУНОК У PDF',
+    calcBtnBookFloor: 'Забронювати видовий поверх',
+    somUnit: 'сом',
   },
   en: {
     pageTitle: '100% Payment',
@@ -725,7 +846,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
       {
         complex: 'Madina Residence',
         classType: 'Business Class',
-        area: '43.59 m²',
+        area: '43.59 м²',
         standardPrice: '$65 385',
         cashPrice: 'from $61 500',
         saving: 'Save up to $3,885',
@@ -738,7 +859,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
       {
         complex: 'Aykol + Club House',
         classType: 'Comfort+ (Kok-Jar)',
-        area: '42.00 m²',
+        area: '42.00 м²',
         standardPrice: '$50 400',
         cashPrice: 'from $47 000',
         saving: 'Save up to $3,400',
@@ -806,11 +927,32 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: 'Transfer funds via wire or company cashier and receive official payment documentation.',
       },
     ],
-    calcBadge: 'Interactive Calculator',
-    calcTitle: 'Calculate Your Savings Online',
-    calcDesc: 'Adjust price to see instant cash discount.',
+    calcBadge: '100% PAYMENT FINANCIAL CALCULATOR',
+    calcTitle: 'CALCULATE YOUR 100% UPFRONT DISCOUNT',
+    calcDesc: 'Select layout or adjust the slider to see your instant lump-sum savings.',
     btnDownloadPdf: 'Download PDF Quote',
-    netSavingsLabel: 'Your Net Savings (6% Discount):',
+    netSavingsLabel: 'Your Net Savings:',
+    calcRateOnline: 'Live NBKR Rate',
+    calcMaxDiscountBadge: 'Executive Management Discount',
+    calcBtnCatalog: 'SELECT FLOOR PLAN FROM CATALOG (11 UNITS)',
+    calcBtnCatalogSelected: 'SELECTED:',
+    calcBasePriceLabel: 'BASE APARTMENT PRICE:',
+    calcEditHint: 'click to edit manually',
+    calcDiscountHeading: 'DEVELOPER DISCOUNT RATE:',
+    calcDiscountStandard: '(Standard)',
+    calcDiscountVip: '(VIP)',
+    calcScaleSpecial: 'Special Rate:',
+    calcScaleSaving: 'Your Savings:',
+    calcBenefitTitle: 'NET SAVINGS:',
+    calcBenefitDesc: 'Saved funds fully cover interior design, renovations, or an underground parking bay.',
+    calcResultTitle: 'FINAL SPECIAL PRICE WITH 100% PAYMENT:',
+    calcSavingsLabel: 'Your Total Savings:',
+    calcBaseNote: 'Base Price:',
+    calcDisclaimer: '* Payment is made in KGS based on the official NBKR exchange rate on the payment date. Rate is locked in DDU.',
+    calcBtnFixWa: 'LOCK IN DISCOUNT VIA WHATSAPP',
+    calcBtnPdf: 'DOWNLOAD PDF QUOTE',
+    calcBtnBookFloor: 'Reserve Panoramic Floor',
+    somUnit: 'KGS',
   },
   zh: {
     pageTitle: '100% 一次性全款',
@@ -952,11 +1094,32 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
         desc: '通过银行电汇或财务室缴费，当场领取完税凭据及100%全款结清公函。',
       },
     ],
-    calcBadge: '交互式全款计算器',
-    calcTitle: '在线测算全款购房优惠',
-    calcDesc: '调整总价，即刻测算现金全款折扣。',
+    calcBadge: '100%全款置业财务计算器',
+    calcTitle: '在线测算全款购房特惠',
+    calcDesc: '选择心仪户型或拖动滑块，即刻测算现金全款最高折扣。',
     btnDownloadPdf: '下载 PDF 格式预算单',
-    netSavingsLabel: '您的净节省额（6%折扣）：',
+    netSavingsLabel: '您的净节省额：',
+    calcRateOnline: '央行实时汇率',
+    calcMaxDiscountBadge: '高管专属特批顶格折扣',
+    calcBtnCatalog: '在售主力户型库中挑选 (共11款)',
+    calcBtnCatalogSelected: '当前选定房源：',
+    calcBasePriceLabel: '官方指导总价：',
+    calcEditHint: '点击可手动输入金额',
+    calcDiscountHeading: '开发商专属折扣比例：',
+    calcDiscountStandard: '(标准)',
+    calcDiscountVip: '(尊享)',
+    calcScaleSpecial: '全款特惠价：',
+    calcScaleSaving: '专属优惠额：',
+    calcBenefitTitle: '直享现金减免：',
+    calcBenefitDesc: '节省资金足以覆盖全套一线品牌家电、高端软装设计或专属地下车位。',
+    calcResultTitle: '一次性全款成交总价：',
+    calcSavingsLabel: '您的净节省额：',
+    calcBaseNote: '指导总价：',
+    calcDisclaimer: '* 房款依据国家法规按实际付款日央行汇率以索姆结算，单价锁定写入正规购房合同。',
+    calcBtnFixWa: '通过 WHATSAPP 锁定底价特惠',
+    calcBtnPdf: '一键下载 PDF 格式预算单',
+    calcBtnBookFloor: '优先锁定高区景观房源',
+    somUnit: '索姆',
   },
 };
 
@@ -965,9 +1128,15 @@ export default function FullPaymentPage() {
   const lang: Locale = (locale as Locale) || 'ru';
   const c = CONTENT[lang] || CONTENT.ru;
 
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(-1);
+  const [isCatalogOpen, setIsCatalogOpen] = useState<boolean>(false);
+
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
+  const [discountPercent, setDiscountPercent] = useState<number>(6);
+  const [currencyMode, setCurrencyMode] = useState<'usd' | 'kgs'>('usd');
+
   const [usdRate, setUsdRate] = useState<number>(87.45);
-  const [rateDate, setRateDate] = useState<string>('');
+  const [rateDate, setRateDate] = useState<string>('24.09.2026');
 
   useEffect(() => {
     let isMounted = true;
@@ -991,10 +1160,18 @@ export default function FullPaymentPage() {
     }
   }, [c.pageTitle]);
 
-  const discountPercent = 6;
   const cashPrice = Math.round(apartmentPrice * (1 - discountPercent / 100));
   const savingsUsd = apartmentPrice - cashPrice;
   const savingsKgs = Math.round(savingsUsd * usdRate);
+  const cashPriceKgs = Math.round(cashPrice * usdRate);
+
+  const handleSelectCatalogApartment = (apt: typeof CATALOG_APARTMENTS[0], idx: number) => {
+    setSelectedPlanIndex(idx);
+    setApartmentPrice(apt.price);
+    setIsCatalogOpen(false);
+  };
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const handleDownloadPdf = () => {
     exportPdfQuote({
@@ -1006,23 +1183,56 @@ export default function FullPaymentPage() {
       paymentPerPeriodUsd: 0,
       usdRate,
       rateDate,
-      selectedApartment: {
-        complex: 'Спецпредложение 100% Оплата',
-        rooms: 1,
-        area: Math.round(apartmentPrice / 1600),
-        floor: 'Все этажи',
-        priceM2: 1500,
-      },
+      selectedApartment: null,
       paymentSchedule: [
         {
           num: 1,
-          period: 'Единоразово (100% расчет со скидкой 6%)',
+          period: `Единоразово (100% расчет со скидкой ${discountPercent}%)`,
           paymentUsd: cashPrice,
-          paymentKgs: Math.round(cashPrice * usdRate),
+          paymentKgs: cashPriceKgs,
           balanceUsd: 0,
         },
       ],
     });
+  };
+
+  const handleFixWhatsApp = () => {
+    const selectedTitle = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].title : 'Индивидуальный расчет';
+    const complexName = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].complex : 'Квартира в EL ORDO GROUP';
+
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Клиент на 100% расчет',
+          phone: 'Через WhatsApp',
+          project: complexName,
+          goal: `100% оплата со скидкой ${discountPercent}%`,
+          budget: `$${cashPrice.toLocaleString('ru-RU')}`,
+          rooms: selectedTitle,
+          details: `Базовая цена: $${apartmentPrice.toLocaleString('ru-RU')} | Скидка: $${savingsUsd.toLocaleString('ru-RU')} (${discountPercent}%)`,
+          comment: `Спеццена при 100% оплате: $${cashPrice.toLocaleString('ru-RU')} (~${cashPriceKgs.toLocaleString('ru-RU')} сом)`,
+          lang,
+          source: 'FullPaymentPage',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    trackWhatsAppClick('full_payment_discount', complexName);
+    trackLeadSubmit('100% Оплата со скидкой', complexName);
+
+    const waText =
+      `Здравствуйте! Рассчитал спеццену при единовременной 100% оплате на сайте EL ORDO GROUP:\n\n` +
+      `• Объект: ${complexName} (${selectedTitle})\n` +
+      `• Базовая стоимость: $${apartmentPrice.toLocaleString('ru-RU')} (~${Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} сом)\n` +
+      `• Размер скидки: ${discountPercent}% (-$${savingsUsd.toLocaleString('ru-RU')} / ~${savingsKgs.toLocaleString('ru-RU')} сом)\n` +
+      `• Итоговая спеццена: $${cashPrice.toLocaleString('ru-RU')} (~${cashPriceKgs.toLocaleString('ru-RU')} сом)\n\n` +
+      `Хочу зафиксировать эту стоимость и забронировать видовой этаж.`;
+
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(waText)}`, '_blank');
   };
 
   return (
@@ -1037,80 +1247,305 @@ export default function FullPaymentPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
-      
-      {/* 1. ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР 100% ОПЛАТЫ */}
-      <div className="my-16 bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-10 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none transition-colors">
-        <div className="text-center max-w-xl mx-auto mb-8">
-          <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
+      {/* 1. ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 100% ОПЛАТЫ */}
+      <section className="my-16 bg-[#03150e] text-white rounded-3xl p-6 sm:p-12 border border-[#d4b26f]/30 shadow-2xl transition-all">
+        
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <span className="text-xs uppercase font-black tracking-widest text-[#d4b26f] block mb-2">
             {c.calcBadge}
           </span>
-          <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f]">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-3">
             {c.calcTitle}
-          </h3>
-          <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-1">
+          </h2>
+          <p className="text-xs sm:text-sm text-gray-300 font-light leading-relaxed">
             {c.calcDesc}
           </p>
         </div>
 
-        <div className="space-y-6">
-          <div className="p-3.5 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 flex items-center justify-between text-xs">
+        <div className="max-w-3xl mx-auto space-y-8">
+          
+          {/* Плашка курса НБКР онлайн + статус максимального дисконта */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-black/40 border border-white/10 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-bold text-gray-700 dark:text-gray-200">
-                Курс НБКР онлайн: <strong>{usdRate} сом/$</strong> {rateDate ? `(${rateDate})` : ''}
+              <span className="text-gray-300 font-medium">
+                {c.calcRateOnline} ({rateDate}):
+              </span>
+              <span className="bg-black/60 px-3 py-1 rounded-lg border border-white/15 text-[#d4b26f] font-black">
+                {usdRate} <span className="text-gray-400 font-normal">{c.somUnit}/$</span>
               </span>
             </div>
-            <div className="inline-flex items-center gap-1 font-bold text-emerald-700 dark:text-emerald-400">
-              <IconShieldCheck className="w-3.5 h-3.5" />
-              <span>Максимальный дисконт</span>
+
+            <div className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-950/40 px-3 py-1 rounded-xl border border-emerald-800/40">
+              <IconShieldCheck className="w-4 h-4 text-emerald-400" />
+              <span>{c.calcMaxDiscountBadge}</span>
             </div>
           </div>
 
-          <div>
-            <div className="flex justify-between items-center mb-1.5 text-xs font-bold uppercase">
-              <span className="text-gray-600 dark:text-gray-300">Базовая стоимость квартиры:</span>
-              <span className="text-[#064734] dark:text-[#d4b26f] font-black text-sm">${apartmentPrice.toLocaleString('ru-RU')}</span>
+          {/* Кнопка-дропдаун: Выбрать планировку из каталога */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setIsCatalogOpen(!isCatalogOpen)}
+              className="w-full py-4 px-6 rounded-2xl bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-between shadow-lg transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 truncate">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <span className="truncate">
+                  {selectedPlanIndex >= 0
+                    ? `${c.calcBtnCatalogSelected} ${CATALOG_APARTMENTS[selectedPlanIndex].complex} — ${CATALOG_APARTMENTS[selectedPlanIndex].title}`
+                    : c.calcBtnCatalog}
+                </span>
+              </div>
+              <svg className={`w-4 h-4 transition-transform duration-300 ${isCatalogOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {isCatalogOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#061e15] border border-white/20 rounded-2xl p-2.5 shadow-2xl z-30 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
+                {CATALOG_APARTMENTS.map((apt, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleSelectCatalogApartment(apt, idx)}
+                    className="w-full text-left p-3 rounded-xl hover:bg-white/10 flex items-center justify-between text-xs transition-colors cursor-pointer"
+                  >
+                    <div>
+                      <strong className="text-white font-bold block">{apt.complex}</strong>
+                      <span className="text-gray-300 text-[11px]">{apt.title}</span>
+                    </div>
+                    <div className="text-right">
+                      <strong className="text-[#d4b26f] font-black">${apt.price.toLocaleString('ru-RU')}</strong>
+                      <span className="text-[10px] text-gray-400 block">≈ {Math.round(apt.price * usdRate).toLocaleString('ru-RU')} {c.somUnit}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Базовая стоимость */}
+          <div className="space-y-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <div>
+                <span className="text-xs font-black uppercase tracking-wider text-white block">
+                  {c.calcBasePriceLabel}
+                </span>
+                <span className="text-[10px] text-gray-400 block">
+                  {c.calcEditHint}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 self-end sm:self-auto">
+                <div className="flex items-center bg-black/50 border border-white/15 px-4 py-2 rounded-2xl">
+                  <span className="text-[#d4b26f] font-black text-sm mr-2">$</span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={apartmentPrice.toLocaleString('ru-RU')}
+                    onChange={(e) => {
+                      const val = Number(e.target.value.replace(/\D/g, ''));
+                      setApartmentPrice(val);
+                      setSelectedPlanIndex(-1);
+                    }}
+                    className="w-28 sm:w-32 bg-transparent text-right font-black text-lg text-white focus:outline-none"
+                  />
+                </div>
+                <span className="text-xs text-gray-400 font-semibold whitespace-nowrap hidden sm:inline">
+                  ≈ {Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} {c.somUnit}
+                </span>
+              </div>
             </div>
+
             <input
               type="range"
               min="35000"
-              max="200000"
+              max="220000"
               step="1000"
               value={apartmentPrice}
-              onChange={(e) => setApartmentPrice(Number(e.target.value))}
-              className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
+              onChange={(e) => {
+                setApartmentPrice(Number(e.target.value));
+                setSelectedPlanIndex(-1);
+              }}
+              className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#d4b26f]"
             />
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#f2f6f4] dark:bg-[#040c09] border border-[#064734]/15 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <span className="text-xs font-bold text-gray-500 uppercase">Спеццена при 100% оплате (скидка {discountPercent}%):</span>
-              <div className="text-3xl sm:text-5xl font-black text-[#064734] dark:text-[#d4b26f] mt-1">
-                ${cashPrice.toLocaleString('ru-RU')}
+          {/* Размер дисконта */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black uppercase tracking-wider text-white">
+                {c.calcDiscountHeading}
+              </span>
+              <span className="bg-black/60 px-3 py-1 rounded-xl border border-white/15 text-xs font-black text-[#d4b26f]">
+                {discountPercent}%
+              </span>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { pct: 5, label: '5%' },
+                { pct: 6, label: `6% ${c.calcDiscountStandard}` },
+                { pct: 7, label: '7%' },
+                { pct: 8, label: `8% ${c.calcDiscountVip}` },
+              ].map((b) => (
+                <button
+                  key={b.pct}
+                  type="button"
+                  onClick={() => setDiscountPercent(b.pct)}
+                  className={`py-2 px-1 text-center rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    discountPercent === b.pct
+                      ? 'bg-[#d4b26f] text-[#064734] shadow-lg'
+                      : 'bg-black/40 text-gray-300 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  {b.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Двухцветная шкала выгоды */}
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center justify-between text-xs font-black">
+              <div className="flex items-center gap-1.5 text-emerald-400">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                <span>{c.calcScaleSpecial} ${cashPrice.toLocaleString('ru-RU')} ({100 - discountPercent}%)</span>
               </div>
-              <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mt-1.5 flex items-center gap-1.5">
-                <IconCheck className="w-4 h-4 shrink-0" />
-                <span>{c.netSavingsLabel} <strong>${savingsUsd.toLocaleString('ru-RU')}</strong> (~{savingsKgs.toLocaleString('ru-RU')} сом)</span>
+              <div className="flex items-center gap-1.5 text-[#d4b26f]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#d4b26f]" />
+                <span>{c.calcScaleSaving} ${savingsUsd.toLocaleString('ru-RU')} ({discountPercent}%)</span>
               </div>
             </div>
 
-            <div className="w-full md:w-auto flex flex-col gap-2 shrink-0">
+            <div className="h-3 w-full bg-black/60 rounded-full overflow-hidden flex p-0.5 border border-white/10">
+              <div
+                style={{ width: `${100 - discountPercent}%` }}
+                className="h-full bg-emerald-500 rounded-l-full transition-all duration-300"
+              />
+              <div
+                style={{ width: `${discountPercent}%` }}
+                className="h-full bg-[#d4b26f] rounded-r-full transition-all duration-300"
+              />
+            </div>
+          </div>
+
+          {/* Плашка выгоды */}
+          <div className="p-4 rounded-2xl bg-black/40 border border-[#d4b26f]/30 flex items-center gap-4 text-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#d4b26f]/20 text-[#d4b26f] flex items-center justify-center font-black text-lg shrink-0">
+              %
+            </div>
+            <div>
+              <strong className="text-white font-black uppercase text-xs sm:text-sm block">
+                {c.calcBenefitTitle} ${savingsUsd.toLocaleString('ru-RU')} (~{savingsKgs.toLocaleString('ru-RU')} {c.somUnit})
+              </strong>
+              <span className="text-gray-400 text-[11px] block mt-0.5">
+                {c.calcBenefitDesc}
+              </span>
+            </div>
+          </div>
+
+          {/* Главная карточка результата */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-black/60 border border-white/15 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            
+            <div className="md:col-span-7 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black uppercase text-gray-300">
+                  {c.calcResultTitle}
+                </span>
+
+                <div className="flex items-center p-1 rounded-xl bg-white/10 border border-white/15">
+                  <button
+                    type="button"
+                    onClick={() => setCurrencyMode('usd')}
+                    className={`px-3 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                      currencyMode === 'usd'
+                        ? 'bg-[#d4b26f] text-[#064734] shadow'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    USD ($)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrencyMode('kgs')}
+                    className={`px-3 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                      currencyMode === 'kgs'
+                        ? 'bg-[#d4b26f] text-[#064734] shadow'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {c.somUnit}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-4xl sm:text-5xl md:text-6xl font-black text-[#d4b26f] tracking-tight">
+                  {currencyMode === 'usd' ? (
+                    `$${cashPrice.toLocaleString('ru-RU')}`
+                  ) : (
+                    `${cashPriceKgs.toLocaleString('ru-RU')} ${c.somUnit}`
+                  )}
+                </div>
+
+                <div className="text-sm font-bold text-emerald-400 mt-1 flex items-center gap-1.5">
+                  <IconCheck className="w-4 h-4 text-emerald-400" />
+                  <span>
+                    {c.calcSavingsLabel} ${savingsUsd.toLocaleString('ru-RU')} (~{savingsKgs.toLocaleString('ru-RU')} {c.somUnit})
+                  </span>
+                </div>
+
+                <span className="text-xs text-gray-400 block mt-2">
+                  {c.calcBaseNote} ${apartmentPrice.toLocaleString('ru-RU')}
+                </span>
+              </div>
+
+              <p className="text-[10px] text-gray-400 leading-relaxed font-light italic border-t border-white/10 pt-3">
+                {c.calcDisclaimer}
+              </p>
+            </div>
+
+            <div className="md:col-span-5 flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={handleFixWhatsApp}
+                className="w-full py-4 px-6 rounded-2xl bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <IconWhatsApp className="w-5 h-5 text-white" />
+                <span>{c.calcBtnFixWa}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleDownloadPdf}
-                className="w-full bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-6 py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 px-6 rounded-2xl bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>{c.btnDownloadPdf}</span>
+                <span>{c.calcBtnPdf}</span>
               </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 2. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ */}
+              <a
+                href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent('Здравствуйте! Хочу уточнить условия бронирования видового этажа при 100% оплате.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 px-6 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all border border-white/15 cursor-pointer text-center"
+              >
+                {c.calcBtnBookFloor}
+              </a>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 2. КАРТОЧКИ РЕАЛЬНОЙ ЭКОНОМИИ ПО КОМПЛЕКСАМ */}
       <div className="mt-8 mb-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
@@ -1174,9 +1609,10 @@ export default function FullPaymentPage() {
 
               <div className="mt-6 pt-3 space-y-2">
                 <a
-                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(item.waText)}`}
+                  href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(item.waText)}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('full_payment_card', item.complex)}
                   className="w-full py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-white dark:text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />

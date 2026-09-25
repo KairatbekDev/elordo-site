@@ -75,6 +75,38 @@ interface InstallmentContent {
   stepsBadge: string;
   stepsTitle: string;
   steps: { step: string; title: string; desc: string }[];
+  calcBadge: string;
+  calcTitle: string;
+  calcDesc: string;
+  calcRateOnline: string;
+  calcFixedRateBadge: string;
+  calcBtnCatalog: string;
+  calcBtnCatalogSelected: string;
+  calcBasePriceLabel: string;
+  calcEditHint: string;
+  calcDownLabel: string;
+  calcMinBadge: string;
+  calcTermLabel: string;
+  calcMaxTermBadge: string;
+  calcMonthsUnit: string;
+  calcFreqLabel: string;
+  calcFreqMonthly: string;
+  calcFreqQuarterly: string;
+  calcScaleDown: string;
+  calcScaleBalance: string;
+  calcSavingsTitle: string;
+  calcSavingsDesc: string;
+  calcResultMonthly: string;
+  calcResultQuarterly: string;
+  calcPaymentsCount: string;
+  calcRemainingLabel: string;
+  calcNoBankFee: string;
+  calcDisclaimer: string;
+  calcBtnFixWa: string;
+  calcBtnPdf: string;
+  calcBtnShowSchedule: string;
+  calcBtnHideSchedule: string;
+  somUnit: string;
 }
 
 interface ScheduleItem {
@@ -83,6 +115,17 @@ interface ScheduleItem {
   paymentUsd: number;
   paymentKgs: number;
   balanceUsd: number;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const CATALOG_APARTMENTS = [
@@ -109,61 +152,20 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     descriptionText: 'Первоначальный взнос составляет от 20% до 30% от общей стоимости квартиры. Остаток распределяется равными долями на срок до 36 месяцев. График выплат согласовывается индивидуально: ежемесячно, поквартально (раз в 3 месяца) или с учетом сезонных поступлений вашего бизнеса. Переплата составляет 0%.',
     documentsText: 'Для заключения Договора долевого участия (ДДУ) требуется исключительно паспорт гражданина (ID-карта или загранпаспорт). Справки с места работы о подтверждении доходов и поручители не требуются.',
     faqList: [
-      { q: 'Фиксируется ли стоимость квадратного метра в договоре?', a: 'Да. Стоимость квадратного метра фиксируется в официальном Договоре долевого участия (ДДУ) в момент подписания и остается неизменной на протяжении всего срока выплат.' },
-      { q: 'Нужен ли залог или поручители?', a: 'Нет, поручители и сторонние залоги не требуются. Обеспечением обязательств выступает сама квартира.' },
-      { q: 'Можно ли погасить рассрочку досрочно?', a: 'Да. Вы можете закрыть остаток в любой момент без скрытых комиссий и штрафов.' },
-      { q: 'Можно ли использовать автомобиль как первоначальный взнос?', a: 'Да, в компании действует программа Trade-in с экспресс-оценкой авто за 24 часа.' },
-      { q: 'Как юридически защищен покупатель?', a: 'С каждым дольщиком заключается официальный ДДУ с обязательной госрегистрацией.' },
-      { q: 'Какой минимальный первоначальный взнос?', a: 'Минимальный первоначальный взнос начинается от 20%.' },
+      { q: 'Фиксируется ли стоимость квадратного метра в договоре?', a: 'Да. Стоимость квадратного метра фиксируется в официальном Договоре долевого участия (ДДУ) в момент подписания и остается неизменной на протяжении всего срока выплат, независимо от рыночных колебаний цен.' },
+      { q: 'Нужен ли залог или поручители?', a: 'Нет, поручители и сторонние залоги не требуются. Обеспечением выполнения обязательств выступает сама строящаяся квартира до момента завершения всех взаиморасчетов.' },
+      { q: 'Можно ли погасить рассрочку досрочно?', a: 'Да. Вы можете закрыть остаток задолженности в любой момент без каких-либо скрытых комиссий, штрафов или дополнительных переплат.' },
+      { q: 'Можно ли использовать автомобиль как первоначальный взнос?', a: 'Да, в компании действует программа Trade-in. Мы проводим независимую экспертную оценку вашего автомобиля по рыночной стоимости за 24 часа и засчитываем эту сумму в счет первого взноса.' },
+      { q: 'Как юридически защищен покупатель?', a: 'С каждым дольщиком заключается официальный ДДУ, подлежащий обязательной государственной регистрации в соответствии с законодательством Кыргызской Республики. Все объекты имеют утвержденные Красные книги и лицензии Госстроя КР.' },
+      { q: 'Какой минимальный первоначальный взнос?', a: 'Минимальный первоначальный взнос начинается от 20% в зависимости от выбранного жилого комплекса и этапа строительства.' },
     ],
     examplesBadge: 'Наглядные расчеты',
     examplesTitle: 'Примеры платежей по квартирам',
     examplesSubtitle: 'Реальные расчеты для 1-комнатных квартир при первоначальном взносе 30% на 36 месяцев',
     examples: [
-      {
-        complex: 'ЖК Abu Dhabi',
-        type: '1-комнатная квартира',
-        area: '49.48 м²',
-        priceM2: 'от 1 650 $',
-        totalPrice: '$81 642',
-        downPayment: '$24 492 (30%)',
-        downPaymentKgs: '≈ 2 143 000 сом',
-        monthly: '$1 587',
-        monthlyKgs: '≈ 138 800 сом',
-        term: '36 месяцев',
-        slug: 'abu-dhabi',
-        waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. (49.48 м²) в ЖК Abu Dhabi с платежом $1587/мес. Есть ли свободные этажи?',
-      },
-      {
-        complex: 'ЖК Madina Residence',
-        type: '1-комнатная квартира',
-        area: '43.59 м²',
-        priceM2: 'от 1 500 $',
-        totalPrice: '$65 385',
-        downPayment: '$19 615 (30%)',
-        downPaymentKgs: '≈ 1 716 000 сом',
-        monthly: '$1 271',
-        monthlyKgs: '≈ 111 200 сом',
-        term: '36 месяцев',
-        slug: 'madina-residence',
-        badge: 'Хит продаж',
-        waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. (43.59 м²) в ЖК Madina Residence с платежом $1271/мес. Отправьте планировку.',
-      },
-      {
-        complex: 'ЖД Айкол +',
-        type: '1-комнатная квартира',
-        area: '42.00 м²',
-        priceM2: 'от 1 200 $',
-        totalPrice: '$50 400',
-        downPayment: '$15 120 (30%)',
-        downPaymentKgs: '≈ 1 323 000 сом',
-        monthly: '$980',
-        monthlyKgs: '≈ 85 700 сом',
-        term: '36 месяцев',
-        slug: 'ajkol-plus',
-        badge: 'Эко-предгорье',
-        waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. в ЖД Айкол+ (Кок-Жар) с платежом $980/мес. Подскажите наличие.',
-      },
+      { complex: 'ЖК Abu Dhabi', type: '1-комнатная квартира', area: '49.48 м²', priceM2: 'от 1 650 $', totalPrice: '$81 642', downPayment: '$24 492 (30%)', downPaymentKgs: '≈ 2 143 000 сом', monthly: '$1 587', monthlyKgs: '≈ 138 800 сом', term: '36 месяцев', slug: 'abu-dhabi', waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. (49.48 м²) в ЖК Abu Dhabi с платежом $1587/мес. Есть ли свободные этажи?' },
+      { complex: 'ЖК Madina Residence', type: '1-комнатная квартира', area: '43.59 м²', priceM2: 'от 1 500 $', totalPrice: '$65 385', downPayment: '$19 615 (30%)', downPaymentKgs: '≈ 1 716 000 сом', monthly: '$1 271', monthlyKgs: '≈ 111 200 сом', term: '36 месяцев', slug: 'madina-residence', badge: 'Хит продаж', waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. (43.59 м²) в ЖК Madina Residence с платежом $1271/мес. Отправьте планировку.' },
+      { complex: 'ЖД Айкол +', type: '1-комнатная квартира', area: '42.00 м²', priceM2: 'от 1 200 $', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 сом', monthly: '$980', monthlyKgs: '≈ 85 700 сом', term: '36 месяцев', slug: 'ajkol-plus', badge: 'Эко-предгорье', waText: 'Здравствуйте! Интересует расчет рассрочки на 1-комн. в ЖД Айкол+ (Кок-Жар) с платежом $980/мес. Подскажите наличие.' },
     ],
     totalPriceLabel: 'Общая стоимость:',
     downPaymentLabel: 'Первый взнос:',
@@ -198,76 +200,67 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     stepsBadge: 'Прозрачная сделка',
     stepsTitle: '4 простых шага к вашей квартире',
     steps: [
-      { step: '01', title: 'Выбор планировки и этажа', desc: 'Выбираете квартиру в каталоге или приезжаете в офис продаж.' },
-      { step: '02', title: 'Согласование графика 0%', desc: 'Определяем размер первоначального взноса и график выплат.' },
-      { step: '03', title: 'Подписание ДДУ по паспорту', desc: 'Заключаем официальный Договор долевого участия за 30 минут.' },
-      { step: '04', title: 'Госрегистрация и получение ключей', desc: 'Договор регистрируется в госорганах КР. Получаете ключи и техпаспорт.' },
+      { step: '01', title: 'Выбор планировки и этажа', desc: 'Выбираете квартиру в каталоге или приезжаете в офис продаж для просмотра детальных архитектурных 3D-макетов.' },
+      { step: '02', title: 'Согласование графика 0%', desc: 'Определяем комфортный размер первоначального взноса (от 20–30%) и график выплат: ежемесячно или поквартально.' },
+      { step: '03', title: 'Подписание ДДУ по паспорту', desc: 'Заключаем официальный Договор долевого участия за 30 минут. Без подтверждения доходов, поручителей и банков.' },
+      { step: '04', title: 'Госрегистрация и получение ключей', desc: 'Договор регистрируется в госорганах КР. После сдачи дома вы получаете ключи и техпаспорт на ваше имя.' },
     ],
+    calcBadge: 'ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 0%',
+    calcTitle: 'РАСЧЕТ ЕЖЕМЕСЯЧНОГО ПЛАТЕЖА',
+    calcDesc: 'Используйте ползунки или готовые кнопки для расчета комфортного взноса под ваш бюджет.',
+    calcRateOnline: 'Курс НБКР онлайн',
+    calcFixedRateBadge: 'Возможна фиксация курса в ДДУ',
+    calcBtnCatalog: 'ВЫБРАТЬ ПЛАНИРОВКУ ИЗ КАТАЛОГА (11 ВАРИАНТОВ)',
+    calcBtnCatalogSelected: 'ВЫБРАНО:',
+    calcBasePriceLabel: 'СТОИМОСТЬ КВАРТИРЫ:',
+    calcEditHint: 'нажмите, чтобы изменить вручную',
+    calcDownLabel: 'ПЕРВОНАЧАЛЬНЫЙ ВЗНОС',
+    calcMinBadge: '(мин.)',
+    calcTermLabel: 'СРОК ВЫПЛАТ:',
+    calcMaxTermBadge: '(макс.)',
+    calcMonthsUnit: 'месяцев',
+    calcFreqLabel: 'ПЕРИОДИЧНОСТЬ ВЫПЛАТ:',
+    calcFreqMonthly: 'Ежемесячно',
+    calcFreqQuarterly: 'Поквартально (раз в 3 мес.)',
+    calcScaleDown: 'Первый взнос:',
+    calcScaleBalance: 'В рассрочку 0%:',
+    calcSavingsTitle: 'ПЕРЕПЛАТА: $0 • БЕЗ СКРЫТЫХ ПРОЦЕНТОВ БАНКА',
+    calcSavingsDesc: 'Экономия до $15 000+ по сравнению со стандартной банковской ипотекой (18–22% годовых).',
+    calcResultMonthly: 'ЕЖЕМЕСЯЧНЫЙ ПЛАТЁЖ (0% ПЕРЕПЛАТ):',
+    calcResultQuarterly: 'ЕЖЕКВАРТАЛЬНЫЙ ПЛАТЁЖ (0%):',
+    calcPaymentsCount: 'выплат',
+    calcRemainingLabel: 'Остаток к распределению:',
+    calcNoBankFee: 'Без комиссии банка',
+    calcDisclaimer: '* Расчет носит предварительный характер. В соответствии с законодательством КР оплата производится в национальной валюте (сом) по официальному учетному курсу НБКР на день фактической оплаты. Возможна индивидуальная фиксация курса в договоре.',
+    calcBtnFixWa: 'ЗАФИКСИРОВАТЬ РАСЧЕТ В WHATSAPP',
+    calcBtnPdf: 'СКАЧАТЬ РАСЧЕТ В PDF',
+    calcBtnShowSchedule: 'Посмотреть детальный график выплат',
+    calcBtnHideSchedule: 'Скрыть детальный график',
+    somUnit: 'сом',
   },
   kg: {
     pageTitle: '0% Бөлүп төлөө',
     heroTitle: 'БАНК КАТЫШУУСУЗ 0% БӨЛҮП ТӨЛӨӨ БАТИРЛЕРИ',
-    heroSubtitle: 'EL ORDO GROUP куруучусунан түз келишимге ыңгайлуу кирүү. 36 айга чейин пайыздарсыз, комиссияларсыз жеке төлөм графиги.',
-    noticeText: 'Куруучунун ички бөлүп төлөөсү батирди банктык ашыкча төлөмдөрсүз сатып алууга мүмкүндүк берет.',
+    heroSubtitle: 'EL ORDO GROUP куруучусунан түз келишимге ыңгайлуу кирүү. 36 айга чейин пайыздарсыз, жашыруун комиссияларсыз жана киреше маалымкатысыз жеке төлөм графиги.',
+    noticeText: 'Куруучунун ички бөлүп төлөөсү батирди банктык ашыкча төлөмдөрсүз жана кредиттик текшерүүсүз сатып алууга мүмкүндүк берет.',
     blockTitle: 'БӨЛҮП ТӨЛӨӨНҮН ДЕТАЛДАРЫ ЖАНА АРТЫКЧЫЛЫКТАРЫ',
-    descriptionText: 'Баштапкы төлөм 20%дан 30%га чейин. Калган сумма 36 айга чейин бөлүштүрүлөт. Ашыкча төлөм 0%.',
+    descriptionText: 'Баштапкы төлөм батирдин жалпы наркынын 20%дан 30%га чейинки бөлүгүн түзөт. Калган сумма 36 айга чейин тең үлүштөр менен бөлүштүрүлөт.',
     documentsText: 'Үлүштүк катышуу келишимин (ДДУ) түзүү үчүн жарандын паспорту гана талап кылынат.',
     faqList: [
-      { q: 'Квадрат метрдин баасы келишимде бекитилеби?', a: 'Ооба, расмий ДДУда толук бекитилет.' },
-      { q: 'Күрөө же кепилдер керекпи?', a: 'Жок, кепилдер талап кылынбайт.' },
-      { q: 'Мөөнөтүнөн мурда жабууга болобу?', a: 'Ооба, эч кандай айып пулсуз жабууга болот.' },
-      { q: 'Унааны колдонсо болобу?', a: 'Ооба, Trade-in программасы иштейт.' },
-      { q: 'Юридикалык коргоо барбы?', a: 'Мамкаттоодон өтүүчү ДДУ түзүлөт.' },
+      { q: 'Квадрат метрдин баасы келишимде бекитилеби?', a: 'Ооба, баа ДДУ түзүлгөндө толук бекитилет.' },
+      { q: 'Күрөө же кепилдер керекпи?', a: 'Жок, талап кылынбайт.' },
+      { q: 'Мөөнөтүнөн мурда жабууга болобу?', a: 'Ооба, айып пулсуз.' },
+      { q: 'Унааны колдонсо болобу?', a: 'Ооба, Trade-in иштейт.' },
+      { q: 'Юридикалык коргоо барбы?', a: 'Мамкаттоодон өткөн расмий ДДУ түзүлөт.' },
       { q: 'Минималдуу төлөм канча?', a: '20%дан башталат.' },
     ],
     examplesBadge: 'Көрсөтмөлүү эсептөөлөр',
     examplesTitle: 'Батирлер боюнча төлөм мисалдары',
-    examplesSubtitle: '36 айга 30% баштапкы төлөм менен эсептөөлөр',
+    examplesSubtitle: '36 айга 30% баштапкы төлөм менен 1 бөлмөлүү батирлердин эсептөөлөрү',
     examples: [
-      {
-        complex: 'ЖК Abu Dhabi',
-        type: '1 бөлмөлүү батир',
-        area: '49.48 м²',
-        priceM2: '1 650 $ баштап',
-        totalPrice: '$81 642',
-        downPayment: '$24 492 (30%)',
-        downPaymentKgs: '≈ 2 143 000 сом',
-        monthly: '$1 587',
-        monthlyKgs: '≈ 138 800 сом',
-        term: '36 ай',
-        slug: 'abu-dhabi',
-        waText: 'Саламатсызбы! ЖК Abu Dhabi боюнча 1 бөлмөлүү батирдин бөлүп төлөө эсебин алгым келет.',
-      },
-      {
-        complex: 'ЖК Madina Residence',
-        type: '1 бөлмөлүү батир',
-        area: '43.59 м²',
-        priceM2: '1 500 $ баштап',
-        totalPrice: '$65 385',
-        downPayment: '$19 615 (30%)',
-        downPaymentKgs: '≈ 1 716 000 сом',
-        monthly: '$1 271',
-        monthlyKgs: '≈ 111 200 сом',
-        term: '36 ай',
-        slug: 'madina-residence',
-        badge: 'Хит сатуу',
-        waText: 'Саламатсызбы! ЖК Madina Residence боюнча 1 бөлмөлүү батирдин бөлүп төлөө эсебин жөнөтүңүзчү.',
-      },
-      {
-        complex: 'ЖД Айкол +',
-        type: '1 бөлмөлүү батир',
-        area: '42.00 м²',
-        priceM2: '1 200 $ баштап',
-        totalPrice: '$50 400',
-        downPayment: '$15 120 (30%)',
-        downPaymentKgs: '≈ 1 323 000 сом',
-        monthly: '$980',
-        monthlyKgs: '≈ 85 700 сом',
-        term: '36 ай',
-        slug: 'ajkol-plus',
-        badge: 'Эко-предгорье',
-        waText: 'Саламатсызбы! ЖД Айкол+ боюнча 1 бөлмөлүү батирдин бөлүп төлөө эсебин тактап бересизби?',
-      },
+      { complex: 'ЖК Abu Dhabi', type: '1 бөлмөлүү батир', area: '49.48 м²', priceM2: '1 650 $ баштап', totalPrice: '$81 642', downPayment: '$24 492 (30%)', downPaymentKgs: '≈ 2 143 000 сом', monthly: '$1 587', monthlyKgs: '≈ 138 800 сом', term: '36 ай', slug: 'abu-dhabi', waText: 'Саламатсызбы! ЖК Abu Dhabi боюнча бөлүп төлөө эсебин алгым келет.' },
+      { complex: 'ЖК Madina Residence', type: '1 бөлмөлүү батир', area: '43.59 м²', priceM2: '1 500 $ баштап', totalPrice: '$65 385', downPayment: '$19 615 (30%)', downPaymentKgs: '≈ 1 716 000 сом', monthly: '$1 271', monthlyKgs: '≈ 111 200 сом', term: '36 ай', slug: 'madina-residence', badge: 'Хит сатуу', waText: 'Саламатсызбы! ЖК Madina Residence бөлүп төлөө эсебин жөнөтүңүзчү.' },
+      { complex: 'ЖД Айкол +', type: '1 бөлмөлүү батир', area: '42.00 м²', priceM2: '1 200 $ баштап', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 сом', monthly: '$980', monthlyKgs: '≈ 85 700 сом', term: '36 ай', slug: 'ajkol-plus', badge: 'Эко-предгорье', waText: 'Саламатсызбы! ЖД Айкол+ боюнча бөлүп төлөө эсебин тактап бересизби?' },
     ],
     totalPriceLabel: 'Жалпы наркы:',
     downPaymentLabel: 'Баштапкы төлөм:',
@@ -292,45 +285,77 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     row3Bank: 'Расмий жумуш ордунан милдеттүү',
     row4Criteria: 'Кошумча камсыздандыруу',
     row4ElOrdo: 'Жок',
-    row4Bank: 'Жыл сайын камсыздандыруу',
+    row4Bank: 'Жыл сайын өмүрдү камсыздандыруу',
     row5Criteria: 'Документтердин топтому',
     row5ElOrdo: 'Паспорт гана',
     row5Bank: '8+ маалымкаттар, кепилдер',
     row6Criteria: 'Тариздөө мөөнөтү',
     row6ElOrdo: 'Кайрылган күнү (30 мүнөт)',
-    row6Bank: '2ден 4 жумага чейин',
+    row6Bank: '2ден 4 жумага чейин кароо',
     stepsBadge: 'Ачык бүтүм',
     stepsTitle: 'Батириңизге жетүүчү 4 жөнөкөй кадам',
     steps: [
-      { step: '01', title: 'Пландоо жана кабатты тандоо', desc: 'Каталогдон батир тандайсыз.' },
-      { step: '02', title: '0% графикти макулдашуу', desc: 'Баштапкы төлөмдү жана графикти аныктайбыз.' },
+      { step: '01', title: 'Пландоо жана кабатты тандоо', desc: 'Каталогдон батир тандайсыз же сатуу кеңсесине келесиз.' },
+      { step: '02', title: '0% графикти макулдашуу', desc: 'Баштапкы төлөмдү жана төлөө графигин аныктайбыз.' },
       { step: '03', title: 'Паспорт менен ДДУга кол коюу', desc: '30 мүнөттүн ичинде расмий ДДУ түзөбүз.' },
-      { step: '04', title: 'Мамкаттоо жана ачкычтарды алуу', desc: 'Келишим катталып, ачкычтарды аласыз.' },
+      { step: '04', title: 'Мамкаттоо жана ачкычтарды алуу', desc: 'Мамлекеттик каттоодон өтүп, техпаспорт аласыз.' },
     ],
+    calcBadge: '0% КАРЖЫЛЫК КАЛЬКУЛЯТОР',
+    calcTitle: 'АЙ САЙЫНКЫ ТӨЛӨМДҮ ЭСЕПТӨӨ',
+    calcDesc: 'Бюджетиңизге ылайыктуу төлөмдү эсептөө үчүн сыдырмаларды колдонуңуз.',
+    calcRateOnline: 'УБ онлайн курсу',
+    calcFixedRateBadge: 'Келишимде курсту бекитүү мүмкүнчүлүгү',
+    calcBtnCatalog: 'КАТАЛОГДОН ПЛАНИРОВКАНЫ ТАНДОО (11 ВАРИАНТ)',
+    calcBtnCatalogSelected: 'ТАНДАЛДЫ:',
+    calcBasePriceLabel: 'БАТИРДИН БААСЫ:',
+    calcEditHint: 'кол менен өзгөртүү үчүн басыңыз',
+    calcDownLabel: 'БАШТАПКЫ ТӨЛӨМ',
+    calcMinBadge: '(мин.)',
+    calcTermLabel: 'ТӨЛӨӨ МӨӨНӨТҮ:',
+    calcMaxTermBadge: '(макс.)',
+    calcMonthsUnit: 'ай',
+    calcFreqLabel: 'ТӨЛӨМ МЕЗГИЛДҮҮЛҮГҮ:',
+    calcFreqMonthly: 'Ай сайын',
+    calcFreqQuarterly: 'Квартал сайын (3 айда бир)',
+    calcScaleDown: 'Баштапкы төлөм:',
+    calcScaleBalance: '0% бөлүп төлөө калдыгы:',
+    calcSavingsTitle: 'АШЫКЧА ТӨЛӨМ: $0 • БАНКТЫК ПАЙЫЗСЫЗ',
+    calcSavingsDesc: 'Банк ипотекасына (18–22%) салыштырмалуу $15 000+ чейин үнөмдөө.',
+    calcResultMonthly: 'АЙ САЙЫНКЫ ТӨЛӨМ (0% АШЫКЧА ТӨЛӨМСҮЗ):',
+    calcResultQuarterly: 'КВАРТАЛДЫК ТӨЛӨМ (0%):',
+    calcPaymentsCount: 'төлөм',
+    calcRemainingLabel: 'Бөлүштүрүлүүчү калдык:',
+    calcNoBankFee: 'Банк комиссиясы жок',
+    calcDisclaimer: '* Төлөмдөр КР Улуттук банкынын расмий курсу боюнча сом менен жүргүзүлөт.',
+    calcBtnFixWa: 'ЭСЕПТИ WHATSAPP АРКЫЛУУ БЕКИТҮҮ',
+    calcBtnPdf: 'PDF ЭСЕБИН КӨЧҮРҮП АЛУУ',
+    calcBtnShowSchedule: 'Төлөм графигин толук көрүү',
+    calcBtnHideSchedule: 'Графикти жашыруу',
+    somUnit: 'сом',
   },
   kz: {
     pageTitle: '0% Бөліп төлеу',
     heroTitle: 'БАНК ҚАТЫСУЫНСЫЗ 0% БӨЛІП ТӨЛЕУ ПӘТЕРЛЕРІ',
-    heroSubtitle: 'EL ORDO GROUP құрылыс салушысынан 36 айға дейін пайыздарсыз төлем кестесі.',
+    heroSubtitle: 'EL ORDO GROUP құрылыс салушысынан тікелей мәмілеге ыңғайлы кіру. 36 айға дейін пайыздарсыз төлем кестесі.',
     noticeText: 'Құрылыс салушының ішкі бөліп төлеуі пәтерді банктік артық төлемдерсіз сатып алуға мүмкіндік береді.',
     blockTitle: 'БӨЛІП ТӨЛЕУДІҢ МӘН-ЖАЙЫ ЖӘНЕ АРТЫҚШЫЛЫҚТАРЫ',
-    descriptionText: 'Бастапқы жарна 20%-дан 30%-ға дейін. Қалдық сома 36 айға дейін бөлінеді. Артық төлем 0%.',
-    documentsText: 'Тек төлқұжат қажет.',
+    descriptionText: 'Бастапқы жарна 20%-дан 30%-ға дейін. Қалдық сома 36 айға дейін тең үлестермен бөлінеді.',
+    documentsText: 'Үлестік қатысу шартын (ДДУ) жасасу үшін тек паспорт қажет.',
     faqList: [
-      { q: 'Баға бекітіле ме?', a: 'Иә, ресми ДДУ шартында бекітіледі.' },
-      { q: 'Кепілгерлер қажет пе?', a: 'Жоқ, талап етілмейді.' },
+      { q: 'Баға шартта бекітіле ме?', a: 'Иә, толық бекітіледі.' },
+      { q: 'Кепілгерлер қажет пе?', a: 'Жоқ, қажет емес.' },
       { q: 'Мерзімінен бұрын жабуға бола ма?', a: 'Иә, айыппұлсыз.' },
       { q: 'Автокөлікті пайдалануға бола ма?', a: 'Иә, Trade-in арқылы.' },
-      { q: 'Заңдық кепілдік қандай?', a: 'Мемтіркеуден өтетін ДДУ жасалады.' },
+      { q: 'Заңдық кепілдік қандай?', a: 'Мемтіркеуден өтетін ресми ДДУ жасалады.' },
       { q: 'Ең төменгі бастапқы жарна қанша?', a: '20%-дан басталады.' },
     ],
     examplesBadge: 'Көрнекі есептеулер',
     examplesTitle: 'Пәтерлер бойынша төлем мысалдары',
-    examplesSubtitle: '36 айға 30% бастапқы жарнамен есептеулер',
+    examplesSubtitle: '36 айға 30% бастапқы жарнамен 1 бөлмелі пәтерлердің нақты есептеулері',
     examples: [
-      { complex: 'ЖК Abu Dhabi', type: '1 бөлмелі пәтер', area: '49.48 м²', priceM2: '1 650 $ бастап', totalPrice: '$81 642', downPayment: '$24 492 (30%)', downPaymentKgs: '≈ 2 143 000 сом', monthly: '$1 587', monthlyKgs: '≈ 138 800 сом', term: '36 ай', slug: 'abu-dhabi', waText: 'Сәлеметсіз бе! ЖК Abu Dhabi бойынша бөліп төлеу есебін алғым келеді.' },
-      { complex: 'ЖК Madina Residence', type: '1 бөлмелі пәтер', area: '43.59 м²', priceM2: '1 500 $ бастап', totalPrice: '$65 385', downPayment: '$19 615 (30%)', downPaymentKgs: '≈ 1 716 000 сом', monthly: '$1 271', monthlyKgs: '≈ 111 200 сом', term: '36 ай', slug: 'madina-residence', badge: 'Хит сатылым', waText: 'Сәлеметсіз бе! ЖК Madina Residence бойынша бөліп төлеу есебін жіберіңізші.' },
-      { complex: 'ЖД Айкол +', type: '1 бөлмелі пәтер', area: '42.00 м²', priceM2: '1 200 $ бастап', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 сом', monthly: '$980', monthlyKgs: '≈ 85 700 сом', term: '36 ай', slug: 'ajkol-plus', badge: 'Эко-бөктер', waText: 'Сәлеметсіз бе! ЖД Айкол+ бойынша бөліп төлеу шартын білгім келеді.' },
+      { complex: 'ЖК Abu Dhabi', type: '1 бөлмелі пәтер', area: '49.48 м²', priceM2: '1 650 $ бастап', totalPrice: '$81 642', downPayment: '$24 492 (30%)', downPaymentKgs: '≈ 2 143 000 сом', monthly: '$1 587', monthlyKgs: '≈ 138 800 сом', term: '36 ай', slug: 'abu-dhabi', waText: 'Сәлеметсіз бе! ЖК Abu Dhabi бойынша бөліп төлеу есебін білгім келеді.' },
+      { complex: 'ЖК Madina Residence', type: '1 бөлмелі пәтер', area: '43.59 м²', priceM2: '1 500 $ бастап', totalPrice: '$65 385', downPayment: '$19 615 (30%)', downPaymentKgs: '≈ 1 716 000 сом', monthly: '$1 271', monthlyKgs: '≈ 111 200 сом', term: '36 ай', slug: 'madina-residence', badge: 'Хит сатылым', waText: 'Сәлеметсіз бе! ЖК Madina Residence бөліп төлеу есебін жіберіңізші.' },
+      { complex: 'ЖД Айкол +', type: '1 бөлмелі пәтер', area: '42.00 м²', priceM2: '1 200 $ бастап', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 сом', monthly: '$980', monthlyKgs: '≈ 85 700 сом', term: '36 ай', slug: 'ajkol-plus', badge: 'Эко-бөктер', waText: 'Сәлеметсіз бе! ЖД Айкол+ бойынша бөліп төлеу есебін алғым келеді.' },
     ],
     totalPriceLabel: 'Жалпы құны:',
     downPaymentLabel: 'Бастапқы жарна:',
@@ -355,7 +380,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     row3Bank: 'Ресми жұмыс орнынан міндетті',
     row4Criteria: 'Қосымша сақтандыру',
     row4ElOrdo: 'Жоқ',
-    row4Bank: 'Жыл сайын сақтандыру',
+    row4Bank: 'Өмір мен мүлікті сақтандыру',
     row5Criteria: 'Құжаттар топтамасы',
     row5ElOrdo: 'Тек төлқұжат',
     row5Bank: '8+ анықтама, кепілгерлер',
@@ -366,25 +391,57 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     stepsTitle: 'Батириңизге жетүүчү 4 жөнөкөй кадам',
     steps: [
       { step: '01', title: 'Жоспарлау мен қабатты таңдау', desc: 'Каталогтан пәтер таңдайсыз.' },
-      { step: '02', title: '0% кестені келісу', desc: 'Бастапқы жарнаны және кестені анықтаймыз.' },
-      { step: '03', title: 'Төлқұжатпен ДДУ-ға қол қою', desc: '30 минут ішінде рәсімдейміз.' },
-      { step: '04', title: 'Мемтіркеу және кілттерді алу', desc: 'Шарт мемлекеттік органдарда тіркеледі.' },
+      { step: '02', title: '0% кестені келісу', desc: 'Бастапқы жарнаны және төлем кестесін анықтаймыз.' },
+      { step: '03', title: 'Төлқұжатпен ДДУ-ға қол қою', desc: '30 минут ішінде ресми ДДУ жасаймыз.' },
+      { step: '04', title: 'Мемтіркеу және кілттерді алу', desc: 'Шарт тіркеліп, кілттер мен техпаспортты аласыз.' },
     ],
+    calcBadge: '0% ҚАРЖЫЛЫҚ КАЛЬКУЛЯТОР',
+    calcTitle: 'АЙ САЙЫНҒЫ ТӨЛЕМДІ ЕСЕПТЕУ',
+    calcDesc: 'Бюджетіңізге ыңғайлы жарнаны есептеу үшін сырғытпаларды пайдаланыңыз.',
+    calcRateOnline: 'ҰБ онлайн бағамы',
+    calcFixedRateBadge: 'Келісімшартта бағамды бекіту мүмкіндігі',
+    calcBtnCatalog: 'ЖОСПАРЛАР КАТАЛОГЫНАН ТАҢДАУ (11 НҰСҚА)',
+    calcBtnCatalogSelected: 'ТАҢДАЛДЫ:',
+    calcBasePriceLabel: 'ПӘТЕРДІҢ ҚҰНЫ:',
+    calcEditHint: 'қолмен өзгерту үшін басыңыз',
+    calcDownLabel: 'БАСТАПҚЫ ЖАРНА',
+    calcMinBadge: '(мин.)',
+    calcTermLabel: 'ТӨЛЕУ МЕРЗІМІ:',
+    calcMaxTermBadge: '(макс.)',
+    calcMonthsUnit: 'ай',
+    calcFreqLabel: 'ТӨЛЕМ МЕРЗІМДІЛІГІ:',
+    calcFreqMonthly: 'Ай сайын',
+    calcFreqQuarterly: 'Тоқсан сайын (3 айда бір)',
+    calcScaleDown: 'Бастапқы жарна:',
+    calcScaleBalance: '0% бөліп төлеу қалдығы:',
+    calcSavingsTitle: 'АРТЫҚ ТӨЛЕМ: $0 • БАНК ПАЙЫЗЫ ЖОҚ',
+    calcSavingsDesc: 'Банк ипотекасына (18–22%) қарағанда $15 000+ дейін үнемдеу.',
+    calcResultMonthly: 'АЙ САЙЫНҒЫ ТӨЛЕМ (0% АРТЫҚ ТӨЛЕМСІЗ):',
+    calcResultQuarterly: 'ТОҚСАНДЫҚ ТӨЛЕМ (0%):',
+    calcPaymentsCount: 'төлем',
+    calcRemainingLabel: 'Бөліп төленетін қалдық:',
+    calcNoBankFee: 'Банк комиссиясы жоқ',
+    calcDisclaimer: '* Төлем ҚР Ұлттық Банкінің нақты күнгі ресми бағамы бойынша соммен жүргізіледі.',
+    calcBtnFixWa: 'ЕСЕПТІ WHATSAPP АРҚЫЛЫ БЕКІТУ',
+    calcBtnPdf: 'PDF ЕСЕБІН ЖҮКТЕП АЛУ',
+    calcBtnShowSchedule: 'Төлем кестесін толық қарау',
+    calcBtnHideSchedule: 'Кестені жасыру',
+    somUnit: 'сом',
   },
   uk: {
     pageTitle: 'Розстрочка 0%',
     heroTitle: 'КВАРТИРИ В РОЗСТРОЧКУ 0% БЕЗ УЧАСТІ БАНКУ',
-    heroSubtitle: 'Комфортний вхід в угоду від забудовника EL ORDO GROUP на термін до 36 місяців без відсотків.',
+    heroSubtitle: 'Комфортний вхід в угоду безпосередньо від забудовника EL ORDO GROUP на термін до 36 місяців без відсотків.',
     noticeText: 'Внутрішня розстрочка від забудовника дозволяє придбати квартиру без банківських переплат.',
     blockTitle: 'ДЕТАЛІ ТА ПЕРЕВАГИ РОЗСТРОЧКИ',
-    descriptionText: 'Перший внесок від 20% до 30%. Залишок на термін до 36 місяців. Переплата 0%.',
-    documentsText: 'Потрібен лише паспорт громадянина.',
+    descriptionText: 'Перший внесок становить від 20% до 30%. Залишок розподіляється рівними частинами на термін до 36 місяців.',
+    documentsText: 'Для укладення ДДУ потрібен виключно паспорт громадянина.',
     faqList: [
       { q: 'Чи фіксується вартість у договорі?', a: 'Так, фіксується в офіційному ДДУ.' },
       { q: 'Чи потрібна застава?', a: 'Ні, поручителі не потрібні.' },
       { q: 'Чи можна погасити достроково?', a: 'Так, без штрафів.' },
       { q: 'Чи можна використати авто?', a: 'Так, за програмою Trade-in.' },
-      { q: 'Як захищений покупець?', a: 'Укладається ДДУ з держреєстрацією.' },
+      { q: 'Як захищений покупець?', a: 'Укладається офіційний зареєстрований ДДУ.' },
       { q: 'Який мінімальний внесок?', a: 'Від 20%.' },
     ],
     examplesBadge: 'Наочні розрахунки',
@@ -403,7 +460,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     aboutBtn: 'Про комплекс',
     tableBadge: 'Фінансова вигода',
     tableTitle: 'Розстрочка EL ORDO чи Іпотека в банку?',
-    tableSubtitle: 'Порівняння умов придбання житла безпосередньо від забудовника та через комерційний банк',
+    tableSubtitle: 'Порівняння умов придбання житла безпосередньо від забудовника та через банк',
     colCriteria: 'Критерій',
     colElOrdo: 'Розстрочка EL ORDO',
     colBank: 'Іпотека в банку',
@@ -418,7 +475,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     row3Bank: 'Обов\'язково з офіційного місця',
     row4Criteria: 'Додаткові страховки',
     row4ElOrdo: 'Відсутні',
-    row4Bank: 'Щорічне страхування',
+    row4Bank: 'Страхування життя та об\'єкта',
     row5Criteria: 'Пакет документів',
     row5ElOrdo: 'Тільки паспорт',
     row5Bank: '8+ довідок, поручителі',
@@ -430,9 +487,41 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     steps: [
       { step: '01', title: 'Вибір планування', desc: 'Обираєте квартиру в каталозі.' },
       { step: '02', title: 'Узгодження графіка 0%', desc: 'Визначаємо розмір першого внеску.' },
-      { step: '03', title: 'Підписання ДДУ', desc: 'Укладаємо офіційний договір за 30 хвилин.' },
-      { step: '04', title: 'Отримання ключів', desc: 'Отримуєте ключі та техпаспорт.' },
+      { step: '03', title: 'Підписання ДДУ', desc: 'Укладаємо офіційний ДДУ за 30 хвилин.' },
+      { step: '04', title: 'Отримання ключів', desc: 'Отримуєте техпаспорт та ключі.' },
     ],
+    calcBadge: '0% ФІНАНСОВИЙ КАЛЬКУЛЯТОР',
+    calcTitle: 'РОЗРАХУНОК ЩОМІСЯЧНОГО ПЛАТЕЖУ',
+    calcDesc: 'Використовуйте повзунки для розрахунку платежу під ваш бюджет.',
+    calcRateOnline: 'Курс НБКР онлайн',
+    calcFixedRateBadge: 'Можлива фіксація курсу в договорі',
+    calcBtnCatalog: 'ОБРАТИ ПЛАНУВАННЯ З КАТАЛОГУ (11 ВАРІАНТІВ)',
+    calcBtnCatalogSelected: 'ОБРАНО:',
+    calcBasePriceLabel: 'ВАРТІСТЬ КВАРТИРИ:',
+    calcEditHint: 'натисніть, щоб змінити вручну',
+    calcDownLabel: 'ПЕРШИЙ ВНЕСОК',
+    calcMinBadge: '(мін.)',
+    calcTermLabel: 'ТЕРМІН ВИПЛАТ:',
+    calcMaxTermBadge: '(макс.)',
+    calcMonthsUnit: 'місяців',
+    calcFreqLabel: 'ПЕРІОДИЧНІСТЬ ВИПЛАТ:',
+    calcFreqMonthly: 'Щомісяця',
+    calcFreqQuarterly: 'Поквартально (раз на 3 міс.)',
+    calcScaleDown: 'Перший внесок:',
+    calcScaleBalance: 'У розстрочку 0%:',
+    calcSavingsTitle: 'ПЕРЕПЛАТА: $0 • БЕЗ БАНКІВСЬКИХ ВІДСОТКІВ',
+    calcSavingsDesc: 'Економія до $15 000+ порівняно зі звичайною іпотекою банку.',
+    calcResultMonthly: 'ЩОМІСЯЧНИЙ ПЛАТІЖ (0% ПЕРЕПЛАТ):',
+    calcResultQuarterly: 'ЩОКВАРТАЛЬНИЙ ПЛАТІЖ (0%):',
+    calcPaymentsCount: 'виплат',
+    calcRemainingLabel: 'Залишок до сплати:',
+    calcNoBankFee: 'Без комісії банку',
+    calcDisclaimer: '* Оплата здійснюється у сомах за офіційним курсом НБКР на день оплати.',
+    calcBtnFixWa: 'ЗАФІКСУВАТИ РОЗРАХУНОК У WHATSAPP',
+    calcBtnPdf: 'ЗАВАНТАЖИТИ РОЗРАХУНОК У PDF',
+    calcBtnShowSchedule: 'Переглянути графік платежів',
+    calcBtnHideSchedule: 'Сховати графік',
+    somUnit: 'сом',
   },
   en: {
     pageTitle: '0% Installment',
@@ -455,8 +544,8 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     examplesSubtitle: 'Real payment breakdowns for 1-room apartments with 30% down payment over 36 months',
     examples: [
       { complex: 'Abu Dhabi RC', type: '1-Room Apartment', area: '49.48 m²', priceM2: 'from $1,650', totalPrice: '$81,642', downPayment: '$24,492 (30%)', downPaymentKgs: '≈ 2,143,000 KGS', monthly: '$1,587', monthlyKgs: '≈ 138,800 KGS', term: '36 months', slug: 'abu-dhabi', waText: 'Hello! Interested in installment calculation for Abu Dhabi RC.' },
-      { complex: 'Madina Residence', type: '1-Room Apartment', area: '43.59 m²', priceM2: 'from $1,500', totalPrice: '$65,385', downPayment: '$19,615 (30%)', downPaymentKgs: '≈ 1,716,000 KGS', monthly: '$1,271', monthlyKgs: '≈ 111,200 KGS', term: '36 months', slug: 'madina-residence', badge: 'Bestseller', waText: 'Hello! Interested in installment calculation for Madina Residence.' },
-      { complex: 'Aykol + Club House', type: '1-Room Apartment', area: '42.00 m²', priceM2: 'from $1,200', totalPrice: '$50,400', downPayment: '$15,120 (30%)', downPaymentKgs: '≈ 1,323,000 KGS', monthly: '$980', monthlyKgs: '≈ 85,700 KGS', term: '36 months', slug: 'ajkol-plus', badge: 'Eco Foothills', waText: 'Hello! Inquiring about installment terms for Aykol+.' },
+      { complex: 'Madina Residence', type: '1-Room Apartment', area: '43.59 м²', priceM2: 'from $1,500', totalPrice: '$65,385', downPayment: '$19,615 (30%)', downPaymentKgs: '≈ 1,716,000 KGS', monthly: '$1,271', monthlyKgs: '≈ 111,200 KGS', term: '36 months', slug: 'madina-residence', badge: 'Bestseller', waText: 'Hello! Interested in installment calculation for Madina Residence.' },
+      { complex: 'Aykol + Club House', type: '1-Room Apartment', area: '42.00 м²', priceM2: 'from $1,200', totalPrice: '$50,400', downPayment: '$15,120 (30%)', downPaymentKgs: '≈ 1,323,000 KGS', monthly: '$980', monthlyKgs: '≈ 85,700 KGS', term: '36 months', slug: 'ajkol-plus', badge: 'Eco Foothills', waText: 'Hello! Inquiring about installment terms for Aykol+.' },
     ],
     totalPriceLabel: 'Total Price:',
     downPaymentLabel: 'Down Payment:',
@@ -496,6 +585,38 @@ const CONTENT: Record<Locale, InstallmentContent> = {
       { step: '03', title: 'Sign Agreement', desc: 'Execute official DDU in 30 minutes.' },
       { step: '04', title: 'Handover & Keys', desc: 'Receive property deeds upon completion.' },
     ],
+    calcBadge: '0% FINANCIAL CALCULATOR',
+    calcTitle: 'CALCULATE MONTHLY INSTALLMENT',
+    calcDesc: 'Use sliders or preset buttons to calculate an installment plan matching your budget.',
+    calcRateOnline: 'Live NBKR Rate',
+    calcFixedRateBadge: 'Exchange rate pegging in contract',
+    calcBtnCatalog: 'SELECT FLOOR PLAN FROM CATALOG (11 UNITS)',
+    calcBtnCatalogSelected: 'SELECTED:',
+    calcBasePriceLabel: 'APARTMENT PRICE:',
+    calcEditHint: 'click to edit manually',
+    calcDownLabel: 'DOWN PAYMENT',
+    calcMinBadge: '(min.)',
+    calcTermLabel: 'INSTALLMENT TERM:',
+    calcMaxTermBadge: '(max.)',
+    calcMonthsUnit: 'months',
+    calcFreqLabel: 'PAYMENT FREQUENCY:',
+    calcFreqMonthly: 'Monthly',
+    calcFreqQuarterly: 'Quarterly (Every 3 months)',
+    calcScaleDown: 'Down Payment:',
+    calcScaleBalance: '0% Installment Balance:',
+    calcSavingsTitle: 'OVERPAYMENT: $0 • ZERO BANK COMMISSIONS',
+    calcSavingsDesc: 'Save up to $15,000+ compared to commercial mortgage interest rates.',
+    calcResultMonthly: 'MONTHLY PAYMENT (0% INTEREST):',
+    calcResultQuarterly: 'QUARTERLY PAYMENT (0%):',
+    calcPaymentsCount: 'payments',
+    calcRemainingLabel: 'Remaining Balance:',
+    calcNoBankFee: 'Zero bank markup',
+    calcDisclaimer: '* Calculations are preliminary estimates based on the official NBKR exchange rate on the payment date.',
+    calcBtnFixWa: 'LOCK IN ESTIMATE VIA WHATSAPP',
+    calcBtnPdf: 'DOWNLOAD PDF QUOTE',
+    calcBtnShowSchedule: 'View Full Payment Schedule',
+    calcBtnHideSchedule: 'Hide Schedule',
+    somUnit: 'som',
   },
   zh: {
     pageTitle: '0% 免息分期',
@@ -519,7 +640,7 @@ const CONTENT: Record<Locale, InstallmentContent> = {
     examples: [
       { complex: '阿布扎比住宅区 (Abu Dhabi)', type: '精致一居室', area: '49.48 м²', priceM2: '1 650 $ 起', totalPrice: '$81 642', downPayment: '$24 492 (30%)', downPaymentKgs: '≈ 2 143 000 索姆', monthly: '$1 587', monthlyKgs: '≈ 138 800 索姆', term: '36个月', slug: 'abu-dhabi', waText: '您好！想了解阿布扎比一居室月供$1587分期房源。' },
       { complex: '玛迪娜公馆 (Madina Residence)', type: '商务一居室', area: '43.59 м²', priceM2: '1 500 $ 起', totalPrice: '$65 385', downPayment: '$19 615 (30%)', downPaymentKgs: '≈ 1 716 000 索姆', monthly: '$1 271', monthlyKgs: '≈ 111 200 索姆', term: '36个月', slug: 'madina-residence', badge: '热销户型', waText: '您好！想了解玛迪娜公馆一居室月供$1271分期房源。' },
-      { complex: '艾科尔+ 精品洋房 (Aykol +)', type: '生态一居室', area: '42.00 м²', priceM2: '1 200 $ 起', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 索姆', monthly: '$980', monthlyKgs: '≈ 85 700 索姆', term: '36个月', slug: 'ajkol-plus', badge: '生态麓区', waText: '您好！想了解艾科尔+一居室月供$980分期房源。' },
+      { complex: '艾科尔+ (Aykol +)', type: '生态一居室', area: '42.00 м²', priceM2: '1 200 $ 起', totalPrice: '$50 400', downPayment: '$15 120 (30%)', downPaymentKgs: '≈ 1 323 000 索姆', monthly: '$980', monthlyKgs: '≈ 85 700 索姆', term: '36个月', slug: 'ajkol-plus', badge: '生态麓区', waText: '您好！想了解艾科尔+一居室月供$980分期房源。' },
     ],
     totalPriceLabel: '房屋总价:',
     downPaymentLabel: '首付款:',
@@ -559,15 +680,46 @@ const CONTENT: Record<Locale, InstallmentContent> = {
       { step: '03', title: '凭身份证件签约', desc: '30分钟内高效签订正规国家备案合同。' },
       { step: '04', title: '交付钥匙', desc: '验收交付后直接领取钥匙与不动产红本。' },
     ],
+    calcBadge: '0% 免息置业财务计算器',
+    calcTitle: '在线测算您的分期月供',
+    calcDesc: '拖动滑块或使用预设按键，即刻测算契合预算的还款节奏。',
+    calcRateOnline: '央行实时汇率',
+    calcFixedRateBadge: '合同中支持锁定汇率机制',
+    calcBtnCatalog: '在售主力户型库中挑选 (共11款)',
+    calcBtnCatalogSelected: '当前选定房源：',
+    calcBasePriceLabel: '房屋总价：',
+    calcEditHint: '点击可手动输入金额',
+    calcDownLabel: '首付款',
+    calcMinBadge: '(最低)',
+    calcTermLabel: '还款总期数：',
+    calcMaxTermBadge: '(最长)',
+    calcMonthsUnit: '个月',
+    calcFreqLabel: '还款周期频率：',
+    calcFreqMonthly: '按月均摊',
+    calcFreqQuarterly: '按季度（每3个月一次）',
+    calcScaleDown: '首付款：',
+    calcScaleBalance: '0% 免息余款：',
+    calcSavingsTitle: '利息支出: $0 • 无商业银行附加成本',
+    calcSavingsDesc: '相较商业银行 18%–22% 高息按揭贷款，全周期立省 $15,000+。',
+    calcResultMonthly: '每月还款金额（0%利息）：',
+    calcResultQuarterly: '每季度还款金额（0%）：',
+    calcPaymentsCount: '期款项',
+    calcRemainingLabel: '剩余待均摊款项：',
+    calcNoBankFee: '无银行手续费',
+    calcDisclaimer: '* 房款依据国家法规按实际付款日央行汇率以索姆结算。',
+    calcBtnFixWa: '通过 WHATSAPP 锁定测算方案',
+    calcBtnPdf: '下载 PDF 格式预算单',
+    calcBtnShowSchedule: '展开还款明细测算表',
+    calcBtnHideSchedule: '收起还款明细',
+    somUnit: '索姆',
   },
 };
 
 export default function InstallmentPage() {
   const { locale } = useLanguage();
-  const lang: Locale = (locale as Locale) || 'ru';
-  const c = CONTENT[lang] || CONTENT.ru;
+  const currentLang = normalizeLocale(locale);
+  const c = CONTENT[currentLang] || CONTENT.ru;
 
-  // 1. Состояние калькулятора
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(-1);
   const [isCatalogOpen, setIsCatalogOpen] = useState<boolean>(false);
 
@@ -577,11 +729,9 @@ export default function InstallmentPage() {
   const [months, setMonths] = useState<number>(36);
   const [frequency, setFrequency] = useState<'monthly' | 'quarterly'>('monthly');
 
-  // Валюта отображения в карточке результата: USD ($) или KGS (сом)
   const [currencyMode, setCurrencyMode] = useState<'usd' | 'kgs'>('usd');
-
   const [usdRate, setUsdRate] = useState<number>(87.45);
-  const [rateDate, setRateDate] = useState<string>('24.09.2026');
+  const [rateDate, setRateDate] = useState<string>('25.09.2026');
   const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
   useEffect(() => {
@@ -606,7 +756,6 @@ export default function InstallmentPage() {
     }
   }, [c.pageTitle]);
 
-  // Выбор планировки из каталога
   const handleSelectCatalogApartment = (apt: typeof CATALOG_APARTMENTS[0], idx: number) => {
     setSelectedPlanIndex(idx);
     setApartmentPrice(apt.price);
@@ -652,13 +801,13 @@ export default function InstallmentPage() {
       paymentSchedule,
     });
   };
+
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const handleFixWhatsApp = () => {
     const selectedTitle = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].title : 'Индивидуальный расчет';
     const complexName = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].complex : 'Квартира в EL ORDO GROUP';
 
-    // 1. Отправка в CRM / Telegram
     try {
       fetch('/api/lead', {
         method: 'POST',
@@ -672,7 +821,7 @@ export default function InstallmentPage() {
           rooms: selectedTitle,
           details: `Взнос: $${downPaymentAmount.toLocaleString('ru-RU')} (${downPaymentPercent}%) | Платеж: $${paymentPerPeriodUsd.toLocaleString('ru-RU')}/${frequency === 'monthly' ? 'мес' : 'кв'}`,
           comment: `Период: ${months} мес., график: ${frequency === 'monthly' ? 'ежемесячный' : 'поквартальный'}`,
-          lang,
+          lang: currentLang,
           source: 'InstallmentPage',
           utm: getStoredUtm(),
           createdAt: new Date().toISOString(),
@@ -680,11 +829,9 @@ export default function InstallmentPage() {
       }).catch(() => {});
     } catch {}
 
-    // 2. Трекинг аналитики
     trackWhatsAppClick('installment_calculator_fix', complexName);
     trackLeadSubmit('Рассрочка 0%', complexName);
 
-    // 3. Открытие диалога WhatsApp
     const waText =
       `Здравствуйте! Рассчитал условия рассрочки 0% на сайте EL ORDO GROUP:\n\n` +
       `• Объект: ${complexName} (${selectedTitle})\n` +
@@ -710,45 +857,43 @@ export default function InstallmentPage() {
       documentsText={c.documentsText}
       faqList={c.faqList}
     >
-      {/* ============================================================== */}
-      {/* ФИРМЕННЫЙ ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 0% (ПОЛНОЕ СООТВЕТСТВИЕ МАКЕТУ) */}
-      {/* ============================================================== */}
+      {/* 1. ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 0% (ПОЛНАЯ МУЛЬТИЯЗЫЧНОСТЬ) */}
       <section className="my-16 bg-[#03150e] text-white rounded-3xl p-6 sm:p-12 border border-[#d4b26f]/30 shadow-2xl transition-all">
         
-        {/* Заголовок калькулятора */}
+        {/* Заголовок */}
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-xs uppercase font-black tracking-widest text-[#d4b26f] block mb-2">
-            ФИНАНСОВЫЙ КАЛЬКУЛЯТОР 0%
+            {c.calcBadge}
           </span>
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-white mb-3">
-            РАСЧЕТ ЕЖЕМЕСЯЧНОГО ПЛАТЕЖА
+            {c.calcTitle}
           </h2>
           <p className="text-xs sm:text-sm text-gray-300 font-light leading-relaxed">
-            Используйте ползунки или готовые кнопки для расчета комфортного взноса под ваш бюджет.
+            {c.calcDesc}
           </p>
         </div>
 
         <div className="max-w-3xl mx-auto space-y-8">
           
-          {/* Плашка курса НБКР онлайн + фиксация в ДДУ */}
+          {/* Плашка курса НБКР */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 rounded-2xl bg-black/40 border border-white/10 text-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-gray-300 font-medium">
-                Курс НБКР онлайн: ({rateDate}):
+                {c.calcRateOnline} ({rateDate}):
               </span>
               <span className="bg-black/60 px-3 py-1 rounded-lg border border-white/15 text-[#d4b26f] font-black">
-                {usdRate} <span className="text-gray-400 font-normal">сом/$</span>
+                {usdRate} <span className="text-gray-400 font-normal">{c.somUnit}/$</span>
               </span>
             </div>
 
             <div className="inline-flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-950/40 px-3 py-1 rounded-xl border border-emerald-800/40">
               <IconShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Возможна фиксация курса в ДДУ</span>
+              <span>{c.calcFixedRateBadge}</span>
             </div>
           </div>
 
-          {/* Кнопка-дропдаун: Выбрать планировку из каталога (11 вариантов) */}
+          {/* Каталог планировок */}
           <div className="relative">
             <button
               type="button"
@@ -761,8 +906,8 @@ export default function InstallmentPage() {
                 </svg>
                 <span className="truncate">
                   {selectedPlanIndex >= 0
-                    ? `ВЫБРАНО: ${CATALOG_APARTMENTS[selectedPlanIndex].complex} — ${CATALOG_APARTMENTS[selectedPlanIndex].title}`
-                    : 'ВЫБРАТЬ ПЛАНИРОВКУ ИЗ КАТАЛОГА (11 ВАРИАНТОВ)'}
+                    ? `${c.calcBtnCatalogSelected} ${CATALOG_APARTMENTS[selectedPlanIndex].complex} — ${CATALOG_APARTMENTS[selectedPlanIndex].title}`
+                    : c.calcBtnCatalog}
                 </span>
               </div>
               <svg className={`w-4 h-4 transition-transform duration-300 ${isCatalogOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -785,7 +930,7 @@ export default function InstallmentPage() {
                     </div>
                     <div className="text-right">
                       <strong className="text-[#d4b26f] font-black">${apt.price.toLocaleString('ru-RU')}</strong>
-                      <span className="text-[10px] text-gray-400 block">≈ {Math.round(apt.price * usdRate).toLocaleString('ru-RU')} сом</span>
+                      <span className="text-[10px] text-gray-400 block">≈ {Math.round(apt.price * usdRate).toLocaleString('ru-RU')} {c.somUnit}</span>
                     </div>
                   </button>
                 ))}
@@ -793,19 +938,18 @@ export default function InstallmentPage() {
             )}
           </div>
 
-          {/* 1. СТОИМОСТЬ КВАРТИРЫ */}
+          {/* Стоимость квартиры */}
           <div className="space-y-2">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <div>
                 <span className="text-xs font-black uppercase tracking-wider text-white block">
-                  СТОИМОСТЬ КВАРТИРЫ:
+                  {c.calcBasePriceLabel}
                 </span>
                 <span className="text-[10px] text-gray-400 block">
-                  нажмите, чтобы изменить вручную
+                  {c.calcEditHint}
                 </span>
               </div>
 
-              {/* Пилюля-инпут */}
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 <div className="flex items-center bg-black/50 border border-white/15 px-4 py-2 rounded-2xl">
                   <span className="text-[#d4b26f] font-black text-sm mr-2">$</span>
@@ -823,12 +967,11 @@ export default function InstallmentPage() {
                   />
                 </div>
                 <span className="text-xs text-gray-400 font-semibold whitespace-nowrap hidden sm:inline">
-                  ≈ {Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} сом
+                  ≈ {Math.round(apartmentPrice * usdRate).toLocaleString('ru-RU')} {c.somUnit}
                 </span>
               </div>
             </div>
 
-            {/* Ползунок цены */}
             <input
               type="range"
               min="30000"
@@ -845,19 +988,18 @@ export default function InstallmentPage() {
             />
           </div>
 
-          {/* 2. ПЕРВОНАЧАЛЬНЫЙ ВЗНОС */}
+          {/* Первоначальный взнос */}
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
               <div>
                 <span className="text-xs font-black uppercase tracking-wider text-white block">
-                  ПЕРВОНАЧАЛЬНЫЙ ВЗНОС ({downPaymentPercent}%):
+                  {c.calcDownLabel} ({downPaymentPercent}%):
                 </span>
                 <span className="text-[10px] text-gray-400 block">
-                  нажмите, чтобы изменить вручную
+                  {c.calcEditHint}
                 </span>
               </div>
 
-              {/* Пилюля-инпут */}
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 <div className="flex items-center bg-black/50 border border-white/15 px-4 py-2 rounded-2xl">
                   <span className="text-[#d4b26f] font-black text-sm mr-2">$</span>
@@ -876,12 +1018,11 @@ export default function InstallmentPage() {
                   />
                 </div>
                 <span className="text-xs text-gray-400 font-semibold whitespace-nowrap hidden sm:inline">
-                  ≈ {Math.round(downPaymentAmount * usdRate).toLocaleString('ru-RU')} сом
+                  ≈ {Math.round(downPaymentAmount * usdRate).toLocaleString('ru-RU')} {c.somUnit}
                 </span>
               </div>
             </div>
 
-            {/* Ползунок первого взноса */}
             <input
               type="range"
               min="20"
@@ -896,10 +1037,9 @@ export default function InstallmentPage() {
               className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#d4b26f]"
             />
 
-            {/* Быстрые кнопки первого взноса */}
             <div className="flex items-center gap-2">
               {[
-                { pct: 20, label: '20% (мин.)' },
+                { pct: 20, label: `20% ${c.calcMinBadge}` },
                 { pct: 30, label: '30%' },
                 { pct: 40, label: '40%' },
                 { pct: 50, label: '50%' },
@@ -923,21 +1063,19 @@ export default function InstallmentPage() {
             </div>
           </div>
 
-          {/* 3. СРОК ВЫПЛАТ И ПЕРИОДИЧНОСТЬ ВЫПЛАТ */}
+          {/* Срок и периодичность */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
             
-            {/* Срок выплат */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-white">
-                  СРОК ВЫПЛАТ:
+                  {c.calcTermLabel}
                 </span>
                 <span className="bg-black/60 px-3 py-1 rounded-xl border border-white/15 text-xs font-black text-white">
-                  {months} месяцев
+                  {months} {c.calcMonthsUnit}
                 </span>
               </div>
 
-              {/* Ползунок месяцев */}
               <input
                 type="range"
                 min="12"
@@ -948,13 +1086,12 @@ export default function InstallmentPage() {
                 className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#d4b26f]"
               />
 
-              {/* Кнопки месяцев */}
               <div className="grid grid-cols-4 gap-1.5">
                 {[
-                  { m: 12, label: '12 месяцев' },
-                  { m: 18, label: '18 месяцев' },
-                  { m: 24, label: '24 месяца' },
-                  { m: 36, label: '36 месяцев (макс.)' },
+                  { m: 12, label: `12 ${c.calcMonthsUnit}` },
+                  { m: 18, label: `18 ${c.calcMonthsUnit}` },
+                  { m: 24, label: `24 ${c.calcMonthsUnit}` },
+                  { m: 36, label: `36 ${c.calcMonthsUnit} ${c.calcMaxTermBadge}` },
                 ].map((item) => (
                   <button
                     key={item.m}
@@ -972,10 +1109,9 @@ export default function InstallmentPage() {
               </div>
             </div>
 
-            {/* Периодичность выплат */}
             <div className="space-y-3">
               <span className="text-xs font-black uppercase tracking-wider text-white block">
-                ПЕРИОДИЧНОСТЬ ВЫПЛАТ:
+                {c.calcFreqLabel}
               </span>
 
               <div className="grid grid-cols-2 gap-2">
@@ -988,8 +1124,8 @@ export default function InstallmentPage() {
                       : 'bg-black/40 text-gray-300 border-white/10 hover:bg-white/10'
                   }`}
                 >
-                  <strong className="text-xs sm:text-sm font-black block">Ежемесячно</strong>
-                  <span className="text-[10px] opacity-80 block">{months} выплат</span>
+                  <strong className="text-xs sm:text-sm font-black block">{c.calcFreqMonthly}</strong>
+                  <span className="text-[10px] opacity-80 block">{months} {c.calcPaymentsCount}</span>
                 </button>
 
                 <button
@@ -1001,24 +1137,24 @@ export default function InstallmentPage() {
                       : 'bg-black/40 text-gray-300 border-white/10 hover:bg-white/10'
                   }`}
                 >
-                  <strong className="text-xs sm:text-sm font-black block">Поквартально (раз в 3 мес.)</strong>
-                  <span className="text-[10px] opacity-80 block">{Math.max(1, Math.ceil(months / 3))} выплат</span>
+                  <strong className="text-xs sm:text-sm font-black block">{c.calcFreqQuarterly}</strong>
+                  <span className="text-[10px] opacity-80 block">{Math.max(1, Math.ceil(months / 3))} {c.calcPaymentsCount}</span>
                 </button>
               </div>
             </div>
 
           </div>
 
-          {/* ДВУХЦВЕТНАЯ СТАТУС-ШКАЛА РАСПРЕДЕЛЕНИЯ СТОИМОСТИ */}
+          {/* Шкала распределения */}
           <div className="space-y-2 pt-2">
             <div className="flex items-center justify-between text-xs font-black">
               <div className="flex items-center gap-1.5 text-[#d4b26f]">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#d4b26f]" />
-                <span>Первый взнос: ${downPaymentAmount.toLocaleString('ru-RU')} ({downPaymentPercent}%)</span>
+                <span>{c.calcScaleDown} ${downPaymentAmount.toLocaleString('ru-RU')} ({downPaymentPercent}%)</span>
               </div>
               <div className="flex items-center gap-1.5 text-emerald-400">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                <span>В рассрочку 0%: ${remainingAmount.toLocaleString('ru-RU')} ({100 - downPaymentPercent}%)</span>
+                <span>{c.calcScaleBalance} ${remainingAmount.toLocaleString('ru-RU')} ({100 - downPaymentPercent}%)</span>
               </div>
             </div>
 
@@ -1034,34 +1170,30 @@ export default function InstallmentPage() {
             </div>
           </div>
 
-          {/* ПЛАШКА: ПЕРЕПЛАТА $0 И ЭКОНОМИЯ */}
+          {/* Плашка выгоды */}
           <div className="p-4 rounded-2xl bg-black/40 border border-[#d4b26f]/30 flex items-center gap-4 text-xs">
             <div className="w-10 h-10 rounded-xl bg-[#d4b26f]/20 text-[#d4b26f] flex items-center justify-center font-black text-lg shrink-0">
               %
             </div>
             <div>
               <strong className="text-white font-black uppercase text-xs sm:text-sm block">
-                ПЕРЕПЛАТА: $0 • БЕЗ СКРЫТЫХ ПРОЦЕНТОВ БАНКА
+                {c.calcSavingsTitle}
               </strong>
               <span className="text-gray-400 text-[11px] block mt-0.5">
-                Экономия до $15 000+ по сравнению со стандартной банковской ипотекой (18-22% годовых).
+                {c.calcSavingsDesc}
               </span>
             </div>
           </div>
 
-          {/* ========================================================= */}
-          {/* ГЛАВНАЯ КАРТОЧКА РЕЗУЛЬТАТА И ДЕЙСТВИЙ */}
-          {/* ========================================================= */}
+          {/* Главная карточка результата */}
           <div className="p-6 sm:p-8 rounded-3xl bg-black/60 border border-white/15 grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             
-            {/* Левая половина: цифры и переключатель валюты */}
             <div className="md:col-span-7 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black uppercase text-gray-300">
-                  {frequency === 'monthly' ? 'ЕЖЕМЕСЯЧНЫЙ ПЛАТЁЖ (0% ПЕРЕПЛАТ):' : 'ЕЖЕКВАРТАЛЬНЫЙ ПЛАТЁЖ (0%):'}
+                  {frequency === 'monthly' ? c.calcResultMonthly : c.calcResultQuarterly}
                 </span>
 
-                {/* Таб переключения USD / KGS */}
                 <div className="flex items-center p-1 rounded-xl bg-white/10 border border-white/15">
                   <button
                     type="button"
@@ -1083,7 +1215,7 @@ export default function InstallmentPage() {
                         : 'text-gray-400 hover:text-white'
                     }`}
                   >
-                    KGS (сом)
+                    {c.somUnit}
                   </button>
                 </div>
               </div>
@@ -1093,33 +1225,32 @@ export default function InstallmentPage() {
                   {currencyMode === 'usd' ? (
                     <>
                       ${paymentPerPeriodUsd.toLocaleString('ru-RU')}
-                      <span className="text-base font-bold text-gray-400"> / {frequency === 'monthly' ? 'месяц' : 'квартал'}</span>
+                      <span className="text-base font-bold text-gray-400"> {c.perMonthSuffix}</span>
                     </>
                   ) : (
                     <>
                       {paymentPerPeriodKgs.toLocaleString('ru-RU')}
-                      <span className="text-base font-bold text-gray-400"> сом / {frequency === 'monthly' ? 'месяц' : 'квартал'}</span>
+                      <span className="text-base font-bold text-gray-400"> {c.somUnit} {c.perMonthSuffix}</span>
                     </>
                   )}
                 </div>
 
                 <div className="text-sm text-gray-300 font-bold mt-1">
                   {currencyMode === 'usd'
-                    ? `≈ ${paymentPerPeriodKgs.toLocaleString('ru-RU')} сом (${numberOfPayments} выплат)`
-                    : `≈ $${paymentPerPeriodUsd.toLocaleString('ru-RU')} (${numberOfPayments} выплат)`}
+                    ? `≈ ${paymentPerPeriodKgs.toLocaleString('ru-RU')} ${c.somUnit} (${numberOfPayments} ${c.calcPaymentsCount})`
+                    : `≈ $${paymentPerPeriodUsd.toLocaleString('ru-RU')} (${numberOfPayments} ${c.calcPaymentsCount})`}
                 </div>
 
                 <span className="text-xs text-gray-400 block mt-2">
-                  Остаток к распределению: ${remainingAmount.toLocaleString('ru-RU')} • Без комиссии банка
+                  {c.calcRemainingLabel} ${remainingAmount.toLocaleString('ru-RU')} • {c.calcNoBankFee}
                 </span>
               </div>
 
               <p className="text-[10px] text-gray-400 leading-relaxed font-light italic border-t border-white/10 pt-3">
-                * Расчет носит предварительный характер. В соответствии с законодательством КР оплата производится в национальной валюте (сом) по официальному учетному курсу НБКР на день фактической оплаты. Возможна индивидуальная фиксация курса в договоре.
+                {c.calcDisclaimer}
               </p>
             </div>
 
-            {/* Правая половина: кнопки конверсии */}
             <div className="md:col-span-5 flex flex-col gap-3">
               <button
                 type="button"
@@ -1127,7 +1258,7 @@ export default function InstallmentPage() {
                 className="w-full py-4 px-6 rounded-2xl bg-emerald-700 hover:bg-emerald-600 active:scale-95 text-white font-black text-xs uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-2 cursor-pointer"
               >
                 <IconWhatsApp className="w-5 h-5 text-white" />
-                <span>ЗАФИКСИРОВАТЬ РАСЧЕТ В WHATSAPP</span>
+                <span>{c.calcBtnFixWa}</span>
               </button>
 
               <button
@@ -1138,7 +1269,7 @@ export default function InstallmentPage() {
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>СКАЧАТЬ РАСЧЕТ В PDF</span>
+                <span>{c.calcBtnPdf}</span>
               </button>
 
               <button
@@ -1146,13 +1277,13 @@ export default function InstallmentPage() {
                 onClick={() => setShowSchedule(!showSchedule)}
                 className="w-full py-3 px-6 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider transition-all border border-white/15 cursor-pointer text-center"
               >
-                {showSchedule ? 'Скрыть детальный график' : 'Посмотреть детальный график выплат'}
+                {showSchedule ? c.calcBtnHideSchedule : c.calcBtnShowSchedule}
               </button>
             </div>
 
           </div>
 
-          {/* Детальный график выплат в модальном раскрытии */}
+          {/* Детальный график выплат */}
           {showSchedule && (
             <div className="border border-white/15 rounded-3xl overflow-hidden bg-black/50 animate-fadeIn">
               <div className="max-h-72 overflow-y-auto">
@@ -1161,8 +1292,8 @@ export default function InstallmentPage() {
                     <tr>
                       <th className="p-3.5 font-bold">№</th>
                       <th className="p-3.5 font-bold">Период</th>
-                      <th className="p-3.5 font-bold">Платеж ($ / сом)</th>
-                      <th className="p-3.5 font-bold text-right">Остаток долга</th>
+                      <th className="p-3.5 font-bold">Платеж ($ / {c.somUnit})</th>
+                      <th className="p-3.5 font-bold text-right">Остаток</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10 text-gray-200">
@@ -1173,7 +1304,7 @@ export default function InstallmentPage() {
                         <td className="p-3.5 font-bold text-white">
                           ${item.paymentUsd.toLocaleString('ru-RU')}{' '}
                           <span className="text-[10px] text-gray-400 font-normal">
-                            (≈ {item.paymentKgs.toLocaleString('ru-RU')} сом)
+                            (≈ {item.paymentKgs.toLocaleString('ru-RU')} {c.somUnit})
                           </span>
                         </td>
                         <td className="p-3.5 text-right font-semibold text-gray-400">

@@ -9,6 +9,8 @@ import { TRANSLATIONS } from '@/lib/i18n/translations';
 import MortgageComparison from '@/components/MortgageComparison';
 import PurchaseRoadmap from '@/components/PurchaseRoadmap';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
+import { trackWhatsAppClick, trackLeadSubmit } from '@/lib/analytics';
+import { getStoredUtm } from '@/lib/utm';
 import {
   IconCheck,
   IconCar,
@@ -353,6 +355,8 @@ export default function PurchaseTermsPage() {
   const s = CALC_STRINGS[currentLang] || CALC_STRINGS.ru;
   const tr = TRADE_IN_STRINGS[currentLang] || TRADE_IN_STRINGS.ru;
 
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+
   // 1. Стоимость квартиры
   const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
   const [priceInput, setPriceInput] = useState<string>('65 000');
@@ -371,7 +375,7 @@ export default function PurchaseTermsPage() {
   const [currencyMode, setCurrencyMode] = useState<'USD' | 'KGS'>('USD');
   const [usdRate, setUsdRate] = useState<number>(87.45);
   const [rateInput, setRateInput] = useState<string>('87.45');
-  const [rateDate, setRateDate] = useState<string>('');
+  const [rateDate, setRateDate] = useState<string>('24.09.2026');
   const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
   // Сворачиваемый каталог планировок
@@ -611,7 +615,16 @@ export default function PurchaseTermsPage() {
       paymentPerPeriodUsd,
       usdRate,
       rateDate,
-      selectedApartment,
+      selectedApartment: selectedApartment
+        ? ({
+            complex: selectedApartment.complex,
+            rooms: selectedApartment.rooms,
+            area: selectedApartment.area,
+            floor: selectedApartment.floor,
+            priceM2: selectedApartment.priceM2,
+            totalPrice: selectedApartment.totalPrice,
+          } as any)
+        : null,
       paymentSchedule,
     });
   };
@@ -622,6 +635,33 @@ export default function PurchaseTermsPage() {
       ? `• Выбранный объект: ${selectedApartment.complex} (${selectedApartment.rooms}-комн., ${selectedApartment.area} м² • ${selectedApartment.floor})\n`
       : '';
 
+    // 1. Отправка в CRM / Telegram
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Клиент с калькулятора (Условия)',
+          phone: 'Через WhatsApp',
+          project: selectedApartment?.complex || 'EL ORDO GROUP',
+          goal: `Рассрочка 0% (${months} мес.)`,
+          budget: `$${apartmentPrice.toLocaleString('ru-RU')}`,
+          rooms: selectedApartment ? `${selectedApartment.rooms}-комн. (${selectedApartment.area} м²)` : 'Индивидуальный расчет',
+          details: `Взнос: $${downPaymentAmount.toLocaleString('ru-RU')} (${downPaymentPercent}%) | Платеж: $${paymentPerPeriodUsd.toLocaleString('ru-RU')}/${frequency === 'monthly' ? 'мес' : 'кв'}`,
+          comment: `Срок: ${months} мес., периодичность: ${frequency === 'monthly' ? 'ежемесячно' : 'поквартально'}`,
+          lang: currentLang,
+          source: 'PurchaseTermsPage',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 2. Трекинг аналитики
+    trackWhatsAppClick('terms_calculator', selectedApartment?.complex || 'Общий расчет');
+    trackLeadSubmit('Рассрочка 0% (Условия)', selectedApartment?.complex || 'Общий расчет');
+
+    // 3. Открытие диалога WhatsApp
     const text =
       `${t.termsPage.waCalcGreeting}\n\n` +
       aptInfo +
@@ -632,7 +672,7 @@ export default function PurchaseTermsPage() {
       `• Курс НБКР: ${usdRate} сом/$\n\n` +
       `${t.termsPage.waCalcQuestion}`;
 
-    window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const handleSendTradeIn = (e: React.FormEvent) => {
@@ -649,6 +689,32 @@ export default function PurchaseTermsPage() {
         ? 'ЖД Айкол +'
         : 'Все объекты компании';
 
+    // 1. Отправка лида в CRM / Telegram
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Заявка на Trade-in (Условия)',
+          phone: 'Через WhatsApp',
+          project: targetLabel,
+          goal: `Trade-in (${typeLabel})`,
+          budget: `$${numEst.toLocaleString('ru-RU')}`,
+          details: `Актив: ${assetName || '—'}${tradeInType === 'auto' && assetYear ? `, год: ${assetYear}` : ''} | Оценка: $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} сом)`,
+          comment: `Покрытие квартиры: ${tradeInCoveragePercent}%, остаток в рассрочку: $${tradeInRemainingToPay.toLocaleString('ru-RU')}`,
+          lang: currentLang,
+          source: 'PurchaseTermsPage_TradeIn',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 2. Трекинг аналитики
+    trackWhatsAppClick('terms_trade_in', targetLabel);
+    trackLeadSubmit('Trade-in (Условия)', targetLabel);
+
+    // 3. Открытие диалога WhatsApp
     const text =
       `${t.termsPage.waTradeGreeting}\n\n` +
       `• ${t.termsPage.waTradeType} ${typeLabel}\n` +
@@ -658,7 +724,7 @@ export default function PurchaseTermsPage() {
       `• ${t.termsPage.waTradeValue} $${numEst.toLocaleString('ru-RU')} (~${kgsEst.toLocaleString('ru-RU')} ${t.termsPage.somUnit})\n\n` +
       `Готов отправить фотографии и документы актива для экспресс-оценки. ${t.termsPage.waTradeQuestion}`;
 
-    window.open(`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`, '_blank');
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   const faqs = useMemo(() => [
@@ -699,7 +765,7 @@ export default function PurchaseTermsPage() {
         </div>
       </section>
 
-      {/* 3. Карточки программ покупки */}
+      {/* 3. Карточки программ покупки со сквозной навигацией */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-8 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
@@ -730,15 +796,24 @@ export default function PurchaseTermsPage() {
                 </li>
               </ul>
             </div>
-            <a
-              href="#calculator"
-              className="mt-6 text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
-            >
-              <span>{t.termsPage.card1Btn}</span>
-              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M19 12l-7 7-7-7" />
-              </svg>
-            </a>
+            
+            <div className="mt-6 pt-2 space-y-2">
+              <a
+                href="#calculator"
+                className="w-full text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
+              >
+                <span>{t.termsPage.card1Btn}</span>
+                <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
+              </a>
+              <Link
+                href="/rassrochka"
+                className="block text-center text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors py-1"
+              >
+                Перейти на страницу рассрочки 0% →
+              </Link>
+            </div>
           </div>
 
           {/* Trade-in / Бартер */}
@@ -771,15 +846,24 @@ export default function PurchaseTermsPage() {
                 </li>
               </ul>
             </div>
-            <a
-              href="#trade-in"
-              className="mt-6 text-center bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1.5"
-            >
-              <span>{t.termsPage.card2Btn}</span>
-              <svg className="w-3.5 h-3.5 text-[#d4b26f]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M19 12l-7 7-7-7" />
-              </svg>
-            </a>
+
+            <div className="mt-6 pt-2 space-y-2">
+              <a
+                href="#trade-in"
+                className="w-full text-center bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-md flex items-center justify-center gap-1.5"
+              >
+                <span>{t.termsPage.card2Btn}</span>
+                <svg className="w-3.5 h-3.5 text-[#064734]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 5v14M19 12l-7 7-7-7" />
+                </svg>
+              </a>
+              <Link
+                href="/trade-in"
+                className="block text-center text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors py-1"
+              >
+                Открыть онлайн-калькулятор Trade-in →
+              </Link>
+            </div>
           </div>
 
           {/* 100% расчет */}
@@ -809,15 +893,25 @@ export default function PurchaseTermsPage() {
                 </li>
               </ul>
             </div>
-            <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(t.termsPage.waFullPaymentText)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
-            >
-              <span>{t.termsPage.card3Btn}</span>
-              <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
-            </a>
+
+            <div className="mt-6 pt-2 space-y-2">
+              <Link
+                href="/polniy-raschet"
+                className="w-full text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-1.5 border border-transparent dark:border-white/10"
+              >
+                <span>{t.termsPage.card3Btn}</span>
+                <IconArrowRight className="w-3.5 h-3.5 text-[#d4b26f]" />
+              </Link>
+              <a
+                href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(t.termsPage.waFullPaymentText)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('terms_full_payment_card', '100% расчет')}
+                className="block text-center text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors py-1"
+              >
+                Узнать персональную скидку в WhatsApp →
+              </a>
+            </div>
           </div>
 
         </div>
@@ -1546,7 +1640,7 @@ export default function PurchaseTermsPage() {
 
                 <div className="flex flex-wrap gap-1.5 mt-2">
                   {(tradeInType === 'auto'
-                    ? ['Toyota Camry', 'Lexus RX / GX', 'Kia K5', 'Hyundai', 'Кроссовер']
+                    ? ['Toyota Camry', 'Lexus GX / RX', 'Kia K5', 'Hyundai', 'Zeekr / Электрокар', 'Кроссовер']
                     : ['1-комн. вторичка', '2-комн. вторичка', '3-комн. вторичка', 'Участок / Дом']
                   ).map((tag) => (
                     <button
@@ -1744,9 +1838,10 @@ export default function PurchaseTermsPage() {
           </div>
 
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(bannerWaMessage)}`}
+            href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(bannerWaMessage)}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('terms_bottom_banner', 'Консультация')}
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black px-8 py-4 rounded-xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#064734]" />
