@@ -10,11 +10,23 @@ import LanguageSelector from '@/components/LanguageSelector';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { reachGoal } from '@/components/YandexMetrika';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconWhatsApp,
   IconInstagram,
   IconArrowRight,
 } from '@/components/Icons';
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
 
 const CONSTRUCTION_LABELS: Record<Locale, string> = {
   ru: 'Ход строительства',
@@ -52,43 +64,43 @@ const QUICK_PROJECTS_INFO: Record<Locale, {
 }> = {
   ru: {
     abuDhabi: 'от 1 650 $/м² • Премиум',
-    madina: 'от 1 400 $/м² • Бизнес',
-    ajkolPlus: 'от 1 100 $/м² • Эко-зона',
+    madina: 'от 1 500 $/м² • Бизнес',
+    ajkolPlus: 'от 1 200 $/м² • Эко-зона',
     closeMenuAria: 'Закрыть меню',
     openMenuAria: 'Открыть меню',
   },
   kg: {
     abuDhabi: '1 650 $/м² баштап • Премиум',
-    madina: '1 400 $/м² баштап • Бизнес',
-    ajkolPlus: '1 100 $/м² баштап • Эко-аймак',
+    madina: '1 500 $/м² баштап • Бизнес',
+    ajkolPlus: '1 200 $/м² баштап • Эко-аймак',
     closeMenuAria: 'Менюну жабуу',
     openMenuAria: 'Менюну ачуу',
   },
   kz: {
     abuDhabi: '1 650 $/м² бастап • Премиум',
-    madina: '1 400 $/м² бастап • Бизнес',
-    ajkolPlus: '1 100 $/м² бастап • Эко-аймақ',
+    madina: '1 500 $/м² бастап • Бизнес',
+    ajkolPlus: '1 200 $/м² бастап • Эко-аймақ',
     closeMenuAria: 'Мәзірді жабу',
     openMenuAria: 'Мәзірді ашу',
   },
   uk: {
     abuDhabi: 'від 1 650 $/м² • Преміум',
-    madina: 'від 1 400 $/м² • Бізнес',
-    ajkolPlus: 'від 1 100 $/м² • Еко-зона',
+    madina: 'від 1 500 $/м² • Бізнес',
+    ajkolPlus: 'від 1 200 $/м² • Еко-зона',
     closeMenuAria: 'Закрити меню',
     openMenuAria: 'Відкрити меню',
   },
   en: {
     abuDhabi: 'from $1,650/m² • Premium',
-    madina: 'from $1,400/m² • Business',
-    ajkolPlus: 'from $1,100/m² • Eco-zone',
+    madina: 'from $1,500/m² • Business',
+    ajkolPlus: 'from $1,200/m² • Eco-zone',
     closeMenuAria: 'Close menu',
     openMenuAria: 'Open menu',
   },
   zh: {
     abuDhabi: '1 650 $/m² 起 • 尊享级',
-    madina: '1 400 $/m² 起 • 商务级',
-    ajkolPlus: '1 100 $/m² 起 • 生态麓区',
+    madina: '1 500 $/m² 起 • 商务级',
+    ajkolPlus: '1 200 $/m² 起 • 生态麓区',
     closeMenuAria: '关闭菜单',
     openMenuAria: '打开菜单',
   },
@@ -102,10 +114,11 @@ export default function Header() {
   const pathname = usePathname();
   const { locale, t } = useLanguage();
 
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const quickInfo = QUICK_PROJECTS_INFO[currentLang] || QUICK_PROJECTS_INFO.ru;
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
-  // Автоматическая проверка рабочего времени по Бишкеку (кроссбраузерно)
+  // Автоматическая проверка рабочего времени по Бишкеку
   useEffect(() => {
     const checkWorkingHours = () => {
       try {
@@ -150,7 +163,7 @@ export default function Header() {
     };
 
     checkWorkingHours();
-    const interval = setInterval(checkWorkingHours, 60000); // Проверка каждую минуту
+    const interval = setInterval(checkWorkingHours, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -178,7 +191,11 @@ export default function Header() {
 
   // Блокировка прокрутки экрана при открытом мобильном меню
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -187,6 +204,19 @@ export default function Header() {
   const waConsultationText = encodeURIComponent(
     WA_CONSULTATION_TEXTS[currentLang] || WA_CONSULTATION_TEXTS.ru
   );
+
+  const handleWhatsAppHeaderClick = (source: string) => {
+    try {
+      reachGoal('wa_click');
+    } catch {}
+    trackWhatsAppClick(source, 'EL ORDO GROUP');
+  };
+
+  const handlePhoneHeaderClick = () => {
+    try {
+      reachGoal('call_click');
+    } catch {}
+  };
 
   return (
     <>
@@ -226,7 +256,7 @@ export default function Header() {
             </div>
           </Link>
 
-          {/* 2. Навигация для десктопа с переводом */}
+          {/* 2. Навигация для десктопа */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -249,7 +279,7 @@ export default function Header() {
           {/* 3. Правый блок: телефон + язык + тема + консультация */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             
-            {/* Прямой телефон и динамический статус работы */}
+            {/* Телефон и динамический статус работы */}
             <div className="hidden xl:flex flex-col items-end text-right mr-1">
               <div className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`} />
@@ -259,7 +289,7 @@ export default function Header() {
               </div>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                onClick={() => reachGoal('call_click')}
+                onClick={handlePhoneHeaderClick}
                 className="text-xs sm:text-sm font-black text-gray-900 dark:text-neutral-100 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
               >
                 {COMPANY_INFO.phones[0] || '+996 709 115 115'}
@@ -269,13 +299,13 @@ export default function Header() {
             {/* Выбор языка */}
             <LanguageSelector />
 
-            {/* Переключатель светлой / темной темы */}
+            {/* Переключатель темы */}
             <ThemeToggle />
 
             {/* Кнопка WhatsApp */}
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
-              onClick={() => reachGoal('wa_click')}
+              href={`https://wa.me/${cleanWaNumber}?text=${waConsultationText}`}
+              onClick={() => handleWhatsAppHeaderClick('header_desktop_consultation')}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#064734] hover:bg-[#032b20] active:scale-95 text-[#d4b26f] hover:text-white text-xs sm:text-sm font-extrabold px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl shadow-md transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer shrink-0"
@@ -318,7 +348,7 @@ export default function Header() {
             onClick={(e) => e.stopPropagation()}
           >
             <div>
-              {/* Шапка меню */}
+              {/* Шапка мобильного меню */}
               <div className="flex items-center justify-between pb-5 border-b border-gray-100 dark:border-white/10">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1 shadow-sm shrink-0">
@@ -369,7 +399,7 @@ export default function Header() {
                 })}
               </nav>
 
-              {/* Быстрый переход к объектам */}
+              {/* Быстрый переход к флагманским объектам */}
               <div className="mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
                 <span className="text-xs uppercase font-extrabold tracking-wider text-gray-400 dark:text-neutral-400 block mb-3">
                   {t.header.flagshipProjects}
@@ -406,19 +436,19 @@ export default function Header() {
             </div>
 
             {/* Нижняя часть меню */}
-            <div className="pt-6 border-t border-gray-100 dark:border-white/10 mt-6">
+            <div className="pt-6 border-t border-gray-100 dark:border-white/10 mt-6 pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <div className="mb-4">
                 <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-1">{t.header.hotline}</span>
                 <a
                   href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                  onClick={() => reachGoal('call_click')}
+                  onClick={handlePhoneHeaderClick}
                   className="text-base font-black text-[#064734] dark:text-[#d4b26f] block"
                 >
                   {COMPANY_INFO.phones[0] || '+996 709 115 115'}
                 </a>
                 <a
                   href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
-                  onClick={() => reachGoal('call_click')}
+                  onClick={handlePhoneHeaderClick}
                   className="text-xs text-gray-600 dark:text-neutral-300 block mt-0.5"
                 >
                   {COMPANY_INFO.phones[1] || '+996 990 115 115'}
@@ -427,8 +457,8 @@ export default function Header() {
 
               <div className="grid grid-cols-2 gap-2">
                 <a
-                  href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waConsultationText}`}
-                  onClick={() => reachGoal('wa_click')}
+                  href={`https://wa.me/${cleanWaNumber}?text=${waConsultationText}`}
+                  onClick={() => handleWhatsAppHeaderClick('header_mobile_drawer')}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="py-3 px-2 rounded-xl bg-[#064734] hover:bg-[#032b20] text-white font-bold text-xs text-center flex items-center justify-center gap-2 shadow cursor-pointer"
