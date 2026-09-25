@@ -43,6 +43,17 @@ interface FormTexts {
   waTemplate: (name: string, proj: string, goal: string, phone: string) => string;
 }
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 const UI_DATA: Record<Locale, FormTexts> = {
   ru: {
     badge: 'Персональный подбор квартиры',
@@ -312,7 +323,7 @@ const UI_DATA: Record<Locale, FormTexts> = {
 
 export default function ConsultationForm() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const ui = UI_DATA[currentLang] || UI_DATA.ru;
 
   const [name, setName] = useState('');
@@ -326,8 +337,8 @@ export default function ConsultationForm() {
 
   const selectedGoal = ui.goals[goalIndex] || ui.goals[0];
   const selectedProject = ui.projects[projectIndex] || ui.projects[0];
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
-  // Корректное форматирование без зацикливания при Backspace
   const formatPhoneInput = (input: string) => {
     if (!input || input.trim() === '' || input.trim() === '+') {
       return '+996 ';
@@ -342,12 +353,10 @@ export default function ConsultationForm() {
 
     let raw = input.replace(/\D/g, '');
 
-    // Если пользователь стёр цифры до кода страны
     if (raw === '9' || raw === '99' || raw === '996') {
       return '+996 ';
     }
 
-    // Если вставили номер начиная с 0 (например: 0709...)
     if (raw.startsWith('0')) {
       raw = '996' + raw.slice(1);
     } else if (!raw.startsWith('996')) {
@@ -381,14 +390,12 @@ export default function ConsultationForm() {
   const validatePhone = () => {
     const digitsOnly = phone.replace(/\D/g, '');
 
-    // Если номер кыргызский (+996) — обязательно 12 цифр
     if (phone.trim().startsWith('+996') || digitsOnly.startsWith('996')) {
       if (digitsOnly.length !== 12) {
         setError(ui.phoneError);
         return false;
       }
     } else {
-      // Международный номер — от 10 до 15 цифр
       if (digitsOnly.length < 10 || digitsOnly.length > 15) {
         setError(ui.phoneError);
         return false;
@@ -432,9 +439,11 @@ export default function ConsultationForm() {
       }
 
       // Фиксация цели в Яндекс.Метрике
-      reachGoal('lead_submit');
+      try {
+        reachGoal('lead_submit');
+      } catch {}
       
-      // Сквозной трекинг лида для Meta Pixel (Instagram) и Google Analytics
+      // Сквозной трекинг лида для Meta Pixel и Google Analytics
       trackLeadSubmit(selectedGoal, selectedProject);
 
       setIsSuccess(true);
@@ -449,12 +458,15 @@ export default function ConsultationForm() {
   const handleWhatsAppSubmit = () => {
     if (!validatePhone()) return;
 
-    reachGoal('wa_click');
+    try {
+      reachGoal('wa_click');
+    } catch {}
+    
     trackWhatsAppClick('consultation_form', selectedProject);
 
     const clientName = name.trim() ? name.trim() : ui.defaultClient;
     const message = ui.waTemplate(clientName, selectedProject, selectedGoal, phone);
-    const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(message)}`;
+    const waUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(message)}`;
     window.open(waUrl, '_blank');
   };
 
@@ -473,7 +485,7 @@ export default function ConsultationForm() {
               {ui.successTitle}
             </h3>
 
-            <p className="text-sm text-white/90 leading-relaxed mb-6">
+            <p className="text-sm text-white/90 leading-relaxed mb-6 font-light">
               {ui.successDesc(name.trim() || ui.defaultClient, phone)}
             </p>
 
@@ -511,7 +523,7 @@ export default function ConsultationForm() {
 
             <form onSubmit={handleDirectCallback} className="space-y-5 max-w-2xl mx-auto relative">
               
-              {/* Скрытая ловушка для ботов */}
+              {/* Скрытая ловушка для спам-ботов */}
               <div
                 aria-hidden="true"
                 style={{
@@ -536,7 +548,7 @@ export default function ConsultationForm() {
                 />
               </div>
 
-              {/* Чипы выбора темы */}
+              {/* Чипы выбора темы запроса */}
               <div>
                 <label className="block text-[11px] font-black uppercase tracking-wider text-gray-300 mb-2">
                   {ui.goalLabel}
