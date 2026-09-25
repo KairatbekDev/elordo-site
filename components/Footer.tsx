@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import { reachGoal } from '@/components/YandexMetrika';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconWhatsApp,
   IconInstagram,
@@ -13,16 +15,42 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 export default function Footer() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const waFooterText = encodeURIComponent(t.footer.waText);
+  const handleWhatsAppClick = () => {
+    try {
+      reachGoal('wa_click');
+    } catch {}
+    trackWhatsAppClick('footer_wa', 'EL ORDO GROUP');
+  };
+
+  const handleCallClick = () => {
+    try {
+      reachGoal('call_click');
+    } catch {}
+  };
+
+  const waFooterText = encodeURIComponent(t.footer?.waText || 'Здравствуйте! Интересует консультация по объектам EL ORDO GROUP.');
 
   return (
     <footer className="bg-[#022118] text-white border-t border-white/10 relative overflow-hidden selection:bg-[#d4b26f] selection:text-[#064734]">
@@ -30,7 +58,7 @@ export default function Footer() {
       {/* Фоновое свечение */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#064734]/30 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-12 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-28 sm:pb-12 relative z-10">
         
         {/* Основная сетка колонок */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-14 border-b border-white/10">
@@ -39,9 +67,11 @@ export default function Footer() {
           <div className="lg:col-span-4 space-y-4">
             <Link href="/" className="inline-flex items-center gap-2.5 group">
               <div className="w-10 h-10 rounded-xl bg-[#064734] border border-[#d4b26f]/30 flex items-center justify-center p-1.5 shadow-sm group-hover:bg-[#042e22] group-hover:scale-105 transition-all shrink-0">
-                <img
+                <Image
                   src="/logo-icon.png"
                   alt="EL ORDO GROUP"
+                  width={40}
+                  height={40}
                   className="w-full h-full object-contain"
                 />
               </div>
@@ -176,14 +206,14 @@ export default function Footer() {
               <span className="text-[11px] text-gray-400 block mb-0.5">{t.footer.hotline}</span>
               <a
                 href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
-                onClick={() => reachGoal('call_click')}
+                onClick={handleCallClick}
                 className="text-sm font-black text-white hover:text-[#d4b26f] transition-colors block"
               >
                 {COMPANY_INFO.phones[0] || '+996 709 115 115'}
               </a>
               <a
                 href={`tel:${COMPANY_INFO.phones[1]?.replace(/\s+/g, '') || '+996990115115'}`}
-                onClick={() => reachGoal('call_click')}
+                onClick={handleCallClick}
                 className="text-xs text-gray-300 hover:text-[#d4b26f] transition-colors block mt-0.5"
               >
                 {COMPANY_INFO.phones[1] || '+996 990 115 115'}
@@ -208,8 +238,8 @@ export default function Footer() {
 
             <div className="pt-2 flex flex-col gap-2">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waFooterText}`}
-                onClick={() => reachGoal('wa_click')}
+                href={`https://wa.me/${cleanWaNumber}?text=${waFooterText}`}
+                onClick={handleWhatsAppClick}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white text-xs font-black uppercase tracking-wider transition-all shadow border border-emerald-500/30 cursor-pointer"
