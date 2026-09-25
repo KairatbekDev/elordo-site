@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, notFound } from 'next/navigation';
 import FloorPlansSection, { ApartmentPlan } from '@/components/FloorPlansSection';
@@ -10,6 +10,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import LegalDocuments from '@/components/LegalDocuments';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconCheck,
   IconMapPin,
@@ -63,6 +64,17 @@ interface ComplexData {
   plans?: ApartmentPlan[];
   typicalFloors?: TypicalFloorItem[];
   videoUrl?: string;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const COMPLEXES: Record<string, ComplexData> = {
@@ -939,10 +951,10 @@ const COMPLEXES: Record<string, ComplexData> = {
           desc: {
             ru: 'Парковочные места для автомобилей жильцов дома.',
             kg: 'Үй жашоочуларынын унаалары үчүн токтотуучу орундар.',
-            kz: 'Тұрғындардың көліктеріне арналған тұрақ орындары.',
+            kz: 'Тұрғындар мен қонақтарға арналған автотұрақ орындары.',
             uk: 'Місця для паркування автомобілів мешканців.',
             en: 'Spacious dedicated parking spaces for residents.',
-            zh: '规划规整的私家车地面专属停车位。',
+            zh: '为业主及来访亲朋科学规划专属便捷停车位。',
           },
           image: '/projects/ajkol.jpg',
         },
@@ -1140,7 +1152,7 @@ const COMPLEXES: Record<string, ComplexData> = {
           name: { ru: 'Закрытый двор', kg: 'Жабык короо', kz: 'Жабық аула', uk: 'Закритий двір', en: 'Private Courtyard', zh: '封闭式安全庭院' },
           desc: {
             ru: 'Тихая и безопасная дворовая территория для жителей.',
-            kg: 'Жашоочулар үчүн тынч жана коопсуз короо аймагы.',
+            kg: 'Жошоочулар үчүн тынч жана коопсуз короо аймагы.',
             kz: 'Тұрғындар үшін тыныш әрі қауіпсіз аула аумағы.',
             uk: 'Тиха та безпечна дворова територія для мешканців.',
             en: 'Quiet and safe courtyard for community residents.',
@@ -1370,7 +1382,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             kz: 'Тұрғындар мен қонақтар үшін жерасты және қонақ тұрағы.',
             uk: 'Підземний та гостьовий паркінг для авто резидентів.',
             en: 'Underground and visitor parking for residents.',
-            zh: '为业主与来访宾客贴心配备地下及地面访客车位。',
+            zh: '为业主与来访亲朋科学规划专属地下车位。',
           },
           image: '/projects/Ordo.jpg',
         },
@@ -1400,7 +1412,48 @@ const COMPLEXES: Record<string, ComplexData> = {
   },
 };
 
-const UI_STRINGS = {
+const UI_STRINGS: Record<Locale, {
+  catalog: string;
+  priceLabel: string;
+  deadlineLabel: string;
+  locationLabel: string;
+  perSqm: string;
+  btnSecondary: string;
+  btnWhatsappCalc: string;
+  btnAllProjects: string;
+  specsFloors: string;
+  specsCeiling: string;
+  specsSeismic: string;
+  specsConstruction: string;
+  specsHeating: string;
+  advantagesTitle: string;
+  plansSoldTitle: string;
+  plansSoldDesc: (name: string) => string;
+  plansRequestTitle: string;
+  plansRequestDesc: (name: string) => string;
+  btnRequestPlans: string;
+  purchaseTitle: (name: string) => string;
+  fullPaymentTitle: string;
+  fullPaymentDesc: string;
+  fullPaymentAction: string;
+  installmentTitle: string;
+  installmentDesc: string;
+  installmentAction: string;
+  tradeInTitle: string;
+  tradeInDesc: string;
+  tradeInAction: string;
+  legalTitle: string;
+  reviewsBadge: string;
+  reviewsTitle: string;
+  officeBadge: string;
+  officeTitle: (name: string) => string;
+  officeAddressLabel: string;
+  route2Gis: string;
+  btnWhatsApp: string;
+  btnInstagram: string;
+  callBtn: string;
+  waHeroText: (name: string, addr: string) => string;
+}> = {
   ru: {
     catalog: 'Каталог объектов',
     priceLabel: 'Стоимость:',
@@ -1417,11 +1470,11 @@ const UI_STRINGS = {
     specsHeating: 'Отопление',
     advantagesTitle: 'Преимущества проекта',
     plansSoldTitle: 'Объект сдан в эксплуатацию',
-    plansSoldDesc: (name: string) => `Все квартиры от застройщика в ${name} распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке или записаться в лист ожидания, свяжитесь с нашим отделом продаж.`,
+    plansSoldDesc: (name) => `Все квартиры от застройщика в ${name} распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке или записаться в лист ожидания, свяжитесь с нашим отделом продаж.`,
     plansRequestTitle: 'Шахматка и планировки по запросу',
-    plansRequestDesc: (name: string) => `Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в ${name} менеджер отправит вам напрямую в мессенджер.`,
+    plansRequestDesc: (name) => `Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в ${name} менеджер отправит вам напрямую в мессенджер.`,
     btnRequestPlans: 'Запросить планировки в WhatsApp',
-    purchaseTitle: (name: string) => `Программы приобретения в ${name}`,
+    purchaseTitle: (name) => `Программы приобретения в ${name}`,
     fullPaymentTitle: '100% ОПЛАТА',
     fullPaymentDesc: 'Максимальная персональная скидка за квадратный метр и приоритетный выбор этажа.',
     fullPaymentAction: 'Условия скидки',
@@ -1435,13 +1488,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Репутация и доверие',
     reviewsTitle: 'Отзывы резидентов',
     officeBadge: 'Отдел продаж',
-    officeTitle: (name: string) => `Консультация по объекту ${name}`,
+    officeTitle: (name) => `Консультация по объекту ${name}`,
     officeAddressLabel: 'Фактический адрес объекта:',
     route2Gis: 'Открыть локацию в 2GIS',
     btnWhatsApp: 'Написать в WhatsApp',
     btnInstagram: 'Перейти в Instagram',
     callBtn: 'Позвонить',
-    waHeroText: (name: string, addr: string) => `Здравствуйте! Интересует ${name} (${addr}). Хочу получить актуальную шахматку свободных квартир и расчет рассрочки 0%.`,
+    waHeroText: (name, addr) => `Здравствуйте! Интересует ${name} (${addr}). Хочу получить актуальную шахматку свободных квартир и расчет рассрочки 0%.`,
   },
   kg: {
     catalog: 'Объекттер каталогу',
@@ -1459,11 +1512,11 @@ const UI_STRINGS = {
     specsHeating: 'Жылытуу',
     advantagesTitle: 'Долбоордун артыкчылыктары',
     plansSoldTitle: 'Объект пайдаланууга берилген',
-    plansSoldDesc: (name: string) => `Куруучудан ${name} комплексиндеги бардык батирлер сатылып бүттү. Ээлеринен экинчилик рыноктогу сунуштарды билүү же күтүү тизмесине жазылуу үчүн сатуу бөлүмүнө кайрылыңыз.`,
+    plansSoldDesc: (name) => `Куруучудан ${name} комплексиндеги бардык батирлер сатылып бүттү. Ээлеринен экинчилик рыноктогу сунуштарды билүү же күтүү тизмесине жазылуу үчүн сатуу бөлүмүнө кайрылыңыз.`,
     plansRequestTitle: 'Шахматка жана пландар суроо-талап боюнча',
-    plansRequestDesc: (name: string) => `${name} долбоору боюнча бош батирлердин, панорамалуу кабаттардын тизмесин жана пайызсыз бөлүп төлөө эсебин менеджер сизге мессенджерге жөнөтөт.`,
+    plansRequestDesc: (name) => `${name} долбоору боюнча бош батирлердин, панорамалуу кабаттардын тизмесин жана пайызсыз бөлүп төлөө эсебин менеджер сизге мессенджерге жөнөтөт.`,
     btnRequestPlans: 'WhatsApp аркылуу пландарды суроо',
-    purchaseTitle: (name: string) => `${name} объектисин сатып алуу программалары`,
+    purchaseTitle: (name) => `${name} объектисин сатып алуу программалары`,
     fullPaymentTitle: '100% ТӨЛӨМ',
     fullPaymentDesc: 'Чарчы метрге максималдуу жеке арзандатуу жана кабаттарды артыкчылыктуу тандоо.',
     fullPaymentAction: 'Арзандатуу шарттары',
@@ -1477,13 +1530,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Аброю жана ишеним',
     reviewsTitle: 'Тургундардын пикирлери',
     officeBadge: 'Сатуу бөлүмү',
-    officeTitle: (name: string) => `${name} объектиси боюнча кеңеш алуу`,
+    officeTitle: (name) => `${name} объектиси боюнча кеңеш алуу`,
     officeAddressLabel: 'Объекттин иш жүзүндөгү дареги:',
     route2Gis: '2GIS аркылуу даректи ачуу',
     btnWhatsApp: 'WhatsApp аркылуу жазуу',
     btnInstagram: 'Instagram баракчасына өтүү',
     callBtn: 'Чалуу',
-    waHeroText: (name: string, addr: string) => `Саламатсызбы! ${name} (${addr}) кызыктырып жатат. Бош батирлердин шахматкасын жана 0% бөлүп төлөө эсебин алгым келет.`,
+    waHeroText: (name, addr) => `Саламатсызбы! ${name} (${addr}) кызыктырып жатат. Бош батирлердин шахматкасын жана 0% бөлүп төлөө эсебин алгым келет.`,
   },
   kz: {
     catalog: 'Нысандар каталогы',
@@ -1501,11 +1554,11 @@ const UI_STRINGS = {
     specsHeating: 'Жылыту',
     advantagesTitle: 'Жобаның артықшылықтары',
     plansSoldTitle: 'Нысан пайдалануға берілген',
-    plansSoldDesc: (name: string) => `Құрылыс салушыдан ${name} кешеніндегі барлық пәтерлер сатылып кетті. Екінші нарықтағы ұсыныстарды білу немесе күту парағына жазылу үшін сату бөліміне хабарласыңыз.`,
+    plansSoldDesc: (name) => `Құрылыс салушыдан ${name} кешеніндегі барлық пәтерлер сатылып кетті. Екінші нарықтағы ұсыныстарды білу немесе күту парағына жазылу үшін сату бөліміне хабарласыңыз.`,
     plansRequestTitle: 'Шахматка мен жоспарлар сұраныс бойынша',
-    plansRequestDesc: (name: string) => `${name} кешеніндегі бос пәтерлер тізімін және пайызсыз бөліп төлеу есебін менеджер тікелей мессенджерге жібереді.`,
+    plansRequestDesc: (name) => `${name} кешеніндегі бос пәтерлер тізімін және пайызсыз бөліп төлеу есебін менеджер тікелей мессенджерге жібереді.`,
     btnRequestPlans: 'WhatsApp арқылы жоспарларды сұрау',
-    purchaseTitle: (name: string) => `${name} сатып алу бағдарламалары`,
+    purchaseTitle: (name) => `${name} сатып алу бағдарламалары`,
     fullPaymentTitle: '100% ТӨЛЕМ',
     fullPaymentDesc: 'Шаршы метрге ең жоғары дербес жеңілдік және қабатты басымдықпен таңдау.',
     fullPaymentAction: 'Жеңілдік шарттары',
@@ -1518,14 +1571,14 @@ const UI_STRINGS = {
     legalTitle: 'Заңдық тазалық пен кепілдіктер',
     reviewsBadge: 'Бедел мен сенім',
     reviewsTitle: 'Тұрғындардың пікірлері',
-    officeBadge: 'Сатуу бөлімі',
-    officeTitle: (name: string) => `${name} нысаны бойынша кеңес алу`,
+    officeBadge: 'Сатуу бөлүмү',
+    officeTitle: (name) => `${name} нысаны бойынша кеңес алу`,
     officeAddressLabel: 'Нысанның нақты мекенжайы:',
-    route2Gis: '2GIS арқылы бағытты ашу',
+    route2Gis: '2GIS аркылы бағытты ашу',
     btnWhatsApp: 'WhatsApp-қа жазу',
     btnInstagram: 'Instagram парақшасына өту',
     callBtn: 'Қоңырау шалу',
-    waHeroText: (name: string, addr: string) => `Сәлеметсіз бе! ${name} (${addr}) бойынша бос пәтерлер шахматкасы мен 0% бөліп төлеу есебін алғым келеді.`,
+    waHeroText: (name, addr) => `Сәлеметсіз бе! ${name} (${addr}) бойынша бос пәтерлер шахматкасы мен 0% бөліп төлеу есебін алғым келеді.`,
   },
   uk: {
     catalog: 'Каталог об’єктів',
@@ -1543,11 +1596,11 @@ const UI_STRINGS = {
     specsHeating: 'Опалення',
     advantagesTitle: 'Переваги проєкту',
     plansSoldTitle: 'Об’єкт зданий в експлуатацію',
-    plansSoldDesc: (name: string) => `Усі квартири від забудовника у ${name} продані. Щоб дізнатися про наявність пропозицій від власників або записатися до списку очікування, зв’яжіться з відділом продажів.`,
+    plansSoldDesc: (name) => `Усі квартири від забудовника у ${name} продані. Щоб дізнатися про наявність пропозицій від власників або записатися до списку очікування, зв’яжіться з відділом продажів.`,
     plansRequestTitle: 'Шахматка та планування за запитом',
-    plansRequestDesc: (name: string) => `Актуальний список вільних квартир, видових поверхів та розрахунок розстрочки у ${name} менеджер надішле вам у месенджер.`,
+    plansRequestDesc: (name) => `Актуальний список вільних квартир, видових поверхів та розрахунок розстрочки у ${name} менеджер надішле вам у месенджер.`,
     btnRequestPlans: 'Запросити планування у WhatsApp',
-    purchaseTitle: (name: string) => `Програми придбання в ${name}`,
+    purchaseTitle: (name) => `Програми придбання в ${name}`,
     fullPaymentTitle: '100% ОПЛАТА',
     fullPaymentDesc: 'Максимальна персональна знижка за квадратний метр та пріоритетний вибір поверху.',
     fullPaymentAction: 'Умови знижки',
@@ -1561,13 +1614,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Репутація та довіра',
     reviewsTitle: 'Відгуки мешканців',
     officeBadge: 'Відділ продажів',
-    officeTitle: (name: string) => `Консультація щодо об’єкта ${name}`,
+    officeTitle: (name) => `Консультація щодо об’єкта ${name}`,
     officeAddressLabel: 'Фактична адреса об’єкта:',
     route2Gis: 'Відкрити локацію у 2GIS',
     btnWhatsApp: 'Написати у WhatsApp',
     btnInstagram: 'Перейти в Instagram',
     callBtn: 'Зателефонувати',
-    waHeroText: (name: string, addr: string) => `Доброго дня! Цікавить ${name} (${addr}). Хочу отримати актуальну шахматку вільних квартир та розрахунок розстрочки 0%.`,
+    waHeroText: (name, addr) => `Доброго дня! Цікавить ${name} (${addr}). Хочу отримати актуальну шахматку вільних квартир та розрахунок розстрочки 0%.`,
   },
   en: {
     catalog: 'Project Catalog',
@@ -1585,11 +1638,11 @@ const UI_STRINGS = {
     specsHeating: 'Heating System',
     advantagesTitle: 'Project Advantages',
     plansSoldTitle: 'Building Commissioned',
-    plansSoldDesc: (name: string) => `All developer apartments in ${name} are sold out. To inquire about resale offers from owners or join the waiting list, please contact our sales office.`,
+    plansSoldDesc: (name) => `All developer apartments in ${name} are sold out. To inquire about resale offers from owners or join the waiting list, please contact our sales office.`,
     plansRequestTitle: 'Floor Plans & Availability on Request',
-    plansRequestDesc: (name: string) => `Our manager will directly send you the up-to-date availability list, panoramic floor selection, and 0% installment plan for ${name}.`,
+    plansRequestDesc: (name) => `Our manager will directly send you the up-to-date availability list, panoramic floor selection, and 0% installment plan for ${name}.`,
     btnRequestPlans: 'Request Plans via WhatsApp',
-    purchaseTitle: (name: string) => `Purchase Programs for ${name}`,
+    purchaseTitle: (name) => `Purchase Programs for ${name}`,
     fullPaymentTitle: '100% PAYMENT',
     fullPaymentDesc: 'Maximum bespoke discount per square meter and priority floor choice.',
     fullPaymentAction: 'Discount Terms',
@@ -1603,13 +1656,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Reputation & Trust',
     reviewsTitle: 'Resident Testimonials',
     officeBadge: 'Sales Department',
-    officeTitle: (name: string) => `Consultation for ${name}`,
+    officeTitle: (name) => `Consultation for ${name}`,
     officeAddressLabel: 'Project Physical Address:',
     route2Gis: 'Open Location in 2GIS',
     btnWhatsApp: 'Chat on WhatsApp',
     btnInstagram: 'Visit Instagram',
     callBtn: 'Call Now',
-    waHeroText: (name: string, addr: string) => `Hello! Interested in ${name} (${addr}). I would like to receive the availability grid and 0% installment calculation.`,
+    waHeroText: (name, addr) => `Hello! Interested in ${name} (${addr}). I would like to receive the availability grid and 0% installment calculation.`,
   },
   zh: {
     catalog: '楼盘目录',
@@ -1627,13 +1680,13 @@ const UI_STRINGS = {
     specsHeating: '采暖方式',
     advantagesTitle: '核心项目亮点',
     plansSoldTitle: '项目已顺利竣工交付',
-    plansSoldDesc: (name: string) => `${name} 开发商一手房源已全盘售罄。如需了解业主二手挂牌转让房源或登记预约排卡，请联络营销中心。`,
+    plansSoldDesc: (name) => `${name} 开发商一手房源已全盘售罄。如需了解业主二手挂牌转让房源或登记预约排卡，请联络营销中心。`,
     plansRequestTitle: '在售销控表与户型图册',
-    plansRequestDesc: (name: string) => `专属置业顾问将通过在线消息直接向您发送 ${name} 当前最新可选房源、景观楼层及0%免息分期还款明细。`,
+    plansRequestDesc: (name) => `专属置业顾问将通过在线消息直接向您发送 ${name} 当前最新可选房源、景观楼层及0%免息分期还款明细。`,
     btnRequestPlans: '通过 WhatsApp 获取户型图册',
-    purchaseTitle: (name: string) => `${name} 置业方案`,
+    purchaseTitle: (name) => `${name} 置业方案`,
     fullPaymentTitle: '100% 一次性全款',
-    fullPaymentDesc: '尊享每平米顶格专属特惠直减，享有核心景观高楼层优先选房权。',
+    fullPaymentDesc: '尊享每平米顶格专属特惠直减，优先选定高区南北通透及开阔全景天幕房源。',
     fullPaymentAction: '优惠详情',
     installmentTitle: '0% 免息分期',
     installmentDesc: '开发商自营最长36个月免息分期付款，无需收入证明与银行审核。',
@@ -1645,13 +1698,13 @@ const UI_STRINGS = {
     reviewsBadge: '卓越声誉与信任',
     reviewsTitle: '业主真实评价',
     officeBadge: '品牌营销中心',
-    officeTitle: (name: string) => `${name} 专属置业咨询`,
+    officeTitle: (name) => `${name} 专属置业咨询`,
     officeAddressLabel: '项目现场精准定位:',
     route2Gis: '在 2GIS 中导航定位',
     btnWhatsApp: 'WhatsApp 在线咨询',
     btnInstagram: '访问 Instagram 官方页面',
     callBtn: '拨打电话',
-    waHeroText: (name: string, addr: string) => `您好！我对 ${name} (${addr}) 项目很感兴趣，想获取最新在售房源销控表及0%免息分期方案。`,
+    waHeroText: (name, addr) => `您好！我对 ${name} (${addr}) 项目很感兴趣，想获取最新在售房源销控表及0%免息分期方案。`,
   },
 };
 
@@ -1659,8 +1712,10 @@ export default function ComplexPage() {
   const routeParams = useParams();
   const slug = (routeParams?.slug as string) || '';
   const langContext = useLanguage() as any;
-  const currentLang: Locale = (langContext.locale || langContext.currentLang || langContext.language || 'ru') as Locale;
-  const t = langContext.t;
+  const currentLang: Locale = normalizeLocale(
+    langContext.locale || langContext.currentLang || langContext.language || 'ru'
+  );
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
 
   const lookupKey = slug === 'kele-chek' ? 'kelechek' : slug;
   const rawProject = COMPLEXES[lookupKey];
@@ -1709,6 +1764,12 @@ export default function ComplexPage() {
     };
   }, [rawProject, currentLang]);
 
+  useEffect(() => {
+    if (project && typeof window !== 'undefined') {
+      document.title = `${project.name} | EL ORDO GROUP`;
+    }
+  }, [project]);
+
   if (!rawProject || !project) {
     notFound();
   }
@@ -1727,6 +1788,7 @@ export default function ComplexPage() {
     ? project.hero.price
     : `${project.hero.price} ${ui.perSqm}`;
 
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
   const whatsappHeroText = encodeURIComponent(
     ui.waHeroText(project.name, project.hero.address)
   );
@@ -1759,7 +1821,7 @@ export default function ComplexPage() {
             alt={project.name}
             className="w-full h-full object-cover object-center opacity-30 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/75" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
@@ -1801,9 +1863,10 @@ export default function ComplexPage() {
 
           <div className="flex flex-wrap justify-center gap-3">
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('complex_hero_consult', project.name)}
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#064734]" />
@@ -1866,7 +1929,7 @@ export default function ComplexPage() {
               <h3 className="text-lg font-black mb-3 text-gray-900 dark:text-white">
                 {adv.title}
               </h3>
-              <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+              <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 font-light">
                 {adv.desc}
               </p>
             </div>
@@ -1893,13 +1956,13 @@ export default function ComplexPage() {
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
                 </div>
                 <h3 className="text-base font-black mb-1 text-gray-900 dark:text-white">
                   {item.name}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed font-light">
                   {item.desc}
                 </p>
               </div>
@@ -1945,9 +2008,10 @@ export default function ComplexPage() {
               {ui.plansRequestDesc(project.name)}
             </p>
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('complex_request_plans', project.name)}
               className="inline-flex items-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -1972,11 +2036,11 @@ export default function ComplexPage() {
                 <IconDiamond className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.fullPaymentTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.fullPaymentDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.fullPaymentAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -1991,11 +2055,11 @@ export default function ComplexPage() {
                 <IconCalendar className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.installmentTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.installmentDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.installmentAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -2010,11 +2074,11 @@ export default function ComplexPage() {
                 <IconCar className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.tradeInTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.tradeInDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.tradeInAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -2023,7 +2087,7 @@ export default function ComplexPage() {
       </section>
 
       {/* 8. Официальная разрешительная документация и лицензии */}
-            <LegalDocuments />
+      <LegalDocuments />
 
       {/* 9. Отзывы резидентов (Мультиязычные) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
@@ -2050,7 +2114,7 @@ export default function ComplexPage() {
             {localizedReviews.map((rev, idx) => (
               <div
                 key={idx}
-                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left"
+                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left shadow-lg"
               >
                 <div>
                   <div className="flex items-center gap-1 text-[#d4b26f] mb-3">
@@ -2114,9 +2178,10 @@ export default function ComplexPage() {
 
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+                href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('complex_office_wa', project.name)}
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -2136,7 +2201,7 @@ export default function ComplexPage() {
         </div>
       </section>
 
-      {/* 11. Мобильный Sticky Action Bar */}
+      {/* 11. Мобильная Sticky Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 md:hidden p-3 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 flex items-center gap-2 shadow-2xl transition-colors">
         <a
           href={`tel:${COMPANY_INFO.phones[0]?.replace(/\s+/g, '') || '+996709115115'}`}
@@ -2146,9 +2211,10 @@ export default function ComplexPage() {
           <span>{ui.callBtn}</span>
         </a>
         <a
-          href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+          href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackWhatsAppClick('mobile_sticky_bar', project.name)}
           className="flex-[2] py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] font-black text-xs uppercase tracking-wider text-center shadow-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer"
         >
           <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
