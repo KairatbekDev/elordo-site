@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import { IconWhatsApp } from '@/components/Icons';
 
 export interface TypicalFloorItem {
@@ -18,6 +19,17 @@ interface TypicalFloorsSectionProps {
   floors: TypicalFloorItem[];
   whatsappNumber?: string;
   theme?: 'dark' | 'light';
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const UI_TEXTS: Record<Locale, {
@@ -188,12 +200,14 @@ export default function TypicalFloorsSection({
   whatsappNumber = COMPANY_INFO.whatsapp,
 }: TypicalFloorsSectionProps) {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const ui = UI_TEXTS[currentLang] || UI_TEXTS.ru;
 
   const [activeFloorId, setActiveFloorId] = useState<string>(floors[0]?.id || '2');
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const cleanWaNumber = (whatsappNumber || COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const currentIndex = floors.findIndex((f) => f.id === activeFloorId);
   const currentFloor = floors[currentIndex !== -1 ? currentIndex : 0] || floors[0];
@@ -260,7 +274,7 @@ export default function TypicalFloorsSection({
           <h2 className="text-2xl sm:text-4xl font-black uppercase tracking-tight mb-3 text-[#064734] dark:text-[#d4b26f]">
             {ui.title}
           </h2>
-          <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-neutral-400">
+          <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-neutral-400 font-light">
             {ui.desc}
           </p>
         </div>
@@ -272,6 +286,7 @@ export default function TypicalFloorsSection({
             onClick={handlePrevFloor}
             className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white dark:hover:bg-[#d4b26f] dark:hover:text-[#064734] flex items-center justify-center transition-all text-sm font-bold shadow-sm cursor-pointer"
             title={ui.prevFloor}
+            aria-label={ui.prevFloor}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5" />
@@ -308,6 +323,7 @@ export default function TypicalFloorsSection({
             onClick={handleNextFloor}
             className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-[#064734] hover:text-white dark:hover:bg-[#d4b26f] dark:hover:text-[#064734] flex items-center justify-center transition-all text-sm font-bold shadow-sm cursor-pointer"
             title={ui.nextFloor}
+            aria-label={ui.nextFloor}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M5 12h14" />
@@ -336,6 +352,7 @@ export default function TypicalFloorsSection({
                 disabled={zoomLevel <= 0.8}
                 className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors cursor-pointer text-gray-700 dark:text-neutral-200"
                 title={ui.zoomOut}
+                aria-label={ui.zoomOut}
               >
                 −
               </button>
@@ -345,6 +362,7 @@ export default function TypicalFloorsSection({
                 disabled={zoomLevel >= 2.5}
                 className="w-8 h-8 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 disabled:opacity-30 font-black text-sm transition-colors cursor-pointer text-gray-700 dark:text-neutral-200"
                 title={ui.zoomIn}
+                aria-label={ui.zoomIn}
               >
                 +
               </button>
@@ -374,6 +392,7 @@ export default function TypicalFloorsSection({
             <img
               src={currentFloor.image}
               alt={`${projectName} - ${localizedFloorLabel}`}
+              decoding="async"
               className="max-h-full max-w-full object-contain transition-transform duration-300 drop-shadow-sm select-none"
               style={{ transform: `scale(${zoomLevel})` }}
             />
@@ -413,9 +432,10 @@ export default function TypicalFloorsSection({
 
             {/* Запрос шахматки */}
             <a
-              href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waMessage)}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(waMessage)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('typical_floors_wa', `${projectName} - ${localizedFloorLabel}`)}
               className="w-full sm:w-auto bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-[0.98] text-white dark:text-[#064734] font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
@@ -456,6 +476,7 @@ export default function TypicalFloorsSection({
                 disabled={zoomLevel <= 0.8}
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold cursor-pointer"
                 title={ui.zoomOut}
+                aria-label={ui.zoomOut}
               >
                 −
               </button>
@@ -465,6 +486,7 @@ export default function TypicalFloorsSection({
                 disabled={zoomLevel >= 2.5}
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white flex items-center justify-center font-bold cursor-pointer"
                 title={ui.zoomIn}
+                aria-label={ui.zoomIn}
               >
                 +
               </button>
@@ -476,6 +498,7 @@ export default function TypicalFloorsSection({
                 }}
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition-all ml-3 cursor-pointer"
                 title="Close"
+                aria-label="Close"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -488,6 +511,7 @@ export default function TypicalFloorsSection({
             <img
               src={currentFloor.image}
               alt={`${projectName} - ${localizedFloorLabel}`}
+              decoding="async"
               className="max-h-[85vh] max-w-[90vw] object-contain transition-transform duration-200"
               style={{ transform: `scale(${zoomLevel})` }}
               onClick={(e) => {
