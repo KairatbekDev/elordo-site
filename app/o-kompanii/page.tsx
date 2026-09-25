@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconBuilding,
   IconShieldCheck,
@@ -19,6 +20,17 @@ import {
   IconArrowRight,
   IconCheck,
 } from '@/components/Icons';
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
 
 const DOCS_DATA: Record<Locale, {
   sectionBadge: string;
@@ -293,9 +305,18 @@ const DOCS_DATA: Record<Locale, {
   },
 };
 
+const WA_ABOUT_TEXTS: Record<Locale, string> = {
+  ru: 'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить презентацию объектов и юридический пакет разрешительных документов.',
+  kg: 'Саламатсызбы! EL ORDO GROUP сайтындагы «Компания жөнүндө» бөлүмүнөн жазып жатам. Объекттердин презентациясын жана уруксат берүүчү документтердин топтомун алгым келет.',
+  kz: 'Сәлеметсіз бе! EL ORDO GROUP сайтындағы «Компания туралы» бөлімінен жазып отырмын. Нысандардың таныстырылымы мен құжаттар топтамасын алғым келеді.',
+  uk: 'Доброго дня! Пишу з сайту EL ORDO GROUP з розділу «Про компанію». Хочу отримати презентацію об’єктів та юридичний пакет дозвільних документів.',
+  en: 'Hello! Inquiring from the "About Us" section of the EL ORDO GROUP website. Please send the developments presentation and official legal documents bundle.',
+  zh: '您好！我在 EL ORDO GROUP 官网“关于我们”页面查阅。请发送在售楼盘画册及官方工程资质红本文件包。',
+};
+
 export default function AboutPage() {
   const { t, locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const docs = DOCS_DATA[currentLang] || DOCS_DATA.ru;
 
   const [selectedDoc, setSelectedDoc] = useState<null | {
@@ -306,9 +327,18 @@ export default function AboutPage() {
     badge: string;
   }>(null);
 
-  const waAboutText = encodeURIComponent(
-    'Здравствуйте! Пишу с сайта EL ORDO GROUP из раздела «О компании». Хочу получить презентацию объектов и юридический пакет разрешительных документов.'
-  );
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+  const waAboutText = encodeURIComponent(WA_ABOUT_TEXTS[currentLang] || WA_ABOUT_TEXTS.ru);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelectedDoc(null);
+    };
+    if (selectedDoc) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedDoc]);
 
   const team = [
     {
@@ -400,6 +430,23 @@ export default function AboutPage() {
     },
   ];
 
+  const getDocRequestWaMessage = (docTitle: string, docSerial: string) => {
+    switch (currentLang) {
+      case 'kg':
+        return `Саламатсызбы! «${docTitle} (${docSerial})» документинин расмий сканерин PDF форматында жөнөтүңүзчү.`;
+      case 'kz':
+        return `Сәлеметсіз бе! «${docTitle} (${docSerial})» құжатының ресми сканын PDF форматында жіберуіңізді сұраймын.`;
+      case 'uk':
+        return `Доброго дня! Прошу надіслати офіційний скан документа «${docTitle} (${docSerial})» у PDF форматі.`;
+      case 'en':
+        return `Hello! Please send the official document scan of "${docTitle} (${docSerial})" in PDF format.`;
+      case 'zh':
+        return `您好！请发送“${docTitle} (${docSerial})”的官方盖章 PDF 扫描件。`;
+      default:
+        return `Здравствуйте! Прошу выслать официальный скан документа «${docTitle} (${docSerial})» в PDF формате.`;
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#fafbfa] dark:bg-[#07130e] text-gray-900 dark:text-gray-100 selection:bg-[#d4b26f] selection:text-[#064734] transition-colors duration-200">
       
@@ -414,7 +461,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* 2. Hero-блок с горизонтальным логотипом logo-2.jpeg сверху */}
+      {/* 2. Hero-блок с фирменным логотипом */}
       <section className="relative min-h-[500px] sm:min-h-[560px] flex items-center justify-center bg-[#064734] text-white py-20 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
@@ -430,16 +477,16 @@ export default function AboutPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
           
-          {/* Фирменный логотип (увеличенный) */}
+          {/* Фирменный логотип */}
           <div className="mb-6 inline-flex items-center justify-center">
             <img
               src="/logo-2.png"
               alt="EL ORDO GROUP"
-              className="h-40 sm:h-28 md:h-52 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
+              className="h-32 sm:h-40 md:h-48 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
             />
           </div>
 
-          {/* Единственная аккуратная плашка-бейджик */}
+          {/* Аккуратная плашка-бейджик */}
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-md">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>{t.aboutPage.heroBadge}</span>
@@ -465,9 +512,10 @@ export default function AboutPage() {
               <IconArrowRight className="w-3.5 h-3.5" />
             </Link>
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${waAboutText}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('about_leadership', 'Консультация руководства')}
               className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-7 py-3.5 rounded-xl text-xs sm:text-sm border border-white/20 transition-all backdrop-blur-sm flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -640,6 +688,7 @@ export default function AboutPage() {
               </div>
 
               <button
+                type="button"
                 onClick={() => setSelectedDoc(doc)}
                 className="inline-flex items-center justify-between w-full pt-4 border-t border-gray-100 dark:border-white/10 text-xs font-black uppercase tracking-wider text-[#064734] dark:text-[#d4b26f] hover:underline cursor-pointer"
               >
@@ -661,11 +710,12 @@ export default function AboutPage() {
             </p>
           </div>
           <a
-            href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-              'Здравствуйте! Хочу получить полный пакет документов (сканы лицензии Госстроя, Красной книги и типовой ДДУ) для проверки юристом.'
+            href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(
+              getDocRequestWaMessage('Полный пакет документов', 'Лицензия Госстроя, Красная книга, типовой ДДУ')
             )}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('about_docs_bundle', 'Юридический пакет')}
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-6 py-3.5 rounded-2xl text-xs uppercase tracking-wider transition-all shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#064734]" />
@@ -757,7 +807,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* 9. Контакты офиса продаж и карта */}
+      {/* 9. Контакты офиса продаж и интерактивная карта */}
       <section className="bg-white dark:bg-[#07130e] border-t border-gray-100 dark:border-white/10 py-16 sm:py-20 transition-colors">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-10">
@@ -802,9 +852,10 @@ export default function AboutPage() {
 
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${waAboutText}`}
+                href={`https://wa.me/${cleanWaNumber}?text=${waAboutText}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('about_office_wa', 'Офис продаж')}
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#064734] dark:hover:bg-[#095740] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center border border-transparent dark:border-white/10 cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -826,13 +877,20 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Модальное окно просмотра документа */}
+      {/* Модальное окно просмотра документа (с закрытием по фону и Escape) */}
       {selectedDoc && (
-        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 max-w-lg w-full rounded-3xl p-6 sm:p-8 shadow-2xl relative">
+        <div 
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setSelectedDoc(null)}
+        >
+          <div 
+            className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 max-w-lg w-full rounded-3xl p-6 sm:p-8 shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setSelectedDoc(null)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-black w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 cursor-pointer"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white text-xl font-black w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-white/10 cursor-pointer transition-colors"
             >
               ✕
             </button>
@@ -860,14 +918,15 @@ export default function AboutPage() {
 
             <div className="flex gap-3">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
-                  `Здравствуйте! Прошу выслать официальный скан документа «${selectedDoc.title} (${selectedDoc.serial})» в PDF формате.`
+                href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(
+                  getDocRequestWaMessage(selectedDoc.title, selectedDoc.serial)
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('modal_doc_request', selectedDoc.title)}
                 className="w-full bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow text-center flex items-center justify-center gap-2 cursor-pointer"
               >
-                <IconWhatsApp className="w-4 h-4" />
+                <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                 <span>{docs.modalBtnWa}</span>
               </a>
             </div>
