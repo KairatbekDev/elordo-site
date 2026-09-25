@@ -3,24 +3,57 @@
 import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
+import { trackEvent } from '@/lib/analytics';
 
-const COUNTER_ID = process.env.NEXT_PUBLIC_YM_ID || '112524603';
+const COUNTER_ID_RAW =
+  process.env.NEXT_PUBLIC_YM_ID ||
+  process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID ||
+  '112524603';
+
+const COUNTER_ID = Number(COUNTER_ID_RAW.replace(/\D/g, '')) || 112524603;
 
 declare global {
   interface Window {
-    ym?: (id: number, method: string, ...args: any[]) => void;
+    ym?: {
+      (id: number, method: string, ...args: any[]): void;
+      a?: any[];
+      l?: number;
+    };
   }
 }
 
-// Функция фиксации целевых действий (WhatsApp, звонки, заявки)
+// Функция-заглушка для очереди вызовов до полной инициализации библиотеки
+function safeYmCall(method: string, ...args: any[]) {
+  if (typeof window === 'undefined') return;
+
+  if (typeof window.ym === 'function') {
+    window.ym(COUNTER_ID, method, ...args);
+  } else {
+    // Формируем очередь вызовов по официальному протоколу Яндекс.Метрики
+    window.ym = window.ym || Object.assign(
+      function (...callArgs: any[]) {
+        (window.ym!.a = window.ym!.a || []).push(callArgs);
+      },
+      { a: [], l: 1 * Number(new Date()) }
+    );
+    window.ym(COUNTER_ID, method, ...args);
+  }
+}
+
+// Экспорт reachGoal для компонентов
 export const reachGoal = (target: string, params?: Record<string, any>) => {
-  if (typeof window !== 'undefined') {
-    if (window.ym) {
-      window.ym(Number(COUNTER_ID), 'reachGoal', target, params);
-    }
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`🎯 [YM reachGoal]: "${target}"`, params || '');
-    }
+  if (typeof window === 'undefined') return;
+
+  // 1. Отправка в Яндекс.Метрику
+  safeYmCall('reachGoal', target, params);
+
+  // 2. Дублирование во все рекламные каналы через единый диспетчер
+  try {
+    trackEvent(target, params);
+  } catch {}
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🎯 [YM reachGoal]: "${target}"`, params || '');
   }
 };
 
@@ -28,12 +61,13 @@ function MetrikaTracking() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Отслеживаем переходы между страницами внутри Next.js (SPA)
+  // Отслеживание SPA-переходов между страницами Next.js
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.ym) {
-      const url = pathname + (searchParams?.toString() ? `?${searchParams.toString()}` : '');
-      window.ym(Number(COUNTER_ID), 'hit', url);
-    }
+    if (typeof window === 'undefined') return;
+    const search = searchParams?.toString();
+    const url = pathname + (search ? `?${search}` : '');
+
+    safeYmCall('hit', url);
   }, [pathname, searchParams]);
 
   return null;
