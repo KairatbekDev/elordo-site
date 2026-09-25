@@ -7,6 +7,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import { trackWhatsAppClick, trackPdfDownload } from '@/lib/analytics';
 import {
   IconCheck,
   IconArrowRight,
@@ -45,12 +46,30 @@ interface QuizContent {
   estPriceLabel: string;
   estMonthlyLabel: string;
   estDownLabel: string;
+  calcModeLabel: string;
+  modeMonthly: string;
+  modeQuarterly: string;
+  modeCash: string;
+  termMonthlyLabel: string;
+  termCashLabel: string;
+  benefitLabel: string;
   btnWa: string;
   btnPdf: string;
   btnExplore: string;
   liveRatePrefix: string;
   somSuffix: string;
   steps: QuizStep[];
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
@@ -69,6 +88,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: 'Ориентировочная стоимость:',
     estMonthlyLabel: 'Платеж в месяц (0% без банка):',
     estDownLabel: 'Первоначальный взнос (30%):',
+    calcModeLabel: 'Формат расчета:',
+    modeMonthly: '36 мес. (ежемесячно)',
+    modeQuarterly: 'Поквартально (12 выплат)',
+    modeCash: '100% расчет (-6%)',
+    termMonthlyLabel: '36 мес. ({count} выплат)',
+    termCashLabel: 'Единоразово',
+    benefitLabel: 'Чистая выгода со скидкой:',
     btnWa: 'Получить планировки и шахматку в WhatsApp',
     btnPdf: 'Скачать полный расчет в PDF',
     btnExplore: 'Смотреть страницу комплекса',
@@ -133,6 +159,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: 'Болжолдуу наркы:',
     estMonthlyLabel: 'Ай сайын төлөм (банксыз 0%):',
     estDownLabel: 'Баштапкы төлөм (30%):',
+    calcModeLabel: 'Төлөө форматы:',
+    modeMonthly: '36 ай (ай сайын)',
+    modeQuarterly: 'Чейрек сайын (12 төлөм)',
+    modeCash: '100% төлөм (-6%)',
+    termMonthlyLabel: '36 ай ({count} төлөм)',
+    termCashLabel: 'Бир жолку төлөм',
+    benefitLabel: 'Арзандатуу менен таза пайда:',
     btnWa: 'Пландарды жана шахматканы WhatsApp-тан алуу',
     btnPdf: 'Толук PDF эсебин көчүрүп алуу',
     btnExplore: 'Комплекстин барагына өтүү',
@@ -197,6 +230,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: 'Болжамды бағасы:',
     estMonthlyLabel: 'Ай сайынғы төлем (банксіз 0%):',
     estDownLabel: 'Бастапқы жарна (30%):',
+    calcModeLabel: 'Есептеу форматы:',
+    modeMonthly: '36 ай (ай сайын)',
+    modeQuarterly: 'Тоқсан сайын (12 төлем)',
+    modeCash: '100% есеп айырысу (-6%)',
+    termMonthlyLabel: '36 ай ({count} төлем)',
+    termCashLabel: 'Бір реттік төлем',
+    benefitLabel: 'Жеңілдікпен таза пайда:',
     btnWa: 'WhatsApp арқылы жоспарлар мен шахматканы алу',
     btnPdf: 'Толық PDF есебін жүктеп алу',
     btnExplore: 'Кешен парақшасына өту',
@@ -261,6 +301,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: 'Орієнтовна вартість:',
     estMonthlyLabel: 'Платіж на місяць (0% без банку):',
     estDownLabel: 'Перший внесок (30%):',
+    calcModeLabel: 'Формат розрахунку:',
+    modeMonthly: '36 міс. (щомісяця)',
+    modeQuarterly: 'Поквартально (12 виплат)',
+    modeCash: '100% розрахунок (-6%)',
+    termMonthlyLabel: '36 міс. ({count} виплат)',
+    termCashLabel: 'Одноразово',
+    benefitLabel: 'Чиста вигода зі знижкою:',
     btnWa: 'Отримати планування та шахматку у WhatsApp',
     btnPdf: 'Завантажити повний розрахунок у PDF',
     btnExplore: 'Сторінка комплексу',
@@ -325,6 +372,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: 'Estimated Total Price:',
     estMonthlyLabel: 'Monthly Payment (0% Developer Plan):',
     estDownLabel: 'Down Payment (30%):',
+    calcModeLabel: 'Calculation Mode:',
+    modeMonthly: '36 mo. (Monthly)',
+    modeQuarterly: 'Quarterly (12 payments)',
+    modeCash: '100% Cash (-6%)',
+    termMonthlyLabel: '36 mo. ({count} payments)',
+    termCashLabel: 'Single Payment',
+    benefitLabel: 'Net Discount Savings:',
     btnWa: 'Get Floor Plans & Availability on WhatsApp',
     btnPdf: 'Download Full PDF Quote',
     btnExplore: 'View Development Page',
@@ -389,6 +443,13 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     estPriceLabel: '参考总价：',
     estMonthlyLabel: '每月还款金额（开发商0%免息）：',
     estDownLabel: '首付款（30%）：',
+    calcModeLabel: '测算还款模式：',
+    modeMonthly: '36个月（等额按月）',
+    modeQuarterly: '按季度（12期结算）',
+    modeCash: '100%全款（特惠直减6%）',
+    termMonthlyLabel: '36个月（共{count}期）',
+    termCashLabel: '一次性支付',
+    benefitLabel: '全款特惠直减金额：',
     btnWa: '在 WhatsApp 中获取详细户型图册与销控表',
     btnPdf: '一键下载完整 PDF 预算单',
     btnExplore: '查看该楼盘详情主页',
@@ -453,7 +514,7 @@ interface MatchedProject {
 
 export default function SmartApartmentQuiz() {
   const { locale } = useLanguage();
-  const lang: Locale = (locale as Locale) || 'ru';
+  const lang: Locale = normalizeLocale(locale);
   const c = QUIZ_TRANSLATIONS[lang] || QUIZ_TRANSLATIONS.ru;
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
@@ -467,6 +528,8 @@ export default function SmartApartmentQuiz() {
   const [paymentMode, setPaymentMode] = useState<'monthly' | 'quarterly' | 'cash'>('monthly');
   const [usdRate, setUsdRate] = useState<number>(87.45);
   const [rateDate, setRateDate] = useState<string>('');
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   useEffect(() => {
     let isMounted = true;
@@ -644,7 +707,7 @@ export default function SmartApartmentQuiz() {
     };
   }, [matchedProject, paymentMode]);
 
-  // Генерация ПОЛНОГО графика выплат на все 36 месяцев
+  // Генерация полного графика выплат
   const fullPaymentSchedule = useMemo(() => {
     if (financialCalc.isCash) {
       return [
@@ -679,8 +742,10 @@ export default function SmartApartmentQuiz() {
     return schedule;
   }, [financialCalc, usdRate]);
 
-  // Скачивание ПОЛНОГО расчета в PDF
+  // Скачивание полного расчета в PDF
   const handleDownloadPdf = () => {
+    trackPdfDownload(matchedProject.name, matchedProject.unitArea);
+
     exportPdfQuote({
       apartmentPrice: financialCalc.totalPrice,
       downPaymentAmount: financialCalc.downPayment,
@@ -720,8 +785,8 @@ export default function SmartApartmentQuiz() {
         : '\n') +
       `Отправьте, пожалуйста, официальную презентацию и свободные планировки в WhatsApp.`;
 
-    return `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(text)}`;
-  }, [matchedProject, financialCalc, paymentMode, usdRate]);
+    return `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`;
+  }, [matchedProject, financialCalc, paymentMode, usdRate, cleanWaNumber]);
 
   return (
     <section id="quiz" className="max-w-5xl mx-auto px-4 sm:px-6 my-16 scroll-mt-24">
@@ -742,7 +807,7 @@ export default function SmartApartmentQuiz() {
             {isCompleted ? c.resultTitle : c.heading}
           </h2>
 
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-neutral-400 mt-2 leading-relaxed">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-neutral-400 mt-2 leading-relaxed font-light">
             {isCompleted ? c.resultDesc : c.subheading}
           </p>
         </div>
@@ -880,7 +945,7 @@ export default function SmartApartmentQuiz() {
               {/* Интерактивный переключатель условий */}
               <div className="my-5">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500 dark:text-neutral-400 block mb-2">
-                  Формат расчета:
+                  {c.calcModeLabel}
                 </span>
                 <div className="grid grid-cols-3 gap-2 text-xs font-bold">
                   <button
@@ -892,7 +957,7 @@ export default function SmartApartmentQuiz() {
                         : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
                     }`}
                   >
-                    36 мес. (ежемесячно)
+                    {c.modeMonthly}
                   </button>
                   <button
                     type="button"
@@ -903,7 +968,7 @@ export default function SmartApartmentQuiz() {
                         : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
                     }`}
                   >
-                    Поквартально (12 выплат)
+                    {c.modeQuarterly}
                   </button>
                   <button
                     type="button"
@@ -914,7 +979,7 @@ export default function SmartApartmentQuiz() {
                         : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-white/10'
                     }`}
                   >
-                    100% расчет (-6%)
+                    {c.modeCash}
                   </button>
                 </div>
               </div>
@@ -936,7 +1001,7 @@ export default function SmartApartmentQuiz() {
                 <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10">
                   <span className="text-[11px] text-gray-500 block mb-1">Срок и график:</span>
                   <strong className="text-base font-black text-gray-900 dark:text-white">
-                    {financialCalc.isCash ? 'Единоразово' : `${financialCalc.months} мес. (${financialCalc.numberOfPayments} выплат)`}
+                    {financialCalc.isCash ? c.termCashLabel : c.termMonthlyLabel.replace('{count}', String(financialCalc.numberOfPayments))}
                   </strong>
                   <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block mt-0.5">
                     0% переплат без банка
@@ -945,7 +1010,7 @@ export default function SmartApartmentQuiz() {
 
                 <div className="p-3.5 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 border border-[#064734]/20 dark:border-[#d4b26f]/30">
                   <span className="text-[11px] text-[#064734] dark:text-[#d4b26f] font-bold block mb-1">
-                    {financialCalc.isCash ? 'Чистая выгода:' : `Платеж в ${paymentMode === 'quarterly' ? 'квартал' : 'месяц'}:`}
+                    {financialCalc.isCash ? c.benefitLabel : `Платеж в ${paymentMode === 'quarterly' ? 'квартал' : 'месяц'}:`}
                   </span>
                   <strong className="text-lg font-black text-[#064734] dark:text-[#d4b26f]">
                     $<AnimatedCounter value={financialCalc.isCash ? Math.round(matchedProject.totalPriceUsd * 0.06) : financialCalc.paymentPerPeriod} />
@@ -962,6 +1027,7 @@ export default function SmartApartmentQuiz() {
                   href={waUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick('smart_quiz_result', matchedProject.name)}
                   className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-[#d4b26f] hover:text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer"
                 >
                   <IconWhatsApp className="w-5 h-5 text-[#25D366]" />
