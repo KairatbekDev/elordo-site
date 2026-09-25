@@ -7,6 +7,7 @@ import { IconWhatsApp } from '@/components/Icons';
 import { reachGoal } from '@/components/YandexMetrika';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { trackPdfDownload, trackWhatsAppClick } from '@/lib/analytics';
 
 interface DownloadBrochureModalProps {
   projectSlug: string;
@@ -14,11 +15,23 @@ interface DownloadBrochureModalProps {
   botUsername?: string;
 }
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 const MODAL_TEXTS: Record<Locale, {
   triggerBtn: string;
   title: string;
   desc: (name: string) => string;
   btnDirectDownload: string;
+  generatingPdf: string;
   btnTelegram: string;
   btnWhatsApp: string;
   footnote: string;
@@ -30,6 +43,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: 'Получить официальный PDF',
     desc: (name) => `Официальный буклет, свободные этажи и актуальные цены по объекту «${name}»`,
     btnDirectDownload: 'Скачать PDF на устройство',
+    generatingPdf: 'Формирование файла...',
     btnTelegram: 'Получить мгновенно в Telegram',
     btnWhatsApp: 'Получить в WhatsApp',
     footnote: 'Прямая загрузка официального документа от застройщика EL ORDO GROUP',
@@ -41,6 +55,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: 'Расмий PDF алуу',
     desc: (name) => `«${name}» объектиси боюнча расмий буклет, бош кабаттар жана баалар`,
     btnDirectDownload: 'Түзмөккө PDF көчүрүп алуу',
+    generatingPdf: 'Файл даярдалууда...',
     btnTelegram: 'Telegram аркылуу тез алуу',
     btnWhatsApp: 'WhatsApp аркылуу алуу',
     footnote: 'EL ORDO GROUP куруучусунан расмий документти түз көчүрүү',
@@ -52,6 +67,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: 'Ресми PDF алу',
     desc: (name) => `«${name}» нысаны бойынша ресми буклет, бос қабаттар мен бағалар`,
     btnDirectDownload: 'Құрылғыға PDF жүктеп алу',
+    generatingPdf: 'Файл дайындалуда...',
     btnTelegram: 'Telegram арқылы лезде алу',
     btnWhatsApp: 'WhatsApp-та алу',
     footnote: 'EL ORDO GROUP құрылыс салушысынан ресми құжатты тікелей жүктеу',
@@ -63,6 +79,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: 'Отримати офіційний PDF',
     desc: (name) => `Офіційний буклет, вільні поверхи та актуальні ціни щодо об’єкта «${name}»`,
     btnDirectDownload: 'Завантажити PDF на пристрій',
+    generatingPdf: 'Формування файлу...',
     btnTelegram: 'Отримати миттєво в Telegram',
     btnWhatsApp: 'Отримати у WhatsApp',
     footnote: 'Пряме завантаження офіційного документа від забудовника EL ORDO GROUP',
@@ -74,6 +91,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: 'Get Official PDF',
     desc: (name) => `Official brochure, floor availability, and up-to-date pricing for "${name}"`,
     btnDirectDownload: 'Download PDF directly to device',
+    generatingPdf: 'Generating PDF...',
     btnTelegram: 'Get instantly via Telegram',
     btnWhatsApp: 'Receive in WhatsApp',
     footnote: 'Direct download of official documentation from EL ORDO GROUP',
@@ -85,6 +103,7 @@ const MODAL_TEXTS: Record<Locale, {
     title: '获取官方 PDF 资料',
     desc: (name) => `「${name}」官方楼盘简介、可选楼层与最新在售销控底价`,
     btnDirectDownload: '一键下载 PDF 至本地设备',
+    generatingPdf: '正在生成文件...',
     btnTelegram: '在 Telegram 中极速下载',
     btnWhatsApp: '在 WhatsApp 中直接接收',
     footnote: '开发商 EL ORDO GROUP 官方合规文件直接下载',
@@ -101,8 +120,10 @@ export default function DownloadBrochureModal({
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const ui = MODAL_TEXTS[currentLang] || MODAL_TEXTS.ru;
+
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -135,7 +156,11 @@ export default function DownloadBrochureModal({
   const handleDirectDownload = async () => {
     try {
       setIsDownloading(true);
-      reachGoal('pdf_download_direct');
+      try {
+        reachGoal('pdf_download_direct');
+      } catch {}
+      trackPdfDownload(projectName, 0);
+
       await downloadCompanyBrochurePdf();
       handleClose();
     } catch {
@@ -158,7 +183,7 @@ export default function DownloadBrochureModal({
   const tgPayload = slugMapping[projectSlug] || `${projectSlug.replace(/-/g, '_')}_pdf`;
   const tgUrl = `https://t.me/${botUsername}?start=${tgPayload}`;
 
-  const waUrl = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(
+  const waUrl = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(
     ui.waMessage(projectName)
   )}`;
 
@@ -214,7 +239,7 @@ export default function DownloadBrochureModal({
             <h3 className="text-xl font-black text-gray-950 dark:text-white uppercase mb-2">
               {ui.title}
             </h3>
-            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6 leading-relaxed font-light">
               {ui.desc(projectName)}
             </p>
 
@@ -229,7 +254,7 @@ export default function DownloadBrochureModal({
                 <svg className="w-5 h-5 text-[#064734] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                <span>{isDownloading ? 'Формирование файла...' : ui.btnDirectDownload}</span>
+                <span>{isDownloading ? ui.generatingPdf : ui.btnDirectDownload}</span>
               </button>
 
               {/* Кнопка 2: Telegram */}
@@ -252,7 +277,10 @@ export default function DownloadBrochureModal({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => {
-                  reachGoal('wa_click');
+                  try {
+                    reachGoal('wa_click');
+                  } catch {}
+                  trackWhatsAppClick('download_brochure_modal', projectName);
                   handleClose();
                 }}
                 className="w-full py-3.5 px-5 rounded-2xl bg-[#25D366] hover:bg-[#20bd5a] active:scale-[0.98] text-white font-black text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-3 cursor-pointer"
@@ -262,7 +290,7 @@ export default function DownloadBrochureModal({
               </a>
             </div>
 
-            <p className="text-[10px] text-gray-400 dark:text-neutral-500 mt-4">
+            <p className="text-[10px] text-gray-400 dark:text-neutral-500 mt-4 font-medium">
               {ui.footnote}
             </p>
           </div>
