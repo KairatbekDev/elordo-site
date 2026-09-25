@@ -28,6 +28,17 @@ interface ApartmentUnit {
   image: string;
 }
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 // 11 реальных планировок жилых комплексов компании с привязкой к чертежам
 const APARTMENTS_DATA: ApartmentUnit[] = [
   // ЖК Abu Dhabi
@@ -190,6 +201,9 @@ const SELECTOR_STRINGS: Record<Locale, {
   modalFinish: string;
   modalSeismic: string;
   modalResetZoom: string;
+  modalLegalNotice: string;
+  emptyMessage: string;
+  resetFiltersBtn: string;
 }> = {
   ru: {
     badge: 'Интерактивный конфигуратор квартир',
@@ -223,6 +237,9 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: 'Отделка: Под самоотделку (ПСО)',
     modalSeismic: 'Сейсмостойкость: 9 баллов (М350)',
     modalResetZoom: 'Сброс',
+    modalLegalNotice: 'Прямой официальный ДДУ от застройщика EL ORDO GROUP с обязательной государственной регистрацией в Госрегистре КР.',
+    emptyMessage: 'По выбранным параметрам планировок не найдено. Попробуйте сбросить фильтры.',
+    resetFiltersBtn: 'Сбросить фильтры',
   },
   kg: {
     badge: 'Интерактивдүү батир конфигуратору',
@@ -256,6 +273,9 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: 'Абалы: Өз алдынча оңдоого (ПСО)',
     modalSeismic: 'Сейсмотуруктуулук: 9 балл (М350)',
     modalResetZoom: 'Баштапкы',
+    modalLegalNotice: 'КР Мамкаттоосунда милдеттүү мамлекеттик каттоосу бар EL ORDO GROUP куруучусунан расмий ДДУ келишими.',
+    emptyMessage: 'Тандалган параметрлер боюнча батирлер табылган жок. Чыпкаларды тазалап көрүңүз.',
+    resetFiltersBtn: 'Чыпкаларды тазалоо',
   },
   kz: {
     badge: 'Интерактивті пәтер конфигураторы',
@@ -289,6 +309,9 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: 'Әрлеу күйі: Өздігінен әрлеуге (ПСО)',
     modalSeismic: 'Сейсмотөзімділік: 9 балл (М350)',
     modalResetZoom: 'Бастапқы',
+    modalLegalNotice: 'ҚР Мемтіркеуінде міндетті мемлекеттік тіркеуі бар EL ORDO GROUP құрылыс салушысының ресми ДДУ шарты.',
+    emptyMessage: 'Таңдалған параметрлер бойынша пәтерлер табылмады. Сүзгілерді тазартып көріңіз.',
+    resetFiltersBtn: 'Сүзгілерді тазарту',
   },
   uk: {
     badge: 'Інтерактивний конфігуратор квартир',
@@ -322,6 +345,9 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: 'Оздоблення: Під чистове (ПСО)',
     modalSeismic: 'Сейсмостійкість: 9 балів (М350)',
     modalResetZoom: 'Скинути',
+    modalLegalNotice: 'Офіційний прямий ДДУ від забудовника EL ORDO GROUP з обов’язковою державною реєстрацією в Держреєстрі КР.',
+    emptyMessage: 'За обраними параметрами планувань не знайдено. Спробуйте скинути фільтри.',
+    resetFiltersBtn: 'Скинути фільтри',
   },
   en: {
     badge: 'Interactive Apartment Configurator',
@@ -355,6 +381,9 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: 'Handover State: Shell & Core (PSO)',
     modalSeismic: 'Seismic Safety: 9 points (M350)',
     modalResetZoom: 'Reset',
+    modalLegalNotice: 'Direct official Equity Participation Agreement (DDU) with mandatory state registration under Kyrgyz Republic cadastre law.',
+    emptyMessage: 'No apartment layouts found matching your criteria. Try resetting filters.',
+    resetFiltersBtn: 'Reset Filters',
   },
   zh: {
     badge: '交互式全维房源配置器',
@@ -388,12 +417,15 @@ const SELECTOR_STRINGS: Record<Locale, {
     modalFinish: '交付标准：毛坯自装 (PSO)',
     modalSeismic: '抗震设防：9度抗震 (M350标号)',
     modalResetZoom: '重置',
+    modalLegalNotice: '由 EL ORDO GROUP 开发商直签正规购房合同 (DDU)，依法在吉尔吉斯国家不动产地籍局登记备案。',
+    emptyMessage: '未找到符合当前筛选条件的户型，请尝试重置筛选条件。',
+    resetFiltersBtn: '重置筛选',
   },
 };
 
 export default function ApartmentSelector() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const s = SELECTOR_STRINGS[currentLang] || SELECTOR_STRINGS.ru;
 
   // Фильтры
@@ -472,10 +504,16 @@ export default function ApartmentSelector() {
     return list;
   }, [selectedComplex, selectedRooms, sortBy]);
 
+  // Сброс фильтров
+  const handleResetFilters = () => {
+    setSelectedComplex('all');
+    setSelectedRooms('all');
+    setSortBy('popular');
+  };
+
   // Скачивание персонального PDF-расчета
   const handleDownloadPdf = useCallback(
     (apt: ApartmentUnit) => {
-      // 1. Фиксация события скачивания PDF в аналитике
       trackPdfDownload(apt.complex, apt.area);
 
       const totalPrice = Math.round(apt.area * apt.priceM2);
@@ -531,7 +569,7 @@ export default function ApartmentSelector() {
         <h2 className="text-2xl sm:text-4xl font-black uppercase text-[#064734] dark:text-[#d4b26f] tracking-tight">
           {s.title}
         </h2>
-        <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-2 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-gray-500 dark:text-neutral-400 mt-2 max-w-2xl mx-auto leading-relaxed font-light">
           {s.subtitle}
         </p>
 
@@ -572,9 +610,9 @@ export default function ApartmentSelector() {
                 onChange={(e) => setSortBy(e.target.value as any)}
                 className="bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-2.5 py-1 text-xs font-bold text-gray-800 dark:text-gray-200 focus:outline-none cursor-pointer"
               >
-                <option value="popular">{s.sortPopular}</option>
-                <option value="priceAsc">{s.sortPriceAsc}</option>
-                <option value="areaDesc">{s.sortAreaDesc}</option>
+                <option value="popular" className="dark:bg-[#0b1b15]">{s.sortPopular}</option>
+                <option value="priceAsc" className="dark:bg-[#0b1b15]">{s.sortPriceAsc}</option>
+                <option value="areaDesc" className="dark:bg-[#0b1b15]">{s.sortAreaDesc}</option>
               </select>
             </div>
           </div>
@@ -781,7 +819,7 @@ export default function ApartmentSelector() {
                     onClick={() => setActivePlanModal(apt)}
                     className="relative h-56 w-full rounded-2xl bg-white p-3 mb-4 flex items-center justify-center border border-gray-100 shadow-inner overflow-hidden cursor-pointer group/img"
                   >
-                    <span className="absolute bottom-2 left-2 text-[10px] font-bold text-gray-400 bg-white/90 px-2 py-0.5 rounded shadow-sm z-10 opacity-0 group-hover/img:opacity-100 transition-opacity">
+                    <span className="absolute bottom-2 left-2 text-[10px] font-bold text-gray-500 bg-white/95 px-2.5 py-1 rounded-md shadow-sm z-10 opacity-0 group-hover/img:opacity-100 transition-opacity border border-gray-100">
                       🔍 {s.clickToEnlarge}
                     </span>
 
@@ -936,10 +974,17 @@ export default function ApartmentSelector() {
           })}
         </div>
       ) : (
-        <div className="text-center py-12 bg-white dark:bg-[#0b1b15] rounded-3xl border border-gray-200 dark:border-white/10 p-6">
-          <p className="text-sm font-bold text-gray-500 dark:text-neutral-400">
-            По выбранным параметрам планировок не найдено. Попробуйте сбросить фильтры.
+        <div className="text-center py-12 bg-white dark:bg-[#0b1b15] rounded-3xl border border-gray-200 dark:border-white/10 p-8 shadow-sm">
+          <p className="text-sm font-bold text-gray-600 dark:text-gray-300 mb-4">
+            {s.emptyMessage}
           </p>
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="px-6 py-2.5 rounded-xl bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] font-bold text-xs uppercase tracking-wider transition-all shadow hover:bg-[#032b20] active:scale-95 cursor-pointer"
+          >
+            {s.resetFiltersBtn}
+          </button>
         </div>
       )}
 
@@ -1021,7 +1066,7 @@ export default function ApartmentSelector() {
                     src={activePlanModal.image}
                     alt={activePlanModal.complex}
                     className="max-h-[360px] max-w-full object-contain"
-                  ></img>
+                  />
                 </div>
               </div>
 
@@ -1050,8 +1095,8 @@ export default function ApartmentSelector() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-[#064734]/30 border border-[#064734] mb-6 text-xs text-emerald-100">
-                    Прямой договор ДДУ от застройщика EL ORDO GROUP с обязательной государственной регистрацией в Госрегистре КР.
+                  <div className="p-4 rounded-2xl bg-[#064734]/30 border border-[#064734] mb-6 text-xs text-emerald-100 leading-relaxed font-light">
+                    {s.modalLegalNotice}
                   </div>
                 </div>
 
