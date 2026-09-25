@@ -6,6 +6,9 @@ import Image from 'next/image';
 import BishkekMap from '@/components/BishkekMap';
 import { COMPANY_INFO, PROJECTS_LIST } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
+import { Locale } from '@/lib/i18n/types';
+import { trackWhatsAppClick, trackLeadSubmit } from '@/lib/analytics';
+import { getStoredUtm } from '@/lib/utm';
 import {
   IconMapPin,
   IconPhone,
@@ -18,14 +21,28 @@ import {
   IconArrowRight,
 } from '@/components/Icons';
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 export default function ContactsPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const currentLang: Locale = normalizeLocale(locale);
+
   const [selectedProject, setSelectedProject] = useState<string>('ЖК Abu Dhabi');
   const [visitTime, setVisitTime] = useState<string>('today');
+  const [clientName, setClientName] = useState<string>('');
+  const [clientPhone, setClientPhone] = useState<string>('');
 
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
-  // Синхронизация заголовка страницы во вкладке браузера
   useEffect(() => {
     if (typeof window !== 'undefined') {
       document.title = `${t.header.contacts} | EL ORDO GROUP`;
@@ -59,10 +76,39 @@ export default function ContactsPage() {
 
   const handleBookVisit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const selectedTimeLabel = visitTimeLabels[visitTime] || visitTime;
+
+    // 1. Отправка лида в CRM / Telegram
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: clientName.trim() || 'Клиент (Запись на визит)',
+          phone: clientPhone.trim() || 'Через WhatsApp',
+          project: selectedProject,
+          goal: 'Визит в офис продаж',
+          comment: `Желаемое время визита: ${selectedTimeLabel}`,
+          lang: currentLang,
+          source: 'ContactsPage_Booking',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 2. Трекинг событий аналитики
+    trackWhatsAppClick('contacts_book_visit', selectedProject);
+    trackLeadSubmit('Запись на визит в офис', selectedProject);
+
+    // 3. Формирование персонализированного сообщения WhatsApp
     const text =
       `${t.contactsPage.waGreeting}\n\n` +
+      (clientName ? `• Имя: ${clientName.trim()}\n` : '') +
+      (clientPhone ? `• Телефон: ${clientPhone.trim()}\n` : '') +
       `• ${t.contactsPage.waProject} ${selectedProject}\n` +
-      `• ${t.contactsPage.waTime} ${visitTimeLabels[visitTime] || visitTime}\n\n` +
+      `• ${t.contactsPage.waTime} ${selectedTimeLabel}\n\n` +
       `${t.contactsPage.waConfirm}`;
 
     window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
@@ -101,7 +147,7 @@ export default function ContactsPage() {
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
-          <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-3 px-3.5 py-1.5 rounded-full bg-black/40 border border-[#d4b26f]/30">
+          <span className="inline-block text-xs uppercase font-black tracking-widest text-[#d4b26f] mb-3 px-3.5 py-1.5 rounded-full bg-black/40 border border-[#d4b26f]/30 shadow-md">
             {t.contactsPage.heroBadge}
           </span>
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight mb-4 drop-shadow-md">
@@ -126,7 +172,7 @@ export default function ContactsPage() {
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
                 {t.contactsPage.officeCardBadge}
               </span>
-              <p className="text-base sm:text-lg font-black text-gray-900 dark:text-white leading-snug mb-2">
+              <p className="text-base sm:text-lg font-black text-gray-950 dark:text-white leading-snug mb-2">
                 {COMPANY_INFO.address}
               </p>
               <p className="text-xs text-gray-500 dark:text-neutral-400 leading-relaxed">
@@ -137,6 +183,7 @@ export default function ContactsPage() {
               href={COMPANY_INFO.gisUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('contacts_route_2gis', 'Маршрут в 2GIS')}
               className="mt-6 inline-flex items-center gap-1.5 text-xs font-black text-[#064734] dark:text-[#d4b26f] hover:text-[#d4b26f] dark:hover:text-[#eddab2] hover:underline"
             >
               <span>{t.contactsPage.officeCardRoute}</span>
@@ -153,7 +200,7 @@ export default function ContactsPage() {
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
                 {t.contactsPage.phoneCardBadge}
               </span>
-              <div className="space-y-1.5 text-base sm:text-lg font-black text-gray-900 dark:text-white">
+              <div className="space-y-1.5 text-base sm:text-lg font-black text-gray-950 dark:text-white">
                 {COMPANY_INFO.phones.map((phone, idx) => (
                   <a
                     key={idx}
@@ -172,6 +219,7 @@ export default function ContactsPage() {
               href={`https://wa.me/${cleanWaNumber}?text=${waQuickConsultText}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('contacts_quick_consult', 'Быстрая консультация')}
               className="mt-6 inline-flex items-center gap-2 text-xs font-black text-emerald-700 dark:text-emerald-400 hover:underline cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -188,14 +236,14 @@ export default function ContactsPage() {
               <span className="text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-neutral-400 block mb-1">
                 {t.contactsPage.hoursCardBadge}
               </span>
-              <p className="text-sm font-black text-gray-900 dark:text-white">
+              <p className="text-sm font-black text-gray-950 dark:text-white">
                 {t.contactsPage.hoursMonFri} <span className="text-[#064734] dark:text-[#d4b26f]">09:00 – 18:00</span>
               </p>
-              <p className="text-sm font-black text-gray-900 dark:text-white">
+              <p className="text-sm font-black text-gray-950 dark:text-white">
                 {t.contactsPage.hoursSat} <span className="text-[#064734] dark:text-[#d4b26f]">10:00 – 16:00</span>
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">
-                {t.contactsPage.hoursSun} <span className="text-gray-900 dark:text-white font-bold">{t.contactsPage.hoursSunValue}</span>
+                {t.contactsPage.hoursSun} <span className="text-gray-950 dark:text-white font-bold">{t.contactsPage.hoursSunValue}</span>
               </p>
               <div className="mt-4 pt-3 border-t border-gray-100 dark:border-white/10">
                 <span className="text-[11px] text-gray-400 dark:text-neutral-400 block mb-0.5">{t.contactsPage.hoursAccountLabel}</span>
@@ -224,7 +272,7 @@ export default function ContactsPage() {
         </div>
       </div>
 
-      {/* 4. Запись на визит в офис */}
+      {/* 4. Запись на визит в офис продаж */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="bg-white dark:bg-[#0b1b15] rounded-3xl p-6 sm:p-12 border border-gray-200 dark:border-white/10 shadow-xl dark:shadow-none grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
           
@@ -236,7 +284,7 @@ export default function ContactsPage() {
             <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#064734] dark:text-[#d4b26f] leading-tight">
               {t.contactsPage.bookingTitle}
             </h2>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {t.contactsPage.bookingDesc}
             </p>
 
@@ -274,21 +322,21 @@ export default function ContactsPage() {
             </div>
           </div>
 
-          {/* Форма бронирования */}
-          <div className="lg:col-span-6 bg-[#f5f8f6] dark:bg-[#040c09] p-6 sm:p-8 rounded-2xl border border-gray-200 dark:border-white/10 transition-colors">
+          {/* Форма бронирования с прямым сохранением в CRM */}
+          <div className="lg:col-span-6 bg-[#f5f8f6] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-gray-200 dark:border-white/10 transition-colors shadow-inner">
             <h3 className="text-sm font-black uppercase text-gray-900 dark:text-white mb-4">
               {t.contactsPage.formTitle}
             </h3>
 
-            <form onSubmit={handleBookVisit} className="space-y-4 text-xs">
+            <form onSubmit={handleBookVisit} className="space-y-3.5 text-xs">
               <div>
-                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">
                   {t.contactsPage.formProjectLabel}
                 </label>
                 <select
                   value={selectedProject}
                   onChange={(e) => setSelectedProject(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] font-medium cursor-pointer"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f] font-semibold cursor-pointer"
                 >
                   {PROJECTS_LIST.map((proj) => {
                     const classLabel = getProjectClassLabel(proj.slug);
@@ -303,6 +351,34 @@ export default function ContactsPage() {
                     {t.contactsPage.formAllProjects}
                   </option>
                 </select>
+              </div>
+
+              {/* Опциональные контакты гостя для предварительного пропуска */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">
+                    Ваше имя:
+                  </label>
+                  <input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="Например: Азамат"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">
+                    Телефон:
+                  </label>
+                  <input
+                    type="tel"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    placeholder="+996 (700) 00-00-00"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white dark:bg-[#0b1b15] border border-gray-300 dark:border-white/15 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:border-[#064734] dark:focus:border-[#d4b26f]"
+                  />
+                </div>
               </div>
 
               <div>
@@ -333,11 +409,12 @@ export default function ContactsPage() {
 
               <button
                 type="submit"
-                className="w-full mt-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 border border-transparent cursor-pointer"
+                className="w-full mt-2 bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] active:scale-95 text-[#d4b26f] hover:text-white dark:text-[#064734] dark:hover:text-[#064734] font-black py-4 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 border border-transparent cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366] dark:text-[#064734]" />
                 <span>{t.contactsPage.btnSubmit}</span>
               </button>
+
               <p className="text-[11px] text-gray-500 dark:text-neutral-400 text-center font-medium">
                 {t.contactsPage.formNote}
               </p>
@@ -347,7 +424,7 @@ export default function ContactsPage() {
         </div>
       </section>
 
-      {/* 5. Интерактивная карта Бишкека */}
+      {/* 5. Интерактивная карта Бишкека с объектами и офисом */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
         <div className="mb-6">
           <span className="text-xs font-black uppercase tracking-widest text-[#d4b26f] block mb-1">
