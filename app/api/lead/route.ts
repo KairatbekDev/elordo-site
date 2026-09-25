@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     const realIp = req.headers.get('x-real-ip');
     const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : realIp || '127.0.0.1';
 
-    // 1. Защита от спама и спам-флуда
+    // 1. Защита от спама и флуда
     if (isRateLimited(clientIp)) {
       return NextResponse.json(
         { success: false, error: 'Слишком много запросов. Подождите 5 минут.' },
@@ -80,10 +80,11 @@ export async function POST(req: Request) {
       rooms,
       lang,
       website,
+      source,
       utm,
     } = data;
 
-    // 2. Honeypot-ловушка для спам-ботов
+    // 2. Honeypot-ловушка для ботов
     if (website && String(website).trim().length > 0) {
       console.warn(`[SPAM BLOCKED] Honeypot сработал для IP ${clientIp}`);
       return NextResponse.json({ success: true });
@@ -106,6 +107,7 @@ export async function POST(req: Request) {
     const safePhone = escapeHtml(String(phone || '').trim().slice(0, 30));
     const safeProject = escapeHtml(String(project || 'Не выбран').slice(0, 80));
     const safeGoal = escapeHtml(String(goal || 'Консультация').slice(0, 80));
+    const safeSource = escapeHtml(String(source || 'Сайт').slice(0, 50));
     const safeLang = escapeHtml(String(lang || 'RU').toUpperCase().slice(0, 10));
 
     // Дополнительные параметры (из квиза, селектора или комментариев)
@@ -118,31 +120,43 @@ export async function POST(req: Request) {
     // 5. Разбор рекламных меток (UTM) для отдела маркетинга
     let marketingInfo = 'Прямой заход / Органический поиск';
     if (utm && typeof utm === 'object') {
-      const source = escapeHtml(utm.utm_source || '');
-      const medium = escapeHtml(utm.utm_medium || '');
-      const campaign = escapeHtml(utm.utm_campaign || '');
-      const content = escapeHtml(utm.utm_content || '');
-      const term = escapeHtml(utm.utm_term || '');
+      const utmSource = escapeHtml(utm.utm_source || '');
+      const utmMedium = escapeHtml(utm.utm_medium || '');
+      const utmCampaign = escapeHtml(utm.utm_campaign || '');
+      const utmContent = escapeHtml(utm.utm_content || '');
+      const utmTerm = escapeHtml(utm.utm_term || '');
 
       const parts: string[] = [];
-      if (source) parts.push(`Источник: <b>${source}</b>`);
-      if (medium) parts.push(`Тип: <i>${medium}</i>`);
-      if (campaign) parts.push(`Кампания: <code>${campaign}</code>`);
-      if (term) parts.push(`Ключ: <u>${term}</u>`);
-      if (content) parts.push(`Объявление: ${content}`);
+      if (utmSource) parts.push(`Источник: <b>${utmSource}</b>`);
+      if (utmMedium) parts.push(`Тип: <i>${utmMedium}</i>`);
+      if (utmCampaign) parts.push(`Кампания: <code>${utmCampaign}</code>`);
+      if (utmTerm) parts.push(`Ключ: <u>${utmTerm}</u>`);
+      if (utmContent) parts.push(`Объявление: ${utmContent}`);
 
       if (parts.length > 0) {
         marketingInfo = parts.join('\n📢 ');
       }
     }
 
-    const token = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+    const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
 
+    // Защита для локальной разработки
     if (!token || !chatId) {
-      console.error('[CRITICAL] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены в переменных окружения Vercel!');
+      console.warn('[LEAD API DEV] TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены. Логирование заявки:', {
+        safeName,
+        safePhone,
+        safeProject,
+        safeGoal,
+        safeSource,
+      });
+
+      if (process.env.NODE_ENV !== 'production') {
+        return NextResponse.json({ success: true, simulated: true });
+      }
+
       return NextResponse.json(
-        { success: false, error: 'Ошибка конфигурации сервера' },
+        { success: false, error: 'Ошибка конфигурации сервера (Telegram)' },
         { status: 500 }
       );
     }
@@ -165,7 +179,8 @@ export async function POST(req: Request) {
       `👤 <b>Клиент:</b> ${safeName}\n` +
       `📞 <b>Телефон:</b> <a href="tel:+${waPhone}">+${waPhone}</a> (<code>${safePhone}</code>)\n` +
       `🏢 <b>Объект:</b> <b>${safeProject}</b>\n` +
-      `🎯 <b>Цель:</b> ${safeGoal}\n`;
+      `🎯 <b>Цель:</b> ${safeGoal}\n` +
+      `📍 <b>Форма:</b> ${safeSource}\n`;
 
     if (extraDetails.length > 0) {
       messageHtml += `📋 <b>Детали:</b>\n• ${extraDetails.join('\n• ')}\n`;
