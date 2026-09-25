@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconWhatsApp,
   IconArrowRight,
@@ -27,6 +28,17 @@ interface FloorPlansSectionProps {
   whatsappNumber?: string;
   theme?: 'dark' | 'light';
   botUsername?: string;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const UI_TEXTS: Record<Locale, {
@@ -339,13 +351,15 @@ export default function FloorPlansSection({
   botUsername = COMPANY_INFO.telegramBot || 'elordo_crm_bot',
 }: FloorPlansSectionProps) {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const ui = UI_TEXTS[currentLang] || UI_TEXTS.ru;
 
   const [activeTab, setActiveTab] = useState<'all' | 1 | 2 | 3>('all');
   const [selectedPlan, setSelectedPlan] = useState<ApartmentPlan | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const cleanWaNumber = (whatsappNumber || COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const filteredPlans = useMemo(() => {
     return activeTab === 'all' ? plans : plans.filter((p) => p.rooms === activeTab);
@@ -394,7 +408,7 @@ export default function FloorPlansSection({
 
   const getWhatsAppLink = (plan: ApartmentPlan) => {
     const message = ui.waMessage(plan.title, plan.area, projectName);
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(message)}`;
   };
 
   const getTelegramPlanLink = (plan: ApartmentPlan) => {
@@ -685,6 +699,7 @@ export default function FloorPlansSection({
                     href={getWhatsAppLink(selectedPlan)}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick('floor_plan_inquire', `${projectName} - ${selectedPlan.title}`)}
                     className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all duration-200 shadow-xl flex items-center justify-center gap-2.5 border border-emerald-500/30 cursor-pointer"
                   >
                     <IconWhatsApp className="w-5 h-5 text-[#25D366] shrink-0" />
