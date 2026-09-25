@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
@@ -14,10 +14,10 @@ import {
 
 interface MapPointRaw {
   id: string;
-  name: string;
+  name: Record<Locale, string>;
   category: 'office' | 'active' | 'finished';
   categoryLabel: Record<Locale, string>;
-  address: string;
+  address: Record<Locale, string>;
   coords: [number, number];
   deadline?: Record<Locale, string>;
   price?: Record<Locale, string>;
@@ -25,10 +25,28 @@ interface MapPointRaw {
   gisUrl: string;
 }
 
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
 const RAW_POINTS: MapPointRaw[] = [
   {
     id: 'office',
-    name: 'Главный офис EL ORDO',
+    name: {
+      ru: 'Главный офис продаж EL ORDO',
+      kg: 'EL ORDO башкы сатуу кеңсеси',
+      kz: 'EL ORDO бас сату кеңсесі',
+      uk: 'Головний офіс продажів EL ORDO',
+      en: 'EL ORDO Head Sales Gallery',
+      zh: 'EL ORDO 集团总部营销中心',
+    },
     category: 'office',
     categoryLabel: {
       ru: 'Офис продаж',
@@ -38,7 +56,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Sales Office',
       zh: '品牌营销中心',
     },
-    address: 'ул. Исы Ахунбаева, 137/1',
+    address: {
+      ru: 'ул. Исы Ахунбаева, 137/1',
+      kg: 'Иса Ахунбаев көч., 137/1',
+      kz: 'Иса Ахунбаев к-сі, 137/1',
+      uk: 'вул. Іси Ахунбаєва, 137/1',
+      en: '137/1 Isa Akhunbaev Street',
+      zh: '比什凯克市伊萨·阿洪巴耶夫街137/1号',
+    },
     coords: [42.84356, 74.59448],
     desc: {
       ru: 'Консультации, показ макетов, оформление договоров и рассрочки.',
@@ -52,7 +77,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'abu-dhabi',
-    name: 'ЖК Abu Dhabi',
+    name: {
+      ru: 'ЖК Abu Dhabi',
+      kg: '«Abu Dhabi» ТЖК',
+      kz: '«Abu Dhabi» ТҮК',
+      uk: 'ЖК Abu Dhabi',
+      en: 'Abu Dhabi RC',
+      zh: '阿布扎比住宅区 (Abu Dhabi)',
+    },
     category: 'active',
     categoryLabel: {
       ru: 'Премиум-класс',
@@ -62,7 +94,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Premium Class',
       zh: '尊享级 (Premium)',
     },
-    address: 'ул. Сухомлинова, 29',
+    address: {
+      ru: 'ул. Сухомлинова, 29',
+      kg: 'Сухомлинов көч., 29',
+      kz: 'Сухомлинов к-сі, 29',
+      uk: 'вул. Сухомлинова, 29',
+      en: '29 Sukhomlinov Street',
+      zh: '比什凯克市苏霍姆利诺夫街29号',
+    },
     coords: [42.84694, 74.58175],
     deadline: {
       ru: '2029 г. 3 кв.',
@@ -92,7 +131,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'madina-residence',
-    name: 'ЖК Madina Residence',
+    name: {
+      ru: 'ЖК Madina Residence',
+      kg: '«Madina Residence» ТЖК',
+      kz: '«Madina Residence» ТҮК',
+      uk: 'ЖК Madina Residence',
+      en: 'Madina Residence',
+      zh: '麦地那公馆 (Madina Residence)',
+    },
     category: 'active',
     categoryLabel: {
       ru: 'Бизнес-класс',
@@ -102,7 +148,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Business Class',
       zh: '商务级 (Business)',
     },
-    address: 'ул. Огонбаева, 12',
+    address: {
+      ru: 'ул. Огонбаева, 12',
+      kg: 'Огонбаев көч., 12',
+      kz: 'Огонбаев к-сі, 12',
+      uk: 'вул. Огонбаєва, 12',
+      en: '12 Ogonbaev Street',
+      zh: '比什凯克市奥贡巴耶夫街12号',
+    },
     coords: [42.87785, 74.63916],
     deadline: {
       ru: '2027 г. 3 кв.',
@@ -132,7 +185,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'ajkol-plus',
-    name: 'ЖД Айкол +',
+    name: {
+      ru: 'ЖД Айкол +',
+      kg: '«Айкөл +» КҮ',
+      kz: '«Айкөл +» КҮ',
+      uk: 'ЖБ Айкол +',
+      en: 'Aikol+ Club House',
+      zh: '艾科尔+ 精品洋房 (Aikol+)',
+    },
     category: 'active',
     categoryLabel: {
       ru: 'Комфорт+',
@@ -142,7 +202,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Comfort+',
       zh: '舒适+ (Comfort+)',
     },
-    address: 'с. Кок-Жар, ул. Баялинова, 6',
+    address: {
+      ru: 'с. Кок-Жар, ул. Баялинова, 6',
+      kg: 'Көк-Жар а., Баялинов көч., 6',
+      kz: 'Көк-Жар а., Баялинов к-сі, 6',
+      uk: 'с. Кок-Жар, вул. Баялінова, 6',
+      en: '6 Bayalinov Street, Kok-Jar',
+      zh: '比什凯克市Kok-Jar区巴亚利诺夫街6号',
+    },
     coords: [42.81725, 74.64607],
     deadline: {
       ru: '2028 г. 3 кв.',
@@ -172,7 +239,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'ajkol',
-    name: 'ЖД Айкол',
+    name: {
+      ru: 'ЖД Айкол',
+      kg: '«Айкөл» ТҮ',
+      kz: '«Айкөл» ТҮ',
+      uk: 'ЖБ Айкол',
+      en: 'Aikol House',
+      zh: '艾科尔住宅 (Aikol)',
+    },
     category: 'finished',
     categoryLabel: {
       ru: 'Сдан',
@@ -182,7 +256,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Completed',
       zh: '已交付',
     },
-    address: 'ул. Арашан, 10',
+    address: {
+      ru: 'ул. Арашан, 10',
+      kg: 'Арашан көч., 10',
+      kz: 'Арашан к-сі, 10',
+      uk: 'вул. Арашан, 10',
+      en: '10 Arashan Street',
+      zh: '阿拉尚街10号',
+    },
     coords: [42.8171, 74.64892],
     desc: {
       ru: 'Полностью построенный, введенный в эксплуатацию дом.',
@@ -196,7 +277,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'kelechek',
-    name: 'ЖК Келечек',
+    name: {
+      ru: 'ЖК Келечек',
+      kg: '«Келечек» ТЖК',
+      kz: '«Келешек» ТҮК',
+      uk: 'ЖК Келечек',
+      en: 'Kelechek Complex',
+      zh: '未来住宅区 (Kelechek)',
+    },
     category: 'finished',
     categoryLabel: {
       ru: 'Сдан',
@@ -206,7 +294,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Completed',
       zh: '已交付',
     },
-    address: 'ул. Космическая, 153',
+    address: {
+      ru: 'ул. Космическая, 153',
+      kg: 'Космическая көч., 153',
+      kz: 'Космическая к-сі, 153',
+      uk: 'вул. Космічна, 153',
+      en: '153 Kosmicheskaya Street',
+      zh: '比什凯克市太空街153号',
+    },
     coords: [42.84588, 74.55136],
     desc: {
       ru: 'Полностью построенный, введенный в эксплуатацию дом.',
@@ -220,7 +315,14 @@ const RAW_POINTS: MapPointRaw[] = [
   },
   {
     id: 'ordo',
-    name: 'КД Ордо',
+    name: {
+      ru: 'КД Ордо',
+      kg: '«Ордо» КҮ',
+      kz: '«Ордо» КҮ',
+      uk: 'КБ Ордо',
+      en: 'Ordo Club House',
+      zh: '奥尔多精品洋房 (Ordo)',
+    },
     category: 'finished',
     categoryLabel: {
       ru: 'Сдан',
@@ -230,7 +332,14 @@ const RAW_POINTS: MapPointRaw[] = [
       en: 'Completed',
       zh: '已交付',
     },
-    address: 'ул. Тверская, 20',
+    address: {
+      ru: 'ул. Тверская, 20',
+      kg: 'Тверская көч., 20',
+      kz: 'Тверская к-сі, 20',
+      uk: 'вул. Тверська, 20',
+      en: '20 Tverskaya Street',
+      zh: '特维尔斯卡亚街20号',
+    },
     coords: [42.87974, 74.54623],
     desc: {
       ru: 'Первый клубный дом компании с панорамой на горы.',
@@ -244,7 +353,19 @@ const RAW_POINTS: MapPointRaw[] = [
   },
 ];
 
-const UI_TEXT = {
+const UI_TEXT: Record<Locale, {
+  all: string;
+  office: string;
+  active: string;
+  finished: string;
+  office2gis: string;
+  clickPrompt: string;
+  aboutProject: string;
+  mainOffice: string;
+  to2gis: string;
+  enableTouch: string;
+  lockScroll: string;
+}> = {
   ru: {
     all: 'Все',
     office: 'Офис',
@@ -327,7 +448,7 @@ const UI_TEXT = {
 
 export default function BishkekMap() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const ui = UI_TEXT[currentLang] || UI_TEXT.ru;
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -341,10 +462,10 @@ export default function BishkekMap() {
   const points = useMemo(() => {
     return RAW_POINTS.map((p) => ({
       id: p.id,
-      name: p.name,
+      name: p.name[currentLang] || p.name.ru,
       category: p.category,
       categoryLabel: p.categoryLabel[currentLang] || p.categoryLabel.ru,
-      address: p.address,
+      address: p.address[currentLang] || p.address.ru,
       coords: p.coords,
       deadline: p.deadline ? (p.deadline[currentLang] || p.deadline.ru) : undefined,
       price: p.price ? (p.price[currentLang] || p.price.ru) : undefined,
@@ -352,6 +473,33 @@ export default function BishkekMap() {
       gisUrl: p.gisUrl,
     }));
   }, [currentLang]);
+
+  const createPopupContent = useCallback((point: typeof points[0], currentUi: typeof ui) => {
+    const isOffice = point.category === 'office';
+    const projectBtn = !isOffice
+      ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">${currentUi.aboutProject}</a>`
+      : '';
+
+    return `
+      <div style="font-family: inherit; padding: 4px; min-width: 200px;">
+        <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
+          ${point.categoryLabel}
+        </div>
+        <div style="font-size: 13px; font-weight: 900; color: #111; margin-bottom: 3px; line-height: 1.2;">
+          ${point.name}
+        </div>
+        <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
+          ${point.address}
+        </div>
+        <div style="display: flex; gap: 6px;">
+          ${projectBtn}
+          <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
+            ${currentUi.to2gis}
+          </a>
+        </div>
+      </div>
+    `;
+  }, []);
 
   useEffect(() => {
     if (!document.getElementById('leaflet-css')) {
@@ -438,34 +586,11 @@ export default function BishkekMap() {
 
         const marker = L.marker(point.coords, { icon: customIcon }).addTo(map);
 
-        const projectBtn = !isOffice
-          ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">${ui.aboutProject}</a>`
-          : '';
-
-        const popupContent = `
-          <div style="font-family: inherit; padding: 3px; min-width: 190px;">
-            <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
-              ${point.categoryLabel}
-            </div>
-            <div style="font-size: 13px; font-weight: 900; color: #111; margin-bottom: 3px; line-height: 1.2;">
-              ${point.name}
-            </div>
-            <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
-              ${point.address}
-            </div>
-            <div style="display: flex; gap: 6px;">
-              ${projectBtn}
-              <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
-                ${ui.to2gis}
-              </a>
-            </div>
-          </div>
-        `;
-
-        marker.bindPopup(popupContent);
+        marker.bindPopup(createPopupContent(point, ui));
 
         marker.on('click', () => {
           setSelectedId(point.id);
+          marker.setZIndexOffset(1000);
           const el = itemsRef.current[point.id];
           if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -505,8 +630,9 @@ export default function BishkekMap() {
         mapRef.current = null;
       }
     };
-  }, []);
+  }, [createPopupContent, points, ui]);
 
+  // Управление жестами карты на смартфонах
   useEffect(() => {
     if (!mapRef.current) return;
     const isMobile = window.innerWidth < 1024;
@@ -521,39 +647,17 @@ export default function BishkekMap() {
     }
   }, [isMapActive]);
 
+  // Обновление контента всплывающих окон при смене языка
   useEffect(() => {
     if (!mapRef.current) return;
     points.forEach((point) => {
       const marker = markersRef.current[point.id];
       if (!marker) return;
-      const isOffice = point.category === 'office';
-      const projectBtn = !isOffice
-        ? `<a href="/${point.id}" style="flex: 1; text-align: center; background: #064734; color: #fff; font-size: 11px; font-weight: 800; padding: 7px 10px; border-radius: 8px; text-decoration: none;">${ui.aboutProject}</a>`
-        : '';
-
-      const popupContent = `
-        <div style="font-family: inherit; padding: 3px; min-width: 190px;">
-          <div style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: ${isOffice ? '#b8860b' : '#064734'}; margin-bottom: 2px;">
-            ${point.categoryLabel}
-          </div>
-          <div style="font-size: 13px; font-weight: 900; color: #111; margin-bottom: 3px; line-height: 1.2;">
-            ${point.name}
-          </div>
-          <div style="font-size: 11px; color: #666; margin-bottom: 8px;">
-            ${point.address}
-          </div>
-          <div style="display: flex; gap: 6px;">
-            ${projectBtn}
-            <a href="${point.gisUrl}" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: #f0f3f1; color: #064734; font-size: 11px; font-weight: 700; padding: 7px 10px; border-radius: 8px; text-decoration: none; border: 1px solid #dbe3df;">
-              ${ui.to2gis}
-            </a>
-          </div>
-        </div>
-      `;
-      marker.setPopupContent(popupContent);
+      marker.setPopupContent(createPopupContent(point, ui));
     });
-  }, [points, ui]);
+  }, [points, ui, createPopupContent]);
 
+  // Фильтрация маркеров
   useEffect(() => {
     if (!mapRef.current) return;
     points.forEach((point) => {
@@ -572,7 +676,10 @@ export default function BishkekMap() {
     if (mapRef.current) {
       mapRef.current.flyTo(point.coords, 15, { duration: 0.8 });
       const marker = markersRef.current[point.id];
-      if (marker) marker.openPopup();
+      if (marker) {
+        marker.setZIndexOffset(1000);
+        marker.openPopup();
+      }
     }
   };
 
