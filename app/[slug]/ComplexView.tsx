@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import LegalDocuments from '@/components/LegalDocuments';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconCheck,
   IconMapPin,
@@ -65,6 +66,17 @@ export interface ComplexData {
   plans?: ApartmentPlan[];
   typicalFloors?: TypicalFloorItem[];
   videoUrl?: string;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 export const COMPLEXES: Record<string, ComplexData> = {
@@ -336,12 +348,12 @@ export const COMPLEXES: Record<string, ComplexData> = {
         zh: '2027年第3季度',
       },
       price: {
-        ru: 'от 1 400 $',
-        kg: '1 400 $ баштап',
-        kz: '1 400 $ бастап',
-        uk: 'від 1 400 $',
-        en: 'from $1,400',
-        zh: '1 400 $ 起',
+        ru: 'от 1 500 $',
+        kg: '1 500 $ баштап',
+        kz: '1 500 $ бастап',
+        uk: 'від 1 500 $',
+        en: 'from $1,500',
+        zh: '1 500 $ 起',
       },
       address: {
         ru: 'ул. Огонбаева, 12',
@@ -354,12 +366,12 @@ export const COMPLEXES: Record<string, ComplexData> = {
     },
     specs: {
       floors: {
-        ru: '14 этажей',
-        kg: '14 кабат',
-        kz: '14 қабат',
-        uk: '14 поверхів',
-        en: '14 floors',
-        zh: '14层',
+        ru: '14 этажей (3 блока)',
+        kg: '14 кабат (3 блок)',
+        kz: '14 қабат (3 блок)',
+        uk: '14 поверхів (3 блоки)',
+        en: '14 floors (3 blocks)',
+        zh: '14层 (3栋)',
       },
       ceiling: '3.15 м',
       construction: {
@@ -576,12 +588,12 @@ export const COMPLEXES: Record<string, ComplexData> = {
         zh: '2028年第3季度',
       },
       price: {
-        ru: 'от 1 100 $',
-        kg: '1 100 $ баштап',
-        kz: '1 100 $ бастап',
-        uk: 'від 1 100 $',
-        en: 'from $1,100',
-        zh: '1 100 $ 起',
+        ru: 'от 1 200 $',
+        kg: '1 200 $ баштап',
+        kz: '1 200 $ бастап',
+        uk: 'від 1 200 $',
+        en: 'from $1,200',
+        zh: '1 200 $ 起',
       },
       address: {
         ru: 'с. Кок-Жар, ул. Баялинова, 6',
@@ -770,38 +782,38 @@ export const COMPLEXES: Record<string, ComplexData> = {
     theme: 'light',
     hero: {
       tag: {
-        ru: 'ЖИЛОЙ ДОМ',
-        kg: 'ТУРАК ЖАЙ ҮЙҮ',
-        kz: 'ТҰРҒЫН ҮЙ',
-        uk: 'ЖИТЛОВИЙ БУДИНОК',
-        en: 'RESIDENTIAL BUILDING',
-        zh: '精工品质住宅',
+        ru: 'СДАН В ЭКСПЛУАТАЦИЮ',
+        kg: 'ПАЙДАЛАНУУГА БЕРИЛГЕН',
+        kz: 'ПАЙДАЛАНУҒА БЕРІЛГЕН',
+        uk: 'ЗДАНИЙ В ЕКСПЛУАТАЦІЮ',
+        en: 'COMMISSIONED',
+        zh: '已交付入住',
       },
       title: 'АЙКОЛ',
       subtitle: {
-        ru: 'Уютный малоквартирный жилой дом комфорт-класса в высокой стадии строительной готовности. Монолитно-кирпичный конструктив и надежные инженерные сети.',
-        kg: 'Курулуш даярдыгы жогору болгон ыңгайлуу чакан батирлүү комфорт-класстагы турак үй. Монолит-бышкан кыш конструкциясы жана ишенимдүү инженердик тармактар.',
-        kz: 'Құрылыс дайындығы жоғары жайлы шағын пәтерлі тұрғын үй. Монолитті-кірпіш конструкциясы және сенімді инженерлік желілер.',
-        uk: 'Затишний житловий будинок комфорт-класу високого ступеня будівельної готовності. Монолітно-цегляний конструктив та надійні інженерні мережі.',
-        en: 'A cozy comfort-class residential building nearing completion. Monolithic brick construction and robust modern utilities.',
-        zh: '准现房在建的舒适型品质住宅。坚实钢筋混凝土主体与环保实心红砖结构，完备市政工程管网保障。',
+        ru: 'Уютный малоквартирный жилой дом комфорт-класса в предгорье. Полностью сдан в эксплуатацию, подключен ко всем коммуникациям и заселен.',
+        kg: 'Тоо этегиндеги ыңгайлуу чакан батирлүү комфорт-класстагы турак үй. Толугу менен пайдаланууга берилген жана жашоочулар жайгашкан.',
+        kz: 'Тау бөктеріндегі жайлы шағын пәтерлі тұрғын үй. Толықтай пайдалануға берілген және қоныстанған.',
+        uk: 'Затишний житловий будинок комфорт-класу в передгір’ї. Повністю введений в експлуатацію та заселений.',
+        en: 'A cozy comfort-class residential building in the foothills. Fully commissioned and occupied.',
+        zh: '坐落于生态麓区的舒适型低密住宅，已顺利通过国家竣工验收并交付入住。',
       },
       image: '/projects/ajkol.jpg',
       deadline: {
-        ru: '2026 г. 2 квартал',
-        kg: '2026-ж. 2-квартал',
-        kz: '2026 ж. 2 тоқсан',
-        uk: '2 кв. 2026 р.',
-        en: 'Q2 2026',
-        zh: '2026年第2季度',
+        ru: 'Сдан в эксплуатацию',
+        kg: 'Пайдаланууга берилген',
+        kz: 'Пайдалануға берілген',
+        uk: 'Зданий в експлуатацію',
+        en: 'Fully Commissioned',
+        zh: '已竣工交付',
       },
       price: {
-        ru: 'от 950 $',
-        kg: '950 $ баштап',
-        kz: '950 $ бастап',
-        uk: 'від 950 $',
-        en: 'from $950',
-        zh: '950 $ 起',
+        ru: 'Все квартиры проданы',
+        kg: 'Бардык батирлер сатылды',
+        kz: 'Барлық пәтерлер сатылды',
+        uk: 'Усі квартири продано',
+        en: 'All Units Sold Out',
+        zh: '全盘售罄',
       },
       address: {
         ru: 'ул. Арашан, 10',
@@ -850,20 +862,20 @@ export const COMPLEXES: Record<string, ComplexData> = {
     advantages: [
       {
         title: {
-          ru: 'Скорый ввод в эксплуатацию',
-          kg: 'Жакында пайдаланууга берүү',
-          kz: 'Жуырда пайдалануға беру',
-          uk: 'Швидке введення в експлуатацію',
-          en: 'Fast Delivery & Commissioning',
-          zh: '即将竣工验收交付',
+          ru: '100% сдан Госкомиссии',
+          kg: '100% Мамкомиссияга тапшырылган',
+          kz: '100% Мемкомиссияға тапсырылды',
+          uk: '100% зданий Держкомісії',
+          en: '100% Commissioned',
+          zh: '100%通过国家工程综合验收',
         },
         desc: {
-          ru: 'Строительные работы находятся на завершающей стадии. Сдача дома запланирована на 2026 год.',
-          kg: 'Курулуш иштери аяктоо стадиясында. Үйдү тапшыруу 2026-жылга пландаштырылган.',
-          kz: 'Құрылыс жұмыстары аяқталу кезеңінде. Үйді пайдалануға беру 2026 жылға жоспарланған.',
-          uk: 'Будівельні роботи на завершальній стадії. Здача будинку запланована на 2026 рік.',
-          en: 'Construction works in final stage with commissioning scheduled for 2026.',
-          zh: '主体与砌筑工程进入收尾阶段，预计将于2026年正式验收交付。',
+          ru: 'Дом успешно сдан в эксплуатацию, подключен ко всем инженерным сетям, жильцы оформили право собственности.',
+          kg: 'Үй пайдаланууга берилген, бардык тармактарга кошулган жана жашоочулар менчик укугун катташкан.',
+          kz: 'Үй пайдалануға берілген, барлық желілерге қосылған және тұрғындар меншік құқығын ресімдеген.',
+          uk: 'Будинок успішно зданий в експлуатацію, підключений до всіх інженерних мереж.',
+          en: 'Successfully commissioned and connected to all utilities; residents hold ownership titles.',
+          zh: '住宅顺利通过综合验收并通全套市政管网，全体业主已办结不动产所有权登记。',
         },
         icon: 'city',
       },
@@ -963,12 +975,12 @@ export const COMPLEXES: Record<string, ComplexData> = {
       ],
     },
     legalText: {
-      ru: 'Строительство ведется в строгом соответствии с нормами СНиП КР. Полная документация доступна в офисе продаж.',
-      kg: 'Курулуш КР СНиП нормаларына так ылайык жүрүүдө. Документтер сатуу кеңсесинде жеткиликтүү.',
-      kz: 'Құрылыс ҚР ҚНжЕ талаптарына толық сай жүргізілуде. Құжаттар сату кеңсесінде қолжетімді.',
-      uk: 'Будівництво ведеться в суворій відповідності до СНіП КР. Документація у відділі продажів.',
-      en: 'Constructed according to state building standards. Documentation available at the office.',
-      zh: '严格按照吉尔吉斯国家工程标准规范建设施工，全套行政许可及批文供随时查阅。',
+      ru: 'Строительство завершено в строгом соответствии с нормами СНиП КР. Дом введен в эксплуатацию.',
+      kg: 'Курулуш КР СНиП нормаларына так ылайык аяктаган. Үй пайдаланууга берилген.',
+      kz: 'Құрылыс ҚР ҚНжЕ талаптарына толық сай аяқталды. Үй пайдалануға берілген.',
+      uk: 'Будівництво завершено в суворій відповідності до СНіП КР. Будинок зданий в експлуатацію.',
+      en: 'Constructed according to state building standards. Fully commissioned.',
+      zh: '严格按照吉尔吉斯国家工程建设规范竣工验收，项目已正式交付入驻。',
     },
   },
   'kelechek': {
@@ -1402,7 +1414,48 @@ export const COMPLEXES: Record<string, ComplexData> = {
   },
 };
 
-const UI_STRINGS = {
+const UI_STRINGS: Record<Locale, {
+  catalog: string;
+  priceLabel: string;
+  deadlineLabel: string;
+  locationLabel: string;
+  perSqm: string;
+  btnSecondary: string;
+  btnWhatsappCalc: string;
+  btnAllProjects: string;
+  specsFloors: string;
+  specsCeiling: string;
+  specsSeismic: string;
+  specsConstruction: string;
+  specsHeating: string;
+  advantagesTitle: string;
+  plansSoldTitle: string;
+  plansSoldDesc: (name: string) => string;
+  plansRequestTitle: string;
+  plansRequestDesc: (name: string) => string;
+  btnRequestPlans: string;
+  purchaseTitle: (name: string) => string;
+  fullPaymentTitle: string;
+  fullPaymentDesc: string;
+  fullPaymentAction: string;
+  installmentTitle: string;
+  installmentDesc: string;
+  installmentAction: string;
+  tradeInTitle: string;
+  tradeInDesc: string;
+  tradeInAction: string;
+  legalTitle: string;
+  reviewsBadge: string;
+  reviewsTitle: string;
+  officeBadge: string;
+  officeTitle: (name: string) => string;
+  officeAddressLabel: string;
+  route2Gis: string;
+  btnWhatsApp: string;
+  btnInstagram: string;
+  callBtn: string;
+  waHeroText: (name: string, addr: string) => string;
+}> = {
   ru: {
     catalog: 'Каталог объектов',
     priceLabel: 'Стоимость:',
@@ -1419,11 +1472,11 @@ const UI_STRINGS = {
     specsHeating: 'Отопление',
     advantagesTitle: 'Преимущества проекта',
     plansSoldTitle: 'Объект сдан в эксплуатацию',
-    plansSoldDesc: (name: string) => `Все квартиры от застройщика в ${name} распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке или записаться в лист ожидания, свяжитесь с нашим отделом продаж.`,
+    plansSoldDesc: (name) => `Все квартиры от застройщика в ${name} распроданы. Чтобы узнать о наличии предложений от собственников на вторичном рынке или записаться в лист ожидания, свяжитесь с нашим отделом продаж.`,
     plansRequestTitle: 'Шахматка и планировки по запросу',
-    plansRequestDesc: (name: string) => `Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в ${name} менеджер отправит вам напрямую в мессенджер.`,
+    plansRequestDesc: (name) => `Актуальный список свободных квартир, видовых этажей и расчет беспроцентной рассрочки в ${name} менеджер отправит вам напрямую в мессенджер.`,
     btnRequestPlans: 'Запросить планировки в WhatsApp',
-    purchaseTitle: (name: string) => `Программы приобретения в ${name}`,
+    purchaseTitle: (name) => `Программы приобретения в ${name}`,
     fullPaymentTitle: '100% ОПЛАТА',
     fullPaymentDesc: 'Максимальная персональная скидка за квадратный метр и приоритетный выбор этажа.',
     fullPaymentAction: 'Условия скидки',
@@ -1437,13 +1490,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Репутация и доверие',
     reviewsTitle: 'Отзывы резидентов',
     officeBadge: 'Отдел продаж',
-    officeTitle: (name: string) => `Консультация по объекту ${name}`,
+    officeTitle: (name) => `Консультация по объекту ${name}`,
     officeAddressLabel: 'Фактический адрес объекта:',
     route2Gis: 'Открыть локацию в 2GIS',
     btnWhatsApp: 'Написать в WhatsApp',
     btnInstagram: 'Перейти в Instagram',
     callBtn: 'Позвонить',
-    waHeroText: (name: string, addr: string) => `Здравствуйте! Интересует ${name} (${addr}). Хочу получить актуальную шахматку свободных квартир и расчет рассрочки 0%.`,
+    waHeroText: (name, addr) => `Здравствуйте! Интересует ${name} (${addr}). Хочу получить актуальную шахматку свободных квартир и расчет рассрочки 0%.`,
   },
   kg: {
     catalog: 'Объекттер каталогу',
@@ -1461,11 +1514,11 @@ const UI_STRINGS = {
     specsHeating: 'Жылытуу',
     advantagesTitle: 'Долбоордун артыкчылыктары',
     plansSoldTitle: 'Объект пайдаланууга берилген',
-    plansSoldDesc: (name: string) => `Куруучудан ${name} комплексиндеги бардык батирлер сатылып бүттү. Ээлеринен экинчилик рыноктогу сунуштарды билүү же күтүү тизмесине жазылуу үчүн сатуу бөлүмүнө кайрылыңыз.`,
+    plansSoldDesc: (name) => `Куруучудан ${name} комплексиндеги бардык батирлер сатылып бүттү. Ээлеринен экинчилик рыноктогу сунуштарды билүү же күтүү тизмесине жазылуу үчүн сатуу бөлүмүнө кайрылыңыз.`,
     plansRequestTitle: 'Шахматка жана пландар суроо-талап боюнча',
-    plansRequestDesc: (name: string) => `${name} долбоору боюнча бош батирлердин, панорамалуу кабаттардын тизмесин жана пайызсыз бөлүп төлөө эсебин менеджер сизге мессенджерге жөнөтөт.`,
+    plansRequestDesc: (name) => `${name} долбоору боюнча бош батирлердин, панорамалуу кабаттардын тизмесин жана пайызсыз бөлүп төлөө эсебин менеджер сизге мессенджерге жөнөтөт.`,
     btnRequestPlans: 'WhatsApp аркылуу пландарды суроо',
-    purchaseTitle: (name: string) => `${name} объектисин сатып алуу программалары`,
+    purchaseTitle: (name) => `${name} объектисин сатып алуу программалары`,
     fullPaymentTitle: '100% ТӨЛӨМ',
     fullPaymentDesc: 'Чарчы метрге максималдуу жеке арзандатуу жана кабаттарды артыкчылыктуу тандоо.',
     fullPaymentAction: 'Арзандатуу шарттары',
@@ -1479,13 +1532,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Аброю жана ишеним',
     reviewsTitle: 'Тургундардын пикирлери',
     officeBadge: 'Сатуу бөлүмү',
-    officeTitle: (name: string) => `${name} объектиси боюнча кеңеш алуу`,
+    officeTitle: (name) => `${name} объектиси боюнча кеңеш алуу`,
     officeAddressLabel: 'Объекттин иш жүзүндөгү дареги:',
     route2Gis: '2GIS аркылуу даректи ачуу',
     btnWhatsApp: 'WhatsApp аркылуу жазуу',
     btnInstagram: 'Instagram баракчасына өтүү',
     callBtn: 'Чалуу',
-    waHeroText: (name: string, addr: string) => `Саламатсызбы! ${name} (${addr}) кызыктырып жатат. Бош батирлердин шахматкасын жана 0% бөлүп төлөө эсебин алгым келет.`,
+    waHeroText: (name, addr) => `Саламатсызбы! ${name} (${addr}) кызыктырып жатат. Бош батирлердин шахматкасын жана 0% бөлүп төлөө эсебин алгым келет.`,
   },
   kz: {
     catalog: 'Нысандар каталогы',
@@ -1503,11 +1556,11 @@ const UI_STRINGS = {
     specsHeating: 'Жылыту',
     advantagesTitle: 'Жобаның артықшылықтары',
     plansSoldTitle: 'Нысан пайдалануға берілген',
-    plansSoldDesc: (name: string) => `Құрылыс салушыдан ${name} кешеніндегі барлық пәтерлер сатылып кетті. Екінші нарықтағы ұсыныстарды білу немесе күту парағына жазылу үшін сату бөліміне хабарласыңыз.`,
+    plansSoldDesc: (name) => `Құрылыс салушыдан ${name} кешеніндегі барлық пәтерлер сатылып кетті. Екінші нарықтағы ұсыныстарды білу немесе күту парағына жазылу үшін сату бөліміне хабарласыңыз.`,
     plansRequestTitle: 'Шахматка мен жоспарлар сұраныс бойынша',
-    plansRequestDesc: (name: string) => `${name} кешеніндегі бос пәтерлер тізімін және пайызсыз бөліп төлеу есебін менеджер тікелей мессенджерге жібереді.`,
+    plansRequestDesc: (name) => `${name} кешеніндегі бос пәтерлер тізімін және пайызсыз бөліп төлеу есебін менеджер тікелей мессенджерге жібереді.`,
     btnRequestPlans: 'WhatsApp арқылы жоспарларды сұрау',
-    purchaseTitle: (name: string) => `${name} сатып алу бағдарламалары`,
+    purchaseTitle: (name) => `${name} сатып алу бағдарламалары`,
     fullPaymentTitle: '100% ТӨЛЕМ',
     fullPaymentDesc: 'Шаршы метрге ең жоғары дербес жеңілдік және қабатты басымдықпен таңдау.',
     fullPaymentAction: 'Жеңілдік шарттары',
@@ -1521,13 +1574,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Бедел мен сенім',
     reviewsTitle: 'Тұрғындардың пікірлері',
     officeBadge: 'Сатуу бөлімі',
-    officeTitle: (name: string) => `${name} нысаны бойынша кеңес алу`,
+    officeTitle: (name) => `${name} нысаны бойынша кеңес алу`,
     officeAddressLabel: 'Нысанның нақты мекенжайы:',
     route2Gis: '2GIS арқылы бағытты ашу',
     btnWhatsApp: 'WhatsApp-қа жазу',
     btnInstagram: 'Instagram парақшасына өту',
     callBtn: 'Қоңырау шалу',
-    waHeroText: (name: string, addr: string) => `Сәлеметсіз бе! ${name} (${addr}) бойынша бос пәтерлер шахматкасы мен 0% бөліп төлеу есебін алғым келеді.`,
+    waHeroText: (name, addr) => `Сәлеметсіз бе! ${name} (${addr}) бойынша бос пәтерлер шахматкасы мен 0% бөліп төлеу есебін алғым келеді.`,
   },
   uk: {
     catalog: 'Каталог об’єктів',
@@ -1545,11 +1598,11 @@ const UI_STRINGS = {
     specsHeating: 'Опалення',
     advantagesTitle: 'Переваги проєкту',
     plansSoldTitle: 'Об’єкт зданий в експлуатацію',
-    plansSoldDesc: (name: string) => `Усі квартири від забудовника у ${name} продані. Щоб дізнатися про наявність пропозицій від власників або записатися до списку очікування, зв’яжіться з відділом продажів.`,
+    plansSoldDesc: (name) => `Усі квартири від забудовника у ${name} продані. Щоб дізнатися про наявність пропозицій від власників або записатися до списку очікування, зв’яжіться з відділом продажів.`,
     plansRequestTitle: 'Шахматка та планування за запитом',
-    plansRequestDesc: (name: string) => `Актуальний список вільних квартир, видових поверхів та розрахунок розстрочки у ${name} менеджер надішле вам у месенджер.`,
+    plansRequestDesc: (name) => `Актуальний список вільних квартир, видових поверхів та розрахунок розстрочки у ${name} менеджер надішле вам у месенджер.`,
     btnRequestPlans: 'Запросити планування у WhatsApp',
-    purchaseTitle: (name: string) => `Програми придбання в ${name}`,
+    purchaseTitle: (name) => `Програми придбання в ${name}`,
     fullPaymentTitle: '100% ОПЛАТА',
     fullPaymentDesc: 'Максимальна персональна знижка за квадратний метр та пріоритетний вибір поверху.',
     fullPaymentAction: 'Умови знижки',
@@ -1563,13 +1616,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Репутація та довіра',
     reviewsTitle: 'Відгуки мешканців',
     officeBadge: 'Відділ продажів',
-    officeTitle: (name: string) => `Консультація щодо об’єкта ${name}`,
+    officeTitle: (name) => `Консультація щодо об’єкта ${name}`,
     officeAddressLabel: 'Фактична адреса об’єкта:',
     route2Gis: 'Відкрити локацію у 2GIS',
     btnWhatsApp: 'Написати у WhatsApp',
     btnInstagram: 'Перейти в Instagram',
     callBtn: 'Зателефонувати',
-    waHeroText: (name: string, addr: string) => `Доброго дня! Цікавить ${name} (${addr}). Хочу отримати актуальну шахматку вільних квартир та розрахунок розстрочки 0%.`,
+    waHeroText: (name, addr) => `Доброго дня! Цікавить ${name} (${addr}). Хочу отримати актуальну шахматку вільних квартир та розрахунок розстрочки 0%.`,
   },
   en: {
     catalog: 'Project Catalog',
@@ -1587,11 +1640,11 @@ const UI_STRINGS = {
     specsHeating: 'Heating System',
     advantagesTitle: 'Project Advantages',
     plansSoldTitle: 'Building Commissioned',
-    plansSoldDesc: (name: string) => `All developer apartments in ${name} are sold out. To inquire about resale offers from owners or join the waiting list, please contact our sales office.`,
+    plansSoldDesc: (name) => `All developer apartments in ${name} are sold out. To inquire about resale offers from owners or join the waiting list, please contact our sales office.`,
     plansRequestTitle: 'Floor Plans & Availability on Request',
-    plansRequestDesc: (name: string) => `Our manager will directly send you the up-to-date availability list, panoramic floor selection, and 0% installment plan for ${name}.`,
+    plansRequestDesc: (name) => `Our manager will directly send you the up-to-date availability list, panoramic floor selection, and 0% installment plan for ${name}.`,
     btnRequestPlans: 'Request Plans via WhatsApp',
-    purchaseTitle: (name: string) => `Purchase Programs for ${name}`,
+    purchaseTitle: (name) => `Purchase Programs for ${name}`,
     fullPaymentTitle: '100% PAYMENT',
     fullPaymentDesc: 'Maximum bespoke discount per square meter and priority floor choice.',
     fullPaymentAction: 'Discount Terms',
@@ -1605,13 +1658,13 @@ const UI_STRINGS = {
     reviewsBadge: 'Reputation & Trust',
     reviewsTitle: 'Resident Testimonials',
     officeBadge: 'Sales Department',
-    officeTitle: (name: string) => `Consultation for ${name}`,
+    officeTitle: (name) => `Consultation for ${name}`,
     officeAddressLabel: 'Project Physical Address:',
     route2Gis: 'Open Location in 2GIS',
     btnWhatsApp: 'Chat on WhatsApp',
     btnInstagram: 'Visit Instagram',
     callBtn: 'Call Now',
-    waHeroText: (name: string, addr: string) => `Hello! Interested in ${name} (${addr}). I would like to receive the availability grid and 0% installment calculation.`,
+    waHeroText: (name, addr) => `Hello! Interested in ${name} (${addr}). I would like to receive the availability grid and 0% installment calculation.`,
   },
   zh: {
     catalog: '楼盘目录',
@@ -1629,11 +1682,11 @@ const UI_STRINGS = {
     specsHeating: '采暖方式',
     advantagesTitle: '核心项目亮点',
     plansSoldTitle: '项目已顺利竣工交付',
-    plansSoldDesc: (name: string) => `${name} 开发商一手房源已全盘售罄。如需了解业主二手挂牌转让房源或登记预约排卡，请联络营销中心。`,
+    plansSoldDesc: (name) => `${name} 开发商一手房源已全盘售罄。如需了解业主二手挂牌转让房源或登记预约排卡，请联络营销中心。`,
     plansRequestTitle: '在售销控表与户型图册',
-    plansRequestDesc: (name: string) => `专属置业顾问将通过在线消息直接向您发送 ${name} 当前最新可选房源、景观楼层及0%免息分期还款明细。`,
+    plansRequestDesc: (name) => `专属置业顾问将通过在线消息直接向您发送 ${name} 当前最新可选房源、景观楼层及0%免息分期还款明细。`,
     btnRequestPlans: '通过 WhatsApp 获取户型图册',
-    purchaseTitle: (name: string) => `${name} 置业方案`,
+    purchaseTitle: (name) => `${name} 置业方案`,
     fullPaymentTitle: '100% 一次性全款',
     fullPaymentDesc: '尊享每平米顶格专属特惠直减，享有核心景观高楼层优先选房权。',
     fullPaymentAction: '优惠详情',
@@ -1647,19 +1700,21 @@ const UI_STRINGS = {
     reviewsBadge: '卓越声誉与信任',
     reviewsTitle: '业主真实评价',
     officeBadge: '品牌营销中心',
-    officeTitle: (name: string) => `${name} 专属置业咨询`,
+    officeTitle: (name) => `${name} 专属置业咨询`,
     officeAddressLabel: '项目现场精准定位:',
     route2Gis: '在 2GIS 中导航定位',
     btnWhatsApp: 'WhatsApp 在线咨询',
     btnInstagram: '访问 Instagram 官方页面',
     callBtn: '拨打电话',
-    waHeroText: (name: string, addr: string) => `您好！我对 ${name} (${addr}) 项目很感兴趣，想获取最新在售房源销控表及0%免息分期方案。`,
+    waHeroText: (name, addr) => `您好！我对 ${name} (${addr}) 项目很感兴趣，想获取最新在售房源销控表及0%免息分期方案。`,
   },
 };
 
 export default function ComplexView({ slug }: { slug: string }) {
   const langContext = useLanguage() as any;
-  const currentLang: Locale = (langContext.locale || langContext.currentLang || langContext.language || 'ru') as Locale;
+  const currentLang: Locale = normalizeLocale(
+    langContext.locale || langContext.currentLang || langContext.language || 'ru'
+  );
   const t = langContext.t;
 
   const lookupKey = slug === 'kele-chek' ? 'kelechek' : slug;
@@ -1709,6 +1764,12 @@ export default function ComplexView({ slug }: { slug: string }) {
     };
   }, [rawProject, currentLang]);
 
+  useEffect(() => {
+    if (project && typeof window !== 'undefined') {
+      document.title = `${project.name} | EL ORDO GROUP`;
+    }
+  }, [project]);
+
   if (!rawProject || !project) {
     notFound();
   }
@@ -1727,6 +1788,7 @@ export default function ComplexView({ slug }: { slug: string }) {
     ? project.hero.price
     : `${project.hero.price} ${ui.perSqm}`;
 
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
   const whatsappHeroText = encodeURIComponent(
     ui.waHeroText(project.name, project.hero.address)
   );
@@ -1762,7 +1824,7 @@ export default function ComplexView({ slug }: { slug: string }) {
             sizes="100vw"
             className="object-cover object-center opacity-30 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/75" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center flex flex-col items-center">
@@ -1804,9 +1866,10 @@ export default function ComplexView({ slug }: { slug: string }) {
           {/* Кнопки действий */}
           <div className="flex flex-wrap justify-center items-center gap-3">
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('complex_hero_consult', project.name)}
               className="bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl uppercase tracking-wider text-xs sm:text-sm transition-all shadow-xl flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#064734]" />
@@ -1868,7 +1931,7 @@ export default function ComplexView({ slug }: { slug: string }) {
               key={idx}
               className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-[#064734]/30 dark:hover:border-[#d4b26f]/40 transition-all flex flex-col items-center text-center"
             >
-              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 dark:bg-[#d4b26f]/15 flex items-center justify-center text-[#064734] dark:text-[#d4b26f] mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-[#064734]/15 dark:bg-[#d4b26f]/15 flex items-center justify-center text-[#d4b26f] mb-6">
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -1877,7 +1940,7 @@ export default function ComplexView({ slug }: { slug: string }) {
               <h3 className="text-lg font-black mb-3 text-gray-900 dark:text-white">
                 {adv.title}
               </h3>
-              <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+              <p className="text-xs sm:text-sm leading-relaxed text-gray-600 dark:text-gray-300 font-light">
                 {adv.desc}
               </p>
             </div>
@@ -1901,16 +1964,18 @@ export default function ComplexView({ slug }: { slug: string }) {
             {project.infrastructure.items.map((item, idx) => (
               <div key={idx} className="group">
                 <div className="relative h-64 rounded-3xl overflow-hidden mb-4 bg-neutral-900 shadow-md">
-                  <img
+                  <Image
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
                 </div>
                 <h3 className="text-base font-black mb-1 text-gray-900 dark:text-white">
                   {item.name}
                 </h3>
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed font-light">
                   {item.desc}
                 </p>
               </div>
@@ -1929,6 +1994,7 @@ export default function ComplexView({ slug }: { slug: string }) {
         <FloorPlansSection
           projectName={project.name}
           plans={project.plans}
+          theme={project.theme}
         />
       ) : isSold ? (
         <section className="py-16 px-4 sm:px-6 max-w-4xl mx-auto text-center">
@@ -1955,9 +2021,10 @@ export default function ComplexView({ slug }: { slug: string }) {
               {ui.plansRequestDesc(project.name)}
             </p>
             <a
-              href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
+              href={`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(`Здравствуйте! Интересуют актуальные свободные планировки и цены в ${project.name}.`)}`}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('complex_request_plans', project.name)}
               className="inline-flex items-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white font-black px-7 py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -1982,11 +2049,11 @@ export default function ComplexView({ slug }: { slug: string }) {
                 <IconDiamond className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.fullPaymentTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.fullPaymentDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.fullPaymentAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -2001,11 +2068,11 @@ export default function ComplexView({ slug }: { slug: string }) {
                 <IconCalendar className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.installmentTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.installmentDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.installmentAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -2020,11 +2087,11 @@ export default function ComplexView({ slug }: { slug: string }) {
                 <IconCar className="w-5 h-5" />
               </div>
               <h3 className="text-base font-black mb-1.5 group-hover:text-[#d4b26f] transition-colors">{ui.tradeInTitle}</h3>
-              <p className="text-xs text-white/80 leading-relaxed">
+              <p className="text-xs text-white/80 leading-relaxed font-light">
                 {ui.tradeInDesc}
               </p>
             </div>
-            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1">
+            <span className="mt-5 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>{ui.tradeInAction}</span>
               <IconArrowRight className="w-3.5 h-3.5" />
             </span>
@@ -2032,7 +2099,7 @@ export default function ComplexView({ slug }: { slug: string }) {
         </div>
       </section>
 
-    {/* 8. Официальная разрешительная документация и лицензии */}
+      {/* 8. Официальная разрешительная документация и лицензии */}
       <LegalDocuments
         initialComplex={
           ['abu-dhabi', 'madina-residence', 'ajkol-plus'].includes(lookupKey)
@@ -2040,13 +2107,16 @@ export default function ComplexView({ slug }: { slug: string }) {
             : 'all'
         }
       />
+
       {/* 9. Отзывы резидентов */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src={project.hero.image}
             alt={project.name}
-            className="w-full h-full object-cover opacity-20 scale-105"
+            fill
+            sizes="100vw"
+            className="object-cover opacity-20 scale-105"
           />
           <div className="absolute inset-0 bg-[#032b20]/90" />
         </div>
@@ -2065,7 +2135,7 @@ export default function ComplexView({ slug }: { slug: string }) {
             {localizedReviews.map((rev, idx) => (
               <div
                 key={idx}
-                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left"
+                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left shadow-lg"
               >
                 <div>
                   <div className="flex items-center gap-1 text-[#d4b26f] mb-3">
@@ -2129,9 +2199,10 @@ export default function ComplexView({ slug }: { slug: string }) {
 
             <div className="flex flex-col gap-3">
               <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+                href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsAppClick('complex_office_wa', project.name)}
                 className="inline-flex items-center justify-center gap-2 bg-[#064734] hover:bg-[#032b20] active:scale-95 text-white px-6 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow text-center cursor-pointer"
               >
                 <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -2161,9 +2232,10 @@ export default function ComplexView({ slug }: { slug: string }) {
           <span>{ui.callBtn}</span>
         </a>
         <a
-          href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${whatsappHeroText}`}
+          href={`https://wa.me/${cleanWaNumber}?text=${whatsappHeroText}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackWhatsAppClick('mobile_sticky_bar', project.name)}
           className="flex-[2] py-3 rounded-xl bg-[#064734] hover:bg-[#032b20] text-[#d4b26f] font-black text-xs uppercase tracking-wider text-center shadow-lg flex items-center justify-center gap-1.5 transition-all cursor-pointer"
         >
           <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
