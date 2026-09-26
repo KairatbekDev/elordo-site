@@ -48,7 +48,7 @@ export const PROJECT_VIDEOS = {
   kelechek: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Видеообзор заселенного комплекса
 
   // 6. КД Ордо (СДАН)
-  ordo: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Румтур и видеообзор клубного дома
+  ordo: 'https://youtu.be/BfY6nA076Zo', // Румтур и видеообзор клубного дома
 };
 
 export interface VideoReport {
