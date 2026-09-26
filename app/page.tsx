@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
@@ -11,6 +11,8 @@ import { TRANSLATIONS } from '@/lib/i18n/translations';
 import ConsultationForm from '@/components/ConsultationForm';
 import InfrastructureMap from '@/components/InfrastructureMap';
 import SmartApartmentQuiz from '@/components/SmartApartmentQuiz';
+import LegalDocuments from '@/components/LegalDocuments';
+import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconBuilding,
   IconCrane,
@@ -95,6 +97,17 @@ interface HomeContent {
   ctaDesc: string;
   ctaBtn: string;
   waHeroMsg: string;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
 }
 
 const CONTENT: Record<Locale, HomeContent> = {
@@ -517,12 +530,19 @@ function formatPrice(price: string, lang: Locale, c: HomeContent) {
 
 export default function HomePage() {
   const { locale } = useLanguage();
-  const currentLang: Locale = (locale as Locale) || 'ru';
+  const currentLang: Locale = normalizeLocale(locale);
   const c = CONTENT[currentLang] || CONTENT.ru;
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.ru;
   const reviews = t.reviewsSection?.items || COMPANY_INFO.reviews;
 
-  const waHeroLink = `https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent(c.waHeroMsg)}`;
+  const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
+  const waHeroLink = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(c.waHeroMsg)}`;
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = `EL ORDO GROUP | ${c.heroTitle}`;
+    }
+  }, [c.heroTitle]);
 
   // Динамическая локализация карточек проектов
   const featuredProjects = useMemo(() => {
@@ -599,20 +619,25 @@ export default function HomePage() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center opacity-35 scale-105"
+            className="object-cover object-center opacity-30 scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#064734] via-[#064734]/70 to-black/70" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#064734] via-[#064734]/75 to-black/75" />
         </div>
 
         <div className="relative z-10 max-w-5xl mx-auto text-center flex flex-col items-center">
           
-          {/* Фирменный крупный горизонтальный логотип */}
+          {/* Фирменный логотип */}
           <div className="mb-6 inline-flex items-center justify-center">
             <img
               src="/logo-2.png"
               alt="EL ORDO GROUP"
-              className="h-40 sm:h-28 md:h-52 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.8)]"
+              className="h-32 sm:h-36 md:h-48 w-auto object-contain drop-shadow-[0_4px_25px_rgba(0,0,0,0.85)]"
             />
+          </div>
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-[#d4b26f]/40 text-[#d4b26f] text-xs font-black uppercase tracking-widest mb-6 shadow-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{c.heroTag}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight leading-tight mb-6 drop-shadow-xl max-w-4xl">
@@ -635,6 +660,7 @@ export default function HomePage() {
               href={waHeroLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsAppClick('home_hero_consult', 'Hero Consultation')}
               className="bg-white/10 hover:bg-white/20 active:scale-95 text-white font-bold px-8 py-4 rounded-2xl text-xs sm:text-sm border border-white/25 transition-all backdrop-blur-md flex items-center gap-2 cursor-pointer"
             >
               <IconWhatsApp className="w-4 h-4 text-[#25D366]" />
@@ -644,20 +670,20 @@ export default function HomePage() {
 
           {/* Быстрые цифры */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-3xl text-left">
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{c.statTotalLabel}</span>
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{c.statTotalLabel}</span>
               <strong className="text-base sm:text-lg font-black text-white">{c.statTotalVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{c.statPriceLabel}</span>
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{c.statPriceLabel}</span>
               <strong className="text-base sm:text-lg font-black text-[#d4b26f]">{c.statPriceVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{c.statInstallmentLabel}</span>
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{c.statInstallmentLabel}</span>
               <strong className="text-base sm:text-lg font-black text-white">{c.statInstallmentVal}</strong>
             </div>
-            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15">
-              <span className="text-[11px] text-gray-300 block">{c.statHandoverLabel}</span>
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-sm">
+              <span className="text-[11px] text-gray-300 block mb-0.5">{c.statHandoverLabel}</span>
               <strong className="text-base sm:text-lg font-black text-white">{c.statHandoverVal}</strong>
             </div>
           </div>
@@ -702,21 +728,30 @@ export default function HomePage() {
                       alt={p.name}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/20 pointer-events-none" />
+
                     <div className="absolute top-4 left-4 z-10">
                       <span
-                        className={`inline-flex items-center gap-1 text-[10px] font-extrabold uppercase px-3 py-1.5 rounded-xl shadow ${
-                          isFinished ? 'bg-[#2b2b2b] text-white' : 'bg-[#d4b26f] text-[#064734]'
+                        className={`inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl shadow-md backdrop-blur-md ${
+                          isFinished ? 'bg-neutral-900/90 text-white border border-white/15' : 'bg-[#d4b26f] text-[#064734]'
                         }`}
                       >
-                        {isFinished && <IconCheck className="w-3 h-3 text-emerald-400" />}
+                        {isFinished ? (
+                          <IconCheck className="w-3 h-3 text-emerald-400" />
+                        ) : (
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#064734] animate-pulse" />
+                        )}
                         <span>{isFinished ? c.statusFinished : p.classType}</span>
                       </span>
                     </div>
 
                     {p.price && (
-                      <div className="absolute bottom-3 right-3 z-10 bg-[#064734]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1 rounded-xl border border-white/10 shadow">
+                      <div 
+                        suppressHydrationWarning
+                        className="absolute bottom-3 right-3 z-10 bg-[#064734]/95 dark:bg-black/85 backdrop-blur-md text-[#d4b26f] text-xs font-black px-3.5 py-1.5 rounded-xl border border-white/15 shadow"
+                      >
                         {formatPrice(p.price, currentLang, c)}
                       </div>
                     )}
@@ -746,7 +781,7 @@ export default function HomePage() {
                 <div className="p-6 pt-0">
                   <Link
                     href={`/${p.slug}`}
-                    className="w-full text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3 rounded-xl uppercase tracking-wider text-xs transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full text-center bg-[#064734] hover:bg-[#032b20] dark:bg-[#d4b26f] dark:hover:bg-[#c49f57] text-[#d4b26f] hover:text-white dark:text-[#064734] font-black py-3.5 rounded-xl uppercase tracking-wider text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <span>{c.detailsBtn}</span>
                     <IconArrowRight className="w-3.5 h-3.5" />
@@ -776,7 +811,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link
               href="/polniy-raschet"
-              className="p-8 rounded-3xl bg-[#0b3b2c] text-white border border-white/10 hover:border-[#d4b26f]/40 transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
+              className="p-8 rounded-3xl bg-gradient-to-br from-[#0b3b2c] to-[#041c15] text-white border border-white/10 hover:border-[#d4b26f]/40 hover:shadow-2xl transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
             >
               <div>
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-5 text-[#d4b26f]">
@@ -785,11 +820,11 @@ export default function HomePage() {
                 <h3 className="text-lg font-black mb-2 group-hover:text-[#d4b26f] transition-colors">
                   {c.p1Title}
                 </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
+                <p className="text-xs text-white/80 leading-relaxed font-light">
                   {c.p1Desc}
                 </p>
               </div>
-              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5 group-hover:translate-x-1 transition-transform">
                 <span>{c.p1Action}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </span>
@@ -797,7 +832,7 @@ export default function HomePage() {
 
             <Link
               href="/rassrochka"
-              className="p-8 rounded-3xl bg-[#0b3b2c] text-white border border-white/10 hover:border-[#d4b26f]/40 transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
+              className="p-8 rounded-3xl bg-gradient-to-br from-[#0b3b2c] to-[#041c15] text-white border border-white/10 hover:border-[#d4b26f]/40 hover:shadow-2xl transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
             >
               <div>
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-5 text-[#d4b26f]">
@@ -806,11 +841,11 @@ export default function HomePage() {
                 <h3 className="text-lg font-black mb-2 group-hover:text-[#d4b26f] transition-colors">
                   {c.p2Title}
                 </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
+                <p className="text-xs text-white/80 leading-relaxed font-light">
                   {c.p2Desc}
                 </p>
               </div>
-              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5 group-hover:translate-x-1 transition-transform">
                 <span>{c.p2Action}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </span>
@@ -818,7 +853,7 @@ export default function HomePage() {
 
             <Link
               href="/trade-in"
-              className="p-8 rounded-3xl bg-[#0b3b2c] text-white border border-white/10 hover:border-[#d4b26f]/40 transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
+              className="p-8 rounded-3xl bg-gradient-to-br from-[#0b3b2c] to-[#041c15] text-white border border-white/10 hover:border-[#d4b26f]/40 hover:shadow-2xl transition-all flex flex-col justify-between group shadow-xl cursor-pointer"
             >
               <div>
                 <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center mb-5 text-[#d4b26f]">
@@ -827,11 +862,11 @@ export default function HomePage() {
                 <h3 className="text-lg font-black mb-2 group-hover:text-[#d4b26f] transition-colors">
                   {c.p3Title}
                 </h3>
-                <p className="text-xs text-white/80 leading-relaxed">
+                <p className="text-xs text-white/80 leading-relaxed font-light">
                   {c.p3Desc}
                 </p>
               </div>
-              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="mt-6 text-xs font-black text-[#d4b26f] uppercase tracking-wider flex items-center gap-1.5 group-hover:translate-x-1 transition-transform">
                 <span>{c.p3Action}</span>
                 <IconArrowRight className="w-3.5 h-3.5" />
               </span>
@@ -863,7 +898,7 @@ export default function HomePage() {
       </div>
 
       {/* 7. ПРЕИМУЩЕСТВА СТАНДАРТОВ СТРОИТЕЛЬСТВА */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
             {c.advBadge}
@@ -874,38 +909,38 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center">
+          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center hover:shadow-xl transition-all">
             <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-6">
               <IconBuilding className="w-7 h-7" />
             </div>
             <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2.5">
               {c.adv1Title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {c.adv1Desc}
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center">
+          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center hover:shadow-xl transition-all">
             <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-6">
               <IconCheck className="w-7 h-7" />
             </div>
             <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2.5">
               {c.adv2Title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {c.adv2Desc}
             </p>
           </div>
 
-          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center">
+          <div className="bg-white dark:bg-[#0b1b15] p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm text-center flex flex-col items-center hover:shadow-xl transition-all">
             <div className="w-14 h-14 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/15 text-[#064734] dark:text-[#d4b26f] flex items-center justify-center mb-6">
               <IconCrane className="w-7 h-7" />
             </div>
             <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2.5">
               {c.adv3Title}
             </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-light">
               {c.adv3Desc}
             </p>
           </div>
@@ -939,7 +974,7 @@ export default function HomePage() {
             {reviews.map((rev, idx) => (
               <div
                 key={idx}
-                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left"
+                className="bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-7 flex flex-col justify-between text-left shadow-lg"
               >
                 <div>
                   <div className="flex items-center gap-1 text-[#d4b26f] mb-3">
@@ -967,6 +1002,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Юридические документы */}
+      <LegalDocuments />
+
       {/* 9. ФОРМА ЗАЯВКИ И ПОДБОРА КВАРТИРЫ */}
       <ConsultationForm />
 
@@ -980,7 +1018,7 @@ export default function HomePage() {
             <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-2">
               {c.ctaTitle}
             </h3>
-            <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-light">
               {c.ctaDesc}
             </p>
           </div>
@@ -989,6 +1027,7 @@ export default function HomePage() {
             href={waHeroLink}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('home_bottom_cta', 'Нижний баннер консультации')}
             className="shrink-0 bg-[#d4b26f] hover:bg-[#c49f57] active:scale-95 text-[#064734] font-black px-8 py-4 rounded-2xl text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center gap-2 cursor-pointer"
           >
             <IconWhatsApp className="w-4 h-4 text-[#064734]" />
