@@ -796,7 +796,7 @@ const COMPLEXES: Record<string, ComplexData> = {
         en: 'A cozy comfort-class residential building in the foothills. Fully commissioned and occupied.',
         zh: '坐落于生态麓区的舒适型低密住宅，已顺利通过国家竣工验收并交付入住。',
       },
-      image: '/projects/ajkol.jpg',
+      image: '/projects/ajkol.png',
       deadline: {
         ru: 'Сдан в эксплуатацию',
         kg: 'Пайдаланууга берилген',
@@ -944,7 +944,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Fenced and safe outdoor play area in the courtyard.',
             zh: '围合式安全庭院儿童活动天地。',
           },
-          image: '/projects/ajkol.jpg',
+          image: '/projects/ajkol.png',
         },
         {
           name: { ru: 'Наземный паркинг', kg: 'Жер үстүндөгү паркинг', kz: 'Жерүсті автотұрағы', uk: 'Наземний паркінг', en: 'Surface Parking', zh: '地面专属停车区' },
@@ -956,7 +956,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Spacious dedicated parking spaces for residents.',
             zh: '为业主及来访亲朋科学规划专属便捷停车位。',
           },
-          image: '/projects/ajkol.jpg',
+          image: '/projects/ajkol.png',
         },
         {
           name: { ru: 'Инженерные узлы', kg: 'Инженердик түйүндөр', kz: 'Инженерлік тораптар', uk: 'Інженерні вузли', en: 'Modern Utilities', zh: '现代工程机电设备' },
@@ -968,7 +968,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Modern low-noise elevators and premium piping.',
             zh: '静音品牌高速电梯与高标准水暖电工程设施。',
           },
-          image: '/projects/ajkol.jpg',
+          image: '/projects/ajkol.png',
         },
       ],
     },
@@ -1010,7 +1010,7 @@ const COMPLEXES: Record<string, ComplexData> = {
         en: 'Successfully completed, commissioned, and resident-occupied residential complex by EL ORDO GROUP. Real testament to our reliability.',
         zh: 'EL ORDO GROUP 成功打造并全盘交付入驻的成熟社区。品牌硬核筑家实力的有力印证。',
       },
-      image: '/projects/Kelechek.jpg',
+      image: '/projects/Kelechek.png',
       deadline: {
         ru: 'Сдан в эксплуатацию',
         kg: 'Пайдаланууга берилген',
@@ -1158,7 +1158,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Quiet and safe courtyard for community residents.',
             zh: '专属于业主的安宁私密居住庭院。',
           },
-          image: '/projects/Kelechek.jpg',
+          image: '/projects/Kelechek.png',
         },
         {
           name: { ru: 'Игровой городок', kg: 'Оюн шаарчасы', kz: 'Ойын қалашығы', uk: 'Ігрове містечко', en: 'Play Town', zh: '趣味儿童游乐场' },
@@ -1170,7 +1170,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Sports and play zones for active recreation.',
             zh: '配备全龄段健身及趣味儿童游乐设施。',
           },
-          image: '/projects/Kelechek.jpg',
+          image: '/projects/Kelechek.png',
         },
         {
           name: { ru: 'Светлые холлы', kg: 'Жарык холлдор', kz: 'Жарық холлдар', uk: 'Світлі холи', en: 'Bright Lobbies', zh: '明亮通透单元入户厅' },
@@ -1182,7 +1182,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Clean and tidy entrance groups and stairways.',
             zh: '洁净明亮的人性化入户门厅与公共楼梯间。',
           },
-          image: '/projects/Kelechek.jpg',
+          image: '/projects/Kelechek.png',
         },
       ],
     },
@@ -1224,7 +1224,7 @@ const COMPLEXES: Record<string, ComplexData> = {
         en: 'The premier boutique club house completed by EL ORDO GROUP. Exclusive format, natural stone facade, and panoramic mountain vistas.',
         zh: 'EL ORDO GROUP 打造的首部标志性精品洋房。低密醇熟社区，甄选天然石材立面，坐拥壮阔雪山全景。',
       },
-      image: '/projects/Ordo.jpg',
+      image: '/projects/Ordo.png',
       deadline: {
         ru: 'Сдан в эксплуатацию',
         kg: 'Пайдаланууга берилген',
@@ -1372,7 +1372,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: '24/7 access control and continuous digital CCTV monitoring.',
             zh: '24小时智能化门禁与全方位无死角视频安防系统。',
           },
-          image: '/projects/Ordo.jpg',
+          image: '/projects/Ordo.png',
         },
         {
           name: { ru: 'Паркинг', kg: 'Паркинг', kz: 'Автотұрақ', uk: 'Паркінг', en: 'Resident Parking', zh: '智能停车场' },
@@ -1384,7 +1384,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Underground and visitor parking for residents.',
             zh: '为业主与来访亲朋科学规划专属地下车位。',
           },
-          image: '/projects/Ordo.jpg',
+          image: '/projects/Ordo.png',
         },
         {
           name: { ru: 'Хвойный ландшафт', kg: 'Ийне жалбырактуу ландшафт', kz: 'Қылқанжапырақты ландшафт', uk: 'Хвойний ландшафт', en: 'Conifer Landscaping', zh: '松柏四季园林' },
@@ -1396,7 +1396,7 @@ const COMPLEXES: Record<string, ComplexData> = {
             en: 'Manicured grounds featuring conifer flora and evergreen design.',
             zh: '精心修剪造景的常青绿植与精致园林微景观。',
           },
-          image: '/projects/Ordo.jpg',
+          image: '/projects/Ordo.png',
         },
       ],
     },

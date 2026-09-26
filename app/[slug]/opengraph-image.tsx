@@ -55,7 +55,7 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
-    imageFile: 'projects/ajkol.jpg',
+    imageFile: 'projects/ajkol.png',
   },
   kelechek: {
     name: 'ЖК Келечек',
@@ -64,7 +64,7 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
-    imageFile: 'projects/Kelechek.jpg',
+    imageFile: 'projects/Kelechek.png',
   },
   ordo: {
     name: 'КД Ордо',
@@ -73,7 +73,7 @@ const PROJECTS_METADATA: Record<
     price: 'Все квартиры проданы',
     deadline: 'Сдан Госкомиссии',
     badge: 'Введен в эксплуатацию',
-    imageFile: 'projects/Ordo.jpg',
+    imageFile: 'projects/Ordo.png',
   },
 };
 

@@ -124,7 +124,7 @@ export const PROJECTS: Project[] = [
     location: 'г. Бишкек',
     address: 'ул. Арашан, 10',
     price: 'от 950 $/м²',
-    image: '/projects/ajkol.jpg',
+    image: '/projects/ajkol.png',
     badge: 'Высокая готовность',
     description:
       'Современный монолитно-кирпичный жилой дом в завершающей стадии строительства. Оптимальный выбор для комфортной семейной жизни.',
@@ -149,7 +149,7 @@ export const PROJECTS: Project[] = [
     location: 'г. Бишкек',
     address: 'ул. Космическая, 153',
     price: 'Все квартиры проданы',
-    image: '/projects/Kelechek.jpg',
+    image: '/projects/Kelechek.png',
     badge: '100% готовность',
     description:
       'Полностью завершенный, успешно сданный государственной комиссии и заселенный жилой комплекс с уютным двором и детской площадкой.',
@@ -174,7 +174,7 @@ export const PROJECTS: Project[] = [
     location: 'г. Бишкек',
     address: 'ул. Тверская, 20',
     price: 'Все квартиры проданы',
-    image: '/projects/Ordo.jpg',
+    image: '/projects/Ordo.png',
     badge: 'Первый сданный проект',
     description:
       'Первый знаковый клубный дом компании с авторской архитектурой, закрытой территорией, подземным паркингом и панорамой на горы.',

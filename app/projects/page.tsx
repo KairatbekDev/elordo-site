@@ -69,7 +69,7 @@ const RAW_PROJECTS: ProjectRaw[] = [
     name: 'ЖД Айкол',
     category: 'finished',
     classCategory: 'comfort',
-    image: '/projects/ajkol.jpg',
+    image: '/projects/ajkol.png',
     priceNum: 0,
   },
   {
@@ -77,7 +77,7 @@ const RAW_PROJECTS: ProjectRaw[] = [
     name: 'ЖК Келечек',
     category: 'finished',
     classCategory: 'comfort',
-    image: '/projects/Kelechek.jpg',
+    image: '/projects/Kelechek.png',
     priceNum: 0,
   },
   {
@@ -85,7 +85,7 @@ const RAW_PROJECTS: ProjectRaw[] = [
     name: 'КД Ордо',
     category: 'finished',
     classCategory: 'premium',
-    image: '/projects/Ordo.jpg',
+    image: '/projects/Ordo.png',
     priceNum: 0,
   },
 ];
