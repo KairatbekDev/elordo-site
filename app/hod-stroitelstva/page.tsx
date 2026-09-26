@@ -751,7 +751,7 @@ const REPORTS: ReportItem[] = [
         progress: 100,
         thumbnail: '/projects/Ordo.png',
         videoUrl: PROJECT_VIDEOS.ordo,
-        videoDuration: '03:30 • 4K Обзор',
+        videoDuration: '00:30 • Обзор',
         description: {
           ru: 'Видеообзор клубного дома «Ордо»: натуральный фасад из гранита и травертина, входная группа и панорамы гор Ала-Тоо.',
           kg: 'Табигый граниттен фасад, кооз холлдор жана «Ордо» клубдук үйүнүн жайлуу атмосферасы.',
