@@ -18,7 +18,7 @@ import {
 export const PROJECT_VIDEOS = {
   // 1. ЖК Abu Dhabi (Строящийся)
   abuDhabi: {
-    latest: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Август 2026 (Главное видео)
+    latest: 'https://youtube.com/shorts/xWB55Ogjxkk?feature=share', // Август 2026 (Главное видео)
     jul2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Июль 2026
     jun2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Июнь 2026
     may2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Май 2026
