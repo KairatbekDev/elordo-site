@@ -11,7 +11,6 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
-import LegalDocuments from '@/components/LegalDocuments';
 import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconCheck,
@@ -2100,13 +2099,6 @@ export default function ComplexView({ slug }: { slug: string }) {
       </section>
 
       {/* 8. Официальная разрешительная документация и лицензии */}
-      <LegalDocuments
-        initialComplex={
-          ['abu-dhabi', 'madina-residence', 'ajkol-plus'].includes(lookupKey)
-            ? (lookupKey as 'abu-dhabi' | 'madina-residence' | 'ajkol-plus')
-            : 'all'
-        }
-      />
 
       {/* 9. Отзывы резидентов */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white">
