@@ -182,7 +182,7 @@ const REPORTS: ReportItem[] = [
         progress: 45,
         thumbnail: '/projects/Abu-Dhabi.png',
         videoUrl: PROJECT_VIDEOS.abuDhabi.latest,
-        videoDuration: '02:45 • 4K Drone',
+        videoDuration: '00:46 • Drone',
         description: {
           ru: 'Свежий облёт с дрона: бетонирование перекрытия 15 этажа и старт 16 этажа, кладка автоклавного кирпича.',
           kg: 'Жаңы дрон видеосу: 15-кабаттын бүтүшү жана 16-кабаттын башталышы.',
