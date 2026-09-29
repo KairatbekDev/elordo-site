@@ -12,48 +12,130 @@ import {
 } from '@/components/Icons';
 
 // =========================================================================
-// 📹 YOUTUBE-ССЫЛКИ ДЛЯ ВСЕХ 6 ОБЪЕКТОВ
-// Вставляйте сюда ссылки в любом формате (обычные, youtu.be, shorts или embed)
+// 📹 1. YOUTUBE-ССЫЛКИ ДЛЯ ВСЕХ 6 ОБЪЕКТОВ
+// Меняйте ссылки прямо здесь. Поддерживаются Shorts, обычные видео, youtu.be и mp4
 // =========================================================================
 export const PROJECT_VIDEOS = {
- // 1. ЖК Abu Dhabi (Строящийся)
+  // 1. ЖК Abu Dhabi (Строящийся)
   abuDhabi: {
-    latest: 'https://youtube.com/shorts/xWB55Ogjxkk?feature=share', // Сентябрь 2026 (Плита 8-го этажа, Блок «Б»)
-    jul2026: '', // Июль 2026
-    jun2026: '', // Июнь 2026
-    may2026: '', // Май 2026
-    apr2026: '', // Апрель 2026
-    nov2025: '', // Ноябрь 2025 (Фундамент)
+    latest: 'https://youtube.com/shorts/xWB55Ogjxkk?feature=share', // 28.09.2026 — 8-й этаж Блок «Б»
+    jul2026: '', // 18.07.2026 — 6-й этаж
+    jun2026: '', // 10.06.2026 — 5-й этаж
+    may2026: '', // 14.05.2026 — 4-й этаж
+    apr2026: '', // 20.04.2026 — 2-й этаж
+    nov2025: '', // 15.11.2025 — Фундаментная плита 1.8 м
   },
 
   // 2. ЖК Madina Residence (Строящийся)
   madina: {
-    latest: 'https://youtube.com/shorts/bElPGpP-5oI?feature=share', // Август 2026 (Главное видео)
-    jun2026: '', // Июнь 2026
-    may2026: '', // Май 2026
-    mar2026: '', // Март 2026
+    latest: 'https://youtube.com/shorts/bElPGpP-5oI?feature=share', // 17.08.2026 — Фасад 70% и сети
+    jun2026: '', // 20.06.2026 — Кладка наружных стен
+    may2026: '', // 24.05.2026 — Топпинг каркаса (14 этаж)
+    mar2026: '', // 12.03.2026 — 11-й этаж
+    jul2024: '', // 15.07.2024 — Старт строительства
   },
 
   // 3. ЖД Айкол + (Строящийся)
   ajkolPlus: {
-    latest: 'https://youtube.com/shorts/t-DxuulNuCw?feature=share', // Июль 2026 (Главное видео)
-    may2026: '', // Май 2026
-    mar2026: '', // Март 2026
+    latest: 'https://youtube.com/shorts/t-DxuulNuCw?feature=share', // 26.09.2026 — Заливка 7-го этажа
+    may2026: '', // 19.05.2026 — 5-й этаж
+    mar2026: '', // 24.03.2026 — 2-й этаж
+    nov2025: '', // 10.11.2025 — Подземный паркинг
+    aug2025: '', // 15.08.2025 — Котлован
   },
 
   // 4. ЖД Айкол (СДАН)
-  ajkol: 'https://youtube.com/shorts/K2z55r4Ma-s?feature=share', // Финальный видеообзор сданного дома
+  ajkol: 'https://youtube.com/shorts/K2z55r4Ma-s?feature=share', // 11.09.2026 — Вручение ключей новоселам
 
   // 5. ЖК Келечек (СДАН)
-  kelechek: '', // Видеообзор заселенного комплекса
+  kelechek: '', // 20.12.2024 — Видеообзор заселенного комплекса
 
   // 6. КД Ордо (СДАН)
-  ordo: 'https://youtu.be/BfY6nA076Zo', // Румтур и видеообзор клубного дома
+  ordo: 'https://youtu.be/BfY6nA076Zo', // 15.10.2023 — Румтур сданного дома
 };
+
+// =========================================================================
+// 🗓 УНИВЕРСАЛЬНЫЙ ФОРМАТТЕР ДАТ ДЛЯ 6 ЯЗЫКОВ
+// Принимает дату вида 'YYYY-MM-DD' или 'DD.MM.YYYY' и переводит на язык сайта
+// =========================================================================
+export function formatLocalizedDate(
+  dateInput: string | Record<Locale, string> | undefined,
+  locale: Locale
+): string {
+  if (!dateInput) return '';
+  if (typeof dateInput === 'object') {
+    return dateInput[locale] || dateInput.ru || '';
+  }
+
+  let year = 0,
+    month = -1,
+    day = 0;
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateInput)) {
+    const [y, m, d] = dateInput.split('-').map(Number);
+    year = y;
+    month = m - 1;
+    day = d;
+  } else if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateInput)) {
+    const [d, m, y] = dateInput.split('.').map(Number);
+    year = y;
+    month = m - 1;
+    day = d;
+  } else if (/^\d{4}-\d{2}$/.test(dateInput)) {
+    const [y, m] = dateInput.split('-').map(Number);
+    year = y;
+    month = m - 1;
+  } else {
+    return dateInput;
+  }
+
+  const monthsGenitive: Record<Locale, string[]> = {
+    ru: ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+    kg: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+    kz: ['қаңтар', 'ақпан', 'наурыз', 'сәуір', 'мамыр', 'маусым', 'шілде', 'тамыз', 'қыркүйек', 'қазан', 'қараша', 'желтоқсан'],
+    uk: ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    zh: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+  };
+
+  const monthsNominative: Record<Locale, string[]> = {
+    ru: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+    kg: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+    kz: ['Қаңтар', 'Ақпан', 'Наурыз', 'Сәуір', 'Мамыр', 'Маусым', 'Шілде', 'Тамыз', 'Қыркүйек', 'Қазан', 'Қараша', 'Желтоқсан'],
+    uk: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
+    en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    zh: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+  };
+
+  if (day > 0) {
+    const m = monthsGenitive[locale]?.[month] || monthsGenitive.ru[month];
+    switch (locale) {
+      case 'kg': return `${day}-${m}, ${year}-ж.`;
+      case 'kz': return `${day} ${m}, ${year} ж.`;
+      case 'uk': return `${day} ${m} ${year} р.`;
+      case 'en': return `${m} ${day}, ${year}`;
+      case 'zh': return `${year}年${month + 1}月${day}日`;
+      case 'ru':
+      default:   return `${day} ${m} ${year} г.`;
+    }
+  } else {
+    const m = monthsNominative[locale]?.[month] || monthsNominative.ru[month];
+    switch (locale) {
+      case 'kg': return `${m} ${year}`;
+      case 'kz': return `${m} ${year}`;
+      case 'uk': return `${m} ${year}`;
+      case 'en': return `${m} ${year}`;
+      case 'zh': return `${year}年${month + 1}月`;
+      case 'ru':
+      default:   return `${m} ${year}`;
+    }
+  }
+}
 
 export interface VideoReport {
   id: string;
-  date: Record<Locale, string>;
+  rawDate?: string; // '2026-09-28' — вводите дату тут, она переведется сама!
+  date?: Record<Locale, string>;
   stage: Record<Locale, string>;
   progress: number;
   thumbnail: string;
@@ -110,8 +192,21 @@ function formatVideoSource(url: string) {
   return { isDirectVideo: false, src: embedUrl };
 }
 
+function getVideoDate(video: VideoReport, locale: Locale): string {
+  if (video.rawDate) {
+    return formatLocalizedDate(video.rawDate, locale);
+  }
+  if (video.date) {
+    return video.date[locale] || video.date.ru || '';
+  }
+  return '';
+}
+
+// =========================================================================
+// 🏗 ПОЛНАЯ БАЗА ОТЧЕТОВ И АРХИВОВ С 2021 ПО 2026 ГОД
+// =========================================================================
 const REPORTS: ReportItem[] = [
-  // 1. ЖК Abu Dhabi (Строящийся — 6 архивных выпусков)
+  // 1. ЖК Abu Dhabi (Строящийся)
   {
     id: 'rep-abu-dhabi',
     projectSlug: 'abu-dhabi',
@@ -176,8 +271,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'ad-v-2026-09',
-        date: { ru: 'Сентябрь 2026', kg: 'Сентябрь 2026', kz: 'Қыркүйек 2026', uk: 'Вересень 2026', en: 'September 2026', zh: '2026年9月' },
+        id: 'ad-v-2026-09-28',
+        rawDate: '2026-09-28',
         stage: { ru: 'Монолит перекрытия 8-го этажа (Блок «Б»)', kg: '8-кабаттын монолити (Блок «Б»)', kz: '8-қабаттың жабындысы (Блок «Б»)', uk: 'Моноліт 8 поверху (Блок «Б»)', en: '8th floor slab pour (Block B)', zh: 'B座第8层现浇顶板施工' },
         progress: 42,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -193,8 +288,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ad-v-2026-07',
-        date: { ru: 'Июль 2026', kg: 'Июль 2026', kz: 'Шілде 2026', uk: 'Липень 2026', en: 'July 2026', zh: '2026年7月' },
+        id: 'ad-v-2026-07-18',
+        rawDate: '2026-07-18',
         stage: { ru: 'Монолитный каркас 6-го этажа', kg: '6-кабаттын монолити', kz: '6-қабаттың монолиті', uk: 'Моноліт 6 поверху', en: '6th floor concrete core', zh: '第6层主体结构' },
         progress: 36,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -210,8 +305,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ad-v-2026-06',
-        date: { ru: 'Июнь 2026', kg: 'Июнь 2026', kz: 'Маусым 2026', uk: 'Червень 2026', en: 'June 2026', zh: '2026年6月' },
+        id: 'ad-v-2026-06-10',
+        rawDate: '2026-06-10',
         stage: { ru: 'Монолитный каркас 5-го этажа', kg: '5-кабаттын монолити', kz: '5-қабаттың монолиті', uk: 'Моноліт 5 поверху', en: '5th floor framing', zh: '第5层主体框架' },
         progress: 31,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -227,8 +322,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ad-v-2026-05',
-        date: { ru: 'Май 2026', kg: 'Май 2026', kz: 'Мамыр 2026', uk: 'Травень 2026', en: 'May 2026', zh: '2026年5月' },
+        id: 'ad-v-2026-05-14',
+        rawDate: '2026-05-14',
         stage: { ru: 'Монолитный каркас 4-го этажа', kg: '4-кабаттын монолити', kz: '4-қабаттың монолиті', uk: 'Моноліт 4 поверху', en: '4th floor concrete core', zh: '第4层主体结构' },
         progress: 26,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -244,8 +339,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ad-v-2026-04',
-        date: { ru: 'Апрель 2026', kg: 'Апрель 2026', kz: 'Сәуір 2026', uk: 'Квітень 2026', en: 'April 2026', zh: '2026年4月' },
+        id: 'ad-v-2026-04-20',
+        rawDate: '2026-04-20',
         stage: { ru: 'Монолит 2-го этажа и монтаж кранов', kg: '2-кабат жана крандар', kz: '2-қабат және крандар', uk: 'Моноліт 2 поверху', en: '2nd floor & cranes', zh: '第2层主体结构及塔吊' },
         progress: 20,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -261,8 +356,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ad-v-2025-11',
-        date: { ru: 'Ноябрь 2025', kg: 'Ноябрь 2025', kz: 'Қараша 2025', uk: 'Листопад 2025', en: 'November 2025', zh: '2025年11月' },
+        id: 'ad-v-2025-11-15',
+        rawDate: '2025-11-15',
         stage: { ru: 'Нулевой цикл: фундаментная плита', kg: 'Нөлдүк цикл: фундамент плитасы', kz: 'Нөлдік деңгей: іргетас', uk: 'Фундаментна плита', en: 'Raft foundation & basement', zh: '地下车库与大体积基础筏板' },
         progress: 12,
         thumbnail: '/projects/Abu-Dhabi.png',
@@ -279,7 +374,8 @@ const REPORTS: ReportItem[] = [
       },
     ],
   },
-  // 2. ЖК Madina Residence (Строящийся — 4 архивных выпуска)
+
+  // 2. ЖК Madina Residence (Строящийся)
   {
     id: 'rep-madina',
     projectSlug: 'madina-residence',
@@ -344,8 +440,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'mr-v-2026-08',
-        date: { ru: 'Август 2026', kg: 'Август 2026', kz: 'Тамыз 2026', uk: 'Серпень 2026', en: 'August 2026', zh: '2026年8月' },
+        id: 'mr-v-2026-08-17',
+        rawDate: '2026-08-17',
         stage: { ru: 'Фасадные работы 70% и внутренние сети', kg: 'Фасад иштери 70% жана ички түйүндөр', kz: 'Қасбет жұмыстары 70% және желілер', uk: 'Фасадні роботи 70% та мережі', en: 'Façade works 70% & MEP', zh: '外立面70%与室内机电施工' },
         progress: 78,
         thumbnail: '/projects/Madina-Residense.png',
@@ -361,8 +457,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'mr-v-2026-06',
-        date: { ru: 'Июнь 2026', kg: 'Июнь 2026', kz: 'Маусым 2026', uk: 'Червень 2026', en: 'June 2026', zh: '2026年6月' },
+        id: 'mr-v-2026-06-20',
+        rawDate: '2026-06-20',
         stage: { ru: 'Завершение кладки и старт окон', kg: 'Кыш кыноонун аякташы', kz: 'Кірпіш қалаудың аяқталуы', uk: 'Завершення кладки', en: 'Masonry wrap-up & windows', zh: '外墙砌体收尾与窗框安装' },
         progress: 66,
         thumbnail: '/projects/Madina-Residense.png',
@@ -378,8 +474,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'mr-v-2026-05',
-        date: { ru: 'Май 2026', kg: 'Май 2026', kz: 'Мамыр 2026', uk: 'Травень 2026', en: 'May 2026', zh: '2026年5月' },
+        id: 'mr-v-2026-05-24',
+        rawDate: '2026-05-24',
         stage: { ru: 'Топпинг каркаса (14 этаж)', kg: '14-кабаттын бүтүшү', kz: '14-қабаттың аяқталуы', uk: 'Топпінг каркаса (14 поверх)', en: 'Topping out (14th floor)', zh: '14层主体结构结构封顶' },
         progress: 60,
         thumbnail: '/projects/Madina-Residense.png',
@@ -395,8 +491,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'mr-v-2026-03',
-        date: { ru: 'Март 2026', kg: 'Март 2026', kz: 'Наурыз 2026', uk: 'Березень 2026', en: 'March 2026', zh: '2026年3月' },
+        id: 'mr-v-2026-03-12',
+        rawDate: '2026-03-12',
         stage: { ru: 'Монолитный каркас 11-го этажа', kg: '11-кабаттын монолити', kz: '11-қабаттың монолиті', uk: 'Моноліт 11 поверху', en: '11th floor framing', zh: '第11层结构现浇' },
         progress: 52,
         thumbnail: '/projects/Madina-Residense.png',
@@ -413,7 +509,8 @@ const REPORTS: ReportItem[] = [
       },
     ],
   },
- // 3. ЖД Айкол + (Строящийся — архивные выпуски)
+
+  // 3. ЖД Айкол + (Строящийся)
   {
     id: 'rep-ajkol-plus',
     projectSlug: 'ajkol-plus',
@@ -478,8 +575,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'ap-v-2026-09',
-        date: { ru: 'Сентябрь 2026', kg: 'Сентябрь 2026', kz: 'Қыркүйек 2026', uk: 'Вересень 2026', en: 'September 2026', zh: '2026年9月' },
+        id: 'ap-v-2026-09-26',
+        rawDate: '2026-09-26',
         stage: { ru: 'Заливка перекрытия 7-го этажа', kg: '7-кабаттын жабуусун куюу', kz: '7-қабаттың жабындысын құю', uk: 'Заливка перекриття 7-го поверху', en: '7th floor slab pouring', zh: '第7层楼面现浇施工' },
         progress: 62,
         thumbnail: '/projects/Aikolplus.png',
@@ -495,8 +592,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ap-v-2026-05',
-        date: { ru: 'Май 2026', kg: 'Май 2026', kz: 'Мамыр 2026', uk: 'Травень 2026', en: 'May 2026', zh: '2026年5月' },
+        id: 'ap-v-2026-05-19',
+        rawDate: '2026-05-19',
         stage: { ru: 'Монолитный каркас 5-го этажа', kg: '5-кабаттын монолити', kz: '5-қабаттың монолиті', uk: 'Моноліт 5 поверху', en: '5th floor framing', zh: '第5层主体框架' },
         progress: 49,
         thumbnail: '/projects/Aikolplus.png',
@@ -512,8 +609,8 @@ const REPORTS: ReportItem[] = [
         },
       },
       {
-        id: 'ap-v-2026-03',
-        date: { ru: 'Март 2026', kg: 'Март 2026', kz: 'Наурыз 2026', uk: 'Березень 2026', en: 'March 2026', zh: '2026年3月' },
+        id: 'ap-v-2026-03-24',
+        rawDate: '2026-03-24',
         stage: { ru: 'Цоколь и 2-й этаж', kg: 'Цоколь жана 2-кабат', kz: 'Цоколь және 2-қабат', uk: 'Цоколь та 2 поверх', en: 'Podium & 2nd floor', zh: '架空层及第2层' },
         progress: 35,
         thumbnail: '/projects/Aikolplus.png',
@@ -539,12 +636,12 @@ const REPORTS: ReportItem[] = [
     isFinished: true,
     image: '/projects/ajkol.png',
     pacePerMonth: {
-      ru: 'Ключи вручены (Сентябрь 2026)',
-      kg: 'Ачкычтар тапшырылды (Сентябрь 2026)',
-      kz: 'Кілттер табысталды (Қыркүйек 2026)',
-      uk: 'Ключі вручено (Вересень 2026)',
-      en: 'Keys Handed Over (September 2026)',
-      zh: '钥匙全数移交（2026年9月）',
+      ru: 'Ключи вручены (11.09.2026)',
+      kg: 'Ачкычтар тапшырылды (11.09.2026)',
+      kz: 'Кілттер табысталды (11.09.2026)',
+      uk: 'Ключі вручено (11.09.2026)',
+      en: 'Keys Handed Over (11.09.2026)',
+      zh: '钥匙全数移交（2026.09.11）',
     },
     workersOnSite: 0,
     cranesOnSite: 0,
@@ -596,8 +693,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'ajkol-v-final',
-        date: { ru: 'Сентябрь 2026', kg: 'Сентябрь 2026', kz: 'Қыркүйек 2026', uk: 'Вересень 2026', en: 'September 2026', zh: '2026年9月' },
+        id: 'ajkol-v-2026-09-11',
+        rawDate: '2026-09-11',
         stage: { ru: 'Торжественное открытие и вручение ключей', kg: 'Ачылыш аземи жана ачкыч тапшыруу', kz: 'Ашылу салтанаты және кілт тапсыру', uk: 'Урочисте відкриття та вручення ключів', en: 'Grand Opening & Key Handover', zh: '项目盛大开园与钥匙交付盛典' },
         progress: 100,
         thumbnail: '/projects/ajkol.png',
@@ -614,14 +711,15 @@ const REPORTS: ReportItem[] = [
       },
     ],
   },
-  // 5. ЖК Келечек (СДАН)
+
+  // 5. ЖК Келечек (СДАН) — хроника 2022-2024
   {
     id: 'rep-kelechek',
     projectSlug: 'kelechek',
     projectName: 'ЖК Келечек',
     isFinished: true,
     image: '/projects/Kelechek.png',
-    pacePerMonth: { ru: 'Объект заселен', kg: 'Эл жашайт', kz: 'Қоныстанған', uk: 'Заселений', en: '100% Delivered', zh: '100% 入住' },
+    pacePerMonth: { ru: 'Сдан в эксплуатацию', kg: 'Пайдаланууга берилген', kz: 'Тапсырылған', uk: 'Зданий в експлуатацію', en: '100% Delivered', zh: '100% 入住' },
     workersOnSite: 0,
     cranesOnSite: 0,
     breakdown: [
@@ -672,8 +770,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'kelechek-v-final',
-        date: { ru: 'Сдан в эксплуатацию', kg: 'Пайдаланууга берилген', kz: 'Тапсырылған', uk: 'Введений в експлуатацію', en: 'Delivered', zh: '已交付入住' },
+        id: 'kelechek-v-2024-12-20',
+        rawDate: '2024-12-20',
         stage: { ru: 'Финальный видеообзор готового ЖК', kg: 'Даяр ЖК видеосу', kz: 'Дайын ТК бейнебаяны', uk: 'Фінальний відеоогляд готового ЖК', en: 'Delivered Complex Tour', zh: '交付实景视频巡礼' },
         progress: 100,
         thumbnail: '/projects/Kelechek.png',
@@ -691,14 +789,14 @@ const REPORTS: ReportItem[] = [
     ],
   },
 
-  // 6. КД Ордо (СДАН)
+  // 6. КД Ордо (СДАН) — хроника с 2021 по 2023 год!
   {
     id: 'rep-ordo',
     projectSlug: 'ordo',
     projectName: 'КД Ордо',
     isFinished: true,
     image: '/projects/Ordo.png',
-    pacePerMonth: { ru: 'Объект заселен', kg: 'Эл жашайт', kz: 'Қоныстанған', uk: 'Заселений', en: '100% Delivered', zh: '100% 入住' },
+    pacePerMonth: { ru: 'Сдан в эксплуатацию', kg: 'Пайдаланууга берилген', kz: 'Тапсырылған', uk: 'Зданий в експлуатацію', en: '100% Delivered', zh: '100% 入住' },
     workersOnSite: 0,
     cranesOnSite: 0,
     breakdown: [
@@ -708,12 +806,12 @@ const REPORTS: ReportItem[] = [
       { label: { ru: 'Подземный паркинг', kg: 'Жер астындагы паркинг', kz: 'Жерасты автотұрағы', uk: 'Підземний паркінг', en: 'Basement Parking', zh: '智能地下车库' }, percent: 100 },
     ],
     desc: {
-      ru: 'Первый знаковый клубный дом компании EL ORDO GROUP. Авторский фасад из гранита и травертина, собственная газовая котельная, панорамные виды на горы Ала-Тоо и полная приватность жильцов.',
-      kg: 'EL ORDO GROUP компаниясынын алгачкы бүткөрүлгөн клубдук үйү.',
-      kz: 'EL ORDO GROUP компаниясының алғашқы жүзеге асырылған клубтық үйі.',
-      uk: 'Перший реалізований клубний будинок компанії EL ORDO GROUP.',
-      en: 'The hallmark boutique club house completed by EL ORDO GROUP.',
-      zh: 'EL ORDO GROUP 打造的首部标志性低密纯洋房。',
+      ru: 'Первый знаковый клубный дом компании EL ORDO GROUP (строительство с 2021 по 2023 гг.). Авторский фасад из гранита и травертина, собственная газовая котельная, панорамные виды на горы Ала-Тоо и полная приватность жильцов.',
+      kg: 'EL ORDO GROUP компаниясынын алгачкы бүткөрүлгөн клубдук үйү (2021-2023-жж.).',
+      kz: 'EL ORDO GROUP компаниясының алғашқы жүзеге асырылған клубтық үйі (2021-2023 жж.).',
+      uk: 'Перший реалізований клубний будинок компанії EL ORDO GROUP (2021-2023 рр.).',
+      en: 'The hallmark boutique club house completed by EL ORDO GROUP (2021-2023 construction period).',
+      zh: 'EL ORDO GROUP 打造的首部标志性低密纯洋房（2021-2023年匠心营建）。',
     },
     points: {
       ru: [
@@ -749,8 +847,8 @@ const REPORTS: ReportItem[] = [
     },
     videoArchive: [
       {
-        id: 'ordo-v-final',
-        date: { ru: 'Сдан в эксплуатацию', kg: 'Пайдаланууга берилген', kz: 'Тапсырылған', uk: 'Введений в експлуатацію', en: 'Delivered', zh: '已交付入住' },
+        id: 'ordo-v-2023-10-15',
+        rawDate: '2023-10-15',
         stage: { ru: 'Румтур и видеообзор клубного дома', kg: 'Клубдук үйдүн румтуру жана видеосу', kz: 'Клубтық үйдің қорытынды бейнебаяны', uk: 'Фінальний румтур та відеоогляд клубного будинку', en: 'Club House Final Tour', zh: '精品洋房实景现房巡礼' },
         progress: 100,
         thumbnail: '/projects/Ordo.png',
@@ -763,6 +861,40 @@ const REPORTS: ReportItem[] = [
           uk: 'Авторський фасад із граніту та травертину, просторі холи та приватна атмосфера КД «Ордо».',
           en: 'Natural granite & travertine facade, signature boutique lobbies, and mountain panoramas at Ordo Club House.',
           zh: '天然花岗岩与洞石奢雅立面、精装入户大堂与低密纯洋房全景沉浸式实景呈现。',
+        },
+      },
+      {
+        id: 'ordo-v-2022-03-20',
+        rawDate: '2022-03-20',
+        stage: { ru: 'Монолитный каркас и кладка', kg: 'Монолит жана кыш кыноо', kz: 'Монолит және кірпіш қалау', uk: 'Монолітний каркас і кладка', en: 'Concrete Frame & Masonry', zh: '主体封顶与二次结构施工' },
+        progress: 68,
+        thumbnail: '/projects/Ordo.png',
+        videoUrl: '',
+        videoDuration: '02:10 • Архив',
+        description: {
+          ru: 'Завершение монолитного каркаса здания и монтаж кирпичных перегородок.',
+          kg: 'Монолиттик каркасты аяктоо жана кыш коюу иштери.',
+          kz: 'Ғимараттың монолитті қаңқасын аяқтау және кірпіш қалау.',
+          uk: 'Завершення монолітного каркаса та цегляна кладка.',
+          en: 'Completion of structural frame and brick masonry wrap-up.',
+          zh: '洋房主体骨架浇筑完毕，全面铺开室内隔墙砌筑。',
+        },
+      },
+      {
+        id: 'ordo-v-2021-03-15',
+        rawDate: '2021-03-15',
+        stage: { ru: 'Нулевой цикл и котлован (Старт проекта)', kg: 'Нөлдүк цикл жана котлован (Башталышы)', kz: 'Нөлдік деңгей және қазаншұңқыр (Басталуы)', uk: 'Нульовий цикл та котлован (Старт)', en: 'Groundbreak & Excavation', zh: '工程奠基土方开挖与基础施工' },
+        progress: 15,
+        thumbnail: '/projects/Ordo.png',
+        videoUrl: '',
+        videoDuration: '02:30 • 4K Архив',
+        description: {
+          ru: 'Земляные работы, подготовка фундаментной плиты и старт первого объекта EL ORDO GROUP в марте 2021 года.',
+          kg: 'Жер иштери, пайдубалды даярдоо жана EL ORDO GROUPтун алгачкы объектинин башталышы.',
+          kz: 'Жер қазу жұмыстары, іргетасты дайындау және алғашқы нысанның басталуы.',
+          uk: 'Земляні роботи, підготовка фундаментної плити та старт першого проєкту.',
+          en: 'Earthworks, foundation slab preparation and project kick-off in March 2021.',
+          zh: '开挖基坑、抗震基础筏板垫层浇筑，2021年3月项目正式开工破土。',
         },
       },
     ],
@@ -803,7 +935,7 @@ const UI: Record<Locale, {
   ru: {
     heroBadge: 'ВИДЕОДНЕВНИК СТРОЙКИ • EL ORDO GROUP',
     heroTitle: 'ХОД СТРОИТЕЛЬСТВА ОБЪЕКТОВ',
-    heroDesc: 'Ежемесячные 4K видеооблёты с дрона от котлована до верхних этажей. Смотрите хронику возведения вашего дома в динамике.',
+    heroDesc: 'Ежемесячные 4K видеооблёты и репортажи со стройплощадок от котлована до ввода в эксплуатацию. Хроника возведения объектов с 2021 года.',
     filterAll: 'Все объекты',
     filterUnderConstruction: 'Строящиеся ЖК',
     filterCommissioned: 'Сданные дома',
@@ -811,7 +943,7 @@ const UI: Record<Locale, {
     statWorkers: 'Строителей на смене',
     statStandards: 'СНиП КР (9 баллов)',
     statControl: 'Лабораторный контроль',
-    watchLatestVideoBtn: 'Смотреть видеооблёт',
+    watchLatestVideoBtn: 'Смотреть видеоотчёт',
     watchTourBtn: 'Смотреть видеообзор',
     archiveBadge: 'Видеоархив стройки с начала работ',
     archiveCount: (count: number) => `${count} видеоотчёта`,
@@ -834,7 +966,7 @@ const UI: Record<Locale, {
   kg: {
     heroBadge: 'КУРУЛУШ ВИДЕОКҮНДӨЛҮГҮ • EL ORDO GROUP',
     heroTitle: 'ОБЪЕКТТЕРДИН КУРУЛУШ ЖҮРҮШҮ',
-    heroDesc: 'Дрондон тартылган ай сайынкы 4K видеолор. Котловандан баштап акыркы кабатка чейинки өсүш тарыхын көрүңүз.',
+    heroDesc: 'Дрондон тартылган ай сайынкы 4K видеолор. 2021-жылдан берки котловандан баштап акыркы кабатка чейинки өсүш тарыхын көрүңүз.',
     filterAll: 'Бардык объекттер',
     filterUnderConstruction: 'Курулуп жаткан ЖК',
     filterCommissioned: 'Пайдаланууга берилгендер',
@@ -896,7 +1028,7 @@ const UI: Record<Locale, {
   uk: {
     heroBadge: 'ВІДЕОЩОДЕННИК БУДІВНИЦТВА • EL ORDO GROUP',
     heroTitle: 'ХІД БУДІВНИЦТВА ОБ’ЄКТІВ',
-    heroDesc: 'Щомісячні 4K відеозвіти з дрона від котловану до верхніх поверхів. Дивіться динаміку зведення будинку.',
+    heroDesc: 'Щомісячні 4K відеозвіти та репортажі з майданчиків від котловану до введення в експлуатацію з 2021 року.',
     filterAll: 'Всі об’єкти',
     filterUnderConstruction: 'Споруджувані ЖК',
     filterCommissioned: 'Здані будинки',
@@ -904,7 +1036,7 @@ const UI: Record<Locale, {
     statWorkers: 'Будівельників на зміні',
     statStandards: 'СНіП (9 балів)',
     statControl: 'Лабораторний контроль',
-    watchLatestVideoBtn: 'Дивитися відеообліт',
+    watchLatestVideoBtn: 'Дивитися відеозвіт',
     watchTourBtn: 'Дивитися відеоогляд',
     archiveBadge: 'Відеоархів будівництва від початку',
     archiveCount: (count: number) => `${count} відеозвіти`,
@@ -927,7 +1059,7 @@ const UI: Record<Locale, {
   en: {
     heroBadge: 'CONSTRUCTION VIDEO DIARY • EL ORDO GROUP',
     heroTitle: 'CONSTRUCTION PROGRESS REPORTS',
-    heroDesc: 'Monthly 4K aerial drone updates from foundation to rooftop. Watch the chronological evolution of your home.',
+    heroDesc: 'Chronological 4K updates and on-site diary from groundbreak to handover across all developments since 2021.',
     filterAll: 'All Projects',
     filterUnderConstruction: 'Under Construction',
     filterCommissioned: 'Delivered Projects',
@@ -935,7 +1067,7 @@ const UI: Record<Locale, {
     statWorkers: 'Builders on Shift',
     statStandards: 'Seismic Safety (9 Points)',
     statControl: 'Lab Strength Certified',
-    watchLatestVideoBtn: 'Watch Drone Survey',
+    watchLatestVideoBtn: 'Watch Video Report',
     watchTourBtn: 'Watch Video Tour',
     archiveBadge: 'Video Archive Since Groundbreak',
     archiveCount: (count: number) => `${count} video reports`,
@@ -958,7 +1090,7 @@ const UI: Record<Locale, {
   zh: {
     heroBadge: '工程航拍视频家书 • EL ORDO GROUP',
     heroTitle: '各楼盘最新工程建设进度',
-    heroDesc: '每月4K超高清航拍视频全程收录。从第一方开挖土方到顶层结构封顶，全周期视频档案真实呈现。',
+    heroDesc: '自2021年至今全周期工程视频档案真实收录。从第一方开挖土方到顶层结构封顶及圆满交房，全景呈现。',
     filterAll: '全部开发楼盘',
     filterUnderConstruction: '在建施工楼盘',
     filterCommissioned: '已交付入住楼盘',
@@ -966,7 +1098,7 @@ const UI: Record<Locale, {
     statWorkers: '当班精工匠人',
     statStandards: '9度抗震设防标准',
     statControl: '国家实验室强度质检',
-    watchLatestVideoBtn: '观看航拍特辑',
+    watchLatestVideoBtn: '观看最新播报',
     watchTourBtn: '观看交付实景',
     archiveBadge: '开工至今全周期视频档案',
     archiveCount: (count: number) => `共 ${count} 期视频`,
@@ -1078,7 +1210,7 @@ export default function ConstructionProgressPage() {
               <span className="text-[11px] text-white/80">{t.statWorkers}</span>
             </div>
             <div className="p-2.5">
-              <strong className="text-2xl font-black text-[#d4b26f] block">M350</strong>
+              <strong className="text-2xl font-black text-[#d4b26f] block">M350 / M450</strong>
               <span className="text-[11px] text-white/80">{t.statStandards}</span>
             </div>
             <div className="p-2.5">
@@ -1166,7 +1298,7 @@ export default function ConstructionProgressPage() {
                   ) : latestVideo ? (
                     <span className="text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-white/15 flex items-center gap-1.5 shadow bg-[#064734]/90 backdrop-blur-md">
                       <IconCalendar className="w-3.5 h-3.5 text-[#d4b26f]" />
-                      <span>{latestVideo.date[currentLang] || latestVideo.date.ru}</span>
+                      <span>{getVideoDate(latestVideo, currentLang)}</span>
                     </span>
                   ) : null}
 
@@ -1319,7 +1451,7 @@ export default function ConstructionProgressPage() {
                     ))}
                   </div>
 
-                  {/* МИНИ-ЛЕНТА АРХИВА (для объектов с несколькими выпусками) */}
+                  {/* МИНИ-ЛЕНТА АРХИВА */}
                   {hasArchive && (
                     <div className="mb-6 p-4 rounded-2xl bg-gray-50/80 dark:bg-white/5 border border-gray-100 dark:border-white/10">
                       <div className="flex items-center justify-between mb-3">
@@ -1345,7 +1477,7 @@ export default function ConstructionProgressPage() {
                             className="p-2 rounded-xl bg-white dark:bg-black/30 border border-gray-200/80 dark:border-white/10 hover:border-[#064734] dark:hover:border-[#d4b26f] text-left transition-all group/v cursor-pointer"
                           >
                             <span className="text-[10px] font-black text-gray-900 dark:text-white block group-hover/v:text-[#064734] dark:group-hover/v:text-[#d4b26f]">
-                              ▶ {v.date[currentLang] || v.date.ru}
+                              ▶ {getVideoDate(v, currentLang)}
                             </span>
                             <span className="text-[9px] text-gray-500 dark:text-neutral-400 block truncate">
                               {v.stage[currentLang] || v.stage.ru}
@@ -1442,7 +1574,7 @@ export default function ConstructionProgressPage() {
                 <div className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
                   <span className="text-xs sm:text-sm font-black uppercase text-[#d4b26f]">
-                    {cinemaModal.project.projectName} • {cinemaModal.activeVideo.date[currentLang] || cinemaModal.activeVideo.date.ru}
+                    {cinemaModal.project.projectName} • {getVideoDate(cinemaModal.activeVideo, currentLang)}
                   </span>
                 </div>
 
@@ -1462,24 +1594,34 @@ export default function ConstructionProgressPage() {
                 {/* Левая часть: Экран видео */}
                 <div className={`${hasPlaylist ? 'lg:col-span-8' : 'lg:col-span-12'} flex flex-col bg-black`}>
                   <div className="relative aspect-video w-full flex items-center justify-center bg-black">
-                    {isDirectVideo ? (
-                      <video
-                        key={cinemaModal.activeVideo.id}
-                        src={src}
-                        controls
-                        autoPlay
-                        playsInline
-                        className="w-full h-full object-contain"
-                      />
+                    {src ? (
+                      isDirectVideo ? (
+                        <video
+                          key={cinemaModal.activeVideo.id}
+                          src={src}
+                          controls
+                          autoPlay
+                          playsInline
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <iframe
+                          key={cinemaModal.activeVideo.id}
+                          src={src}
+                          title={cinemaModal.activeVideo.stage[currentLang] || cinemaModal.activeVideo.stage.ru}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                          allowFullScreen
+                          className="w-full h-full border-0"
+                        />
+                      )
                     ) : (
-                      <iframe
-                        key={cinemaModal.activeVideo.id}
-                        src={src}
-                        title={cinemaModal.activeVideo.stage[currentLang] || cinemaModal.activeVideo.stage.ru}
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowFullScreen
-                        className="w-full h-full border-0"
-                      />
+                      <div className="flex flex-col items-center justify-center p-8 text-center text-neutral-400">
+                        <svg className="w-12 h-12 mb-3 text-[#d4b26f] opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <span className="text-sm font-bold text-white mb-1">Архивный видеоотчёт готовится к публикации</span>
+                        <span className="text-xs text-neutral-400">Скоро здесь появится оцифрованная запись этого этапа</span>
+                      </div>
                     )}
                   </div>
 
@@ -1496,7 +1638,7 @@ export default function ConstructionProgressPage() {
                   </div>
                 </div>
 
-                {/* Правая часть: Хронологический плейлист (только если видео больше одного) */}
+                {/* Правая часть: Хронологический плейлист */}
                 {hasPlaylist && (
                   <div className="lg:col-span-4 bg-neutral-900 border-t lg:border-t-0 lg:border-l border-white/10 p-5 flex flex-col">
                     <span className="text-xs font-black uppercase tracking-wider text-gray-300 mb-3 block">
@@ -1529,7 +1671,7 @@ export default function ConstructionProgressPage() {
 
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between text-xs font-bold mb-0.5">
-                                <span className="truncate">{video.date[currentLang] || video.date.ru}</span>
+                                <span className="truncate">{getVideoDate(video, currentLang)}</span>
                                 <span className="text-[10px] text-[#d4b26f]">{video.progress}%</span>
                               </div>
                               <span className="text-[9px] text-gray-400 block truncate">
