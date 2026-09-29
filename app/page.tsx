@@ -8,12 +8,9 @@ import { COMPANY_INFO } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
-import ConsultationForm from '@/components/ConsultationForm';
 import InfrastructureMap from '@/components/InfrastructureMap';
 import SmartApartmentQuiz from '@/components/SmartApartmentQuiz';
 import { trackWhatsAppClick } from '@/lib/analytics';
-import VideoReviewsSection from '@/components/VideoReviewsSection';
-import CommercialVideosSection from '@/components/CommercialVideosSection';
 import {
   IconBuilding,
   IconCrane,
@@ -948,10 +945,7 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* 🏢 НОВЫЙ БЛОК: КОММЕРЧЕСКАЯ НЕДВИЖИМОСТЬ */}
-      <CommercialVideosSection />
-
-      {/* 8. ОТЗЫВЫ РЕЗИДЕНТОВ */}
+      {/* 8. ОТЗЫВЫ РЕЗИДЕНТОВ (ТЕКСТОВЫЕ КАРТОЧКИ) */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white my-16">
         <div className="absolute inset-0 z-0">
           <Image
@@ -1005,12 +999,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-    {/* 📹 НОВЫЙ БЛОК: ЖИВЫЕ ВИДЕООТЗЫВЫ НОВОСЁЛОВ */}
-      <VideoReviewsSection />
-
-      {/* 9. ФОРМА ЗАЯВКИ И ПОДБОРА КВАРТИРЫ */}
-      <ConsultationForm />
 
       {/* 10. БАННЕР КОНСУЛЬТАЦИИ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 mt-16">
