@@ -19,33 +19,33 @@ export const PROJECT_VIDEOS = {
  // 1. ЖК Abu Dhabi (Строящийся)
   abuDhabi: {
     latest: 'https://youtube.com/shorts/xWB55Ogjxkk?feature=share', // Сентябрь 2026 (Плита 8-го этажа, Блок «Б»)
-    jul2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Июль 2026
-    jun2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Июнь 2026
-    may2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Май 2026
-    apr2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Апрель 2026
-    nov2025: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Ноябрь 2025 (Фундамент)
+    jul2026: '', // Июль 2026
+    jun2026: '', // Июнь 2026
+    may2026: '', // Май 2026
+    apr2026: '', // Апрель 2026
+    nov2025: '', // Ноябрь 2025 (Фундамент)
   },
 
   // 2. ЖК Madina Residence (Строящийся)
   madina: {
     latest: 'https://youtube.com/shorts/bElPGpP-5oI?feature=share', // Август 2026 (Главное видео)
-    jun2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Июнь 2026
-    may2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Май 2026
-    mar2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Март 2026
+    jun2026: '', // Июнь 2026
+    may2026: '', // Май 2026
+    mar2026: '', // Март 2026
   },
 
   // 3. ЖД Айкол + (Строящийся)
   ajkolPlus: {
     latest: 'https://youtube.com/shorts/t-DxuulNuCw?feature=share', // Июль 2026 (Главное видео)
-    may2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Май 2026
-    mar2026: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Март 2026
+    may2026: '', // Май 2026
+    mar2026: '', // Март 2026
   },
 
   // 4. ЖД Айкол (СДАН)
   ajkol: 'https://youtube.com/shorts/K2z55r4Ma-s?feature=share', // Финальный видеообзор сданного дома
 
   // 5. ЖК Келечек (СДАН)
-  kelechek: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Видеообзор заселенного комплекса
+  kelechek: '', // Видеообзор заселенного комплекса
 
   // 6. КД Ордо (СДАН)
   ordo: 'https://youtu.be/BfY6nA076Zo', // Румтур и видеообзор клубного дома
