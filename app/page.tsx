@@ -11,8 +11,9 @@ import { TRANSLATIONS } from '@/lib/i18n/translations';
 import ConsultationForm from '@/components/ConsultationForm';
 import InfrastructureMap from '@/components/InfrastructureMap';
 import SmartApartmentQuiz from '@/components/SmartApartmentQuiz';
-import LegalDocuments from '@/components/LegalDocuments';
 import { trackWhatsAppClick } from '@/lib/analytics';
+import VideoReviewsSection from '@/components/VideoReviewsSection';
+import CommercialVideosSection from '@/components/CommercialVideosSection';
 import {
   IconBuilding,
   IconCrane,
@@ -947,6 +948,9 @@ export default function HomePage() {
         </div>
       </section>
 
+{/* 🏢 НОВЫЙ БЛОК: КОММЕРЧЕСКАЯ НЕДВИЖИМОСТЬ */}
+      <CommercialVideosSection />
+
       {/* 8. ОТЗЫВЫ РЕЗИДЕНТОВ */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white my-16">
         <div className="absolute inset-0 z-0">
@@ -1002,8 +1006,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Юридические документы */}
-      <LegalDocuments />
+    {/* 📹 НОВЫЙ БЛОК: ЖИВЫЕ ВИДЕООТЗЫВЫ НОВОСЁЛОВ */}
+      <VideoReviewsSection />
 
       {/* 9. ФОРМА ЗАЯВКИ И ПОДБОРА КВАРТИРЫ */}
       <ConsultationForm />

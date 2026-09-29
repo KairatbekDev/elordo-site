@@ -174,7 +174,9 @@ export default function Header() {
 
   const navLinks = useMemo(() => [
     { href: '/projects', label: t.header.catalog },
-    { href: '/hod-stroitelstva', label: constructionLabel },
+    { href: '/hod-stroitelstva', label: 'Ход строительства' },
+    { href: '/otzyvy', label: 'Отзывы' },
+    { href: '/commercial', label: 'Коммерция' },
     { href: '/usloviya', label: t.header.terms },
     { href: '/o-kompanii', label: t.header.about },
     { href: '/contacts', label: t.header.contacts },
