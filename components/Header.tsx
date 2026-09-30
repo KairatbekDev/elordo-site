@@ -308,8 +308,8 @@ export default function Header() {
     } catch {}
   };
 
-  // Проверка активности родительских дропдаунов (включая /shahmatka)
-  const isBuyersActive = ['/shahmatka', '/usloviya', '/rassrochka', '/trade-in', '/polniy-raschet'].includes(pathname);
+  // Проверка активности родительских дропдаунов
+  const isBuyersActive = ['/usloviya', '/rassrochka', '/trade-in', '/polniy-raschet'].includes(pathname);
   const isCompanyActive = ['/o-kompanii', '/about', '/otzyvy', '/contacts'].includes(pathname);
 
   return (
@@ -406,30 +406,8 @@ export default function Header() {
               </button>
 
               {/* Выпадающее окно с hover-мостом */}
-              <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[230px]">
+              <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 min-w-[220px]">
                 <div className="bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl space-y-1">
-                  
-                  {/* ШАХМАТКА КВАРТИР С ВЕКТОРНОЙ SVG ИКОНКОЙ */}
-                  <Link
-                    href="/shahmatka"
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 hover:bg-[#064734] dark:hover:bg-[#d4b26f] transition-all text-xs font-black text-[#064734] dark:text-[#d4b26f] hover:text-white dark:hover:text-[#064734] group/sh"
-                  >
-                    <svg
-                      className="w-4 h-4 shrink-0 transition-transform group-hover/sh:scale-110"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
-                      />
-                    </svg>
-                    <span>{navText.shahmatka}</span>
-                  </Link>
-
                   <Link
                     href="/usloviya"
                     className="block px-3 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-colors text-xs font-bold text-gray-800 dark:text-neutral-200 hover:text-[#064734] dark:hover:text-[#d4b26f]"
@@ -658,21 +636,6 @@ export default function Header() {
                   </button>
                   {mobileBuyersOpen && (
                     <div className="px-4 pb-3 space-y-2 bg-gray-50/50 dark:bg-white/5 pt-1">
-                      <Link
-                        href="/shahmatka"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center gap-2 text-xs font-bold text-[#064734] dark:text-[#d4b26f]"
-                      >
-                        <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
-                          />
-                        </svg>
-                        <span>{navText.shahmatka}</span>
-                      </Link>
                       <Link
                         href="/usloviya"
                         onClick={() => setIsOpen(false)}
