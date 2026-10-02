@@ -10,6 +10,7 @@ import { Locale } from '@/lib/i18n/types';
 import { TRANSLATIONS } from '@/lib/i18n/translations';
 import InfrastructureMap from '@/components/InfrastructureMap';
 import SmartApartmentQuiz from '@/components/SmartApartmentQuiz';
+import ApartmentSelector from '@/components/ApartmentSelector';
 import { trackWhatsAppClick } from '@/lib/analytics';
 import {
   IconBuilding,
@@ -791,10 +792,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 3. ИНТЕЛЛЕКТУАЛЬНЫЙ СМАРТ-КВИЗ ПОДБОРА КВАРТИРЫ */}
+      {/* 3. ИНТЕЛЛЕКТУАЛЬНЫЙ СМАРТ-КВИЗ ПОДБОРА КВАРТИРЫ ЗА 60 СЕКУНД */}
       <SmartApartmentQuiz />
 
-      {/* 4. ПРОГРАММЫ ПРИОБРЕТЕНИЯ */}
+      {/* 4. ИНТЕРАКТИВНЫЙ КОНФИГУРАТОР КВАРТИР С ОНЛАЙН-РАСЧЕТОМ (37 ПЛАНИРОВОК) */}
+      <ApartmentSelector />
+
+      {/* 5. ПРОГРАММЫ ПРИОБРЕТЕНИЯ */}
       <section className="bg-[#f0f4f2] dark:bg-[#040c09] py-20 px-4 sm:px-6 transition-colors border-y border-transparent dark:border-white/5">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -873,7 +877,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 5. ИНТЕРАКТИВНАЯ КАРТА БИШКЕКА */}
+      {/* 6. ИНТЕРАКТИВНАЯ КАРТА БИШКЕКА */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-12">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
@@ -890,12 +894,12 @@ export default function HomePage() {
         <BishkekMap />
       </section>
 
-      {/* 6. ИНФРАСТРУКТУРА И ТОЧКИ ПРИТЯЖЕНИЯ (2GIS / ВРЕМЯ В ПУТИ) */}
+      {/* 7. ИНФРАСТРУКТУРА И ТОЧКИ ПРИТЯЖЕНИЯ (2GIS / ВРЕМЯ В ПУТИ) */}
       <div className="border-t border-gray-100 dark:border-white/5">
         <InfrastructureMap />
       </div>
 
-      {/* 7. ПРЕИМУЩЕСТВА СТАНДАРТОВ СТРОИТЕЛЬСТВА */}
+      {/* 8. ПРЕИМУЩЕСТВА СТАНДАРТОВ СТРОИТЕЛЬСТВА */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <span className="text-xs uppercase font-extrabold tracking-widest text-[#d4b26f] block mb-2">
@@ -945,7 +949,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 8. ОТЗЫВЫ РЕЗИДЕНТОВ (ТЕКСТОВЫЕ КАРТОЧКИ) */}
+      {/* 9. ОТЗЫВЫ РЕЗИДЕНТОВ */}
       <section className="relative py-20 px-4 sm:px-6 overflow-hidden bg-neutral-900 text-white my-16">
         <div className="absolute inset-0 z-0">
           <Image

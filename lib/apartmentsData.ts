@@ -18,7 +18,7 @@ export interface ApartmentItem {
 
 export const ALL_APARTMENTS: ApartmentItem[] = [
   // =========================================================================
-  // 🏢 ЖК ABU DHABI ($1 650 / м²) — 13 вариантов
+  // 🏢 ЖК ABU DHABI ($1 650 / м²) — 13 вариантов (1-в-1 к чертежам)
   // =========================================================================
   {
     id: 'ad-1-4948',
@@ -31,7 +31,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 81642,
-    planImage: '/plans/abu-dhabi/1k-49-48.png',
+    planImage: '/layouts/abu-dhabi/1%201room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Во внутренний двор и парк',
@@ -53,7 +53,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 82055,
-    planImage: '/plans/abu-dhabi/1k-49-73.png',
+    planImage: '/layouts/abu-dhabi/2%201room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Восточная сторона, утреннее солнце',
@@ -75,7 +75,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 83952,
-    planImage: '/plans/abu-dhabi/1k-50-88.png',
+    planImage: '/layouts/abu-dhabi/3%201room-abu.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Вид на Южную магистраль и горы',
@@ -97,7 +97,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 90222,
-    planImage: '/plans/abu-dhabi/1k-54-68.png',
+    planImage: '/layouts/abu-dhabi/4%201room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Панорамный вид во двор',
@@ -119,7 +119,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 91773,
-    planImage: '/plans/abu-dhabi/1k-55-62.png',
+    planImage: '/layouts/abu-dhabi/5%201room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Юго-восток, солнечная сторона',
@@ -141,7 +141,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 95783,
-    planImage: '/plans/abu-dhabi/1k-58-05.png',
+    planImage: '/layouts/abu-dhabi/6%201room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Просторная евро-двушка с видом на парк',
@@ -163,7 +163,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 129195,
-    planImage: '/plans/abu-dhabi/2k-78-30.png',
+    planImage: '/layouts/abu-dhabi/1%202room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Панорама гор Ала-Тоо',
@@ -185,7 +185,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 131621,
-    planImage: '/plans/abu-dhabi/2k-79-77.png',
+    planImage: '/layouts/abu-dhabi/2%202room-abu.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Двусторонняя: горы и внутренний двор',
@@ -207,7 +207,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 132429,
-    planImage: '/plans/abu-dhabi/2k-80-26.png',
+    planImage: '/layouts/abu-dhabi/3%202room-abu.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Вид на город и горы',
@@ -229,7 +229,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 134624,
-    planImage: '/plans/abu-dhabi/2k-81-59.png',
+    planImage: '/layouts/abu-dhabi/4%202room-abu.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Панорамные витражи на юг',
@@ -251,7 +251,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 137907,
-    planImage: '/plans/abu-dhabi/2k-83-58.png',
+    planImage: '/layouts/abu-dhabi/5%202room-abu.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Юго-запад, закат и горы',
@@ -273,7 +273,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 138584,
-    planImage: '/plans/abu-dhabi/2k-83-99.png',
+    planImage: '/layouts/abu-dhabi/6%202room-abu.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Угловая с панорамным обзором 270°',
@@ -295,7 +295,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1650,
     price: 196878,
-    planImage: '/plans/abu-dhabi/3k-119-32.png',
+    planImage: '/layouts/abu-dhabi/1%203room-abu.png',
     badge: 'Блок Б • Премиум',
     windowsView: {
       ru: 'Пентхаус-формат: панорама на горы и город',
@@ -321,7 +321,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 65385,
-    planImage: '/plans/madina/1k-43-59.png',
+    planImage: '/layouts/madina-residence/1%201room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Вид на благоустроенный зеленый двор',
@@ -343,7 +343,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 67815,
-    planImage: '/plans/madina/1k-45-21.png',
+    planImage: '/layouts/madina-residence/2%201room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Восточная сторона, мягкий утренний свет',
@@ -365,7 +365,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 69705,
-    planImage: '/plans/madina/1k-46-47.png',
+    planImage: '/layouts/madina-residence/3%201room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Вид на детскую и спортивную площадки',
@@ -387,7 +387,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 72900,
-    planImage: '/plans/madina/1k-48-60.png',
+    planImage: '/layouts/madina-residence/1%201room-madina.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Тихий закрытый внутренний двор',
@@ -409,7 +409,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 73545,
-    planImage: '/plans/madina/1k-49-03.png',
+    planImage: '/layouts/madina-residence/2%201room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Правильная прямоугольная геометрия комнат',
@@ -431,7 +431,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 73710,
-    planImage: '/plans/madina/1k-49-14.png',
+    planImage: '/layouts/madina-residence/3%201room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Уютная спальня и просторная лоджия',
@@ -453,7 +453,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 74850,
-    planImage: '/plans/madina/1k-49-90.png',
+    planImage: '/layouts/madina-residence/1%201room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Удобная планировка с гардеробной и лоджией',
@@ -475,7 +475,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 75015,
-    planImage: '/plans/madina/1k-50-01.png',
+    planImage: '/layouts/madina-residence/2%201room-madina.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Южная сторона, солнце в течение всего дня',
@@ -497,7 +497,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 75270,
-    planImage: '/plans/madina/1k-50-18.png',
+    planImage: '/layouts/madina-residence/3%201room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Вид на проспект Чуй и город',
@@ -519,7 +519,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 79725,
-    planImage: '/plans/madina/1k-53-15.png',
+    planImage: '/layouts/madina-residence/1%201room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Светлая евро-двушка с окнами на две стороны',
@@ -541,7 +541,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 80820,
-    planImage: '/plans/madina/1k-53-88.png',
+    planImage: '/layouts/madina-residence/2%201room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Просторная евро-двушка с большой кухней-гостиной',
@@ -563,7 +563,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 86805,
-    planImage: '/plans/madina/1k-57-87.png',
+    planImage: '/layouts/madina-residence/3%201room-madina.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Угловая евро-двушка с панорамным остеклением',
@@ -585,7 +585,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 106500,
-    planImage: '/plans/madina/2k-71-00.png',
+    planImage: '/layouts/madina-residence/1%202room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Раздельные санузлы, вид на город',
@@ -607,7 +607,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 106605,
-    planImage: '/plans/madina/2k-71-07.png',
+    planImage: '/layouts/madina-residence/2%202room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Идеальное зонирование: гостевая и спальная зоны',
@@ -629,7 +629,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 111450,
-    planImage: '/plans/madina/2k-74-30.png',
+    planImage: '/layouts/madina-residence/3%202room-madina.png',
     badge: 'Блок Б',
     windowsView: {
       ru: 'Южная сторона, солнечная гостиная с витражами',
@@ -651,7 +651,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 111795,
-    planImage: '/plans/madina/2k-74-53.png',
+    planImage: '/layouts/madina-residence/4%202room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Изолированные спальни и вид во двор',
@@ -673,7 +673,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 111885,
-    planImage: '/plans/madina/2k-74-59.png',
+    planImage: '/layouts/madina-residence/5%202room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Два санузла, ниша под гардеробную',
@@ -695,7 +695,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 112110,
-    planImage: '/plans/madina/2k-74-74.png',
+    planImage: '/layouts/madina-residence/6%202room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Вид во внутренний ландшафтный двор',
@@ -717,7 +717,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 113850,
-    planImage: '/plans/madina/2k-75-90.png',
+    planImage: '/layouts/madina-residence/7%202room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Двусторонняя распашонка восток-запад',
@@ -739,7 +739,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 121950,
-    planImage: '/plans/madina/2k-81-30.png',
+    planImage: '/layouts/madina-residence/8%202room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Большая кухня 18 м² и панорамная лоджия',
@@ -761,7 +761,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 121965,
-    planImage: '/plans/madina/2k-81-31.png',
+    planImage: '/layouts/madina-residence/9%202room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Просторные квадратные спальни и лоджия',
@@ -783,7 +783,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 125670,
-    planImage: '/plans/madina/2k-83-78.png',
+    planImage: '/layouts/madina-residence/10%202room-madina.png',
     badge: 'Блок А',
     windowsView: {
       ru: 'Премиальная угловая планировка с видом на горы',
@@ -805,7 +805,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 126135,
-    planImage: '/plans/madina/2k-84-09.png',
+    planImage: '/layouts/madina-residence/11%202room-madina.png',
     badge: 'Блок В',
     windowsView: {
       ru: 'Максимальная площадь 2-комнатных в комплексе',
@@ -827,7 +827,7 @@ export const ALL_APARTMENTS: ApartmentItem[] = [
     floor: '2–14 этажи',
     priceM2: 1500,
     price: 162720,
-    planImage: '/plans/madina/3k-108-48.png',
+    planImage: '/layouts/madina-residence/1%203room-madina.png',
     badge: 'Блок Б • Для семьи',
     windowsView: {
       ru: 'Флагманская 3-комнатная квартира для большой семьи',
