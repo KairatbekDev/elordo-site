@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PaymentLayout from '@/components/PaymentLayout';
 import { COMPANY_INFO } from '@/lib/data';
@@ -104,18 +104,74 @@ interface FullPaymentContent {
   somUnit: string;
 }
 
-const CATALOG_APARTMENTS = [
-  { complex: 'ЖК Abu Dhabi', title: '1-комн. Блок Б (49.48 м²)', price: 81642, slug: 'abu-dhabi' },
-  { complex: 'ЖК Abu Dhabi', title: '1-комн. Блок А (50.88 м²)', price: 83952, slug: 'abu-dhabi' },
-  { complex: 'ЖК Abu Dhabi', title: '2-комн. Блок Б (78.30 м²)', price: 129195, slug: 'abu-dhabi' },
-  { complex: 'ЖК Abu Dhabi', title: '3-комн. Блок Б (119.32 м²)', price: 196878, slug: 'abu-dhabi' },
-  { complex: 'ЖК Madina Residence', title: '1-комн. Блок А (43.59 м²)', price: 65385, slug: 'madina-residence' },
-  { complex: 'ЖК Madina Residence', title: '1-комн. Блок В (49.03 м²)', price: 73545, slug: 'madina-residence' },
-  { complex: 'ЖК Madina Residence', title: '2-комн. Блок А (71.00 м²)', price: 106500, slug: 'madina-residence' },
-  { complex: 'ЖК Madina Residence', title: '3-комн. Блок Б (108.48 м²)', price: 162720, slug: 'madina-residence' },
-  { complex: 'ЖД Айкол +', title: '1-комн. (42.00 м²)', price: 50400, slug: 'ajkol-plus' },
-  { complex: 'ЖД Айкол +', title: '2-комн. (74.30 м²)', price: 89160, slug: 'ajkol-plus' },
-  { complex: 'ЖД Айкол +', title: '3-комн. (88.50 м²)', price: 106200, slug: 'ajkol-plus' },
+interface CatalogApartment {
+  id: string;
+  complex: string;
+  slug: string;
+  rooms: 1 | 2 | 3;
+  roomsLabel: string;
+  area: number;
+  block: string;
+  badge?: string;
+  pricePerM2: number;
+  price: number;
+}
+
+function normalizeLocale(loc: any): Locale {
+  if (!loc) return 'ru';
+  const l = String(loc).toLowerCase().trim();
+  if (l.startsWith('kg') || l.startsWith('ky')) return 'kg';
+  if (l.startsWith('kz') || l.startsWith('kk')) return 'kz';
+  if (l.startsWith('uk') || l.startsWith('ua')) return 'uk';
+  if (l.startsWith('en')) return 'en';
+  if (l.startsWith('zh') || l.startsWith('cn')) return 'zh';
+  return 'ru';
+}
+
+// =========================================================================
+// 🏢 БАЗА ВСЕХ 37 ПЛАНИРОВОК: ЖК ABU DHABI + ЖК MADINA RESIDENCE
+// =========================================================================
+const CATALOG_APARTMENTS: CatalogApartment[] = [
+  // --- ЖК Abu Dhabi ($1 650/м²) ---
+  { id: 'ad-1-4948', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 49.48, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 81642 },
+  { id: 'ad-1-4973', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 49.73, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 82055 },
+  { id: 'ad-1-5088', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 50.88, block: 'Блок А', badge: 'Блок А', pricePerM2: 1650, price: 83952 },
+  { id: 'ad-1-5468', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 54.68, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 90222 },
+  { id: 'ad-1-5562', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 55.62, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 91773 },
+  { id: 'ad-1-5805', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 1, roomsLabel: '1-комнатная', area: 58.05, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 95783 },
+  { id: 'ad-2-7830', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 78.30, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 129195 },
+  { id: 'ad-2-7977', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 79.77, block: 'Блок А', badge: 'Блок А', pricePerM2: 1650, price: 131621 },
+  { id: 'ad-2-8026', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 80.26, block: 'Блок А', badge: 'Блок А', pricePerM2: 1650, price: 132429 },
+  { id: 'ad-2-8159', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 81.59, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1650, price: 134624 },
+  { id: 'ad-2-8358', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 83.58, block: 'Блок А', badge: 'Блок А', pricePerM2: 1650, price: 137907 },
+  { id: 'ad-2-8399', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 2, roomsLabel: '2-комнатная', area: 83.99, block: 'Блок А', badge: 'Блок А', pricePerM2: 1650, price: 138584 },
+  { id: 'ad-3-11932', complex: 'ЖК Abu Dhabi', slug: 'abu-dhabi', rooms: 3, roomsLabel: '3-комнатная', area: 119.32, block: 'Блок Б', badge: 'Блок Б • Премиум', pricePerM2: 1650, price: 196878 },
+
+  // --- ЖК Madina Residence ($1 500/м²) ---
+  { id: 'mr-1-4359', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 43.59, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 65385 },
+  { id: 'mr-1-4521', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 45.21, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 67815 },
+  { id: 'mr-1-4647', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 46.47, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 69705 },
+  { id: 'mr-1-4860', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 48.60, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1500, price: 72900 },
+  { id: 'mr-1-4903', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 49.03, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 73545 },
+  { id: 'mr-1-4914', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 49.14, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 73710 },
+  { id: 'mr-1-4990', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 49.90, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 74850 },
+  { id: 'mr-1-5001', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 50.01, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1500, price: 75015 },
+  { id: 'mr-1-5018', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 50.18, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 75270 },
+  { id: 'mr-1-5315', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 53.15, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 79725 },
+  { id: 'mr-1-5388', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 53.88, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 80820 },
+  { id: 'mr-1-5787', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 1, roomsLabel: '1-комнатная', area: 57.87, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1500, price: 86805 },
+  { id: 'mr-2-7100', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 71.00, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 106500 },
+  { id: 'mr-2-7107', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 71.07, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 106605 },
+  { id: 'mr-2-7430', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 74.30, block: 'Блок Б', badge: 'Блок Б', pricePerM2: 1500, price: 111450 },
+  { id: 'mr-2-7453', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 74.53, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 111795 },
+  { id: 'mr-2-7459', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 74.59, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 111885 },
+  { id: 'mr-2-7474', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 74.74, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 112110 },
+  { id: 'mr-2-7590', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 75.90, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 113850 },
+  { id: 'mr-2-8130', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 81.30, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 121950 },
+  { id: 'mr-2-8131', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 81.31, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 121965 },
+  { id: 'mr-2-8378', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 83.78, block: 'Блок А', badge: 'Блок А', pricePerM2: 1500, price: 125670 },
+  { id: 'mr-2-8409', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 2, roomsLabel: '2-комнатная', area: 84.09, block: 'Блок В', badge: 'Блок В', pricePerM2: 1500, price: 126135 },
+  { id: 'mr-3-10848', complex: 'ЖК Madina Residence', slug: 'madina-residence', rooms: 3, roomsLabel: '3-комнатная', area: 108.48, block: 'Блок Б', badge: 'Блок Б • Для семьи', pricePerM2: 1500, price: 162720 },
 ];
 
 const CONTENT: Record<Locale, FullPaymentContent> = {
@@ -266,7 +322,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: 'Ваша чистая экономия:',
     calcRateOnline: 'Курс НБКР онлайн',
     calcMaxDiscountBadge: 'Максимальный дисконт от руководства',
-    calcBtnCatalog: 'ВЫБРАТЬ ПЛАНИРОВКУ ИЗ КАТАЛОГА (11 ВАРИАНТОВ)',
+    calcBtnCatalog: 'ВЫБРАТЬ ПЛАНИРОВКУ ИЗ КАТАЛОГА',
     calcBtnCatalogSelected: 'ВЫБРАНО:',
     calcBasePriceLabel: 'БАЗОВАЯ СТОИМОСТЬ КВАРТИРЫ:',
     calcEditHint: 'нажмите, чтобы изменить вручную',
@@ -433,7 +489,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: 'Сиздин таза үнөмдөөңүз:',
     calcRateOnline: 'УБ онлайн курсу',
     calcMaxDiscountBadge: 'Жетекчиликтен максималдуу дисконт',
-    calcBtnCatalog: 'КАТАЛОГДОН ПЛАНИРОВКАНЫ ТАНДОО (11 ВАРИАНТ)',
+    calcBtnCatalog: 'КАТАЛОГДОН ПЛАНИРОВКАНЫ ТАНДОО',
     calcBtnCatalogSelected: 'ТАНДАЛДЫ:',
     calcBasePriceLabel: 'БАТИРДИН БАЗАЛЫК БААСЫ:',
     calcEditHint: 'кол менен өзгөртүү үчүн басыңыз',
@@ -562,13 +618,13 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     ],
     investBadge: 'Бішкектің жылжымайтын мүлкіне инвестиция',
     investTitle: 'Объект тапшырылганга чейин капиталдын 25%дан 35%га чейин өсүшү',
-    investDesc: 'Курулуштун баштапкы баскычтарында батирди 100% төлөм менен сатып алуу — Кыргызстандагы эң кирешелүү жана коопсуз инвестициялык курал. Чарчы метрдин наркынын өсүшү монолиттин даярдыгы менен кепилденет.',
+    investDesc: 'Курулуштун баштапкы баскычтарында батирди 100% төлөм менен сатып алуу — Кыргызстандагы эң кирешелүү жана коопсуз инвестициялық курал. Чарчы метрдин наркынын өсүшү монолиттин даярдыгы менен кепилденет.',
     investStat1Val: '+25–35%',
     investStat1Label: 'Курулуш мезгилиндеги капиталдаштыруу',
     investStat2Val: '8–11%',
-    investStat2Label: 'Ижарага берүүдөгү жылдык киреше',
+    investStat2Label: 'Жалға берудегі жылдық табыс',
     investStat3Val: 'Цессия',
-    investStat3Label: 'Үй тапшырылганга чейин оңой кайра сатуу',
+    investStat3Label: 'Үй тапшырылганға дейін оңай қайта сату',
     stepsBadge: 'Тез және заңды түрде таза',
     stepsTitle: 'Баспана алудың 4 қадамы',
     steps: [
@@ -600,7 +656,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: 'Сіздің таза үнемдеуіңіз:',
     calcRateOnline: 'ҰБ онлайн бағамы',
     calcMaxDiscountBadge: 'Басшылықтан максималды дисконт',
-    calcBtnCatalog: 'КАТАЛОГТАН ЖОСПАРДЫ ТАҢДАУ (11 НҰСҚА)',
+    calcBtnCatalog: 'КАТАЛОГТАН ЖОСПАРДЫ ТАҢДАУ',
     calcBtnCatalogSelected: 'ТАҢДАЛДЫ:',
     calcBasePriceLabel: 'ПӘТЕРДІҢ БАЗАЛЫҚ БАҒАСЫ:',
     calcEditHint: 'қолмен өзгерту үшін басыңыз',
@@ -767,7 +823,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: 'Ваша чиста економія:',
     calcRateOnline: 'Курс НБКР онлайн',
     calcMaxDiscountBadge: 'Максимальний дисконт від керівництва',
-    calcBtnCatalog: 'ОБРАТИ ПЛАНУВАННЯ З КАТАЛОГУ (11 ВАРІАНТІВ)',
+    calcBtnCatalog: 'ОБРАТИ ПЛАНУВАННЯ З КАТАЛОГУ',
     calcBtnCatalogSelected: 'ОБРАНО:',
     calcBasePriceLabel: 'БАЗОВА ВАРТІСТЬ КВАРТИРИ:',
     calcEditHint: 'натисніть, щоб змінити вручну',
@@ -934,7 +990,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: 'Your Net Savings:',
     calcRateOnline: 'Live NBKR Rate',
     calcMaxDiscountBadge: 'Executive Management Discount',
-    calcBtnCatalog: 'SELECT FLOOR PLAN FROM CATALOG (11 UNITS)',
+    calcBtnCatalog: 'SELECT APARTMENT FROM CATALOG',
     calcBtnCatalogSelected: 'SELECTED:',
     calcBasePriceLabel: 'BASE APARTMENT PRICE:',
     calcEditHint: 'click to edit manually',
@@ -1101,7 +1157,7 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
     netSavingsLabel: '您的净节省额：',
     calcRateOnline: '央行实时汇率',
     calcMaxDiscountBadge: '高管专属特批顶格折扣',
-    calcBtnCatalog: '在售主力户型库中挑选 (共11款)',
+    calcBtnCatalog: '在售主力户型库中挑选',
     calcBtnCatalogSelected: '当前选定房源：',
     calcBasePriceLabel: '官方指导总价：',
     calcEditHint: '点击可手动输入金额',
@@ -1125,18 +1181,22 @@ const CONTENT: Record<Locale, FullPaymentContent> = {
 
 export default function FullPaymentPage() {
   const { locale } = useLanguage();
-  const lang: Locale = (locale as Locale) || 'ru';
+  const lang: Locale = normalizeLocale(locale);
   const c = CONTENT[lang] || CONTENT.ru;
 
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(-1);
   const [isCatalogOpen, setIsCatalogOpen] = useState<boolean>(false);
 
-  const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
+  // Фильтры внутри каталога
+  const [catalogComplexFilter, setCatalogComplexFilter] = useState<'all' | 'abu-dhabi' | 'madina-residence'>('all');
+  const [catalogRoomsFilter, setCatalogRoomsFilter] = useState<'all' | 1 | 2 | 3>('all');
+
+  const [apartmentPrice, setApartmentPrice] = useState<number>(81642);
   const [discountPercent, setDiscountPercent] = useState<number>(6);
   const [currencyMode, setCurrencyMode] = useState<'usd' | 'kgs'>('usd');
 
   const [usdRate, setUsdRate] = useState<number>(87.45);
-  const [rateDate, setRateDate] = useState<string>('24.09.2026');
+  const [rateDate, setRateDate] = useState<string>('02.10.2026');
 
   useEffect(() => {
     let isMounted = true;
@@ -1160,13 +1220,22 @@ export default function FullPaymentPage() {
     }
   }, [c.pageTitle]);
 
+  // Фильтрация квартир в каталоге
+  const filteredApartments = useMemo(() => {
+    return CATALOG_APARTMENTS.filter((apt) => {
+      if (catalogComplexFilter !== 'all' && apt.slug !== catalogComplexFilter) return false;
+      if (catalogRoomsFilter !== 'all' && apt.rooms !== catalogRoomsFilter) return false;
+      return true;
+    });
+  }, [catalogComplexFilter, catalogRoomsFilter]);
+
   const cashPrice = Math.round(apartmentPrice * (1 - discountPercent / 100));
   const savingsUsd = apartmentPrice - cashPrice;
   const savingsKgs = Math.round(savingsUsd * usdRate);
   const cashPriceKgs = Math.round(cashPrice * usdRate);
 
-  const handleSelectCatalogApartment = (apt: typeof CATALOG_APARTMENTS[0], idx: number) => {
-    setSelectedPlanIndex(idx);
+  const handleSelectCatalogApartment = (apt: CatalogApartment, originalIdx: number) => {
+    setSelectedPlanIndex(originalIdx);
     setApartmentPrice(apt.price);
     setIsCatalogOpen(false);
   };
@@ -1174,6 +1243,8 @@ export default function FullPaymentPage() {
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   const handleDownloadPdf = () => {
+    const selectedApt = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex] : null;
+
     exportPdfQuote({
       apartmentPrice: cashPrice,
       downPaymentAmount: cashPrice,
@@ -1183,7 +1254,15 @@ export default function FullPaymentPage() {
       paymentPerPeriodUsd: 0,
       usdRate,
       rateDate,
-      selectedApartment: null,
+      selectedApartment: selectedApt
+        ? {
+            complex: `${selectedApt.complex} (${selectedApt.block})`,
+            rooms: selectedApt.rooms,
+            area: selectedApt.area,
+            floor: '2–14',
+            priceM2: selectedApt.pricePerM2,
+          }
+        : null,
       paymentSchedule: [
         {
           num: 1,
@@ -1197,8 +1276,9 @@ export default function FullPaymentPage() {
   };
 
   const handleFixWhatsApp = () => {
-    const selectedTitle = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].title : 'Индивидуальный расчет';
-    const complexName = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex].complex : 'Квартира в EL ORDO GROUP';
+    const selectedApt = selectedPlanIndex >= 0 ? CATALOG_APARTMENTS[selectedPlanIndex] : null;
+    const selectedTitle = selectedApt ? `${selectedApt.roomsLabel} • ${selectedApt.area} м² (${selectedApt.block})` : 'Индивидуальный расчет';
+    const complexName = selectedApt ? selectedApt.complex : 'Квартира в EL ORDO GROUP';
 
     try {
       fetch('/api/lead', {
@@ -1282,7 +1362,7 @@ export default function FullPaymentPage() {
             </div>
           </div>
 
-          {/* Кнопка-дропдаун: Выбрать планировку из каталога */}
+          {/* Кнопка-дропдаун: Выбрать планировку из каталога (37 вариантов) */}
           <div className="relative">
             <button
               type="button"
@@ -1290,39 +1370,144 @@ export default function FullPaymentPage() {
               className="w-full py-4 px-6 rounded-2xl bg-[#d4b26f] hover:bg-[#c49f57] text-[#064734] font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-between shadow-lg transition-all cursor-pointer"
             >
               <div className="flex items-center gap-2.5 truncate">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <span className="truncate">
                   {selectedPlanIndex >= 0
-                    ? `${c.calcBtnCatalogSelected} ${CATALOG_APARTMENTS[selectedPlanIndex].complex} — ${CATALOG_APARTMENTS[selectedPlanIndex].title}`
-                    : c.calcBtnCatalog}
+                    ? `${c.calcBtnCatalogSelected} ${CATALOG_APARTMENTS[selectedPlanIndex].complex} • ${CATALOG_APARTMENTS[selectedPlanIndex].roomsLabel} ${CATALOG_APARTMENTS[selectedPlanIndex].area} м² (${CATALOG_APARTMENTS[selectedPlanIndex].block})`
+                    : `${c.calcBtnCatalog} (${CATALOG_APARTMENTS.length} ВАРИАНТОВ)`}
                 </span>
               </div>
-              <svg className={`w-4 h-4 transition-transform duration-300 ${isCatalogOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <svg className={`w-4 h-4 shrink-0 transition-transform duration-300 ${isCatalogOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
 
+            {/* Выпадающее окно со встроенными фильтрами и сеткой квартир */}
             {isCatalogOpen && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#061e15] border border-white/20 rounded-2xl p-2.5 shadow-2xl z-30 max-h-72 overflow-y-auto space-y-1 animate-fadeIn">
-                {CATALOG_APARTMENTS.map((apt, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleSelectCatalogApartment(apt, idx)}
-                    className="w-full text-left p-3 rounded-xl hover:bg-white/10 flex items-center justify-between text-xs transition-colors cursor-pointer"
-                  >
-                    <div>
-                      <strong className="text-white font-bold block">{apt.complex}</strong>
-                      <span className="text-gray-300 text-[11px]">{apt.title}</span>
-                    </div>
-                    <div className="text-right">
-                      <strong className="text-[#d4b26f] font-black">${apt.price.toLocaleString('ru-RU')}</strong>
-                      <span className="text-[10px] text-gray-400 block">≈ {Math.round(apt.price * usdRate).toLocaleString('ru-RU')} {c.somUnit}</span>
-                    </div>
-                  </button>
-                ))}
+              <div className="absolute top-full left-0 right-0 mt-2 bg-[#061e15] border border-white/20 rounded-3xl p-4 shadow-2xl z-40 max-h-[500px] flex flex-col space-y-3 animate-fadeIn">
+                
+                {/* Быстрые фильтры внутри каталога */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pb-2 border-b border-white/10 shrink-0">
+                  
+                  {/* Выбор ЖК */}
+                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-none">
+                    {[
+                      { id: 'all', label: `Все (${CATALOG_APARTMENTS.length})` },
+                      { id: 'abu-dhabi', label: 'Abu Dhabi (13)' },
+                      { id: 'madina-residence', label: 'Madina Residence (24)' },
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setCatalogComplexFilter(tab.id as any)}
+                        className={`px-3 py-1.5 rounded-xl text-[11px] font-black whitespace-nowrap transition-all cursor-pointer ${
+                          catalogComplexFilter === tab.id
+                            ? 'bg-[#d4b26f] text-[#064734] shadow'
+                            : 'bg-white/5 text-gray-300 hover:bg-white/10'
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Выбор комнатности */}
+                  <div className="flex items-center gap-1 self-start sm:self-auto">
+                    {[
+                      { id: 'all', label: 'Все' },
+                      { id: 1, label: '1-к' },
+                      { id: 2, label: '2-к' },
+                      { id: 3, label: '3-к' },
+                    ].map((rf) => (
+                      <button
+                        key={rf.id}
+                        type="button"
+                        onClick={() => setCatalogRoomsFilter(rf.id as any)}
+                        className={`px-2.5 py-1.5 rounded-xl text-[11px] font-black transition-all cursor-pointer ${
+                          catalogRoomsFilter === rf.id
+                            ? 'bg-emerald-600 text-white shadow'
+                            : 'bg-white/5 text-gray-400 hover:text-white'
+                        }`}
+                      >
+                        {rf.label}
+                      </button>
+                    ))}
+                  </div>
+
+                </div>
+
+                {/* Сетка карточек квартир */}
+                <div className="overflow-y-auto pr-1 space-y-2 flex-1 max-h-[380px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                    {filteredApartments.map((apt) => {
+                      const origIndex = CATALOG_APARTMENTS.findIndex((a) => a.id === apt.id);
+                      const isSelected = selectedPlanIndex === origIndex;
+                      const aptCashPrice = Math.round(apt.price * (1 - discountPercent / 100));
+                      const aptSaving = apt.price - aptCashPrice;
+
+                      return (
+                        <button
+                          key={apt.id}
+                          type="button"
+                          onClick={() => handleSelectCatalogApartment(apt, origIndex)}
+                          className={`p-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
+                            isSelected
+                              ? 'bg-[#064734] border-[#d4b26f] shadow-lg ring-2 ring-[#d4b26f]/50'
+                              : 'bg-black/40 hover:bg-white/10 border-white/10 hover:border-white/20'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className="text-[11px] font-bold text-gray-300">
+                                {apt.roomsLabel} • {apt.area} м²
+                              </span>
+                              <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/10 text-[#d4b26f]">
+                                {apt.block}
+                              </span>
+                            </div>
+
+                            <h4 className="text-xs font-black text-white truncate mb-2">
+                              {apt.complex}
+                            </h4>
+                          </div>
+
+                          <div className="pt-2 border-t border-white/10 flex items-end justify-between">
+                            <div>
+                              <strong className="text-sm font-black text-[#d4b26f] block">
+                                ${aptCashPrice.toLocaleString('ru-RU')}
+                              </strong>
+                              <span className="text-[9px] text-emerald-400 block font-semibold">
+                                скидка: -${aptSaving.toLocaleString('ru-RU')}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-semibold line-through">
+                              ${apt.price.toLocaleString('ru-RU')}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Кнопка сброса к ручному вводу */}
+                {selectedPlanIndex >= 0 && (
+                  <div className="pt-2 border-t border-white/10 text-center shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedPlanIndex(-1);
+                        setIsCatalogOpen(false);
+                      }}
+                      className="text-xs text-gray-400 hover:text-[#d4b26f] font-semibold underline cursor-pointer"
+                    >
+                      Сбросить выбор и ввести сумму вручную
+                    </button>
+                  </div>
+                )}
+
               </div>
             )}
           </div>
@@ -1362,8 +1547,8 @@ export default function FullPaymentPage() {
 
             <input
               type="range"
-              min="35000"
-              max="220000"
+              min="40000"
+              max="250000"
               step="1000"
               value={apartmentPrice}
               onChange={(e) => {
@@ -1619,6 +1804,7 @@ export default function FullPaymentPage() {
                   <span>{c.lockDiscountBtn}</span>
                   <IconArrowRight className="w-3.5 h-3.5" />
                 </a>
+
                 <Link
                   href={`/${item.slug}`}
                   className="block w-full text-center py-1.5 text-[11px] font-bold text-gray-500 dark:text-neutral-400 hover:text-[#064734] dark:hover:text-[#d4b26f] transition-colors"
@@ -1667,6 +1853,7 @@ export default function FullPaymentPage() {
                   </svg>
                 )}
               </div>
+
               <div>
                 <h4 className="text-base font-black text-gray-900 dark:text-white mb-1.5">
                   {priv.title}

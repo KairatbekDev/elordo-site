@@ -71,7 +71,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: 'нажмите, чтобы изменить вручную',
     rateLabel: 'Курс НБКР онлайн:',
     rateFixedBadge: 'Возможна фиксация курса в ДДУ',
-    btnOpenCatalog: 'Выбрать планировку из каталога (11 вариантов)',
+    btnOpenCatalog: 'Выбрать планировку из каталога (37 вариантов)',
     btnCloseCatalog: 'Свернуть каталог планировок',
     filterComplexAll: 'Все комплексы',
     filterRoomsAll: 'Все комнаты',
@@ -96,7 +96,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: 'кол менен өзгөртүү үчүн басыңыз',
     rateLabel: 'УБ онлайн курсу:',
     rateFixedBadge: 'Келишимде курсту бекитүү мүмкүнчүлүгү',
-    btnOpenCatalog: 'Планировкалар каталогун тандоо (11 вариант)',
+    btnOpenCatalog: 'Планировкалар каталогун тандоо (37 вариант)',
     btnCloseCatalog: 'Каталогду жашыруу',
     filterComplexAll: 'Бардык комплекстер',
     filterRoomsAll: 'Бардык бөлмөлөр',
@@ -121,7 +121,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: 'қолмен өзгерту үшін басыңыз',
     rateLabel: 'ҰБ онлайн бағамы:',
     rateFixedBadge: 'Келісімшартта бағамды бекіту мүмкіндігі',
-    btnOpenCatalog: 'Жоспарлар каталогынан таңдау (11 нұсқа)',
+    btnOpenCatalog: 'Жоспарлар каталогынан таңдау (37 нұсқа)',
     btnCloseCatalog: 'Каталогты жасыру',
     filterComplexAll: 'Барлық кешендер',
     filterRoomsAll: 'Барлық бөлмелер',
@@ -146,7 +146,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: 'натисніть, щоб змінити вручну',
     rateLabel: 'Курс НБКР онлайн:',
     rateFixedBadge: 'Можлива фіксація курсу в договорі',
-    btnOpenCatalog: 'Обрати планування з каталогу (11 варіантів)',
+    btnOpenCatalog: 'Обрати планування з каталогу (37 варіантів)',
     btnCloseCatalog: 'Згорнути каталог планувань',
     filterComplexAll: 'Всі комплекси',
     filterRoomsAll: 'Всі кімнати',
@@ -171,7 +171,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: 'click to edit manually',
     rateLabel: 'Live NBKR Rate:',
     rateFixedBadge: 'Exchange rate pegging in contract',
-    btnOpenCatalog: 'Select Floor Plan from Catalog (11 Units)',
+    btnOpenCatalog: 'Select Floor Plan from Catalog (37 Units)',
     btnCloseCatalog: 'Collapse Layouts Catalog',
     filterComplexAll: 'All Developments',
     filterRoomsAll: 'All Rooms',
@@ -196,7 +196,7 @@ const CALC_STRINGS: Record<Locale, {
     editHint: '点击可手动输入金额',
     rateLabel: '央行实时汇率:',
     rateFixedBadge: '合同中支持锁定汇率机制',
-    btnOpenCatalog: '在售主力户型库中挑选 (共11款)',
+    btnOpenCatalog: '在售主力户型库中挑选 (共37款)',
     btnCloseCatalog: '收起户型列表',
     filterComplexAll: '全部楼盘',
     filterRoomsAll: '全部房型',
@@ -320,32 +320,60 @@ const TRADE_IN_STRINGS: Record<Locale, {
 interface ApartmentUnit {
   id: string;
   complex: string;
-  complexSlug: 'abu-dhabi' | 'madina-residence' | 'ajkol-plus';
+  complexSlug: 'abu-dhabi' | 'madina-residence';
   rooms: 1 | 2 | 3;
   area: number;
+  block: string;
   priceM2: number;
   totalPrice: number;
   floor: string;
   badge?: string;
 }
 
+// =========================================================================
+// 🏢 БАЗА ВСЕХ 37 ПЛАНИРОВОК: ЖК ABU DHABI + ЖК MADINA RESIDENCE
+// =========================================================================
 const APARTMENTS_CATALOG: ApartmentUnit[] = [
-  // ЖК Abu Dhabi
-  { id: 'ad-1k-49', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 49.48, priceM2: 1650, totalPrice: 81642, floor: '4–22 этажи', badge: 'Панорама гор' },
-  { id: 'ad-1k-55', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 55.62, priceM2: 1650, totalPrice: 91773, floor: '3–20 этажи', badge: 'Видовая' },
-  { id: 'ad-2k-78', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 78.30, priceM2: 1650, totalPrice: 129195, floor: '5–24 этажи', badge: 'Премиум' },
-  { id: 'ad-2k-83', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 83.58, priceM2: 1650, totalPrice: 137907, floor: '6–22 этажи', badge: 'Двусторонняя' },
-  { id: 'ad-3k-119', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 3, area: 119.32, priceM2: 1650, totalPrice: 196878, floor: 'блок Б', badge: 'Премиум • Блок Б' },
+  // --- ЖК Abu Dhabi ($1 650/м²) ---
+  { id: 'ad-1-4948', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 49.48, block: 'Блок Б', priceM2: 1650, totalPrice: 81642, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-1-4973', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 49.73, block: 'Блок Б', priceM2: 1650, totalPrice: 82055, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-1-5088', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 50.88, block: 'Блок А', priceM2: 1650, totalPrice: 83952, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'ad-1-5468', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 54.68, block: 'Блок Б', priceM2: 1650, totalPrice: 90222, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-1-5562', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 55.62, block: 'Блок Б', priceM2: 1650, totalPrice: 91773, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-1-5805', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 1, area: 58.05, block: 'Блок Б', priceM2: 1650, totalPrice: 95783, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-2-7830', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 78.30, block: 'Блок Б', priceM2: 1650, totalPrice: 129195, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-2-7977', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 79.77, block: 'Блок А', priceM2: 1650, totalPrice: 131621, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'ad-2-8026', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 80.26, block: 'Блок А', priceM2: 1650, totalPrice: 132429, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'ad-2-8159', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 81.59, block: 'Блок Б', priceM2: 1650, totalPrice: 134624, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'ad-2-8358', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 83.58, block: 'Блок А', priceM2: 1650, totalPrice: 137907, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'ad-2-8399', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 2, area: 83.99, block: 'Блок А', priceM2: 1650, totalPrice: 138584, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'ad-3-11932', complex: 'ЖК Abu Dhabi', complexSlug: 'abu-dhabi', rooms: 3, area: 119.32, block: 'Блок Б', priceM2: 1650, totalPrice: 196878, floor: '2–14 этажи', badge: 'Премиум • Блок Б' },
 
-  // ЖК Madina Residence
-  { id: 'mr-1k-43', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 43.59, priceM2: 1500, totalPrice: 65385, floor: '3–12 этажи', badge: 'Хит продаж' },
-  { id: 'mr-2k-68', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 68.20, priceM2: 1500, totalPrice: 102300, floor: '2–14 этажи', badge: 'Бизнес в центре' },
-  { id: 'mr-3k-92', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 3, area: 92.40, priceM2: 1500, totalPrice: 138600, floor: '6–14 этажи', badge: 'Для семьи' },
-
-  // ЖД Айкол +
-  { id: 'aik-1k-42', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 1, area: 42.00, priceM2: 1200, totalPrice: 50400, floor: '2–9 этажи', badge: 'Эко-предгорье' },
-  { id: 'aik-2k-74', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 2, area: 74.30, priceM2: 1200, totalPrice: 89160, floor: '3–8 этажи', badge: 'Чистый воздух' },
-  { id: 'aik-3k-88', complex: 'ЖД Айкол +', complexSlug: 'ajkol-plus', rooms: 3, area: 88.50, priceM2: 1200, totalPrice: 106200, floor: '3–7 этажи', badge: 'Просторная' },
+  // --- ЖК Madina Residence ($1 500/м²) ---
+  { id: 'mr-1-4359', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 43.59, block: 'Блок А', priceM2: 1500, totalPrice: 65385, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-1-4521', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 45.21, block: 'Блок А', priceM2: 1500, totalPrice: 67815, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-1-4647', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 46.47, block: 'Блок В', priceM2: 1500, totalPrice: 69705, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-1-4860', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 48.60, block: 'Блок Б', priceM2: 1500, totalPrice: 72900, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'mr-1-4903', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 49.03, block: 'Блок В', priceM2: 1500, totalPrice: 73545, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-1-4914', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 49.14, block: 'Блок В', priceM2: 1500, totalPrice: 73710, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-1-4990', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 49.90, block: 'Блок А', priceM2: 1500, totalPrice: 74850, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-1-5001', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 50.01, block: 'Блок Б', priceM2: 1500, totalPrice: 75015, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'mr-1-5018', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 50.18, block: 'Блок А', priceM2: 1500, totalPrice: 75270, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-1-5315', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 53.15, block: 'Блок В', priceM2: 1500, totalPrice: 79725, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-1-5388', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 53.88, block: 'Блок А', priceM2: 1500, totalPrice: 80820, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-1-5787', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 1, area: 57.87, block: 'Блок Б', priceM2: 1500, totalPrice: 86805, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'mr-2-7100', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 71.00, block: 'Блок А', priceM2: 1500, totalPrice: 106500, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-2-7107', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 71.07, block: 'Блок В', priceM2: 1500, totalPrice: 106605, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-2-7430', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 74.30, block: 'Блок Б', priceM2: 1500, totalPrice: 111450, floor: '2–14 этажи', badge: 'Блок Б' },
+  { id: 'mr-2-7453', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 74.53, block: 'Блок А', priceM2: 1500, totalPrice: 111795, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-2-7459', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 74.59, block: 'Блок В', priceM2: 1500, totalPrice: 111885, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-2-7474', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 74.74, block: 'Блок В', priceM2: 1500, totalPrice: 112110, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-2-7590', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 75.90, block: 'Блок А', priceM2: 1500, totalPrice: 113850, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-2-8130', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 81.30, block: 'Блок А', priceM2: 1500, totalPrice: 121950, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-2-8131', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 81.31, block: 'Блок В', priceM2: 1500, totalPrice: 121965, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-2-8378', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 83.78, block: 'Блок А', priceM2: 1500, totalPrice: 125670, floor: '2–14 этажи', badge: 'Блок А' },
+  { id: 'mr-2-8409', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 2, area: 84.09, block: 'Блок В', priceM2: 1500, totalPrice: 126135, floor: '2–14 этажи', badge: 'Блок В' },
+  { id: 'mr-3-10848', complex: 'ЖК Madina Residence', complexSlug: 'madina-residence', rooms: 3, area: 108.48, block: 'Блок Б', priceM2: 1500, totalPrice: 162720, floor: '2–14 этажи', badge: 'Для семьи • Блок Б' },
 ];
 
 export default function PurchaseTermsPage() {
@@ -358,13 +386,13 @@ export default function PurchaseTermsPage() {
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
   // 1. Стоимость квартиры
-  const [apartmentPrice, setApartmentPrice] = useState<number>(65000);
-  const [priceInput, setPriceInput] = useState<string>('65 000');
+  const [apartmentPrice, setApartmentPrice] = useState<number>(81642);
+  const [priceInput, setPriceInput] = useState<string>('81 642');
 
-  // 2. Первоначальный взнос (число + строка)
+  // 2. Первоначальный взнос
   const [downPaymentPercent, setDownPaymentPercent] = useState<number>(30);
-  const [downPaymentAmount, setDownPaymentAmount] = useState<number>(19500);
-  const [downPaymentInput, setDownPaymentInput] = useState<string>('19 500');
+  const [downPaymentAmount, setDownPaymentAmount] = useState<number>(24493);
+  const [downPaymentInput, setDownPaymentInput] = useState<string>('24 493');
 
   // 3. Срок рассрочки
   const [months, setMonths] = useState<number>(36);
@@ -375,7 +403,7 @@ export default function PurchaseTermsPage() {
   const [currencyMode, setCurrencyMode] = useState<'USD' | 'KGS'>('USD');
   const [usdRate, setUsdRate] = useState<number>(87.45);
   const [rateInput, setRateInput] = useState<string>('87.45');
-  const [rateDate, setRateDate] = useState<string>('24.09.2026');
+  const [rateDate, setRateDate] = useState<string>('02.10.2026');
   const [showSchedule, setShowSchedule] = useState<boolean>(false);
 
   // Сворачиваемый каталог планировок
@@ -439,7 +467,6 @@ export default function PurchaseTermsPage() {
   const targetApartmentPrice = useMemo(() => {
     if (tradeInTargetComplex === 'abu-dhabi') return 81642;
     if (tradeInTargetComplex === 'madina-residence') return 65385;
-    if (tradeInTargetComplex === 'ajkol-plus') return 50400;
     return apartmentPrice;
   }, [tradeInTargetComplex, apartmentPrice]);
 
@@ -616,14 +643,13 @@ export default function PurchaseTermsPage() {
       usdRate,
       rateDate,
       selectedApartment: selectedApartment
-        ? ({
-            complex: selectedApartment.complex,
+        ? {
+            complex: `${selectedApartment.complex} (${selectedApartment.block})`,
             rooms: selectedApartment.rooms,
             area: selectedApartment.area,
             floor: selectedApartment.floor,
             priceM2: selectedApartment.priceM2,
-            totalPrice: selectedApartment.totalPrice,
-          } as any)
+          }
         : null,
       paymentSchedule,
     });
@@ -632,7 +658,7 @@ export default function PurchaseTermsPage() {
   const handleSendCalculation = () => {
     const freqLabel = frequency === 'monthly' ? s.monthly : s.quarterly;
     const aptInfo = selectedApartment
-      ? `• Выбранный объект: ${selectedApartment.complex} (${selectedApartment.rooms}-комн., ${selectedApartment.area} м² • ${selectedApartment.floor})\n`
+      ? `• Выбранный объект: ${selectedApartment.complex} (${selectedApartment.rooms}-комн., ${selectedApartment.area} м² • ${selectedApartment.block})\n`
       : '';
 
     // 1. Отправка в CRM / Telegram
@@ -685,8 +711,6 @@ export default function PurchaseTermsPage() {
         ? 'ЖК Abu Dhabi'
         : tradeInTargetComplex === 'madina-residence'
         ? 'ЖК Madina Residence'
-        : tradeInTargetComplex === 'ajkol-plus'
-        ? 'ЖД Айкол +'
         : 'Все объекты компании';
 
     // 1. Отправка лида в CRM / Telegram
@@ -935,7 +959,7 @@ export default function PurchaseTermsPage() {
 
           <div className="space-y-8">
             
-            {/* Панель живого курса валют НБКР */}
+            {/* Панель курса валют НБКР */}
             <div className="p-4 rounded-2xl bg-[#064734]/5 dark:bg-white/5 border border-[#064734]/15 dark:border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -964,7 +988,7 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* КНОПКА РАСКРЫТИЯ КАТАЛОГА ПЛАНИРОВОК */}
+            {/* КНОПКА РАСКРЫТИЯ КАТАЛОГА ПЛАНИРОВОК (37 ВАРИАНТОВ) */}
             <div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                 <button
@@ -988,7 +1012,7 @@ export default function PurchaseTermsPage() {
                 {selectedApartment && (
                   <div className="inline-flex items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-white/10 border border-emerald-300 dark:border-white/20 text-xs">
                     <span className="font-bold text-emerald-900 dark:text-[#d4b26f]">
-                      {s.selectedAptPrefix} <strong>{selectedApartment.complex}</strong> ({selectedApartment.rooms}-к, {selectedApartment.area} м²)
+                      {s.selectedAptPrefix} <strong>{selectedApartment.complex}</strong> ({selectedApartment.rooms}-к, {selectedApartment.area} м² • {selectedApartment.block})
                     </span>
                     <button
                       type="button"
@@ -1001,17 +1025,16 @@ export default function PurchaseTermsPage() {
                 )}
               </div>
 
-              {/* РАСКРЫВАЮЩИЙСЯ БЛОК ВСЕХ ПЛАНИРОВОК */}
+              {/* РАСКРЫВАЮЩИЙСЯ БЛОК ВСЕХ 37 ПЛАНИРОВОК С ФИЛЬТРАМИ */}
               {isCatalogOpen && (
                 <div className="mt-4 p-5 sm:p-6 rounded-3xl bg-[#f7faf8] dark:bg-[#040c09] border border-[#064734]/20 dark:border-white/15 animate-fadeIn space-y-4">
                   {/* Панель фильтров каталога */}
                   <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-gray-200 dark:border-white/10">
                     <div className="flex flex-wrap gap-1.5 text-xs font-bold">
                       {[
-                        { id: 'all', label: s.filterComplexAll },
-                        { id: 'abu-dhabi', label: 'Abu Dhabi' },
-                        { id: 'madina-residence', label: 'Madina' },
-                        { id: 'ajkol-plus', label: 'Айкол +' },
+                        { id: 'all', label: `${s.filterComplexAll} (${APARTMENTS_CATALOG.length})` },
+                        { id: 'abu-dhabi', label: 'Abu Dhabi (13)' },
+                        { id: 'madina-residence', label: 'Madina Residence (24)' },
                       ].map((c) => (
                         <button
                           key={c.id}
@@ -1052,7 +1075,7 @@ export default function PurchaseTermsPage() {
                   </div>
 
                   {/* Сетка планировок */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[420px] overflow-y-auto pr-1">
                     {filteredCatalog.map((apt) => {
                       const isSelected = selectedApartment?.id === apt.id;
                       return (
@@ -1077,7 +1100,7 @@ export default function PurchaseTermsPage() {
                           )}
 
                           <span className="text-[11px] font-bold block opacity-70 mb-0.5">
-                            {apt.rooms}-комнатная • {apt.area} м²
+                            {apt.rooms}-комнатная • {apt.area} м² ({apt.block})
                           </span>
                           <h4 className="text-sm font-black mb-2">
                             {apt.complex}
@@ -1088,7 +1111,7 @@ export default function PurchaseTermsPage() {
                               ${apt.totalPrice.toLocaleString('ru-RU')}
                             </strong>
                             <span className="text-[10px] opacity-75">
-                              от ${apt.priceM2}/м²
+                              ${apt.priceM2}/м²
                             </span>
                           </div>
                         </button>
@@ -1135,10 +1158,10 @@ export default function PurchaseTermsPage() {
 
               <input
                 type="range"
-                min="30000"
+                min="40000"
                 max="250000"
                 step="1000"
-                value={apartmentPrice || 30000}
+                value={apartmentPrice || 40000}
                 onChange={(e) => handlePriceSlider(Number(e.target.value))}
                 className="w-full h-2.5 bg-gray-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#064734] dark:accent-[#d4b26f]"
               />
@@ -1317,7 +1340,7 @@ export default function PurchaseTermsPage() {
               </div>
             </div>
 
-            {/* Маркетинговый блок экономии на банковских процентах */}
+            {/* Маркетинговый блок экономии */}
             <div className="p-4 rounded-2xl bg-[#064734]/10 dark:bg-[#d4b26f]/10 border border-[#064734]/20 dark:border-[#d4b26f]/20 flex items-start gap-3.5">
               <div className="w-9 h-9 rounded-xl bg-[#064734] dark:bg-[#d4b26f] text-white dark:text-[#064734] flex items-center justify-center shrink-0 font-black">
                 %
@@ -1620,7 +1643,6 @@ export default function PurchaseTermsPage() {
                 <option value="all">{tr.targetComplexAll}</option>
                 <option value="abu-dhabi">ЖК Abu Dhabi (ул. Сухомлинова, 29)</option>
                 <option value="madina-residence">ЖК Madina Residence (ул. Огонбаева, 12)</option>
-                <option value="ajkol-plus">ЖД Айкол + (с. Кок-Жар)</option>
               </select>
             </div>
 
