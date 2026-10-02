@@ -7,13 +7,18 @@ import { useLanguage } from '@/context/LanguageContext';
 import { Locale } from '@/lib/i18n/types';
 import { exportPdfQuote } from '@/lib/exportPdfQuote';
 import AnimatedCounter from '@/components/AnimatedCounter';
-import { trackWhatsAppClick, trackPdfDownload } from '@/lib/analytics';
+import { trackWhatsAppClick, trackPdfDownload, trackLeadSubmit } from '@/lib/analytics';
+import { reachGoal } from '@/components/YandexMetrika';
+import { getStoredUtm } from '@/lib/utm';
+import ApartmentQuickViewModal from '@/components/ApartmentQuickViewModal';
+import { ApartmentItem, ALL_APARTMENTS } from '@/lib/apartmentsData';
 import {
   IconCheck,
   IconArrowRight,
   IconWhatsApp,
   IconShieldCheck,
   IconDiamond,
+  IconBuilding,
 } from '@/components/Icons';
 
 interface QuizOption {
@@ -56,6 +61,7 @@ interface QuizContent {
   btnWa: string;
   btnPdf: string;
   btnExplore: string;
+  btnView3D: string;
   liveRatePrefix: string;
   somSuffix: string;
   steps: QuizStep[];
@@ -98,6 +104,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: 'Получить планировки и шахматку в WhatsApp',
     btnPdf: 'Скачать полный расчет в PDF',
     btnExplore: 'Смотреть страницу комплекса',
+    btnView3D: 'Смотреть 3D-план',
     liveRatePrefix: 'Курс НБКР онлайн:',
     somSuffix: 'сом',
     steps: [
@@ -127,9 +134,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Какое количество комнат и площадь рассматриваете?',
         subtitle: 'Выберите оптимальное пространство для комфортного проживания.',
         options: [
-          { id: 'r1', title: '1-комнатная квартира', desc: 'Эргономичная площадь 42 – 55 м². Уютная спальня и просторная кухня-гостиная.', badge: 'Хит продаж', iconType: 'r1' },
-          { id: 'r2', title: '2-комнатная квартира', desc: 'Оптимальная площадь 68 – 84 м². Раздельные комнаты, панорамные лоджии, два санузла.', badge: 'Для семьи', iconType: 'r2' },
-          { id: 'r3', title: '3-комнатная квартира', desc: 'Премиальная площадь 88 – 120 м². Мастер-спальня, гардеробные и видовые окна на горы.', badge: 'Макс. простор', iconType: 'r3' },
+          { id: 'r1', title: '1-комнатная квартира', desc: 'Эргономичная площадь 43 – 58 м². Уютная спальня и просторная кухня-гостиная.', badge: 'Хит продаж', iconType: 'r1' },
+          { id: 'r2', title: '2-комнатная квартира', desc: 'Оптимальная площадь 71 – 84 м². Раздельные комнаты, панорамные лоджии, два санузла.', badge: 'Для семьи', iconType: 'r2' },
+          { id: 'r3', title: '3-комнатная квартира', desc: 'Премиальная площадь 108 – 120 м². Мастер-спальня, гардеробные и видовые окна на горы.', badge: 'Макс. простор', iconType: 'r3' },
         ],
       },
       {
@@ -137,9 +144,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Какой приоритет по локации для вас важнее?',
         subtitle: 'Мы подберем комплекс в наиболее подходящем районе столицы.',
         options: [
-          { id: 'center', title: 'Центр и престижный район', desc: 'Рядом с главными деловыми центрами, парками и ресторанами столицы.', badge: 'Статус', iconType: 'center' },
-          { id: 'eco', title: 'Эко-предгорье и чистый воздух', desc: 'Южная экологическая зона (с. Кок-Жар), свежий бриз с гор и тишина.', badge: 'Экология', iconType: 'eco' },
-          { id: 'mountains', title: 'Панорамный вид на горы Ала-Тоо', desc: 'Высокие видовые этажи с захватывающим обзором на снежные вершины.', badge: 'Панорама', iconType: 'mountains' },
+          { id: 'south', title: 'Южная магистраль (Сухомлинова)', desc: 'Премиальный район, горный бриз, парковая зона и быстрый доступ к Магистрали.', badge: 'Престиж', iconType: 'mountains' },
+          { id: 'center', title: 'Центр и престижный район (Огонбаева)', desc: 'Рядом с проспектом Чуй, деловыми центрами, школами и развитой инфраструктурой.', badge: 'Центр', iconType: 'center' },
+          { id: 'eco', title: 'Эко-предгорье и чистый воздух (Кок-Жар)', desc: 'Южная экологическая зона предгорий, чистейший воздух и тишина.', badge: 'Экология', iconType: 'eco' },
         ],
       },
     ],
@@ -169,6 +176,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: 'Пландарды жана шахматканы WhatsApp-тан алуу',
     btnPdf: 'Толук PDF эсебин көчүрүп алуу',
     btnExplore: 'Комплекстин барагына өтүү',
+    btnView3D: '3D-планды көрүү',
     liveRatePrefix: 'УБ онлайн курсу:',
     somSuffix: 'сом',
     steps: [
@@ -198,9 +206,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Канча бөлмөлүү жана кайсы аянтты каалайсыз?',
         subtitle: 'Ыңгайлуу жашоо үчүн керектүү мейкиндикти тандаңыз.',
         options: [
-          { id: 'r1', title: '1 бөлмөлүү батир', desc: 'Ыңгайлуу аянт 42 – 55 м². Ыңгайлуу уктоочу бөлмө жана кенен ашкана.', badge: 'Хит сатуу', iconType: 'r1' },
-          { id: 'r2', title: '2 бөлмөлүү батир', desc: 'Оптималдуу аянт 68 – 84 м². Бөлүнгөн бөлмөлөр, лоджия жана эки санузел.', badge: 'Үй-бүлөгө', iconType: 'r2' },
-          { id: 'r3', title: '3 бөлмөлүү батир', desc: 'Премиум аянт 88 – 120 м². Мастер-уктоочу бөлмө жана тоолорго караган терезелер.', badge: 'Кенен мейкиндик', iconType: 'r3' },
+          { id: 'r1', title: '1 бөлмөлүү батир', desc: 'Ыңгайлуу аянт 43 – 58 м². Ыңгайлуу уктоочу бөлмө жана кенен ашкана.', badge: 'Хит сатуу', iconType: 'r1' },
+          { id: 'r2', title: '2 бөлмөлүү батир', desc: 'Оптималдуу аянт 71 – 84 м². Бөлүнгөн бөлмөлөр, лоджия жана эки санузел.', badge: 'Үй-бүлөгө', iconType: 'r2' },
+          { id: 'r3', title: '3 бөлмөлүү батир', desc: 'Премиум аянт 108 – 120 м². Мастер-уктоочу бөлмө жана тоолорго караган терезелер.', badge: 'Кенен мейкиндик', iconType: 'r3' },
         ],
       },
       {
@@ -208,9 +216,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Жайгашуусу боюнча кайсы артыкчылык маанилүү?',
         subtitle: 'Сиз каалаган аймактан ылайыктуу комплексти сунуштайбыз.',
         options: [
-          { id: 'center', title: 'Борбор жана престиждүү аймак', desc: 'Ишкердик борборлорго, сейил бактарга жана ресторандарга жакын.', badge: 'Статус', iconType: 'center' },
-          { id: 'eco', title: 'Эко-тоо этеги жана таза аба', desc: 'Түштүк экологиялык аймак (Көк-Жар а.), тоо шамалы жана тынчтык.', badge: 'Экология', iconType: 'eco' },
-          { id: 'mountains', title: 'Ала-Тоо тоолоруна панорамалык көрүнүш', desc: 'Ак карлуу тоолорго караган кооз көрүнүшү бар жогорку кабаттар.', badge: 'Панорама', iconType: 'mountains' },
+          { id: 'south', title: 'Түштүк магистраль (Сухомлинов к.)', desc: 'Премиум аймак, тоо шамалы, сейил бак жана Түштүк магистраль.', badge: 'Престиж', iconType: 'mountains' },
+          { id: 'center', title: 'Борбор жана ыңгайлуу аймак (Огонбаев к.)', desc: 'Чүй кең көчөсүнө, мектептерге жана бизнес борборлорго жакын.', badge: 'Борбор', iconType: 'center' },
+          { id: 'eco', title: 'Эко-тоо этеги жана таза аба (Көк-Жар)', desc: 'Түштүк экологиялык аймак, тоо шамалы жана тынчтык.', badge: 'Экология', iconType: 'eco' },
         ],
       },
     ],
@@ -240,6 +248,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: 'WhatsApp арқылы жоспарлар мен шахматканы алу',
     btnPdf: 'Толық PDF есебін жүктеп алу',
     btnExplore: 'Кешен парақшасына өту',
+    btnView3D: '3D-жоспарды көру',
     liveRatePrefix: 'ҰБ онлайн бағамы:',
     somSuffix: 'сом',
     steps: [
@@ -249,9 +258,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         subtitle: 'Бұл кешеннің деңгейі мен тиімді параметрлерін анықтауға көмектеседі.',
         options: [
           { id: 'family', title: 'Отбасымен тұру үшін', desc: 'Кең бөлмелер, көліксіз қауіпсіз жабық аула, мектеп пен балабақшалар.', badge: 'Жайлылық', iconType: 'family' },
-          { id: 'roi', title: 'Инвестиция және қайта сату', desc: 'Құрылыс барысында сатып алып, нысан өткенде 25–35% капиталды көбейту.', badge: 'Жоғары ROI', iconType: 'roi' },
+          { id: 'roi', title: 'Инвестиция және қайта сату', desc: 'Құрылыс барысында сатып алып, 25–35% капиталды көбейту.', badge: 'Жоғары ROI', iconType: 'roi' },
           { id: 'rent', title: 'Жалға беруден тұрақты табыс', desc: 'Бішкек орталығында жоғары сұраныс, валютада жылдық 8–11% табыстылық.', badge: 'Жалға беру', iconType: 'rent' },
-          { id: 'safe', title: 'Капиталды сақтау', desc: 'Қаражатты инфляциядан сапалы күйдірілген кірпіш үйлерде қорғау.', badge: 'Сенімділік', iconType: 'safe' },
+          { id: 'safe', title: 'Капиталды сақтау', desc: 'Қаражатты инфляциядан сапалы кірпіш үйлерде қорғау.', badge: 'Сенімділік', iconType: 'safe' },
         ],
       },
       {
@@ -260,7 +269,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         subtitle: 'Барлық бағдарламалар EL ORDO GROUP құрылыс салушысынан банксіз ұсынылады.',
         options: [
           { id: 'installment', title: '36 айға дейін 0% бөліп төлеу', desc: 'Бастапқы жарна 20–30%, қалғаны пайызсыз және артық төлемсіз.', badge: 'Үстемесіз', iconType: 'installment' },
-          { id: 'cash', title: '100% төлем максималды жеңілдікпен', desc: 'Басшылықтан чаршы метрге жеке дисконт және 24 сағатта ДДУ рәсімдеу.', badge: 'Макс. пайда', iconType: 'cash' },
+          { id: 'cash', title: '100% төлем максималды жеңілдікпен', desc: 'Чаршы метрге жеке дисконт және 24 сағатта ДДУ рәсімдеу.', badge: 'Макс. пайда', iconType: 'cash' },
           { id: 'tradein', title: 'Trade-in (көлік немесе пәтер алмасу)', desc: 'Көлігіңізді 24 сағатта нарықтық бағамен бастапқы жарнаға есептеу.', badge: 'Бартер', iconType: 'tradein' },
         ],
       },
@@ -269,9 +278,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Қанша бөлме мен ауданды қарастырасыз?',
         subtitle: 'Ыңғайлы тұрмыс үшін керекті көлемді таңдаңыз.',
         options: [
-          { id: 'r1', title: '1 бөлмелі пәтер', desc: 'Қолайлы аудан 42 – 55 м². Ыңғайлы жатын бөлме мен кең қонақжай.', badge: 'Хит сатылым', iconType: 'r1' },
-          { id: 'r2', title: '2 бөлмелі пәтер', desc: 'Оңтайлы аудан 68 – 84 м². Бөлек бөлмелер, лоджия және екі санитарлық торап.', badge: 'Отбасыға', iconType: 'r2' },
-          { id: 'r3', title: '3 бөлмелі пәтер', desc: 'Премиум аудан 88 – 120 м². Мастер-жатын бөлме және тауға қарайтын панорама.', badge: 'Кең көлем', iconType: 'r3' },
+          { id: 'r1', title: '1 бөлмелі пәтер', desc: 'Қолайлы аудан 43 – 58 м². Жатын бөлме мен кең қонақжай.', badge: 'Хит сатылым', iconType: 'r1' },
+          { id: 'r2', title: '2 бөлмелі пәтер', desc: 'Оңтайлы аудан 71 – 84 м². Бөлек бөлмелер, лоджия және екі санузел.', badge: 'Отбасыға', iconType: 'r2' },
+          { id: 'r3', title: '3 бөлмелі пәтер', desc: 'Премиум аудан 108 – 120 м². Мастер-жатын бөлме және тау панорамасы.', badge: 'Кең көлем', iconType: 'r3' },
         ],
       },
       {
@@ -279,9 +288,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Орналасу бойынша қандай басымдық маңызды?',
         subtitle: 'Қалаған ауданыңыздан ең қолайлы нысанды таңдаймыз.',
         options: [
-          { id: 'center', title: 'Орталық және беделді аудан', desc: 'Іскерлік орталықтарға, саябақтарға жақын инфрақұрылым.', badge: 'Мәртебе', iconType: 'center' },
-          { id: 'eco', title: 'Эко-бөктер және таза ауа', desc: 'Оңтүстік экологиялық аймақ (Көк-Жар а.), тау самалы мен тыныштық.', badge: 'Экология', iconType: 'eco' },
-          { id: 'mountains', title: 'Ала-Тоо тауларына панорама', desc: 'Қар басқан биік шыңдарға қарайтын әдемі жоғарғы қабаттар.', badge: 'Панорама', iconType: 'mountains' },
+          { id: 'south', title: 'Оңтүстік магистраль (Сухомлинов көш.)', desc: 'Премиум аудан, тау самалы және саябақ жаны.', badge: 'Престиж', iconType: 'mountains' },
+          { id: 'center', title: 'Орталық аудан (Огонбаев көш.)', desc: 'Іскерлік орталықтар мен Шүй даңғылына жақын.', badge: 'Орталық', iconType: 'center' },
+          { id: 'eco', title: 'Эко-бөктер және таза ауа (Көк-Жар)', desc: 'Оңтүстік экологиялық аймақ, тау самалы мен тыныштық.', badge: 'Экология', iconType: 'eco' },
         ],
       },
     ],
@@ -311,6 +320,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: 'Отримати планування та шахматку у WhatsApp',
     btnPdf: 'Завантажити повний розрахунок у PDF',
     btnExplore: 'Сторінка комплексу',
+    btnView3D: 'Дивитися 3D-план',
     liveRatePrefix: 'Курс НБКР онлайн:',
     somSuffix: 'сом',
     steps: [
@@ -320,8 +330,8 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         subtitle: 'Це дозволить визначити клас житла та ключові переваги.',
         options: [
           { id: 'family', title: 'Для життя родини', desc: 'Просторі кімнати, безпечний закритий двір без авто, садочки поруч.', badge: 'Затишок', iconType: 'family' },
-          { id: 'roi', title: 'Інвестиції та перепродаж', desc: 'Купівля на початковому етапі з приростом вартості 25–35% до здачі.', badge: 'Високий ROI', iconType: 'roi' },
-          { id: 'rent', title: 'Дохід від оренди', desc: 'Високий попит у центрі Бішкека з валютною прибутковістю 8–11% річних.', badge: 'Оренда', iconType: 'rent' },
+          { id: 'roi', title: 'Інвестиції та перепродаж', desc: 'Купівля на етапі моноліту з приростом 25–35% до здачі.', badge: 'Високий ROI', iconType: 'roi' },
+          { id: 'rent', title: 'Дохід від оренди', desc: 'Високий попит у центрі Бішкека з прибутковістю 8–11% річних.', badge: 'Оренда', iconType: 'rent' },
           { id: 'safe', title: 'Збереження капіталу', desc: 'Надійний захист заощаджень від інфляції в монолітно-цегляних будинках.', badge: 'Надійність', iconType: 'safe' },
         ],
       },
@@ -340,9 +350,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Скільки кімнат та яку площу розглядаєте?',
         subtitle: 'Оберіть потрібний простір для життя.',
         options: [
-          { id: 'r1', title: '1-кімнатна квартира', desc: 'Функціональна площа 42 – 55 м². Спальня та простора кухня-вітальня.', badge: 'Хіт продажів', iconType: 'r1' },
-          { id: 'r2', title: '2-кімнатна квартира', desc: 'Оптимальна площа 68 – 84 м². Окремі кімнати, лоджія, два санвузли.', badge: 'Для сім’ї', iconType: 'r2' },
-          { id: 'r3', title: '3-кімнатна квартира', desc: 'Преміальна площа 88 – 120 м². Майстер-спальня та панорама на гори.', badge: 'Макс. простір', iconType: 'r3' },
+          { id: 'r1', title: '1-кімнатна квартира', desc: 'Площа 43 – 58 м². Спальня та простора кухня-вітальня.', badge: 'Хіт продажів', iconType: 'r1' },
+          { id: 'r2', title: '2-кімнатна квартира', desc: 'Площа 71 – 84 м². Окремі кімнати, лоджія, два санвузли.', badge: 'Для сім’ї', iconType: 'r2' },
+          { id: 'r3', title: '3-кімнатна квартира', desc: 'Площа 108 – 120 м². Майстер-спальня та панорама на гори.', badge: 'Макс. простір', iconType: 'r3' },
         ],
       },
       {
@@ -350,9 +360,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Який пріоритет за локацією важливіший?',
         subtitle: 'Підберемо житловий комплекс у бажаному районі Бішкека.',
         options: [
-          { id: 'center', title: 'Центр та престижний район', desc: 'Поруч із бізнес-центрами, скверами та ресторанами столиці.', badge: 'Статус', iconType: 'center' },
-          { id: 'eco', title: 'Еко-передгір’я та чисте повітря', desc: 'Південна зона (с. Кок-Жар), свіжий вітер з гір та спокій.', badge: 'Екологія', iconType: 'eco' },
-          { id: 'mountains', title: 'Панорамний краєвид на Ала-Тоо', desc: 'Видові верхні поверхи із захоплюючим краєвидом на засніжені гори.', badge: 'Панорама', iconType: 'mountains' },
+          { id: 'south', title: 'Південна магістраль (вул. Сухомлинова)', desc: 'Преміальний район, панорама на гори та паркова зона.', badge: 'Престиж', iconType: 'mountains' },
+          { id: 'center', title: 'Центр Бішкека (вул. Огонбаєва)', desc: 'Поруч із бізнес-центрами, школами та проспектом Чуй.', badge: 'Центр', iconType: 'center' },
+          { id: 'eco', title: 'Еко-передгір’я та чисте повітря (Кок-Жар)', desc: 'Південна екологічна зона, свіжий вітер з гір та спокій.', badge: 'Екологія', iconType: 'eco' },
         ],
       },
     ],
@@ -382,6 +392,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: 'Get Floor Plans & Availability on WhatsApp',
     btnPdf: 'Download Full PDF Quote',
     btnExplore: 'View Development Page',
+    btnView3D: 'View 3D Floor Plan',
     liveRatePrefix: 'Live NBKR Rate:',
     somSuffix: 'KGS',
     steps: [
@@ -411,9 +422,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Which apartment format and size do you require?',
         subtitle: 'Select the optimal space tailored to your lifestyle.',
         options: [
-          { id: 'r1', title: '1-Room Apartment', desc: 'Smart layouts 42 – 55 m². Private bedroom and expansive kitchen-living area.', badge: 'Bestseller', iconType: 'r1' },
-          { id: 'r2', title: '2-Room Apartment', desc: 'Optimal size 68 – 84 m². Separate rooms, dual bathrooms, panoramic balconies.', badge: 'Family Choice', iconType: 'r2' },
-          { id: 'r3', title: '3-Room Apartment', desc: 'Executive space 88 – 120 m². Master suite, dressing rooms, mountain views.', badge: 'Spacious', iconType: 'r3' },
+          { id: 'r1', title: '1-Room Apartment', desc: 'Smart layouts 43 – 58 m². Private bedroom and expansive kitchen-living area.', badge: 'Bestseller', iconType: 'r1' },
+          { id: 'r2', title: '2-Room Apartment', desc: 'Optimal size 71 – 84 m². Separate rooms, dual bathrooms, panoramic balconies.', badge: 'Family Choice', iconType: 'r2' },
+          { id: 'r3', title: '3-Room Apartment', desc: 'Executive space 108 – 120 m². Master suite, dressing rooms, mountain views.', badge: 'Spacious', iconType: 'r3' },
         ],
       },
       {
@@ -421,9 +432,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: 'Which location priority matters most to you?',
         subtitle: 'We will match you with the most suitable residential address in Bishkek.',
         options: [
-          { id: 'center', title: 'Downtown & Prestigious Hub', desc: 'Adjacent to capital business centers, embassies, parks, and gourmet dining.', badge: 'Prime Status', iconType: 'center' },
-          { id: 'eco', title: 'Eco Foothills & Pure Air', desc: 'Southern green enclave (Kok-Jar village), refreshing alpine breeze, tranquility.', badge: 'Eco Living', iconType: 'eco' },
-          { id: 'mountains', title: 'Panoramic Ala-Too Mountain View', desc: 'Upper panoramic floors featuring unobstructed vistas of snowcapped peaks.', badge: 'Panoramas', iconType: 'mountains' },
+          { id: 'south', title: 'South Highway (Sukhomlinov st.)', desc: 'Prime status, fresh mountain breeze, parks and scenic Highway access.', badge: 'Prestige', iconType: 'mountains' },
+          { id: 'center', title: 'Downtown Bishkek (Ogonbaev st.)', desc: 'Adjacent to Chuy Avenue, key business centers, schools and transit.', badge: 'Center', iconType: 'center' },
+          { id: 'eco', title: 'Eco Foothills & Pure Air (Kok-Jar)', desc: 'Southern green enclave, refreshing alpine breeze and tranquility.', badge: 'Eco Living', iconType: 'eco' },
         ],
       },
     ],
@@ -453,6 +464,7 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
     btnWa: '在 WhatsApp 中获取详细户型图册与销控表',
     btnPdf: '一键下载完整 PDF 预算单',
     btnExplore: '查看该楼盘详情主页',
+    btnView3D: '鉴赏 3D 户型立体图',
     liveRatePrefix: '央行实时汇率：',
     somSuffix: '索姆',
     steps: [
@@ -482,9 +494,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: '您青睐的居室数量与建筑面积？',
         subtitle: '挑选契合家庭生活习惯的理想空间尺度。',
         options: [
-          { id: 'r1', title: '经典精致一居室', desc: '功能面积 42 – 55 м²。独立温馨主卧，配有通透开阔餐客厅一体空间。', badge: '热销户型', iconType: 'r1' },
-          { id: 'r2', title: '舒适两居室', desc: '黄金面积 68 – 84 м²。动静分区，南北通透，配全景观景阳台与双卫浴。', badge: '家庭首选', iconType: 'r2' },
-          { id: 'r3', title: '尊享三居室', desc: '宽境平层 88 – 120 м²。豪华套房主卧，双独立衣帽间，雪山天幕视野。', badge: '奢阔大宅', iconType: 'r3' },
+          { id: 'r1', title: '经典精致一居室', desc: '功能面积 43 – 58 м²。独立温馨主卧，配有通透开阔餐客厅一体空间。', badge: '热销户型', iconType: 'r1' },
+          { id: 'r2', title: '舒适两居室', desc: '黄金面积 71 – 84 м²。动静分区，南北通透，配全景观景阳台与双卫浴。', badge: '家庭首选', iconType: 'r2' },
+          { id: 'r3', title: '尊享三居室', desc: '宽境平层 108 – 120 м²。豪华套房主卧，双独立衣帽间，雪山天幕视野。', badge: '奢阔大宅', iconType: 'r3' },
         ],
       },
       {
@@ -492,9 +504,9 @@ const QUIZ_TRANSLATIONS: Record<Locale, QuizContent> = {
         question: '您对楼盘地理区位有哪些特别偏好？',
         subtitle: '我们将为您智能匹配首都最适宜的宜居地块。',
         options: [
-          { id: 'center', title: '市政核心与繁华商务区', desc: '坐落于比什凯克核心地段，毗邻高级使馆区、城市公园与顶级餐饮。', badge: '核心地标', iconType: 'center' },
-          { id: 'eco', title: '生态麓区与富氧清新空气', desc: '城南生态纯氧居住板块 (Kok-Jar麓区)，畅享清爽山风与静谧生活。', badge: '鲜氧宜居', iconType: 'eco' },
-          { id: 'mountains', title: '阿拉套雪山无遮挡开阔视野', desc: '臻选高区全景观景楼层，天幕窗前尽揽终年积雪巍峨雪山画卷。', badge: '全景视野', iconType: 'mountains' },
+          { id: 'south', title: '南部景观大道 (苏霍姆利诺夫街)', desc: '尊享双子塔地标，近邻城市公园与雪山天幕全景。', badge: '地标旗舰', iconType: 'mountains' },
+          { id: 'center', title: '市政核心与繁华商务区 (奥贡巴耶夫街)', desc: '紧邻楚河大道商圈，全维醇熟商务生活配套。', badge: '城央核心', iconType: 'center' },
+          { id: 'eco', title: '生态麓区与富氧清新空气 (Kok-Jar麓区)', desc: '城南生态纯氧居住板块，畅享清爽山风与静谧生活。', badge: '生态鲜氧', iconType: 'eco' },
         ],
       },
     ],
@@ -510,6 +522,7 @@ interface MatchedProject {
   unitTitle: string;
   unitArea: number;
   totalPriceUsd: number;
+  matchedApartmentId: string;
 }
 
 export default function SmartApartmentQuiz() {
@@ -522,12 +535,15 @@ export default function SmartApartmentQuiz() {
     0: 'family',
     1: 'installment',
     2: 'r2',
-    3: 'center',
+    3: 'south',
   });
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
   const [paymentMode, setPaymentMode] = useState<'monthly' | 'quarterly' | 'cash'>('monthly');
   const [usdRate, setUsdRate] = useState<number>(87.45);
-  const [rateDate, setRateDate] = useState<string>('');
+  const [rateDate, setRateDate] = useState<string>('02.10.2026');
+
+  // Управление модальным окном 3D-планировки
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const cleanWaNumber = (COMPANY_INFO.whatsapp || '').replace(/\D/g, '') || '996709115115';
 
@@ -561,6 +577,9 @@ export default function SmartApartmentQuiz() {
       setCurrentStepIndex((prev) => prev + 1);
     } else {
       setIsCompleted(true);
+      try {
+        reachGoal('smart_quiz_completed');
+      } catch {}
     }
   };
 
@@ -575,39 +594,44 @@ export default function SmartApartmentQuiz() {
     setIsCompleted(false);
   };
 
-  // Определение подобранного ЖК
+  // Определение точно подобранного ЖК и планировки
   const matchedProject: MatchedProject = useMemo(() => {
-    const locPref = answers[3] || 'center';
+    const locPref = answers[3] || 'south';
     const roomPref = answers[2] || 'r2';
 
-    // 1. ЖК Abu Dhabi
-    if (locPref === 'center' || locPref === 'mountains' || answers[0] === 'roi') {
+    // 1. ЖК Abu Dhabi (Южная маг. / Премиум)
+    if (locPref === 'south' || answers[0] === 'roi') {
       let area = 49.48;
       let price = 81642;
-      let title = '1-комнатная квартира';
+      let title = '1-комнатная квартира (Блок Б)';
+      let aptId = 'ad-1-4948';
+
       if (roomPref === 'r2') {
         area = 78.3;
         price = 129195;
-        title = '2-комнатная видовая квартира';
+        title = '2-комнатная квартира (Блок Б)';
+        aptId = 'ad-2-7830';
       } else if (roomPref === 'r3') {
         area = 119.32;
         price = 196878;
-        title = '3-комнатный премиум-пентхаус';
+        title = '3-комнатный премиум-пентхаус (Блок Б)';
+        aptId = 'ad-3-11932';
       }
 
       return {
         slug: 'abu-dhabi',
         name: 'ЖК Abu Dhabi',
-        classType: 'Премиум-класс • Сухомлинова, 29',
-        address: 'г. Бишкек, ул. Сухомлинова, 29 (рядом с парком)',
+        classType: 'Премиум-класс • ул. Сухомлинова, 29',
+        address: 'г. Бишкек, ул. Сухомлинова, 29 (Южная магистраль)',
         image: '/projects/Abu-Dhabi.png',
         unitTitle: title,
         unitArea: area,
         totalPriceUsd: price,
+        matchedApartmentId: aptId,
       };
     }
 
-    // 2. ЖД Айкол +
+    // 2. ЖД Айкол + (Эко-предгорье)
     if (locPref === 'eco') {
       let area = 42.0;
       let price = 50400;
@@ -615,11 +639,11 @@ export default function SmartApartmentQuiz() {
       if (roomPref === 'r2') {
         area = 74.3;
         price = 89160;
-        title = '2-комнатная квартира с террасой';
+        title = '2-комнатная квартира';
       } else if (roomPref === 'r3') {
         area = 88.5;
         price = 106200;
-        title = '3-комнатная просторная квартира';
+        title = '3-комнатная квартира';
       }
 
       return {
@@ -631,36 +655,47 @@ export default function SmartApartmentQuiz() {
         unitTitle: title,
         unitArea: area,
         totalPriceUsd: price,
+        matchedApartmentId: 'aik-1k-42',
       };
     }
 
-    // 3. ЖК Madina Residence
+    // 3. ЖК Madina Residence (Центр)
     let area = 43.59;
     let price = 65385;
-    let title = '1-комнатная бизнес-квартира';
+    let title = '1-комнатная бизнес-квартира (Блок А)';
+    let aptId = 'mr-1-4359';
+
     if (roomPref === 'r2') {
-      area = 68.2;
-      price = 102300;
-      title = '2-комнатная квартира в центре';
+      area = 71.0;
+      price = 106500;
+      title = '2-комнатная квартира (Блок А)';
+      aptId = 'mr-2-7100';
     } else if (roomPref === 'r3') {
-      area = 92.4;
-      price = 138600;
-      title = '3-комнатная семейная квартира';
+      area = 108.48;
+      price = 162720;
+      title = '3-комнатная семейная квартира (Блок Б)';
+      aptId = 'mr-3-10848';
     }
 
     return {
       slug: 'madina-residence',
       name: 'ЖК Madina Residence',
       classType: 'Бизнес-класс • ул. Огонбаева, 12',
-      address: 'г. Бишкек, ул. Огонбаева, 12',
+      address: 'г. Бишкек, ул. Огонбаева, 12 (Центр)',
       image: '/projects/Madina-Residense.png',
       unitTitle: title,
       unitArea: area,
       totalPriceUsd: price,
+      matchedApartmentId: aptId,
     };
   }, [answers]);
 
-  // Финансовый расчет на основе выбранного режима (monthly, quarterly, cash)
+  // Поиск объекта в базе для передачи в модальное окно 3D
+  const activeApartmentData = useMemo<ApartmentItem | null>(() => {
+    return ALL_APARTMENTS.find((a) => a.id === matchedProject.matchedApartmentId) || null;
+  }, [matchedProject]);
+
+  // Финансовый расчет
   const financialCalc = useMemo(() => {
     let finalPrice = matchedProject.totalPriceUsd;
     if (paymentMode === 'cash') {
@@ -693,7 +728,6 @@ export default function SmartApartmentQuiz() {
       };
     }
 
-    // По умолчанию 36 месяцев ежемесячно
     const numberOfPayments = 36;
     const perMonth = Math.round(balance / numberOfPayments);
     return {
@@ -707,7 +741,7 @@ export default function SmartApartmentQuiz() {
     };
   }, [matchedProject, paymentMode]);
 
-  // Генерация полного графика выплат
+  // Полный график выплат
   const fullPaymentSchedule = useMemo(() => {
     if (financialCalc.isCash) {
       return [
@@ -766,14 +800,42 @@ export default function SmartApartmentQuiz() {
     });
   };
 
-  // WhatsApp-сообщение с параметрами
-  const waUrl = useMemo(() => {
+  // WhatsApp-клик с отправкой лида
+  const handleWhatsAppAction = () => {
     const modeText =
       paymentMode === 'cash'
-        ? '100% расчет со скидкой'
+        ? '100% расчет со скидкой 6%'
         : paymentMode === 'quarterly'
         ? 'Поквартальная рассрочка 0% (12 выплат)'
         : 'Ежемесячная рассрочка 0% (36 месяцев)';
+
+    try {
+      reachGoal('quiz_wa_click');
+    } catch {}
+
+    try {
+      fetch('/api/lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Клиент с интерактивного квиза',
+          phone: 'Через WhatsApp',
+          project: matchedProject.name,
+          goal: `Квиз: ${matchedProject.unitTitle}`,
+          budget: `$${financialCalc.totalPrice.toLocaleString('ru-RU')}`,
+          rooms: `${matchedProject.unitArea} м²`,
+          details: `Форма: ${modeText} | Взнос: $${financialCalc.downPayment.toLocaleString('ru-RU')}`,
+          comment: `Платеж: $${financialCalc.paymentPerPeriod.toLocaleString('ru-RU')}/${paymentMode === 'quarterly' ? 'кв' : 'мес'}`,
+          lang,
+          source: 'SmartApartmentQuiz',
+          utm: getStoredUtm(),
+          createdAt: new Date().toISOString(),
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    trackWhatsAppClick('smart_quiz_result', matchedProject.name);
+    trackLeadSubmit('Квиз', matchedProject.name);
 
     const text =
       `Здравствуйте! Я прошёл смарт-подбор квартиры на сайте EL ORDO GROUP:\n\n` +
@@ -783,10 +845,10 @@ export default function SmartApartmentQuiz() {
       (!financialCalc.isCash
         ? `• Первый взнос: $${financialCalc.downPayment.toLocaleString('ru-RU')} • Платеж: $${financialCalc.paymentPerPeriod.toLocaleString('ru-RU')}/${paymentMode === 'quarterly' ? 'квартал' : 'мес'}\n\n`
         : '\n') +
-      `Отправьте, пожалуйста, официальную презентацию и свободные планировки в WhatsApp.`;
+      `Отправьте, пожалуйста, официальную презентацию и свободные этажи в WhatsApp.`;
 
-    return `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`;
-  }, [matchedProject, financialCalc, paymentMode, usdRate, cleanWaNumber]);
+    window.open(`https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(text)}`, '_blank');
+  };
 
   return (
     <section id="quiz" className="max-w-5xl mx-auto px-4 sm:px-6 my-16 scroll-mt-24">
@@ -916,7 +978,7 @@ export default function SmartApartmentQuiz() {
           <div className="relative z-10 max-w-3xl mx-auto animate-fadeIn">
             <div className="bg-[#f7faf8] dark:bg-[#040c09] p-6 sm:p-8 rounded-3xl border border-[#064734]/20 dark:border-white/15 shadow-xl">
               
-              {/* Верхняя плашка результата с анимированным счетчиком цены */}
+              {/* Верхняя плашка результата */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-gray-200 dark:border-white/10">
                 <div>
                   <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-400 text-[11px] font-black uppercase tracking-wider mb-1">
@@ -984,7 +1046,7 @@ export default function SmartApartmentQuiz() {
                 </div>
               </div>
 
-              {/* Финансовая сетка условий с анимированными счетчиками */}
+              {/* Финансовая сетка условий */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 text-xs">
                 <div className="p-3.5 rounded-2xl bg-white dark:bg-[#0b1b15] border border-gray-200 dark:border-white/10">
                   <span className="text-[11px] text-gray-500 block mb-1">
@@ -1023,22 +1085,32 @@ export default function SmartApartmentQuiz() {
 
               {/* Кнопки действий */}
               <div className="space-y-3 pt-2">
-                <a
-                  href={waUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => trackWhatsAppClick('smart_quiz_result', matchedProject.name)}
+                <button
+                  type="button"
+                  onClick={handleWhatsAppAction}
                   className="w-full py-4 px-6 rounded-2xl bg-[#064734] hover:bg-[#032b20] active:scale-[0.98] text-[#d4b26f] hover:text-white font-black text-xs sm:text-sm uppercase tracking-wider transition-all shadow-xl flex items-center justify-center gap-3 cursor-pointer"
                 >
                   <IconWhatsApp className="w-5 h-5 text-[#25D366]" />
                   <span>{c.btnWa}</span>
-                </a>
+                </button>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {/* Кнопка открытия 3D-планировки */}
+                  {activeApartmentData && (
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(true)}
+                      className="py-3 px-3 rounded-xl bg-white/10 dark:bg-white/10 hover:bg-white/20 active:scale-[0.98] text-gray-900 dark:text-white font-black text-xs uppercase tracking-wider transition-all border border-gray-200 dark:border-white/15 flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <IconBuilding className="w-4 h-4 text-[#d4b26f]" />
+                      <span>{c.btnView3D}</span>
+                    </button>
+                  )}
+
                   <button
                     type="button"
                     onClick={handleDownloadPdf}
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.98] text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-2 cursor-pointer"
+                    className="py-3 px-3 rounded-xl bg-[#d4b26f] hover:bg-[#c49f57] active:scale-[0.98] text-[#064734] font-black text-xs uppercase tracking-wider transition-all shadow flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <svg className="w-4 h-4 text-[#064734]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -1048,10 +1120,10 @@ export default function SmartApartmentQuiz() {
 
                   <Link
                     href={`/${matchedProject.slug}`}
-                    className="w-full py-3.5 px-4 rounded-xl bg-white dark:bg-white/10 hover:bg-gray-100 dark:hover:bg-white/15 text-gray-900 dark:text-white font-bold text-xs uppercase tracking-wider transition-all border border-gray-200 dark:border-white/10 flex items-center justify-center gap-2"
+                    className="py-3 px-3 rounded-xl bg-white dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/15 text-gray-900 dark:text-white font-bold text-xs uppercase tracking-wider transition-all border border-gray-200 dark:border-white/10 flex items-center justify-center gap-1.5 text-center"
                   >
                     <span>{c.btnExplore}</span>
-                    <IconArrowRight className="w-4 h-4" />
+                    <IconArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
 
@@ -1071,6 +1143,16 @@ export default function SmartApartmentQuiz() {
         )}
 
       </div>
+
+      {/* Модальное окно 3D-планировки при клике */}
+      {activeApartmentData && (
+        <ApartmentQuickViewModal
+          apartment={activeApartmentData}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          usdRate={usdRate}
+        />
+      )}
     </section>
   );
 }
